@@ -1,0 +1,113 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+const conditionsDescription =
+  "Condiciones de la compra: pedido pendiente, pago contra entrega, envío sin guía prometida y consulta por número y celular. Dropi no está conectado.";
+
+export const metadata: Metadata = {
+  title: "Condiciones",
+  description: conditionsDescription,
+  robots: { index: false, follow: false },
+  openGraph: {
+    title: "Condiciones · COMPRUKI",
+    description: conditionsDescription,
+    url: "/tienda/condiciones",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Condiciones · COMPRUKI",
+    description: conditionsDescription,
+  },
+};
+
+const points = [
+  {
+    label: "El pedido",
+    text: "Queda pendiente hasta que la tienda lo confirme. En este paso nadie cobra. Mientras sigue pendiente, puedes cancelarlo desde el pedido.",
+  },
+  {
+    label: "La talla",
+    text: "Si el producto tiene tallas o tamaños, eliges uno antes de que la tienda confirme. Mientras sigue pendiente, puedes cambiarlo desde el pedido.",
+  },
+  {
+    label: "El pago",
+    text: "Es efectivo contra entrega, por el total de los productos. Transferencia y tarjeta no están conectadas.",
+  },
+  {
+    label: "El envío",
+    text: "No está incluido y se acuerda antes de despachar. No hay guía ni fecha prometida. Dropi no está conectado.",
+  },
+  {
+    label: "Tus datos",
+    text: "Nombre, celular, cédula si la escribes, departamento, ciudad, dirección y referencia. Sirven para preparar este pedido. Sin departamento, el texto para Dropi no lo lleva y la tienda puede confirmar igual. Mientras sigue pendiente, puedes corregirlos.",
+  },
+  {
+    label: "El estado",
+    text: "Se consulta con el número del pedido y el celular de la entrega.",
+  },
+  {
+    label: "Un aviso",
+    text: "Mientras sigue pendiente, puedes dejarle uno a la tienda desde el pedido. No es un chat ni WhatsApp.",
+  },
+  {
+    label: "Devolución",
+    text: "Si la tienda la anota, el motivo queda en el pedido. Esta página no fija un plazo de retracto.",
+  },
+];
+
+export default function ConditionsPage() {
+  return (
+    <div>
+      <section className="store-hero relative overflow-hidden rounded-[14px] border border-line px-3 py-2 sm:px-4">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-accent-strong uppercase">Tienda piloto · Colombia</p>
+        <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">Condiciones de la compra</h1>
+        <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
+          Lo que aceptas al dejar el pedido. Dropi no está conectado. La identidad de la tienda sigue en prueba.
+        </p>
+      </section>
+
+      <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
+        <section className="elevate-1 order-2 rounded-[14px] border border-line bg-card px-3 py-2 xl:order-1" aria-labelledby="condiciones-lista">
+          <h2 id="condiciones-lista" className="text-sm font-semibold">
+            Lo que aceptas
+          </h2>
+          <dl className="mt-2 space-y-2 text-sm leading-5">
+            {points.map((point) => (
+              <div key={point.label} className="grid gap-0.5 sm:grid-cols-[7rem_1fr] sm:gap-3">
+                <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase sm:pt-0.5">{point.label}</dt>
+                <dd>{point.text}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3rem] xl:order-2">
+          <h2 className="text-sm font-semibold">En corto</h2>
+          <ul className="mt-2 space-y-2 text-xs leading-5">
+            <li>
+              <span className="font-semibold text-sm">Nadie cobra aquí</span>
+              <span className="mt-0.5 block text-muted">Pagas al recibir, en efectivo.</span>
+            </li>
+            <li>
+              <span className="font-semibold text-sm">Envío aparte</span>
+              <span className="mt-0.5 block text-muted">Se acuerda antes de despachar.</span>
+            </li>
+            <li>
+              <span className="font-semibold text-sm">Dropi</span>
+              <span className="mt-0.5 block text-muted">No está conectado. Consulta con número y celular.</span>
+            </li>
+          </ul>
+          <Link
+            href="/tienda"
+            className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary text-sm font-semibold text-on-dark"
+          >
+            Volver a la tienda
+          </Link>
+          <Link href="/tienda/consultar" className="mt-2 inline-flex w-full justify-center text-xs font-semibold text-accent-strong">
+            Consultar pedido
+          </Link>
+        </aside>
+      </div>
+    </div>
+  );
+}

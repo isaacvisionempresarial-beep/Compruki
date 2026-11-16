@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+:root {
+  --brand-primary: #222638;
+  --brand-primary-dark: #171a28;
+  --brand-primary-soft: #39415c;
+  --brand-slate: #59657a;
+  --brand-accent: #25c7a5;
+  --brand-accent-strong: #087d70;
+  --brand-accent-tint: #eaf9f5;
+  --brand-coral: #ff8a65;
+  --brand-coral-strong: #b74f35;
+  --brand-coral-tint: #fff1ec;
+  --surface-canvas: #f6f8fc;
+  --surface-card: #ffffff;
+  --surface-subtle: #edf0f6;
+  --border-default: #dde3ed;
+  --text-primary: #222638;
+  --text-secondary: #59657a;
+  --text-on-dark: #ffffff;
+  --text-on-dark-muted: #c9ceda;
+  --status-warning: #6b3e08;
+  --status-warning-tint: #fff6e8;
+  --status-danger: #8e1d34;
+  --status-danger-tint: #fdecef;
+}
+
+@theme inline {
+  --color-primary: var(--brand-primary);
+  --color-primary-dark: var(--brand-primary-dark);
+  --color-primary-soft: var(--brand-primary-soft);
+  --color-accent: var(--brand-accent);
+  --color-accent-strong: var(--brand-accent-strong);
+  --color-accent-tint: var(--brand-accent-tint);
+  --color-coral: var(--brand-coral);
+  --color-coral-strong: var(--brand-coral-strong);
+  --color-coral-tint: var(--brand-coral-tint);
+  --color-canvas: var(--surface-canvas);
+  --color-card: var(--surface-card);
+  --color-subtle: var(--surface-subtle);
+  --color-line: var(--border-default);
+  --color-ink: var(--text-primary);
+  --color-muted: var(--text-secondary);
+  --color-on-dark: var(--text-on-dark);
+  --color-on-dark-muted: var(--text-on-dark-muted);
+  --color-warning: var(--status-warning);
+  --color-warning-tint: var(--status-warning-tint);
+  --color-danger: var(--status-danger);
+  --color-danger-tint: var(--status-danger-tint);
+  --font-sans: var(--font-jakarta), Inter, system-ui, sans-serif;
+}
+
+body {
+  background: var(--surface-canvas);
+  color: var(--text-primary);
+}
+
+:focus-visible {
+  outline: 2px solid #25c7a5;
+  outline-offset: 2px;
+}
+
+.elevate-1 {
+  box-shadow:
+    0 2px 4px -1px rgb(34 38 56 / 0.04),
+    0 4px 8px -2px rgb(34 38 56 / 0.03);
+}
+
+.elevate-3 {
+  box-shadow:
+    0 20px 28px -6px rgb(23 26 40 / 0.12),
+    0 8px 12px -4px rgb(23 26 40 / 0.06);
+}
+
+::selection {
+  background: #222638;
+  color: #ffffff;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  z-index: 70;
+  transform: translateY(-160%);
+  border-radius: 0.75rem;
+  background: #ffffff;
+  color: #222638;
+  padding: 0.6rem 0.9rem;
+  font-weight: 700;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: none;
+  outline: 2px solid #25c7a5;
+  outline-offset: 2px;
+}
+
+.brand-panel {
+  background:
+    radial-gradient(880px 420px at -8% -10%, rgb(37 199 165 / 0.2), transparent 58%),
+    radial-gradient(520px 320px at 110% 108%, rgb(255 138 101 / 0.14), transparent 52%),
+    #222638;
+}
+
+.store-hero {
+  background:
+    radial-gradient(720px 280px at 0% 0%, rgb(37 199 165 / 0.16), transparent 55%),
+    radial-gradient(520px 240px at 100% 100%, rgb(34 38 56 / 0.06), transparent 50%),
+    linear-gradient(180deg, #ffffff 0%, #f3f6fb 100%);
+}
+
+@keyframes store-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.store-card {
+  animation: store-card-in 0.4s ease-out both;
+}
+
+@keyframes route-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.route-skeleton {
+  animation: route-skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

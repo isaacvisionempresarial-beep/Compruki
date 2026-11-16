@@ -1,0 +1,139 @@
+import type { SizeKind } from "@/lib/catalog";
+import { formatCop } from "@/lib/format";
+
+export type AnswerableProduct = {
+  description: string;
+  highlights: string;
+  answers: string;
+  price: number;
+  available: boolean;
+  variants: string[];
+  sizeKind?: SizeKind | null;
+};
+
+const STOP = new Set([
+  "para",
+  "como",
+  "esta",
+  "este",
+  "esto",
+  "esos",
+  "esas",
+  "sobre",
+  "tiene",
+  "tienen",
+  "puede",
+  "pueden",
+  "cual",
+  "cuales",
+  "donde",
+  "cuando",
+  "porque",
+  "desde",
+  "hasta",
+  "entre",
+  "tambien",
+  "solo",
+  "cada",
+  "todo",
+  "toda",
+  "todos",
+  "todas",
+  "muy",
+  "mas",
+  "que",
+  "con",
+  "por",
+  "del",
+  "los",
+  "las",
+  "una",
+  "unos",
+  "unas",
+  "sus",
+]);
+
+export function answerProductQuestion(product: AnswerableProduct, raw: string) {
+  const question = fold(raw).trim();
+  if (!question) return "Escribe la pregunta.";
+  if (/\b(costo|margen|comision|comisiones|ganancia|utilidad)\b/.test(question)) {
+    return "Eso no está en la ficha pública.";
+  }
+
+  const lines = factLines(product);
+  const matched = matchLines(question, lines);
+  if (matched.length > 0 && !isBarePrice(question)) return joinLines(matched);
+
+  if (isPrice(question)) {
+    return `El precio de venta es ${formatCop(product.price)}. Se paga al recibir.`;
+  }
+  if (/\b(disponible|agotado|stock)\b/.test(question) || question.includes("se puede pedir")) {
+    return product.available
+      ? "Está disponible para pedirlo. El pedido queda pendiente de confirmación."
+      : "Está publicado, pero ahora no se puede pedir.";
+  }
+  if (/\b(envio|despacho|demora|llega|flete|domicilio)\b/.test(question)) {
+    return "El envío no está incluido y se confirma antes de despachar. No hay una fecha prometida.";
+  }
+  if (/\b(pagar|pago|contraentrega)\b/.test(question) || question.includes("contra entrega")) {
+    return "Pagas el valor de los productos cuando los recibes. El pedido queda pendiente de confirmación.";
+  }
+  if (/\b(variante|variantes|color|colores|talla|tallas|medida|medidas|tamano|tamanos|modelo)\b/.test(question)) {
+    if (product.variants.length > 0) {
+      const noun = product.sizeKind === "tamano" ? "Los tamaños son" : "Las tallas son";
+      return `${noun} ${joinNames(product.variants)}. El precio es el mismo para todas. Eliges una antes de pedir.`;
+    }
+    return "En la ficha no hay tallas ni tamaños.";
+  }
+  if (matched.length > 0) return joinLines(matched);
+  return "Eso no está escrito en la ficha. La tienda lo confirma al revisar el pedido.";
+}
+
+function factLines(product: AnswerableProduct) {
+  return [product.description, product.highlights, product.answers]
+    .flatMap((block) => block.split(/\n/))
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function matchLines(question: string, lines: string[]) {
+  const tokens = words(question).filter((word) => word.length >= 4 && !STOP.has(word));
+  if (tokens.length === 0) return [];
+  return lines
+    .map((line) => {
+      const folded = fold(line);
+      const score = tokens.filter((token) => folded.includes(token)).length;
+      return { line, score };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((item) => item.line);
+}
+
+function isPrice(question: string) {
+  if (/\b(precio|cuesta|cuestan|vale|valen)\b/.test(question)) return true;
+  return /\bcuanto\b/.test(question) && !/\b(mide|pesa|dura|tarda|incluye|trae|demora)\b/.test(question);
+}
+
+function isBarePrice(question: string) {
+  return isPrice(question) && words(question).filter((word) => !STOP.has(word) && word.length >= 4 && !/^(precio|cuesta|cuestan|vale|valen|cuanto)$/.test(word)).length === 0;
+}
+
+function joinLines(lines: string[]) {
+  if (lines.length === 1) return lines[0];
+  return `Según la ficha:\n${lines.map((line) => `• ${line}`).join("\n")}`;
+}
+
+function joinNames(names: string[]) {
+  if (names.length <= 1) return names[0] ?? "";
+  return `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]}`;
+}
+
+function words(value: string) {
+  return value.split(/[^a-z0-9]+/).filter(Boolean);
+}
+
+function fold(value: string) {
+  return value.normalize("NFD").replace(/\p{M}/gu, "").toLocaleLowerCase("es");
+}
