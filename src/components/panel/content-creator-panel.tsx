@@ -126,6 +126,14 @@ export function ContentCreatorPanel({
                 <p className="font-semibold">
                   {item.productSku} · {item.channel}
                   <span className="ml-2 text-xs font-medium text-muted">{item.source}</span>
+                  <span className="ml-2 text-xs font-medium text-muted">
+                    ·{" "}
+                    {item.reviewStatus === "approved"
+                      ? "aprobado"
+                      : item.reviewStatus === "rejected"
+                        ? "rechazado"
+                        : "pendiente"}
+                  </span>
                 </p>
                 <p className="mt-0.5 text-muted">{item.title}</p>
               </li>

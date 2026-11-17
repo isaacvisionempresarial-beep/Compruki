@@ -1,7 +1,7 @@
 import { formatCop } from "@/lib/format";
 import { orderFocusHref } from "@/lib/store-order";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import { buildTemplateDrafts } from "@/server/agent-content";
+import { buildTemplateDrafts, listPendingContentDrafts } from "@/server/agent-content";
 import { searchLocalCatalog } from "@/server/agent-explorer";
 import { calculateMargin, comparePriceScenarios } from "@/server/agent-tools";
 import { listOrders } from "@/server/order-store";
@@ -11,10 +11,11 @@ export type RoutedAgent = "AG-01" | "AG-02" | "AG-03" | "AG-04";
 
 export type PendingApproval = {
   id: string;
-  kind: "pedido" | "agente";
+  kind: "pedido" | "agente" | "borrador";
   label: string;
   detail: string;
   href?: string;
+  actionable?: boolean;
 };
 
 export type CentralRouteResult = {
@@ -36,9 +37,13 @@ const AGENT_LABEL: Record<RoutedAgent, string> = {
   "AG-04": "Analista",
 };
 
-/** AG-01 · list_pending_approvals (pedidos + corridas awaiting_approval). */
+/** AG-01 · list_pending_approvals (pedidos + borradores + corridas awaiting_approval). */
 export async function listPendingApprovals(): Promise<PendingApproval[]> {
-  const [orders, agentItems] = await Promise.all([listOrders(), listAwaitingAgentApprovals()]);
+  const [orders, agentItems, draftItems] = await Promise.all([
+    listOrders(),
+    listAwaitingAgentApprovals(),
+    listPendingDraftApprovals(),
+  ]);
 
   const pendingOrders = orders
     .filter((order) => order.status === "pendiente_confirmacion" || order.status === "incidencia")
@@ -52,9 +57,22 @@ export async function listPendingApprovals(): Promise<PendingApproval[]> {
           ? `${order.customerName} · incidencia`
           : `${order.customerName} · pendiente de confirmación`,
       href: orderFocusHref(order.number),
+      actionable: false,
     }));
 
-  return [...pendingOrders, ...agentItems];
+  return [...pendingOrders, ...draftItems, ...agentItems];
+}
+
+async function listPendingDraftApprovals(): Promise<PendingApproval[]> {
+  const drafts = await listPendingContentDrafts(8);
+  return drafts.map((draft) => ({
+    id: draft.id,
+    kind: "borrador" as const,
+    label: `${draft.productSku} · ${draft.channel}`,
+    detail: draft.title || "Borrador plantilla pendiente de revisión",
+    href: `/panel/agentes?sku=${encodeURIComponent(draft.productSku)}`,
+    actionable: true,
+  }));
 }
 
 async function listAwaitingAgentApprovals(): Promise<PendingApproval[]> {
@@ -77,6 +95,7 @@ async function listAwaitingAgentApprovals(): Promise<PendingApproval[]> {
       label: String(row.agent_id),
       detail: typeof row.summary === "string" && row.summary ? row.summary : "Corrida en espera de aprobación humana",
       href: "/panel/agentes#corridas",
+      actionable: true,
     }));
   } catch {
     return [];

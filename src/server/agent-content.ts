@@ -31,10 +31,13 @@ export type ContentDraft = {
   source: "plantilla";
 };
 
+export type DraftReviewStatus = "pending" | "approved" | "rejected";
+
 export type SavedContentDraft = ContentDraft & {
   id: string;
   productSku: string;
   createdAt: string;
+  reviewStatus: DraftReviewStatus;
 };
 
 const BRAND_NOTES = [
@@ -141,9 +144,10 @@ export async function saveContentDraft(input: {
         body: input.body.trim().slice(0, 4000),
         cta: input.cta.trim().slice(0, 120),
         source: "plantilla",
+        review_status: "pending",
         created_by: input.createdBy ?? null,
       })
-      .select("id, product_sku, channel, title, body, cta, source, created_at")
+      .select("id, product_sku, channel, title, body, cta, source, review_status, created_at")
       .single();
 
     if (error) {
@@ -151,7 +155,9 @@ export async function saveContentDraft(input: {
         error:
           error.message.includes("schema cache") || error.message.includes("does not exist")
             ? "Falta la tabla content_drafts. Ejecuta supabase/migrations/005_content_drafts.sql."
-            : `No se pudo guardar: ${error.message}`,
+            : error.message.includes("review_status")
+              ? "Falta review_status. Ejecuta supabase/migrations/007_content_draft_review.sql."
+              : `No se pudo guardar: ${error.message}`,
         draft: null,
       };
     }
@@ -167,6 +173,7 @@ export async function saveContentDraft(input: {
         cta: String(data.cta ?? ""),
         source: "plantilla",
         createdAt: String(data.created_at),
+        reviewStatus: mapReviewStatus(data.review_status),
       },
     };
   } catch (error) {
@@ -181,7 +188,7 @@ export async function listContentDrafts(sku?: string, limit = 12): Promise<Saved
     const supabase = createAdminSupabase();
     let query = supabase
       .from("content_drafts")
-      .select("id, product_sku, channel, title, body, cta, source, created_at")
+      .select("id, product_sku, channel, title, body, cta, source, review_status, created_at")
       .eq("tenant_id", tenantId)
       .order("created_at", { ascending: false })
       .limit(limit);
@@ -198,10 +205,45 @@ export async function listContentDrafts(sku?: string, limit = 12): Promise<Saved
       cta: String(row.cta ?? ""),
       source: "plantilla" as const,
       createdAt: String(row.created_at),
+      reviewStatus: mapReviewStatus(row.review_status),
     }));
   } catch {
     return [];
   }
+}
+
+export async function listPendingContentDrafts(limit = 8): Promise<SavedContentDraft[]> {
+  try {
+    const tenantId = await getPilotTenantId();
+    const supabase = createAdminSupabase();
+    const { data, error } = await supabase
+      .from("content_drafts")
+      .select("id, product_sku, channel, title, body, cta, source, review_status, created_at")
+      .eq("tenant_id", tenantId)
+      .eq("review_status", "pending")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error || !data) return [];
+    return data.map((row) => ({
+      id: String(row.id),
+      productSku: String(row.product_sku),
+      channel: row.channel as ContentChannel,
+      title: String(row.title ?? ""),
+      body: String(row.body ?? ""),
+      cta: String(row.cta ?? ""),
+      source: "plantilla" as const,
+      createdAt: String(row.created_at),
+      reviewStatus: "pending",
+    }));
+  } catch {
+    return [];
+  }
+}
+
+function mapReviewStatus(value: unknown): DraftReviewStatus {
+  if (value === "approved" || value === "rejected" || value === "pending") return value;
+  return "pending";
 }
 
 export async function listDraftableProducts() {

@@ -48,13 +48,14 @@ export async function saveContentDraftAction(_state: SaveDraftState, formData: F
   await recordAgentRun({
     agentId: "AG-03",
     status: "succeeded",
-    summary: `Borrador guardado · ${result.draft.productSku} · ${result.draft.channel}`,
+    summary: `Borrador guardado · pendiente revisión humana · ${result.draft.productSku} · ${result.draft.channel}`,
     createdBy: access.user.id,
   });
 
   revalidatePath("/panel/agentes");
+  revalidatePath("/panel");
   return {
     error: null,
-    message: `Borrador ${result.draft.channel} guardado para ${result.draft.productSku}.`,
+    message: `Borrador ${result.draft.channel} guardado para ${result.draft.productSku}. Quedó en Pendientes humanos.`,
   };
 }
