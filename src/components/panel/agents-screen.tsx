@@ -323,9 +323,20 @@ export function AgentsScreen({
       </section>
 
       <section className="mt-6" aria-labelledby="corridas">
-        <h2 id="corridas" className="text-base font-bold">
-          Corridas recientes
-        </h2>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 id="corridas" className="text-base font-bold">
+              Corridas recientes
+            </h2>
+            <p className="mt-1 text-sm text-muted">Últimas 8 en pantalla. El CSV trae hasta 500 del tenant.</p>
+          </div>
+          <a
+            href="/panel/agentes/export"
+            className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle"
+          >
+            Descargar CSV
+          </a>
+        </div>
         {view.recentRuns.length === 0 ? (
           <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3 text-sm text-muted">
             Todavía no hay corridas. Usa Enrutar, Buscar, Generar borradores o Calcular para dejar el

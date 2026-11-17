@@ -40,7 +40,13 @@ export function PendingApprovalsPanel({ items }: { items: PendingApproval[] }) {
               </div>
               <p className="mt-0.5 text-muted">{item.detail}</p>
               {item.preview ? <DraftPreview preview={item.preview} /> : null}
-              {item.actionable ? <ApprovalButtons kind={item.kind} id={item.id} /> : null}
+              {item.actionable ? (
+                <ApprovalButtons
+                  kind={item.kind}
+                  id={item.id}
+                  approveDisabled={Boolean(item.preview?.catalogError)}
+                />
+              ) : null}
             </li>
           ))}
         </ul>
@@ -118,11 +124,24 @@ function clip(text: string, max = 280) {
   return text.length > max ? `${text.slice(0, max)}…` : text;
 }
 
-function ApprovalButtons({ kind, id }: { kind: PendingApproval["kind"]; id: string }) {
+function ApprovalButtons({
+  kind,
+  id,
+  approveDisabled = false,
+}: {
+  kind: PendingApproval["kind"];
+  id: string;
+  approveDisabled?: boolean;
+}) {
   const [state, action, pending] = useActionState(resolvePendingApprovalAction, initial);
 
   return (
     <div className="mt-2">
+      {approveDisabled ? (
+        <p role="status" className="mb-2 text-sm font-medium text-coral">
+          No se puede aprobar: el SKU no está en el catálogo local. Puedes rechazar el borrador.
+        </p>
+      ) : null}
       <div className="flex flex-wrap gap-2">
         <form action={action}>
           <input type="hidden" name="kind" value={kind} />
@@ -130,7 +149,7 @@ function ApprovalButtons({ kind, id }: { kind: PendingApproval["kind"]; id: stri
           <input type="hidden" name="decision" value="approve" />
           <button
             type="submit"
-            disabled={pending}
+            disabled={pending || approveDisabled}
             className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-xs font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
           >
             {pending ? "…" : "Aprobar"}
