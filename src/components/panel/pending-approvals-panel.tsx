@@ -14,8 +14,9 @@ export function PendingApprovalsPanel({ items }: { items: PendingApproval[] }) {
         Pendientes humanos
       </h2>
       <p className="mt-1 text-sm text-muted">
-        Bandeja de AG-01 · list_pending_approvals. Pedidos se atienden en Pedidos; borradores y corridas
-        se aprueban o rechazan aquí. OpenAI no está conectado.
+        Bandeja de AG-01 · list_pending_approvals. Al aprobar un borrador se escribe en el catálogo local
+        (ficha → título/descripción, anuncio → destacados, whatsapp → respuestas). Pedidos se atienden
+        en Pedidos. OpenAI no está conectado.
       </p>
 
       {items.length === 0 ? (

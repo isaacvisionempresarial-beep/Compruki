@@ -39,6 +39,65 @@ export async function listProducts() {
   return (await readProducts()).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt) || a.title.localeCompare(b.title, "es"));
 }
 
+export async function getProductBySku(sku: string) {
+  const normalized = sku.trim().toUpperCase();
+  if (!normalized) return null;
+  const products = await readProducts();
+  return products.find((product) => product.sku === normalized) ?? null;
+}
+
+/** Aplica un borrador aprobado al catálogo local (escritura supervisada). */
+export async function applyApprovedContentDraft(
+  input: {
+    sku: string;
+    channel: "ficha" | "anuncio" | "whatsapp";
+    title: string;
+    body: string;
+    cta: string;
+  },
+  actorName: string,
+): Promise<{ error: string | null; applied: boolean }> {
+  const product = await getProductBySku(input.sku);
+  if (!product) return { error: `No encontré ${input.sku} en el catálogo local.`, applied: false };
+
+  const title = input.title.trim().slice(0, 200) || product.title;
+  const body = input.body.trim().slice(0, 4000);
+  const cta = input.cta.trim().slice(0, 120);
+  const draft: ProductDraft = {
+    id: product.id,
+    title: product.title,
+    description: product.description,
+    highlights: product.highlights,
+    answers: product.answers,
+    sku: product.sku,
+    externalRef: product.externalRef,
+    category: product.category,
+    price: product.price,
+    cost: product.cost,
+    shipping: product.shipping,
+    commissions: product.commissions,
+    published: product.published,
+    available: product.available,
+    variants: product.variants,
+    sizeKind: product.sizeKind ?? "",
+  };
+
+  if (input.channel === "ficha") {
+    draft.title = title;
+    draft.description = [body, cta ? `CTA: ${cta}` : ""].filter(Boolean).join("\n\n");
+  } else if (input.channel === "anuncio") {
+    draft.highlights = [title, body, cta ? `CTA: ${cta}` : ""].filter(Boolean).join("\n");
+  } else {
+    draft.answers = [title, body, cta ? `CTA: ${cta}` : ""].filter(Boolean).join("\n\n");
+  }
+
+  const result = await saveProduct(draft, actorName);
+  if (result.error || !result.product) {
+    return { error: result.error ?? "No se pudo aplicar el borrador al catálogo.", applied: false };
+  }
+  return { error: null, applied: true };
+}
+
 export type PublicProduct = {
   id: string;
   title: string;

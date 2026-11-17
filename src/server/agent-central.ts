@@ -69,7 +69,7 @@ async function listPendingDraftApprovals(): Promise<PendingApproval[]> {
     id: draft.id,
     kind: "borrador" as const,
     label: `${draft.productSku} · ${draft.channel}`,
-    detail: draft.title || "Borrador plantilla pendiente de revisión",
+    detail: `${draft.title || "Borrador plantilla"} · al aprobar se escribe en el catálogo local`,
     href: `/panel/agentes?sku=${encodeURIComponent(draft.productSku)}`,
     actionable: true,
   }));

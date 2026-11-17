@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminSupabase } from "@/lib/supabase/admin";
+import { applyApprovedContentDraft } from "@/server/catalog-store";
 import { recordAgentRun } from "@/server/agent-runs";
 import { assertPanelAccess } from "@/server/panel-auth";
 import { getPilotTenantId } from "@/server/tenant";
@@ -24,7 +25,7 @@ export async function resolvePendingApprovalAction(
   }
 
   if (kind === "borrador") {
-    return resolveDraft(id, decision, access.user.id);
+    return resolveDraft(id, decision, access.user.id, access.actorName);
   }
   if (kind === "agente") {
     return resolveAgentRun(id, decision, access.user.id);
@@ -37,6 +38,7 @@ async function resolveDraft(
   id: string,
   decision: "approve" | "reject",
   userId: string,
+  actorName: string,
 ): Promise<ResolveApprovalState> {
   try {
     const tenantId = await getPilotTenantId();
@@ -48,7 +50,7 @@ async function resolveDraft(
       .eq("tenant_id", tenantId)
       .eq("id", id)
       .eq("review_status", "pending")
-      .select("id, product_sku, channel")
+      .select("id, product_sku, channel, title, body, cta")
       .maybeSingle();
 
     if (error) {
@@ -62,12 +64,44 @@ async function resolveDraft(
     }
     if (!data) return { error: "Ese borrador ya no está pendiente.", message: null };
 
+    const channel = String(data.channel) as "ficha" | "anuncio" | "whatsapp";
+    let applyNote = "";
+    if (decision === "approve") {
+      const applied = await applyApprovedContentDraft(
+        {
+          sku: String(data.product_sku),
+          channel,
+          title: String(data.title ?? ""),
+          body: String(data.body ?? ""),
+          cta: String(data.cta ?? ""),
+        },
+        actorName,
+      );
+      if (applied.error) {
+        await supabase
+          .from("content_drafts")
+          .update({ review_status: "pending" })
+          .eq("tenant_id", tenantId)
+          .eq("id", id);
+        return { error: `Aprobado en bandeja falló al escribir catálogo: ${applied.error}`, message: null };
+      }
+      applyNote =
+        channel === "ficha"
+          ? "Aplicado a título y descripción."
+          : channel === "anuncio"
+            ? "Aplicado a destacados."
+            : "Aplicado a respuestas / WhatsApp.";
+      revalidatePath("/panel/catalogo");
+      revalidatePath(`/panel/catalogo/${encodeURIComponent(String(data.product_sku))}`);
+      revalidatePath("/tienda");
+    }
+
     await recordAgentRun({
       agentId: "AG-03",
       status: decision === "approve" ? "succeeded" : "cancelled",
       summary:
         decision === "approve"
-          ? `Borrador aprobado · ${data.product_sku} · ${data.channel}`
+          ? `Borrador aprobado · ${data.product_sku} · ${data.channel} · ${applyNote}`
           : `Borrador rechazado · ${data.product_sku} · ${data.channel}`,
       createdBy: userId,
     });
@@ -78,7 +112,7 @@ async function resolveDraft(
       error: null,
       message:
         decision === "approve"
-          ? `Borrador ${data.channel} de ${data.product_sku} aprobado.`
+          ? `Borrador ${data.channel} de ${data.product_sku} aprobado. ${applyNote}`
           : `Borrador ${data.channel} de ${data.product_sku} rechazado.`,
     };
   } catch (error) {
