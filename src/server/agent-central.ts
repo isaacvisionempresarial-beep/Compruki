@@ -16,6 +16,13 @@ export type PendingApproval = {
   detail: string;
   href?: string;
   actionable?: boolean;
+  /** Contenido a revisar antes de aprobar (borradores). */
+  preview?: {
+    title: string;
+    body: string;
+    cta: string;
+    applyTarget: string;
+  };
 };
 
 export type CentralRouteResult = {
@@ -65,14 +72,28 @@ export async function listPendingApprovals(): Promise<PendingApproval[]> {
 
 async function listPendingDraftApprovals(): Promise<PendingApproval[]> {
   const drafts = await listPendingContentDrafts(8);
-  return drafts.map((draft) => ({
-    id: draft.id,
-    kind: "borrador" as const,
-    label: `${draft.productSku} · ${draft.channel}`,
-    detail: `${draft.title || "Borrador plantilla"} · al aprobar se escribe en el catálogo local`,
-    href: `/panel/agentes?sku=${encodeURIComponent(draft.productSku)}`,
-    actionable: true,
-  }));
+  return drafts.map((draft) => {
+    const applyTarget =
+      draft.channel === "ficha"
+        ? "título y descripción del producto"
+        : draft.channel === "anuncio"
+          ? "destacados del producto"
+          : "respuestas / WhatsApp del producto";
+    return {
+      id: draft.id,
+      kind: "borrador" as const,
+      label: `${draft.productSku} · ${draft.channel}`,
+      detail: `Al aprobar se escribe en ${applyTarget}.`,
+      href: `/panel/agentes?sku=${encodeURIComponent(draft.productSku)}`,
+      actionable: true,
+      preview: {
+        title: draft.title || "(sin título)",
+        body: draft.body || "(sin cuerpo)",
+        cta: draft.cta || "",
+        applyTarget,
+      },
+    };
+  });
 }
 
 async function listAwaitingAgentApprovals(): Promise<PendingApproval[]> {

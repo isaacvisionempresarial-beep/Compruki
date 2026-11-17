@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import type { PendingApproval } from "@/server/agent-central";
 import { resolvePendingApprovalAction, type ResolveApprovalState } from "@/server/approval-actions";
 
@@ -14,9 +14,9 @@ export function PendingApprovalsPanel({ items }: { items: PendingApproval[] }) {
         Pendientes humanos
       </h2>
       <p className="mt-1 text-sm text-muted">
-        Bandeja de AG-01 · list_pending_approvals. Al aprobar un borrador se escribe en el catálogo local
-        (ficha → título/descripción, anuncio → destacados, whatsapp → respuestas). Pedidos se atienden
-        en Pedidos. OpenAI no está conectado.
+        Bandeja de AG-01 · list_pending_approvals. Revisa el texto del borrador antes de aprobar; al
+        aprobar se escribe en el catálogo local. Pedidos se atienden en Pedidos. OpenAI no está
+        conectado.
       </p>
 
       {items.length === 0 ? (
@@ -40,12 +40,46 @@ export function PendingApprovalsPanel({ items }: { items: PendingApproval[] }) {
                 )}
               </div>
               <p className="mt-0.5 text-muted">{item.detail}</p>
+              {item.preview ? <DraftPreview preview={item.preview} /> : null}
               {item.actionable ? <ApprovalButtons kind={item.kind} id={item.id} /> : null}
             </li>
           ))}
         </ul>
       )}
     </section>
+  );
+}
+
+function DraftPreview({
+  preview,
+}: {
+  preview: NonNullable<PendingApproval["preview"]>;
+}) {
+  const [open, setOpen] = useState(true);
+  const bodyPreview = preview.body.length > 420 ? `${preview.body.slice(0, 420)}…` : preview.body;
+
+  return (
+    <div className="mt-2 rounded-[10px] border border-line bg-canvas px-3 py-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
+          Vista previa → {preview.applyTarget}
+        </p>
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          className="text-xs font-semibold text-accent-strong"
+        >
+          {open ? "Ocultar" : "Ver texto"}
+        </button>
+      </div>
+      {open ? (
+        <div className="mt-2 space-y-1.5">
+          <p className="font-semibold text-ink">{preview.title}</p>
+          <p className="whitespace-pre-wrap text-muted">{bodyPreview}</p>
+          {preview.cta ? <p className="font-semibold text-ink">CTA: {preview.cta}</p> : null}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
