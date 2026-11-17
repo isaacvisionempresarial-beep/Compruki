@@ -17,6 +17,7 @@ type RoleCard = {
 export function AgentBudgetPanel({
   roles,
   monthSpend,
+  canEdit = false,
 }: {
   roles: RoleCard[];
   monthSpend: {
@@ -25,6 +26,7 @@ export function AgentBudgetPanel({
     totalRuns: number;
     byAgent: AgentMonthSpend[];
   };
+  canEdit?: boolean;
 }) {
   const spendById = new Map(monthSpend.byAgent.map((row) => [row.agentId, row]));
 
@@ -34,9 +36,9 @@ export function AgentBudgetPanel({
         Presupuesto y activación (P0-IA)
       </h2>
       <p className="mt-1 text-sm text-muted">
-        Activación y tope mensual por rol (HU-AG05). Si un rol está apagado o sin presupuesto, Enrutar /
-        Buscar / Generar / Calcular se cancelan. OpenAI no está conectado: el costo estimado sigue en
-        cero.
+        Activación y tope mensual por rol (HU-AG05). Solo el propietario los cambia. Si un rol está
+        apagado o sin presupuesto, Enrutar / Buscar / Generar / Calcular se cancelan. OpenAI no está
+        conectado: el costo estimado sigue en cero.
       </p>
 
       <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
@@ -61,6 +63,7 @@ export function AgentBudgetPanel({
             <AgentConfigForm
               role={role}
               spend={spendById.get(role.id) ?? { agentId: role.id, runCount: 0, costEstimateCop: 0 }}
+              canEdit={canEdit}
             />
           </li>
         ))}
@@ -72,9 +75,11 @@ export function AgentBudgetPanel({
 function AgentConfigForm({
   role,
   spend,
+  canEdit,
 }: {
   role: RoleCard;
   spend: AgentMonthSpend;
+  canEdit: boolean;
 }) {
   const [state, action, pending] = useActionState(saveAgentConfigAction, initial);
   const enabled = role.config?.enabled === true;
@@ -111,7 +116,13 @@ function AgentConfigForm({
       <form action={action} className="mt-3 grid gap-2">
         <input type="hidden" name="agentId" value={role.id} />
         <label className="flex items-center gap-2 text-sm font-semibold">
-          <input type="checkbox" name="enabled" defaultChecked={enabled} className="h-4 w-4 accent-[var(--color-accent,#0d9488)]" />
+          <input
+            type="checkbox"
+            name="enabled"
+            defaultChecked={enabled}
+            disabled={!canEdit}
+            className="h-4 w-4 accent-[var(--color-accent,#0d9488)] disabled:opacity-55"
+          />
           Rol activo (bloquea herramientas si está apagado)
         </label>
         <label className="block">
@@ -122,7 +133,8 @@ function AgentConfigForm({
             min={0}
             step={1000}
             defaultValue={budget}
-            className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
+            disabled={!canEdit}
+            className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
           />
         </label>
         <label className="block">
@@ -132,12 +144,18 @@ function AgentConfigForm({
             defaultValue={notes}
             maxLength={500}
             placeholder="Ej. solo borradores, sin publicar"
-            className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
+            disabled={!canEdit}
+            className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
           />
         </label>
+        {!canEdit ? (
+          <p role="status" className="text-sm font-medium text-coral">
+            Solo el propietario puede cambiar esta configuración.
+          </p>
+        ) : null}
         <button
           type="submit"
-          disabled={pending}
+          disabled={pending || !canEdit}
           className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-55"
         >
           {pending ? "Guardando…" : "Guardar"}

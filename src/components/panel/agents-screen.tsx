@@ -304,6 +304,7 @@ export function AgentsScreen({
           config: role.config,
         }))}
         monthSpend={view.monthSpend}
+        canEdit={canApproveCatalog}
       />
 
       <section className="mt-6" aria-labelledby="mas-adelante">

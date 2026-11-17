@@ -16,6 +16,9 @@ export async function saveAgentConfigAction(
 ): Promise<SaveAgentConfigState> {
   const access = await assertPanelAccess();
   if (!access) return { error: "Tu sesión no permite guardar la configuración.", message: null };
+  if (access.role !== "owner") {
+    return { error: "Solo el propietario puede cambiar activación y presupuesto.", message: null };
+  }
 
   const agentId = String(formData.get("agentId") ?? "").trim().toUpperCase();
   if (!editableIds.has(agentId)) {
