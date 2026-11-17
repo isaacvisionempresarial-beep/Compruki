@@ -73,19 +73,41 @@ async function resolveDraft(
     }
 
     const reviewStatus = decision === "approve" ? "approved" : "rejected";
-    const { data, error } = await supabase
+    const reviewedBy = actorName.slice(0, 120);
+    const reviewedAt = new Date().toISOString();
+    let { data, error } = await supabase
       .from("content_drafts")
       .update({
         review_status: reviewStatus,
         title,
         body,
         cta,
+        reviewed_by: reviewedBy,
+        reviewed_at: reviewedAt,
       })
       .eq("tenant_id", tenantId)
       .eq("id", id)
       .eq("review_status", "pending")
       .select("id, product_sku, channel, title, body, cta")
       .maybeSingle();
+
+    if (error && (error.message.includes("reviewed_by") || error.message.includes("reviewed_at"))) {
+      const retry = await supabase
+        .from("content_drafts")
+        .update({
+          review_status: reviewStatus,
+          title,
+          body,
+          cta,
+        })
+        .eq("tenant_id", tenantId)
+        .eq("id", id)
+        .eq("review_status", "pending")
+        .select("id, product_sku, channel, title, body, cta")
+        .maybeSingle();
+      data = retry.data;
+      error = retry.error;
+    }
 
     if (error) {
       return {

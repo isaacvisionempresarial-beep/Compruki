@@ -38,6 +38,8 @@ export type SavedContentDraft = ContentDraft & {
   productSku: string;
   createdAt: string;
   reviewStatus: DraftReviewStatus;
+  reviewedBy: string | null;
+  reviewedAt: string | null;
 };
 
 const BRAND_NOTES = [
@@ -174,6 +176,8 @@ export async function saveContentDraft(input: {
         source: "plantilla",
         createdAt: String(data.created_at),
         reviewStatus: mapReviewStatus(data.review_status),
+        reviewedBy: null,
+        reviewedAt: null,
       },
     };
   } catch (error) {
@@ -188,25 +192,27 @@ export async function listContentDrafts(sku?: string, limit = 12): Promise<Saved
     const supabase = createAdminSupabase();
     let query = supabase
       .from("content_drafts")
-      .select("id, product_sku, channel, title, body, cta, source, review_status, created_at")
+      .select(DRAFT_LIST_COLUMNS)
       .eq("tenant_id", tenantId)
       .order("created_at", { ascending: false })
       .limit(limit);
     if (sku?.trim()) query = query.eq("product_sku", sku.trim().toUpperCase());
 
-    const { data, error } = await query;
+    let { data, error } = await query;
+    if (error && isMissingReviewerColumn(error.message)) {
+      let fallback = supabase
+        .from("content_drafts")
+        .select(DRAFT_LIST_COLUMNS_WITHOUT_REVIEWER)
+        .eq("tenant_id", tenantId)
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      if (sku?.trim()) fallback = fallback.eq("product_sku", sku.trim().toUpperCase());
+      const retry = await fallback;
+      data = retry.data;
+      error = retry.error;
+    }
     if (error || !data) return [];
-    return data.map((row) => ({
-      id: String(row.id),
-      productSku: String(row.product_sku),
-      channel: row.channel as ContentChannel,
-      title: String(row.title ?? ""),
-      body: String(row.body ?? ""),
-      cta: String(row.cta ?? ""),
-      source: "plantilla" as const,
-      createdAt: String(row.created_at),
-      reviewStatus: mapReviewStatus(row.review_status),
-    }));
+    return data.map((row) => mapSavedDraft(row));
   } catch {
     return [];
   }
@@ -216,29 +222,67 @@ export async function listPendingContentDrafts(limit = 8): Promise<SavedContentD
   try {
     const tenantId = await getPilotTenantId();
     const supabase = createAdminSupabase();
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from("content_drafts")
-      .select("id, product_sku, channel, title, body, cta, source, review_status, created_at")
+      .select(DRAFT_LIST_COLUMNS)
       .eq("tenant_id", tenantId)
       .eq("review_status", "pending")
       .order("created_at", { ascending: false })
       .limit(limit);
 
+    if (error && isMissingReviewerColumn(error.message)) {
+      const retry = await supabase
+        .from("content_drafts")
+        .select(DRAFT_LIST_COLUMNS_WITHOUT_REVIEWER)
+        .eq("tenant_id", tenantId)
+        .eq("review_status", "pending")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      data = retry.data;
+      error = retry.error;
+    }
+
     if (error || !data) return [];
-    return data.map((row) => ({
-      id: String(row.id),
-      productSku: String(row.product_sku),
-      channel: row.channel as ContentChannel,
-      title: String(row.title ?? ""),
-      body: String(row.body ?? ""),
-      cta: String(row.cta ?? ""),
-      source: "plantilla" as const,
-      createdAt: String(row.created_at),
-      reviewStatus: "pending",
-    }));
+    return data.map((row) => mapSavedDraft(row));
   } catch {
     return [];
   }
+}
+
+const DRAFT_LIST_COLUMNS =
+  "id, product_sku, channel, title, body, cta, source, review_status, reviewed_by, reviewed_at, created_at";
+const DRAFT_LIST_COLUMNS_WITHOUT_REVIEWER =
+  "id, product_sku, channel, title, body, cta, source, review_status, created_at";
+
+function mapSavedDraft(row: {
+  id: unknown;
+  product_sku: unknown;
+  channel: unknown;
+  title: unknown;
+  body: unknown;
+  cta: unknown;
+  created_at: unknown;
+  review_status?: unknown;
+  reviewed_by?: unknown;
+  reviewed_at?: unknown;
+}): SavedContentDraft {
+  return {
+    id: String(row.id),
+    productSku: String(row.product_sku),
+    channel: row.channel as ContentChannel,
+    title: String(row.title ?? ""),
+    body: String(row.body ?? ""),
+    cta: String(row.cta ?? ""),
+    source: "plantilla",
+    createdAt: String(row.created_at),
+    reviewStatus: mapReviewStatus(row.review_status),
+    reviewedBy: typeof row.reviewed_by === "string" && row.reviewed_by.trim() ? row.reviewed_by.trim() : null,
+    reviewedAt: typeof row.reviewed_at === "string" && row.reviewed_at ? row.reviewed_at : null,
+  };
+}
+
+function isMissingReviewerColumn(message: string) {
+  return message.includes("reviewed_by") || message.includes("reviewed_at");
 }
 
 function mapReviewStatus(value: unknown): DraftReviewStatus {

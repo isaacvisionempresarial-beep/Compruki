@@ -136,6 +136,17 @@ export function ContentCreatorPanel({
                   </span>
                 </p>
                 <p className="mt-0.5 text-muted">{item.title}</p>
+                {item.reviewedAt ? (
+                  <p className="mt-0.5 text-xs text-muted">
+                    {item.reviewStatus === "rejected" ? "Rechazó" : "Aprobó"} {item.reviewedBy || "el panel"} ·{" "}
+                    <time dateTime={item.reviewedAt}>
+                      {new Date(item.reviewedAt).toLocaleString("es-CO", {
+                        dateStyle: "short",
+                        timeStyle: "short",
+                      })}
+                    </time>
+                  </p>
+                ) : null}
               </li>
             ))}
           </ul>
