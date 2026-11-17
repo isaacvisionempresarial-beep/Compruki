@@ -1,2 +1,2 @@
-export const SESSION_COOKIE = "panel_session";
-export const SESSION_VALUE = "owner";
+/** @deprecated Sesión demo sustituida por Supabase Auth. Conservado vacío a propósito. */
+export {};

@@ -13,7 +13,7 @@ export async function lookupOrderAction(_state: LookupOrderState, formData: Form
   if (!/^P-\d{4,6}$/.test(number)) return { error: "Escribe el número del pedido, por ejemplo P-2001." };
   if (!/^3\d{9}$/.test(phone)) return { error: "Escribe el celular de 10 dígitos que dejaste en el pedido." };
 
-  const order = findOrderForCustomer(number, phone);
+  const order = await findOrderForCustomer(number, phone);
   if (!order) return { error: "No encontramos un pedido con ese número y ese celular." };
 
   redirect(`/tienda/pedido/${order.id}?t=${order.viewToken}`);
@@ -27,7 +27,7 @@ export async function cancelCustomerOrderAction(
 ): Promise<CancelCustomerOrderState> {
   const id = String(formData.get("orderId") ?? "");
   const token = String(formData.get("token") ?? "");
-  const result = cancelOrderByCustomer(id, token, String(formData.get("reason") ?? ""));
+  const result = await cancelOrderByCustomer(id, token, String(formData.get("reason") ?? ""));
   if (result.error || !result.order) return { error: result.error ?? "No se pudo cancelar el pedido." };
 
   revalidatePath("/panel");
@@ -49,7 +49,7 @@ export async function correctCustomerDeliveryAction(
 ): Promise<CorrectDeliveryState> {
   const id = String(formData.get("orderId") ?? "");
   const token = String(formData.get("token") ?? "");
-  const result = correctDeliveryByCustomer(id, token, {
+  const result = await correctDeliveryByCustomer(id, token, {
     customerName: String(formData.get("customerName") ?? ""),
     phone: String(formData.get("phone") ?? ""),
     document: String(formData.get("document") ?? ""),
@@ -82,7 +82,7 @@ export async function chooseCustomerSizeAction(_state: ChooseSizeState, formData
   if (skus.length !== variants.length || skus.length !== nexts.length) {
     return { error: "Un producto del pedido ya no coincide." };
   }
-  const result = chooseSizeByCustomer(
+  const result = await chooseSizeByCustomer(
     id,
     token,
     skus.map((sku, index) => ({ sku, variant: variants[index] ?? "", nextVariant: nexts[index] ?? "" })),
@@ -106,7 +106,7 @@ export type BuyerNoteState = { error: string | null };
 export async function saveBuyerNoteAction(_state: BuyerNoteState, formData: FormData): Promise<BuyerNoteState> {
   const id = String(formData.get("orderId") ?? "");
   const token = String(formData.get("token") ?? "");
-  const result = saveBuyerNoteByCustomer(id, token, String(formData.get("buyerNote") ?? ""));
+  const result = await saveBuyerNoteByCustomer(id, token, String(formData.get("buyerNote") ?? ""));
   if (result.error || !result.order) return { error: result.error ?? "No se pudo guardar el aviso." };
 
   revalidatePath("/panel");

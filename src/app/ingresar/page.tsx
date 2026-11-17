@@ -19,6 +19,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function LoginPage() {
-  return <LoginScreen />;
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ modo?: string; error?: string }>;
+}) {
+  const params = await searchParams;
+  const initialMode = params.modo === "nueva-clave" ? "nueva-clave" : params.error === "enlace" ? "recovery" : "login";
+  const linkError = params.error === "enlace";
+  const accessDenied = params.error === "sin-acceso";
+
+  return <LoginScreen initialMode={initialMode} linkError={linkError} accessDenied={accessDenied} />;
 }

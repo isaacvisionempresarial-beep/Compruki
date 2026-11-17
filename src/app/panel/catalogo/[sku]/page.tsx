@@ -8,13 +8,13 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ sku: string }> }): Promise<Metadata> {
   const { sku } = await params;
-  const product = getCatalogProduct(sku);
+  const product = await getCatalogProduct(sku);
   return { title: product ? product.title : "No encontrado" };
 }
 
 export default async function CatalogProductPage({ params }: { params: Promise<{ sku: string }> }) {
   const { sku } = await params;
-  const product = getCatalogProduct(sku);
+  const product = await getCatalogProduct(sku);
   if (!product) notFound();
-  return <ProductEditorPage product={product} relatedOrderCount={countOrdersForSku(product.sku)} />;
+  return <ProductEditorPage product={product} relatedOrderCount={await countOrdersForSku(product.sku)} />;
 }

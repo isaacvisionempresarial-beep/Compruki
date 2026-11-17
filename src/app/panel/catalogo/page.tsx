@@ -10,6 +10,6 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default function CatalogPage() {
-  return <CatalogScreen products={listProducts()} orders={listOrders()} />;
+export default async function CatalogPage() {
+  return <CatalogScreen products={await listProducts()} orders={await listOrders()} />;
 }

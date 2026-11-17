@@ -9,6 +9,6 @@ export const metadata: Metadata = {
 };
 export const dynamic = "force-dynamic";
 
-export default function OrdersPage() {
-  return <OrdersScreen orders={listOrders()} sizeGuides={listSizeGuides()} />;
+export default async function OrdersPage() {
+  return <OrdersScreen orders={await listOrders()} sizeGuides={await listSizeGuides()} />;
 }

@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const order = getOrder(id);
+  const order = await getOrder(id);
   return {
     title: order ? `Pedido ${order.number}` : "No encontrado",
     description:
@@ -26,9 +26,9 @@ export default async function OrderPage({
 }) {
   const { id } = await params;
   const { t, nuevo } = await searchParams;
-  const order = getOrder(id);
+  const order = await getOrder(id);
   if (!order || !t || order.viewToken !== t) notFound();
-  const published = listPublicProducts();
+  const published = await listPublicProducts();
   const images = published
     .filter((product) => product.images.length > 0)
     .map((product) => ({ sku: product.sku, images: product.images }));

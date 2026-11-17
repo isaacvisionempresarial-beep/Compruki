@@ -4,13 +4,30 @@ import { useState, type ReactNode } from "react";
 import { useActionState } from "react";
 import { Wordmark } from "@/components/brand/wordmark";
 import { Icon } from "@/components/icons";
-import { DEMO_EMAIL, DEMO_PASSWORD } from "@/lib/demo-account";
-import { signIn, type SignInState } from "@/server/auth";
+import {
+  requestPasswordReset,
+  signIn,
+  signOut,
+  updatePassword,
+  type RecoverState,
+  type SignInState,
+  type UpdatePasswordState,
+} from "@/server/auth";
 
 const initialState: SignInState = { error: null };
 
-export function LoginScreen() {
-  const [mode, setMode] = useState<"login" | "recovery">("login");
+type Mode = "login" | "recovery" | "nueva-clave";
+
+export function LoginScreen({
+  initialMode = "login",
+  linkError = false,
+  accessDenied = false,
+}: {
+  initialMode?: Mode;
+  linkError?: boolean;
+  accessDenied?: boolean;
+}) {
+  const [mode, setMode] = useState<Mode>(initialMode);
 
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(420px,0.95fr)]">
@@ -50,7 +67,11 @@ export function LoginScreen() {
           </div>
 
           <div className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 sm:px-4">
-            {mode === "login" ? <LoginForm onRecover={() => setMode("recovery")} /> : <RecoveryForm onBack={() => setMode("login")} />}
+            {mode === "login" ? (
+              <LoginForm onRecover={() => setMode("recovery")} accessDenied={accessDenied} />
+            ) : null}
+            {mode === "recovery" ? <RecoveryForm onBack={() => setMode("login")} linkError={linkError} /> : null}
+            {mode === "nueva-clave" ? <NewPasswordForm onBack={() => setMode("login")} /> : null}
           </div>
         </div>
       </main>
@@ -58,7 +79,7 @@ export function LoginScreen() {
   );
 }
 
-function LoginForm({ onRecover }: { onRecover: () => void }) {
+function LoginForm({ onRecover, accessDenied }: { onRecover: () => void; accessDenied?: boolean }) {
   const [state, formAction, pending] = useActionState(signIn, initialState);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -70,6 +91,23 @@ function LoginForm({ onRecover }: { onRecover: () => void }) {
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Iniciar sesión</h1>
       <p className="mt-1 text-sm text-muted">Correo de tu comercio. Dropi no está conectado.</p>
+
+      {accessDenied ? (
+        <div className="mt-3 space-y-2">
+          <p role="alert" className="rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
+            Tu cuenta entró, pero no tiene membresía en la tienda piloto. Pide que te enlacen en Supabase
+            (tabla memberships) o cierra sesión.
+          </p>
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle"
+            >
+              Cerrar sesión
+            </button>
+          </form>
+        </div>
+      ) : null}
 
       <form action={formAction} className="mt-3 space-y-2">
         <Field label="Correo" htmlFor="email">
@@ -115,7 +153,10 @@ function LoginForm({ onRecover }: { onRecover: () => void }) {
           </div>
         </Field>
 
-        <div className="flex justify-end">
+        <div className="flex flex-wrap justify-end gap-x-3 gap-y-1">
+          <a href="/ingresar?modo=nueva-clave" className="text-sm font-semibold text-accent-strong">
+            Cambiar contraseña
+          </a>
           <button type="button" className="text-sm font-semibold text-accent-strong" onClick={onRecover}>
             Olvidé mi acceso
           </button>
@@ -141,56 +182,33 @@ function LoginForm({ onRecover }: { onRecover: () => void }) {
           {pending ? "Entrando…" : "Entrar al panel"}
         </button>
       </form>
-
-      <div className="mt-3 rounded-[10px] border border-line bg-subtle px-3 py-2">
-        <p className="text-sm font-semibold">Acceso de muestra</p>
-        <p className="mt-0.5 text-xs leading-5 text-muted">Prototipo. Auth definitiva con Supabase.</p>
-        <dl className="mt-2 space-y-1 text-xs">
-          <div className="flex items-baseline justify-between gap-3">
-            <dt className="text-muted">Correo</dt>
-            <dd className="font-medium">{DEMO_EMAIL}</dd>
-          </div>
-          <div className="flex items-baseline justify-between gap-3">
-            <dt className="text-muted">Contraseña</dt>
-            <dd className="font-medium">{DEMO_PASSWORD}</dd>
-          </div>
-        </dl>
-        <button
-          type="button"
-          className="mt-2 inline-flex h-10 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas"
-          onClick={() => {
-            setEmail(DEMO_EMAIL);
-            setPassword(DEMO_PASSWORD);
-          }}
-        >
-          Llenar con este acceso
-        </button>
-      </div>
     </>
   );
 }
 
-function RecoveryForm({ onBack }: { onBack: () => void }) {
-  const [sent, setSent] = useState(false);
+function RecoveryForm({ onBack, linkError }: { onBack: () => void; linkError?: boolean }) {
+  const [state, formAction, pending] = useActionState(requestPasswordReset, {
+    error: null,
+    sent: false,
+  } satisfies RecoverState);
   const [email, setEmail] = useState("");
-  const canPrepare = Boolean(email.trim() && email.includes("@"));
+  const canSend = Boolean(email.trim() && email.includes("@"));
 
   return (
     <>
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Recuperar acceso</h1>
       <p className="mt-1 text-sm text-muted">
-        El enlace se enviará cuando el correo quede conectado. Dropi no está conectado.
+        Te enviamos un enlace. Al abrirlo volverás aquí para elegir la nueva contraseña. Dropi no está conectado.
       </p>
 
-      <form
-        className="mt-3 space-y-2"
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (!canPrepare) return;
-          setSent(true);
-        }}
-      >
+      {linkError ? (
+        <p role="alert" className="mt-3 rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
+          El enlace no se pudo usar. Pide uno nuevo o cambia la contraseña con tu clave actual.
+        </p>
+      ) : null}
+
+      <form action={formAction} className="mt-3 space-y-2">
         <Field label="Correo" htmlFor="recovery-email">
           <input
             id="recovery-email"
@@ -205,25 +223,140 @@ function RecoveryForm({ onBack }: { onBack: () => void }) {
           />
         </Field>
 
-        {sent ? (
+        {state.sent ? (
           <p role="status" className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 text-sm leading-5 text-ink">
-            Quedó anotado el correo, pero este prototipo todavía no envía el enlace. Cuando Supabase Auth esté
-            conectado, este paso mandará el correo para crear una contraseña nueva.
+            Si el correo existe, recibirás el enlace. Ábrelo en este mismo navegador; te traerá a «Nueva
+            contraseña».
+          </p>
+        ) : null}
+        {state.error ? (
+          <p role="alert" className="rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
+            {state.error}
+          </p>
+        ) : null}
+
+        <button
+          type="submit"
+          disabled={!canSend || pending}
+          className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
+        >
+          {pending ? "Enviando…" : state.sent ? "Volver a enviar" : "Enviar enlace"}
+        </button>
+      </form>
+
+      <div className="mt-3 flex flex-col gap-2">
+        <a href="/ingresar?modo=nueva-clave" className="text-sm font-semibold text-accent-strong">
+          Ya puedo cambiar la contraseña aquí
+        </a>
+        <button type="button" className="text-sm font-semibold text-accent-strong" onClick={onBack}>
+          Volver a iniciar sesión
+        </button>
+      </div>
+    </>
+  );
+}
+
+function NewPasswordForm({ onBack }: { onBack: () => void }) {
+  const [state, formAction, pending] = useActionState(updatePassword, {
+    error: null,
+    ok: false,
+  } satisfies UpdatePasswordState);
+  const [email, setEmail] = useState("isaacvisionempresarial@gmail.com");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [visible, setVisible] = useState(false);
+  const canSave = password.length >= 8 && password === confirm;
+
+  return (
+    <>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
+      <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Nueva contraseña</h1>
+      <p className="mt-1 text-sm text-muted">
+        Si viniste del correo de recuperación, basta la clave nueva. Si no, escribe también la actual (por ejemplo{" "}
+        <span className="font-semibold">ComprukiTemp2026!</span>).
+      </p>
+
+      <form action={formAction} className="mt-3 space-y-2">
+        <Field label="Correo" htmlFor="new-email">
+          <input
+            id="new-email"
+            name="email"
+            type="email"
+            autoComplete="username"
+            autoCapitalize="none"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            className={inputClass}
+          />
+        </Field>
+
+        <Field label="Contraseña actual (si no usaste el enlace)" htmlFor="current-password">
+          <input
+            id="current-password"
+            name="currentPassword"
+            type={visible ? "text" : "password"}
+            autoComplete="current-password"
+            value={currentPassword}
+            onChange={(event) => setCurrentPassword(event.target.value)}
+            className={inputClass}
+          />
+        </Field>
+
+        <Field label="Nueva contraseña" htmlFor="new-password">
+          <div className="relative">
+            <input
+              id="new-password"
+              name="password"
+              type={visible ? "text" : "password"}
+              autoComplete="new-password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              className={`${inputClass} pr-24`}
+            />
+            <button
+              type="button"
+              className="absolute top-1/2 right-2 h-10 -translate-y-1/2 rounded-[10px] px-2 text-sm font-semibold text-accent-strong"
+              aria-pressed={visible}
+              onClick={() => setVisible((current) => !current)}
+            >
+              {visible ? "Ocultar" : "Mostrar"}
+            </button>
+          </div>
+        </Field>
+
+        <Field label="Confirmar nueva contraseña" htmlFor="confirm-password">
+          <input
+            id="confirm-password"
+            name="confirm"
+            type={visible ? "text" : "password"}
+            autoComplete="new-password"
+            required
+            minLength={8}
+            value={confirm}
+            onChange={(event) => setConfirm(event.target.value)}
+            className={inputClass}
+          />
+        </Field>
+
+        {state.error ? (
+          <p role="alert" className="rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
+            {state.error}
           </p>
         ) : null}
 
         <p className="text-xs leading-5 text-muted">
-          {canPrepare
-            ? "Todavía no se envía el correo. Solo deja el aviso de que falta conectar Auth."
-            : "Sin un correo el botón queda bloqueado."}
+          {canSave ? "Al guardar entrarás al panel con la nueva clave." : "Mínimo 8 caracteres y que coincidan."}
         </p>
 
         <button
           type="submit"
-          disabled={!canPrepare}
+          disabled={!canSave || pending}
           className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
         >
-          {sent ? "Volver a preparar" : "Preparar enlace"}
+          {pending ? "Guardando…" : "Guardar y entrar"}
         </button>
       </form>
 

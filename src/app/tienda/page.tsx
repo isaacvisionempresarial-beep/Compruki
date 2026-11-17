@@ -8,6 +8,6 @@ export const metadata: Metadata = {
 };
 export const dynamic = "force-dynamic";
 
-export default function StorePage() {
-  return <StoreHome products={listPublicProducts()} />;
+export default async function StorePage() {
+  return <StoreHome products={await listPublicProducts()} />;
 }

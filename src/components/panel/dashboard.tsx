@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import { PeriodControl } from "@/components/panel/period-control";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
-import { DEMO_USER } from "@/lib/demo-account";
 import { STATUS_LABEL, type Period } from "@/lib/demo-data";
 import { cx } from "@/lib/cx";
 import { formatCop, formatDay } from "@/lib/format";
@@ -17,10 +16,12 @@ export function Dashboard({
   storeOrders,
   sizeGuides,
   today,
+  greetingName,
 }: {
   storeOrders: StoreOrder[];
   sizeGuides: SizeGuide[];
   today: string;
+  greetingName: string;
 }) {
   const [storePeriod, setStorePeriod] = useState<Period>("7d");
   const query = usePanelQuery().trim().toLocaleLowerCase("es");
@@ -90,7 +91,7 @@ export function Dashboard({
         <div className="min-w-0">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Resumen</p>
           <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">
-            Hola {DEMO_USER.name.split(" ")[0]}, tu tienda está en modo venta
+            Hola {greetingName}, tu tienda está en modo venta
           </h1>
           <p className="mt-1 text-sm text-muted">
             Cifras y pendientes de los pedidos de la tienda. Dropi no está conectado.

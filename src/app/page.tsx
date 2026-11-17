@@ -1,8 +1,7 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { SESSION_COOKIE, SESSION_VALUE } from "@/lib/session";
+import { getPanelUser } from "@/server/panel-auth";
 
 export default async function Home() {
-  const jar = await cookies();
-  redirect(jar.get(SESSION_COOKIE)?.value === SESSION_VALUE ? "/panel" : "/ingresar");
+  const user = await getPanelUser();
+  redirect(user ? "/panel" : "/ingresar");
 }

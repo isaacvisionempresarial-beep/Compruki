@@ -11,13 +11,13 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ number: string }> }): Promise<Metadata> {
   const { number } = await params;
-  const order = listOrders().find((item) => item.number === decodeURIComponent(number));
+  const order = (await listOrders()).find((item) => item.number === decodeURIComponent(number));
   return { title: order ? `Sincronización ${order.number}` : "No encontrado" };
 }
 
 export default async function SyncOrderPage({ params }: { params: Promise<{ number: string }> }) {
   const { number } = await params;
-  const order = listOrders().find((item) => item.number === decodeURIComponent(number));
+  const order = (await listOrders()).find((item) => item.number === decodeURIComponent(number));
   if (!order) notFound();
 
   return (

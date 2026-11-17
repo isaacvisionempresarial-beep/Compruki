@@ -1,7 +1,6 @@
 "use server";
 
-import { cookies } from "next/headers";
-import { SESSION_COOKIE, SESSION_VALUE } from "@/lib/session";
+import { assertPanelSignedIn } from "@/server/panel-auth";
 
 const OFFICIAL_MCP = "https://mcp.dropi.co/mcp";
 const OFFICIAL_HOST = "mcp.dropi.co";
@@ -13,8 +12,7 @@ export type DropiProbe = {
 
 export async function probeOfficialDropi(_previous: DropiProbe | null = null): Promise<DropiProbe> {
   void _previous;
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
+  if (!(await assertPanelSignedIn())) {
     return { state: "sin_respuesta", detail: "Entra al panel para consultar el servidor oficial." };
   }
 

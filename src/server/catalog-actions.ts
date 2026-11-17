@@ -1,11 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { MAX_PRODUCT_VIDEO_BYTES, parsePesos, parseVariants, sniffImage, sniffVideo, type ProductDraft, type ProductImageType } from "@/lib/catalog";
-import { DEMO_USER } from "@/lib/demo-account";
-import { SESSION_COOKIE, SESSION_VALUE } from "@/lib/session";
+import { assertPanelAccess } from "@/server/panel-auth";
 import { deactivateProduct, deleteProduct, getCatalogProductById, saveProduct, type MediaUpdate } from "@/server/catalog-store";
 import { countOrdersForSku } from "@/server/order-store";
 
@@ -21,10 +19,10 @@ export type ProductLifecycleState = {
 };
 
 export async function saveProductAction(_state: SaveProductState, formData: FormData): Promise<SaveProductState> {
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    return { error: "Tu sesión no permite cambiar el catálogo.", productId: null, message: null };
-  }
+  const access = await assertPanelAccess();
+    if (!access) {
+      return { error: "Tu sesión no permite cambiar el catálogo.", productId: null, message: null };
+    }
 
   const price = parsePesos(String(formData.get("price") ?? ""));
   const cost = parsePesos(String(formData.get("cost") ?? ""));
@@ -54,7 +52,7 @@ export async function saveProductAction(_state: SaveProductState, formData: Form
   };
 
   const previousSku = String(formData.get("previousSku") ?? "");
-  const result = saveProduct(draft, DEMO_USER.name, media);
+  const result = await saveProduct(draft, access.actorName, media);
   if (result.error || !result.product) {
     return { error: result.error ?? "No se pudo guardar el producto.", productId: null, message: null };
   }
@@ -79,18 +77,18 @@ export async function deleteProductAction(
   _state: ProductLifecycleState,
   formData: FormData,
 ): Promise<ProductLifecycleState> {
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    return { error: "Tu sesión no permite cambiar el catálogo.", message: null };
-  }
+  const access = await assertPanelAccess();
+    if (!access) {
+      return { error: "Tu sesión no permite cambiar el catálogo.", message: null };
+    }
 
   const id = String(formData.get("id") ?? "").trim();
   if (!id) return { error: "No encontré ese producto.", message: null };
 
-  const current = getCatalogProductById(id);
+  const current = await getCatalogProductById(id);
   if (!current) return { error: "Ese producto ya no está en el catálogo.", message: null };
 
-  const result = deleteProduct(id, countOrdersForSku(current.sku));
+  const result = await deleteProduct(id, await countOrdersForSku(current.sku));
   if (result.error || !result.deleted) {
     return { error: result.error ?? "No se pudo eliminar el producto.", message: null };
   }
@@ -109,15 +107,15 @@ export async function deactivateProductAction(
   _state: ProductLifecycleState,
   formData: FormData,
 ): Promise<ProductLifecycleState> {
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    return { error: "Tu sesión no permite cambiar el catálogo.", message: null };
-  }
+  const access = await assertPanelAccess();
+    if (!access) {
+      return { error: "Tu sesión no permite cambiar el catálogo.", message: null };
+    }
 
   const id = String(formData.get("id") ?? "").trim();
   if (!id) return { error: "No encontré ese producto.", message: null };
 
-  const result = deactivateProduct(id, DEMO_USER.name);
+  const result = await deactivateProduct(id, access.actorName);
   if (result.error || !result.product) {
     return { error: result.error ?? "No se pudo marcar como no disponible.", message: null };
   }

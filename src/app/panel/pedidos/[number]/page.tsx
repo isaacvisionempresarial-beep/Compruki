@@ -8,22 +8,22 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ number: string }> }): Promise<Metadata> {
   const { number } = await params;
-  const order = listOrders().find((item) => item.number === decodeURIComponent(number));
+  const order = (await listOrders()).find((item) => item.number === decodeURIComponent(number));
   return { title: order ? `Pedido ${order.number}` : "No encontrado" };
 }
 
 export default async function OrderPage({ params }: { params: Promise<{ number: string }> }) {
   const { number } = await params;
-  const orders = listOrders();
+  const orders = await listOrders();
   const order = orders.find((item) => item.number === decodeURIComponent(number));
   if (!order) notFound();
   return (
     <OrderEditor
       order={order}
       orders={orders}
-      products={listOrderableProducts()}
-      sizeGuides={listSizeGuides()}
-      costGuides={listCostGuides()}
+      products={await listOrderableProducts()}
+      sizeGuides={await listSizeGuides()}
+      costGuides={await listCostGuides()}
     />
   );
 }

@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ sku: string }> }): Promise<Metadata> {
   const { sku } = await params;
-  const product = getPublicProduct(sku);
+  const product = await getPublicProduct(sku);
   if (!product) return { title: "No encontrado" };
 
   const blurb =
@@ -52,7 +52,7 @@ export default async function ProductPage({
 }) {
   const { sku } = await params;
   const { origen } = await searchParams;
-  const product = getPublicProduct(sku);
+  const product = await getPublicProduct(sku);
   if (!product) notFound();
   return <ProductScreen product={product} fromCampaign={origen === "campana"} />;
 }

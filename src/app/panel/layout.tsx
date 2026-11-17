@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { PanelShell } from "@/components/panel/panel-shell";
-import { SESSION_COOKIE, SESSION_VALUE } from "@/lib/session";
+import { requirePanelAccess } from "@/server/panel-auth";
 
 const panelDescription =
   "Panel de la tienda piloto. Catálogo, pedidos, sincronización y margen. Dropi no está conectado.";
@@ -28,10 +26,15 @@ export const metadata: Metadata = {
 };
 
 export default async function PanelLayout({ children }: { children: ReactNode }) {
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    redirect("/ingresar");
-  }
-
-  return <PanelShell>{children}</PanelShell>;
+  const access = await requirePanelAccess();
+  return (
+    <PanelShell
+      storeName={access.tenantName}
+      actorName={access.actorName}
+      roleLabel={access.roleLabel}
+      initials={access.initials}
+    >
+      {children}
+    </PanelShell>
+  );
 }

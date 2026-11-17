@@ -1,12 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { campaignSkusInOrder } from "@/lib/campaign";
 import { parsePesos } from "@/lib/catalog";
-import { DEMO_USER } from "@/lib/demo-account";
-import { SESSION_COOKIE, SESSION_VALUE } from "@/lib/session";
+import { assertPanelAccess } from "@/server/panel-auth";
 import { normalizePhone, type OrderAction } from "@/lib/store-order";
 import { addOrderLine, applyCatalogCosts, markCustomerNotice, placeOrder, saveClosedDepartment, saveDelivery, saveFreight, saveIncidenceReason, saveInternalNote, saveOrderLines, saveProviderRef, saveReturnReason, updateOrder } from "@/server/order-store";
 
@@ -58,7 +56,7 @@ export async function placeOrderAction(_state: PlaceOrderState, formData: FormDa
     return { error: "No se pudo leer el carrito. Vuelve a abrirlo." };
   }
 
-  const result = placeOrder({
+  const result = await placeOrder({
     idempotencyKey: String(formData.get("idempotencyKey") ?? ""),
     customerName: String(formData.get("customerName") ?? ""),
     phone: normalizePhone(String(formData.get("phone") ?? "")),
@@ -84,17 +82,17 @@ export type UpdateOrderState = { error: string | null; orderId: string | null };
 
 export async function updateOrderAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
   const orderId = String(formData.get("orderId") ?? "");
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    return { error: "Tu sesión no permite cambiar este pedido.", orderId };
-  }
+  const access = await assertPanelAccess();
+    if (!access) {
+      return { error: "Tu sesión no permite cambiar este pedido.", orderId };
+    }
 
   const intent = String(formData.get("intent") ?? "");
   if (!ORDER_ACTIONS.includes(intent as OrderAction)) {
     return { error: "Esa acción no existe.", orderId };
   }
 
-  const result = updateOrder(orderId, intent as OrderAction, DEMO_USER.name, String(formData.get("customerReason") ?? ""));
+  const result = await updateOrder(orderId, intent as OrderAction, access.actorName, String(formData.get("customerReason") ?? ""));
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudo actualizar el pedido.", orderId };
   }
@@ -119,10 +117,10 @@ function readPesos(raw: string, label: string) {
 
 export async function saveFreightAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
   const orderId = String(formData.get("orderId") ?? "");
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    return { error: "Tu sesión no permite anotar el flete.", orderId };
-  }
+  const access = await assertPanelAccess();
+    if (!access) {
+      return { error: "Tu sesión no permite anotar el flete.", orderId };
+    }
 
   const shipping = readPesos(String(formData.get("actualShipping") ?? ""), "el flete");
   const returning = readPesos(String(formData.get("returnFreight") ?? ""), "el flete");
@@ -131,10 +129,10 @@ export async function saveFreightAction(_state: UpdateOrderState, formData: Form
     return { error: shipping.error ?? returning.error ?? collection.error, orderId };
   }
 
-  const result = saveFreight(
+  const result = await saveFreight(
     orderId,
     { actualShipping: shipping.value, returnFreight: returning.value, collectionCost: collection.value },
-    DEMO_USER.name,
+    access.actorName,
   );
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudo guardar el flete.", orderId };
@@ -149,12 +147,12 @@ export async function saveFreightAction(_state: UpdateOrderState, formData: Form
 
 export async function applyCatalogCostAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
   const orderId = String(formData.get("orderId") ?? "");
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    return { error: "Tu sesión no permite anotar el costo.", orderId };
-  }
+  const access = await assertPanelAccess();
+    if (!access) {
+      return { error: "Tu sesión no permite anotar el costo.", orderId };
+    }
 
-  const result = applyCatalogCosts(orderId, DEMO_USER.name);
+  const result = await applyCatalogCosts(orderId, access.actorName);
   if (result.error || !result.order) return { error: result.error ?? "No se pudo anotar el costo de la ficha.", orderId };
   if (!result.saved) return { error: null, orderId };
 
@@ -167,13 +165,13 @@ export async function applyCatalogCostAction(_state: UpdateOrderState, formData:
 
 export async function saveProviderRefAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
   const orderId = String(formData.get("orderId") ?? "");
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    return { error: "Tu sesión no permite anotar el número de Dropi.", orderId };
-  }
+  const access = await assertPanelAccess();
+    if (!access) {
+      return { error: "Tu sesión no permite anotar el número de Dropi.", orderId };
+    }
 
   const clearing = formData.get("intent") === "quitar";
-  const result = saveProviderRef(orderId, clearing ? null : String(formData.get("providerRef") ?? ""), DEMO_USER.name);
+  const result = await saveProviderRef(orderId, clearing ? null : String(formData.get("providerRef") ?? ""), access.actorName);
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudo anotar el número de Dropi.", orderId };
   }
@@ -185,12 +183,12 @@ export async function saveProviderRefAction(_state: UpdateOrderState, formData: 
 
 export async function saveClosedDepartmentAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
   const orderId = String(formData.get("orderId") ?? "");
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    return { error: "Tu sesión no permite anotar en este pedido.", orderId };
-  }
+  const access = await assertPanelAccess();
+    if (!access) {
+      return { error: "Tu sesión no permite anotar en este pedido.", orderId };
+    }
 
-  const result = saveClosedDepartment(orderId, String(formData.get("department") ?? ""), DEMO_USER.name);
+  const result = await saveClosedDepartment(orderId, String(formData.get("department") ?? ""), access.actorName);
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudo anotar el departamento.", orderId };
   }
@@ -203,12 +201,12 @@ export async function saveClosedDepartmentAction(_state: UpdateOrderState, formD
 
 export async function saveDeliveryAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
   const orderId = String(formData.get("orderId") ?? "");
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    return { error: "Tu sesión no permite corregir este pedido.", orderId };
-  }
+  const access = await assertPanelAccess();
+    if (!access) {
+      return { error: "Tu sesión no permite corregir este pedido.", orderId };
+    }
 
-  const result = saveDelivery(
+  const result = await saveDelivery(
     orderId,
     {
       customerName: String(formData.get("customerName") ?? ""),
@@ -219,7 +217,7 @@ export async function saveDeliveryAction(_state: UpdateOrderState, formData: For
       address: String(formData.get("address") ?? ""),
       reference: String(formData.get("reference") ?? ""),
     },
-    DEMO_USER.name,
+    access.actorName,
   );
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudieron guardar los datos de entrega.", orderId };
@@ -251,15 +249,15 @@ function lineEditsFrom(value: FormDataEntryValue | null) {
 
 export async function saveOrderLinesAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
   const orderId = String(formData.get("orderId") ?? "");
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    return { error: "Tu sesión no permite corregir este pedido.", orderId };
-  }
+  const access = await assertPanelAccess();
+    if (!access) {
+      return { error: "Tu sesión no permite corregir este pedido.", orderId };
+    }
 
   const drafts = lineEditsFrom(formData.get("lines"));
   if (!drafts) return { error: "No se pudieron leer los productos.", orderId };
 
-  const result = saveOrderLines(orderId, drafts, DEMO_USER.name);
+  const result = await saveOrderLines(orderId, drafts, access.actorName);
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudieron guardar las cantidades.", orderId };
   }
@@ -274,19 +272,19 @@ export async function saveOrderLinesAction(_state: UpdateOrderState, formData: F
 
 export async function addOrderLineAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
   const orderId = String(formData.get("orderId") ?? "");
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    return { error: "Tu sesión no permite corregir este pedido.", orderId };
-  }
+  const access = await assertPanelAccess();
+    if (!access) {
+      return { error: "Tu sesión no permite corregir este pedido.", orderId };
+    }
 
-  const result = addOrderLine(
+  const result = await addOrderLine(
     orderId,
     {
       sku: String(formData.get("sku") ?? ""),
       variant: String(formData.get("variant") ?? ""),
       quantity: Number(formData.get("quantity")),
     },
-    DEMO_USER.name,
+    access.actorName,
   );
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudo agregar el producto.", orderId };
@@ -302,12 +300,12 @@ export async function addOrderLineAction(_state: UpdateOrderState, formData: For
 
 export async function saveIncidenceReasonAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
   const orderId = String(formData.get("orderId") ?? "");
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    return { error: "Tu sesión no permite anotar en este pedido.", orderId };
-  }
+  const access = await assertPanelAccess();
+    if (!access) {
+      return { error: "Tu sesión no permite anotar en este pedido.", orderId };
+    }
 
-  const result = saveIncidenceReason(orderId, String(formData.get("customerReason") ?? ""), DEMO_USER.name);
+  const result = await saveIncidenceReason(orderId, String(formData.get("customerReason") ?? ""), access.actorName);
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudo guardar el motivo.", orderId };
   }
@@ -321,12 +319,12 @@ export async function saveIncidenceReasonAction(_state: UpdateOrderState, formDa
 
 export async function saveReturnReasonAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
   const orderId = String(formData.get("orderId") ?? "");
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    return { error: "Tu sesión no permite anotar en este pedido.", orderId };
-  }
+  const access = await assertPanelAccess();
+    if (!access) {
+      return { error: "Tu sesión no permite anotar en este pedido.", orderId };
+    }
 
-  const result = saveReturnReason(orderId, String(formData.get("customerReason") ?? ""), DEMO_USER.name);
+  const result = await saveReturnReason(orderId, String(formData.get("customerReason") ?? ""), access.actorName);
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudo guardar el motivo.", orderId };
   }
@@ -340,12 +338,12 @@ export async function saveReturnReasonAction(_state: UpdateOrderState, formData:
 
 export async function saveInternalNoteAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
   const orderId = String(formData.get("orderId") ?? "");
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    return { error: "Tu sesión no permite anotar en este pedido.", orderId };
-  }
+  const access = await assertPanelAccess();
+    if (!access) {
+      return { error: "Tu sesión no permite anotar en este pedido.", orderId };
+    }
 
-  const result = saveInternalNote(orderId, String(formData.get("internalNote") ?? ""), DEMO_USER.name);
+  const result = await saveInternalNote(orderId, String(formData.get("internalNote") ?? ""), access.actorName);
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudo guardar la nota.", orderId };
   }
@@ -357,13 +355,13 @@ export async function saveInternalNoteAction(_state: UpdateOrderState, formData:
 
 export async function markCustomerNoticeAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
   const orderId = String(formData.get("orderId") ?? "");
-  const jar = await cookies();
-  if (jar.get(SESSION_COOKIE)?.value !== SESSION_VALUE) {
-    return { error: "Tu sesión no permite anotar en este pedido.", orderId };
-  }
+  const access = await assertPanelAccess();
+    if (!access) {
+      return { error: "Tu sesión no permite anotar en este pedido.", orderId };
+    }
 
   const intent = formData.get("intent") === "quitar" ? "quitar" : "avisar";
-  const result = markCustomerNotice(orderId, intent, DEMO_USER.name);
+  const result = await markCustomerNotice(orderId, intent, access.actorName);
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudo anotar el aviso.", orderId };
   }

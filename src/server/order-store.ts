@@ -1,6 +1,4 @@
 import { randomUUID } from "node:crypto";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import path from "node:path";
 import { campaignSkusInOrder } from "@/lib/campaign";
 import { bogotaNow, sizeChoiceLabel, variantFits } from "@/lib/catalog";
 import { formatCop } from "@/lib/format";
@@ -39,47 +37,46 @@ import {
   type StoreOrder,
 } from "@/lib/store-order";
 import { listProducts } from "@/server/catalog-store";
+import { loadOrders, saveOrders } from "@/server/pg-persistence";
 
-const filePath = path.join(process.cwd(), "data", "orders.json");
-
-export function listOrders() {
-  return readOrders().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+export async function listOrders() {
+  return (await readOrders()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function countOrdersForSku(sku: string) {
+export async function countOrdersForSku(sku: string) {
   const needle = sku.trim().toUpperCase();
   if (!needle) return 0;
-  return readOrders().filter((order) => order.lines.some((line) => line.sku === needle)).length;
+  return (await readOrders()).filter((order) => order.lines.some((line) => line.sku === needle)).length;
 }
 
-export function skusWithOrders() {
+export async function skusWithOrders() {
   const skus = new Set<string>();
-  for (const order of readOrders()) {
+  for (const order of await readOrders()) {
     for (const line of order.lines) skus.add(line.sku);
   }
   return skus;
 }
 
-export function getOrder(id: string) {
-  return readOrders().find((order) => order.id === id) ?? null;
+export async function getOrder(id: string) {
+  return (await readOrders()).find((order) => order.id === id) ?? null;
 }
 
-export function findOrderForCustomer(number: string, phone: string) {
+export async function findOrderForCustomer(number: string, phone: string) {
   const normalizedNumber = normalizeOrderNumber(number);
   const normalizedPhone = normalizePhone(phone);
   if (!/^P-\d{4,6}$/.test(normalizedNumber) || !/^3\d{9}$/.test(normalizedPhone)) return null;
-  return readOrders().find((order) => order.number === normalizedNumber && order.phone === normalizedPhone) ?? null;
+  return (await readOrders()).find((order) => order.number === normalizedNumber && order.phone === normalizedPhone) ?? null;
 }
 
-export function placeOrder(input: CheckoutInput) {
-  const orders = readOrders();
+export async function placeOrder(input: CheckoutInput) {
+  const orders = await readOrders();
   const existing = orders.find((order) => order.idempotencyKey === input.idempotencyKey);
   if (existing) return { error: null, order: existing };
 
   const error = validateCheckout(input);
   if (error) return { error, order: null };
 
-  const catalog = listProducts();
+  const catalog = await listProducts();
   const lines = [];
   for (const line of input.lines) {
     const product = catalog.find((item) => item.sku === line.sku.toUpperCase());
@@ -138,12 +135,12 @@ export function placeOrder(input: CheckoutInput) {
     ],
   };
 
-  writeOrders([order, ...orders]);
+  await writeOrders([order, ...orders]);
   return { error: null, order };
 }
 
-export function updateOrder(id: string, action: OrderAction, actorName: string, rawReason = "") {
-  const orders = readOrders();
+export async function updateOrder(id: string, action: OrderAction, actorName: string, rawReason = "") {
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current) return { error: "No encontré ese pedido.", order: null };
 
@@ -163,7 +160,7 @@ export function updateOrder(id: string, action: OrderAction, actorName: string, 
   if (action === "confirmar") {
     const sizeError = confirmSizeError(
       current,
-      listProducts().map((product) => ({
+      (await listProducts()).map((product) => ({
         sku: product.sku,
         variants: product.variants,
         sizeKind: product.sizeKind ?? null,
@@ -198,12 +195,12 @@ export function updateOrder(id: string, action: OrderAction, actorName: string, 
   else if (action !== "resolver") delete order.customerReason;
   if (order.status !== current.status || order.collected !== current.collected) delete order.customerNotifiedAt;
 
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order };
 }
 
-export function cancelOrderByCustomer(id: string, token: string, rawReason: string) {
-  const orders = readOrders();
+export async function cancelOrderByCustomer(id: string, token: string, rawReason: string) {
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current || !token || current.viewToken !== token) return { error: "No encontré ese pedido.", order: null };
   if (current.status !== "pendiente_confirmacion") {
@@ -237,12 +234,12 @@ export function cancelOrderByCustomer(id: string, token: string, rawReason: stri
     ],
   };
   delete order.customerNotifiedAt;
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order };
 }
 
-export function correctDeliveryByCustomer(id: string, token: string, input: DeliveryDraft) {
-  const orders = readOrders();
+export async function correctDeliveryByCustomer(id: string, token: string, input: DeliveryDraft) {
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current || !token || current.viewToken !== token) return { error: "No encontré ese pedido.", order: null };
   if (current.status !== "pendiente_confirmacion") {
@@ -277,16 +274,16 @@ export function correctDeliveryByCustomer(id: string, token: string, input: Deli
       ...current.history,
     ],
   };
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order };
 }
 
-export function chooseSizeByCustomer(
+export async function chooseSizeByCustomer(
   id: string,
   token: string,
   drafts: Array<{ sku: string; variant: string; nextVariant: string }>,
 ) {
-  const orders = readOrders();
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current || !token || current.viewToken !== token) return { error: "No encontré ese pedido.", order: null, saved: false };
   if (!canEditLines(current)) {
@@ -298,7 +295,7 @@ export function chooseSizeByCustomer(
   }
   if (drafts.length !== current.lines.length) return { error: "Un producto del pedido ya no coincide.", order: null, saved: false };
 
-  const products = listProducts().filter((product) => product.published);
+  const products = (await listProducts()).filter((product) => product.published);
   const used = new Set<number>();
   const lines: OrderLine[] = [];
   const changes: Array<{ line: OrderLine; hadChoice: boolean }> = [];
@@ -346,12 +343,12 @@ export function chooseSizeByCustomer(
       ...current.history,
     ],
   };
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order, saved: true };
 }
 
-export function saveBuyerNoteByCustomer(id: string, token: string, raw: string) {
-  const orders = readOrders();
+export async function saveBuyerNoteByCustomer(id: string, token: string, raw: string) {
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current || !token || current.viewToken !== token) return { error: "No encontré ese pedido.", order: null };
   if (current.status !== "pendiente_confirmacion") {
@@ -381,12 +378,12 @@ export function saveBuyerNoteByCustomer(id: string, token: string, raw: string) 
   };
   if (checked.value) order.buyerNote = checked.value;
   else delete order.buyerNote;
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order };
 }
 
-export function saveIncidenceReason(id: string, rawReason: string, actorName: string) {
-  const orders = readOrders();
+export async function saveIncidenceReason(id: string, rawReason: string, actorName: string) {
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current) return { error: "No encontré ese pedido.", order: null, saved: false };
   if (current.status !== "incidencia") {
@@ -413,12 +410,12 @@ export function saveIncidenceReason(id: string, rawReason: string, actorName: st
     ],
   };
   delete order.customerNotifiedAt;
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order, saved: true };
 }
 
-export function saveReturnReason(id: string, rawReason: string, actorName: string) {
-  const orders = readOrders();
+export async function saveReturnReason(id: string, rawReason: string, actorName: string) {
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current) return { error: "No encontré ese pedido.", order: null, saved: false };
   if (current.status !== "devuelto") {
@@ -445,16 +442,16 @@ export function saveReturnReason(id: string, rawReason: string, actorName: strin
     ],
   };
   delete order.customerNotifiedAt;
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order, saved: true };
 }
 
-export function applyCatalogCosts(id: string, actorName: string) {
-  const orders = readOrders();
+export async function applyCatalogCosts(id: string, actorName: string) {
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current) return { error: "No encontré ese pedido.", order: null, saved: false };
 
-  const products = listProducts();
+  const products = await listProducts();
   let changed = false;
   const lines: OrderLine[] = [];
   for (const line of current.lines) {
@@ -500,16 +497,16 @@ export function applyCatalogCosts(id: string, actorName: string) {
       ...current.history,
     ],
   };
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order, saved: true };
 }
 
-export function saveFreight(
+export async function saveFreight(
   id: string,
   input: { actualShipping: number | null; returnFreight: number | null; collectionCost: number | null },
   actorName: string,
 ) {
-  const orders = readOrders();
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current) return { error: "No encontré ese pedido.", order: null };
   if (current.status !== "entregado" && current.status !== "devuelto") {
@@ -569,12 +566,12 @@ export function saveFreight(
       ...current.history,
     ],
   };
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order };
 }
 
-export function saveProviderRef(id: string, raw: string | null, actorName: string) {
-  const orders = readOrders();
+export async function saveProviderRef(id: string, raw: string | null, actorName: string) {
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current) return { error: "No encontré ese pedido.", order: null };
   if (!canNoteDropiNumber(current)) {
@@ -597,7 +594,7 @@ export function saveProviderRef(id: string, raw: string | null, actorName: strin
         ...current.history,
       ],
     };
-    writeOrders(orders.map((item) => (item.id === id ? order : item)));
+    await writeOrders(orders.map((item) => (item.id === id ? order : item)));
     return { error: null, order };
   }
 
@@ -618,12 +615,12 @@ export function saveProviderRef(id: string, raw: string | null, actorName: strin
       ...current.history,
     ],
   };
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order };
 }
 
-export function saveClosedDepartment(id: string, raw: string, actorName: string) {
-  const orders = readOrders();
+export async function saveClosedDepartment(id: string, raw: string, actorName: string) {
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current) return { error: "No encontré ese pedido.", order: null };
   if (current.department?.trim()) return { error: "Este pedido ya tiene departamento.", order: null };
@@ -647,12 +644,12 @@ export function saveClosedDepartment(id: string, raw: string, actorName: string)
       ...current.history,
     ],
   };
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order };
 }
 
-export function saveDelivery(id: string, input: DeliveryDraft, actorName: string) {
-  const orders = readOrders();
+export async function saveDelivery(id: string, input: DeliveryDraft, actorName: string) {
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current) return { error: "No encontré ese pedido.", order: null };
   if (!canEditDelivery(current)) {
@@ -690,16 +687,16 @@ export function saveDelivery(id: string, input: DeliveryDraft, actorName: string
       ...current.history,
     ],
   };
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order };
 }
 
-export function saveOrderLines(id: string, drafts: LineEdit[], actorName: string) {
-  const orders = readOrders();
+export async function saveOrderLines(id: string, drafts: LineEdit[], actorName: string) {
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current) return { error: "No encontré ese pedido.", order: null };
 
-  const products = listProducts();
+  const products = await listProducts();
   const checked = validateLineEdits(current, drafts, (sku) => {
     const product = products.find((item) => item.sku === sku);
     return product ? { variants: product.variants, sizeKind: product.sizeKind } : null;
@@ -757,16 +754,16 @@ export function saveOrderLines(id: string, drafts: LineEdit[], actorName: string
       ...current.history,
     ],
   };
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order };
 }
 
-export function addOrderLine(
+export async function addOrderLine(
   id: string,
   input: { sku: string; variant: string; quantity: number },
   actorName: string,
 ) {
-  const orders = readOrders();
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current) return { error: "No encontré ese pedido.", order: null };
   if (!canEditLines(current)) {
@@ -779,7 +776,7 @@ export function addOrderLine(
 
   const sku = input.sku.trim().toUpperCase();
   if (!sku) return { error: "Elige un producto.", order: null };
-  const product = listProducts().find((item) => item.sku === sku);
+  const product = (await listProducts()).find((item) => item.sku === sku);
   const variant = input.variant.trim();
   if (!product || !product.published || !product.available) {
     return { error: "Ese producto no se puede agregar. Tiene que estar publicado y disponible.", order: null };
@@ -817,12 +814,12 @@ export function addOrderLine(
       ...current.history,
     ],
   };
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order };
 }
 
-export function saveInternalNote(id: string, raw: string, actorName: string) {
-  const orders = readOrders();
+export async function saveInternalNote(id: string, raw: string, actorName: string) {
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current) return { error: "No encontré ese pedido.", order: null };
 
@@ -848,12 +845,12 @@ export function saveInternalNote(id: string, raw: string, actorName: string) {
       ...current.history,
     ],
   };
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order };
 }
 
-export function markCustomerNotice(id: string, intent: "avisar" | "quitar", actorName: string) {
-  const orders = readOrders();
+export async function markCustomerNotice(id: string, intent: "avisar" | "quitar", actorName: string) {
+  const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current) return { error: "No encontré ese pedido.", order: null };
 
@@ -873,7 +870,7 @@ export function markCustomerNotice(id: string, intent: "avisar" | "quitar", acto
         ...current.history,
       ],
     };
-    writeOrders(orders.map((item) => (item.id === id ? order : item)));
+    await writeOrders(orders.map((item) => (item.id === id ? order : item)));
     return { error: null, order };
   }
 
@@ -891,7 +888,7 @@ export function markCustomerNotice(id: string, intent: "avisar" | "quitar", acto
       ...current.history,
     ],
   };
-  writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order };
 }
 
@@ -899,34 +896,28 @@ function invalidPesos(value: number | null) {
   return value !== null && (!Number.isInteger(value) || value < 0 || value > 5_000_000);
 }
 
-function readOrders() {
-  try {
-    const parsed = JSON.parse(readFileSync(filePath, "utf8")) as StoreOrder[];
-    if (!Array.isArray(parsed)) return [];
-    return parsed.map((order) => ({
-      ...order,
-      collected: order.collected === true,
-      department:
-        typeof order.department === "string" && order.department.trim()
-          ? order.department.trim().replace(/\s+/g, " ")
-          : undefined,
-      document: typeof order.document === "string" && /^\d{6,10}$/.test(order.document.trim()) ? order.document.trim() : undefined,
-      providerRef: typeof order.providerRef === "string" && normalizeProviderRef(order.providerRef) ? normalizeProviderRef(order.providerRef) : undefined,
-      internalNote: typeof order.internalNote === "string" && order.internalNote.trim() ? order.internalNote.trim() : undefined,
-      customerReason: typeof order.customerReason === "string" && order.customerReason.trim() ? order.customerReason.trim().replace(/\s+/g, " ") : undefined,
-      buyerNote:
-        typeof order.buyerNote === "string" && order.buyerNote.trim() && order.buyerNote.trim().replace(/\s+/g, " ").length <= 160
-          ? order.buyerNote.trim().replace(/\s+/g, " ")
-          : undefined,
-      customerNotifiedAt: typeof order.customerNotifiedAt === "string" && /^\d{4}-\d{2}-\d{2}T/.test(order.customerNotifiedAt) ? order.customerNotifiedAt : undefined,
-      history: Array.isArray(order.history) ? order.history : [],
-    }));
-  } catch {
-    return [];
-  }
+async function readOrders() {
+  const parsed = await loadOrders();
+  return parsed.map((order) => ({
+    ...order,
+    collected: order.collected === true,
+    department:
+      typeof order.department === "string" && order.department.trim()
+        ? order.department.trim().replace(/\s+/g, " ")
+        : undefined,
+    document: typeof order.document === "string" && /^\d{6,10}$/.test(order.document.trim()) ? order.document.trim() : undefined,
+    providerRef: typeof order.providerRef === "string" && normalizeProviderRef(order.providerRef) ? normalizeProviderRef(order.providerRef) : undefined,
+    internalNote: typeof order.internalNote === "string" && order.internalNote.trim() ? order.internalNote.trim() : undefined,
+    customerReason: typeof order.customerReason === "string" && order.customerReason.trim() ? order.customerReason.trim().replace(/\s+/g, " ") : undefined,
+    buyerNote:
+      typeof order.buyerNote === "string" && order.buyerNote.trim() && order.buyerNote.trim().replace(/\s+/g, " ").length <= 160
+        ? order.buyerNote.trim().replace(/\s+/g, " ")
+        : undefined,
+    customerNotifiedAt: typeof order.customerNotifiedAt === "string" && /^\d{4}-\d{2}-\d{2}T/.test(order.customerNotifiedAt) ? order.customerNotifiedAt : undefined,
+    history: Array.isArray(order.history) ? order.history : [],
+  }));
 }
 
-function writeOrders(orders: StoreOrder[]) {
-  mkdirSync(path.dirname(filePath), { recursive: true });
-  writeFileSync(filePath, JSON.stringify(orders, null, 2));
+async function writeOrders(orders: StoreOrder[]) {
+  await saveOrders(orders);
 }

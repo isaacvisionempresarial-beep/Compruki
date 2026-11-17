@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { Wordmark } from "@/components/brand/wordmark";
 import { Icon, type IconName } from "@/components/icons";
-import { DEMO_USER } from "@/lib/demo-account";
 import { cx } from "@/lib/cx";
 import { useRouteFocus } from "@/lib/use-route-focus";
 import { signOut } from "@/server/auth";
@@ -24,10 +23,18 @@ const items: Array<{ id: string; label: string; icon: IconName; href?: string }>
   { id: "catalogo", label: "Catálogo", icon: "catalog", href: "/panel/catalogo" },
   { id: "rentabilidad", label: "Rentabilidad", icon: "chart", href: "/panel/rentabilidad" },
   { id: "conexiones", label: "Conexiones", icon: "link", href: "/panel/conexiones" },
-  { id: "ajustes", label: "Configuración", icon: "settings" },
+  { id: "ajustes", label: "Configuración", icon: "settings", href: "/panel/ajustes" },
 ];
 
-export function PanelShell({ children }: { children: ReactNode }) {
+type PanelShellProps = {
+  children: ReactNode;
+  storeName: string;
+  actorName: string;
+  roleLabel: string;
+  initials: string;
+};
+
+export function PanelShell({ children, storeName, actorName, roleLabel, initials }: PanelShellProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -83,7 +90,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
     <PanelQueryContext.Provider value={query}>
       <div className="min-h-dvh bg-canvas">
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-[260px] lg:block">
-          <Sidebar />
+          <Sidebar storeName={storeName} />
         </aside>
 
         {open ? (
@@ -97,7 +104,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
               aria-modal="true"
               aria-label="Menú del panel"
             >
-              <Sidebar onNavigate={() => setOpen(false)} showClose />
+              <Sidebar storeName={storeName} onNavigate={() => setOpen(false)} showClose />
             </div>
           </div>
         ) : null}
@@ -133,15 +140,23 @@ export function PanelShell({ children }: { children: ReactNode }) {
                 COP $
               </span>
               <span className="hidden h-9 items-center rounded-[10px] border border-line bg-card px-3 text-xs font-semibold min-[1440px]:inline-flex">
-                {DEMO_USER.store}
+                {storeName}
               </span>
               <div className="hidden items-center gap-2 min-[1440px]:flex">
-                <span className="grid h-8 w-8 place-items-center rounded-full bg-primary text-xs font-bold text-on-dark">AR</span>
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-primary text-xs font-bold text-on-dark">
+                  {initials}
+                </span>
                 <span className="leading-tight">
-                  <span className="block text-sm font-semibold">{DEMO_USER.name}</span>
-                  <span className="block text-xs text-muted">{DEMO_USER.role}</span>
+                  <span className="block text-sm font-semibold">{actorName}</span>
+                  <span className="block text-xs text-muted">{roleLabel}</span>
                 </span>
               </div>
+              <a
+                href="/ingresar?modo=nueva-clave"
+                className="inline-flex h-10 items-center rounded-[10px] px-2 text-sm font-semibold text-accent-strong hover:bg-subtle"
+              >
+                Clave
+              </a>
               <form action={signOut}>
                 <button
                   type="submit"
@@ -163,7 +178,15 @@ export function PanelShell({ children }: { children: ReactNode }) {
   );
 }
 
-function Sidebar({ onNavigate, showClose = false }: { onNavigate?: () => void; showClose?: boolean }) {
+function Sidebar({
+  storeName,
+  onNavigate,
+  showClose = false,
+}: {
+  storeName: string;
+  onNavigate?: () => void;
+  showClose?: boolean;
+}) {
   const pathname = usePathname();
 
   return (
@@ -231,7 +254,7 @@ function Sidebar({ onNavigate, showClose = false }: { onNavigate?: () => void; s
           Dropi no está conectado
         </p>
         <p className="mt-1.5 text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Tenant activo</p>
-        <p className="mt-0.5 text-sm font-semibold">{DEMO_USER.store}</p>
+        <p className="mt-0.5 text-sm font-semibold">{storeName}</p>
         <Link href="/tienda" className="mt-2 inline-flex text-sm font-semibold text-accent" onClick={onNavigate}>
           Abrir tienda
         </Link>

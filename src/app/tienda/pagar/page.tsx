@@ -9,6 +9,6 @@ export const metadata: Metadata = {
 };
 export const dynamic = "force-dynamic";
 
-export default function CheckoutPage() {
-  return <CheckoutScreen products={listPublicProducts()} />;
+export default async function CheckoutPage() {
+  return <CheckoutScreen products={await listPublicProducts()} />;
 }

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default function ProfitabilityPage() {
+export default async function ProfitabilityPage() {
   const today = bogotaNow().slice(0, 10);
-  return <ProfitabilityScreen products={listProducts()} orders={listOrders()} today={today} />;
+  return <ProfitabilityScreen products={await listProducts()} orders={await listOrders()} today={today} />;
 }
