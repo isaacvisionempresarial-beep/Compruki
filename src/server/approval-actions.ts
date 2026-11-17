@@ -119,15 +119,18 @@ async function resolveDraft(
           .eq("id", id);
         return { error: `Aprobado en bandeja falló al escribir catálogo: ${applied.error}`, message: null };
       }
-      applyNote =
-        channel === "ficha"
+      applyNote = !applied.applied
+        ? "El catálogo ya tenía ese texto."
+        : channel === "ficha"
           ? "Aplicado a título y descripción."
           : channel === "anuncio"
             ? "Aplicado a destacados."
             : "Aplicado a respuestas / WhatsApp.";
-      revalidatePath("/panel/catalogo");
-      revalidatePath(`/panel/catalogo/${encodeURIComponent(String(data.product_sku))}`);
-      revalidatePath("/tienda");
+      if (applied.applied) {
+        revalidatePath("/panel/catalogo");
+        revalidatePath(`/panel/catalogo/${encodeURIComponent(String(data.product_sku))}`);
+        revalidatePath("/tienda");
+      }
     }
 
     const editNote = edited ? " · texto editado en bandeja" : "";

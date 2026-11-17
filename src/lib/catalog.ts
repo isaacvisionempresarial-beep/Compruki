@@ -198,6 +198,12 @@ export function changeSummary(previous: CatalogProduct | null, next: ProductDraf
   if (!sameList(previous.variants, next.variants) || (next.variants.length > 0 && previous.sizeKind !== next.sizeKind)) {
     changes.push(sizeListSummary(next.sizeKind, next.variants));
   }
+  if (previous.title.trim() !== next.title.trim()) {
+    changes.push(next.title.trim() ? "Cambió el título." : "Quitó el título.");
+  }
+  if (previous.description.trim() !== next.description.trim()) {
+    changes.push(next.description.trim() ? "Actualizó la descripción." : "Quitó la descripción.");
+  }
   if (previous.highlights.trim() !== next.highlights.trim()) {
     changes.push(next.highlights.trim() ? "Actualizó las características y beneficios." : "Quitó las características y beneficios.");
   }

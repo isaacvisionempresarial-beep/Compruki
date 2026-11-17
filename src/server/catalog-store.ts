@@ -117,6 +117,13 @@ export async function applyApprovedContentDraft(
   if (!product) return { error: `No encontré ${input.sku} en el catálogo local.`, applied: false };
 
   const proposed = proposeDraftFields(product, input);
+  const sameText =
+    proposed.title.trim() === product.title.trim() &&
+    proposed.description.trim() === product.description.trim() &&
+    proposed.highlights.trim() === product.highlights.trim() &&
+    proposed.answers.trim() === product.answers.trim();
+  if (sameText) return { error: null, applied: false };
+
   const draft: ProductDraft = {
     id: product.id,
     title: proposed.title,
