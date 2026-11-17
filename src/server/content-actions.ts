@@ -1,9 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { assertPanelAccess } from "@/server/panel-auth";
 import { saveContentDraft, type ContentChannel } from "@/server/agent-content";
+import { evaluateAgentPolicy } from "@/server/agent-policy";
 import { recordAgentRun } from "@/server/agent-runs";
+import { assertPanelAccess } from "@/server/panel-auth";
 
 export type SaveDraftState = { error: string | null; message: string | null };
 
@@ -13,6 +14,18 @@ export async function saveContentDraftAction(_state: SaveDraftState, formData: F
 
   const channel = String(formData.get("channel") ?? "") as ContentChannel;
   const sku = String(formData.get("sku") ?? "");
+
+  const policy = await evaluateAgentPolicy("AG-03");
+  if (!policy.ok) {
+    await recordAgentRun({
+      agentId: "AG-03",
+      status: "cancelled",
+      summary: policy.reason,
+      createdBy: access.user.id,
+    });
+    return { error: policy.reason, message: null };
+  }
+
   const result = await saveContentDraft({
     sku,
     channel,

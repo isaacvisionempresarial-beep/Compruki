@@ -63,9 +63,9 @@ create policy agent_runs_member on public.agent_runs
     )
   );
 
--- Semilla de roles P0-IA deshabilitados para el tenant piloto.
+-- Semilla P0-IA activos en modo local (sin OpenAI). Ver también 006_agent_configs_local_on.sql.
 insert into public.agent_configs (tenant_id, agent_id, enabled, monthly_budget_cop, notes)
-select t.id, a.agent_id, false, 0, 'Esqueleto. OpenAI no está conectado.'
+select t.id, a.agent_id, true, 0, 'Piloto local activo. OpenAI no está conectado.'
 from public.tenants t
 cross join (
   values

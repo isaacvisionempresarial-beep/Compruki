@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { buildTemplateDrafts } from "@/server/agent-content";
 import { searchLocalCatalog } from "@/server/agent-explorer";
+import { agentDeniedRedirect, evaluateAgentPolicy } from "@/server/agent-policy";
 import { recordAgentRun } from "@/server/agent-runs";
 import { calculateMargin, comparePriceScenarios, getOrderFinancials } from "@/server/agent-tools";
 import { assertPanelAccess } from "@/server/panel-auth";
@@ -25,6 +26,17 @@ export async function searchExplorerAction(formData: FormData) {
   const q = String(formData.get("q") ?? "").trim();
   const categoria = String(formData.get("categoria") ?? "").trim();
   const sku = String(formData.get("sku") ?? "").trim();
+
+  const policy = await evaluateAgentPolicy("AG-02");
+  if (!policy.ok) {
+    await recordAgentRun({
+      agentId: "AG-02",
+      status: "cancelled",
+      summary: policy.reason,
+      createdBy: access.user.id,
+    });
+    redirect(agentDeniedRedirect("AG-02", policy.reason, { q, categoria, sku }));
+  }
 
   const shortlist = await searchLocalCatalog(q, categoria);
   const filters = [
@@ -59,6 +71,17 @@ export async function generateContentDraftsAction(formData: FormData) {
 
   if (!sku) redirect(agentesRedirect({ q, categoria }));
 
+  const policy = await evaluateAgentPolicy("AG-03");
+  if (!policy.ok) {
+    await recordAgentRun({
+      agentId: "AG-03",
+      status: "cancelled",
+      summary: policy.reason,
+      createdBy: access.user.id,
+    });
+    redirect(agentDeniedRedirect("AG-03", policy.reason, { q, categoria, sku }));
+  }
+
   const packed = await buildTemplateDrafts(sku);
   const channels = packed?.drafts.map((draft) => draft.channel) ?? [];
 
@@ -82,6 +105,17 @@ export async function runAnalystAction(formData: FormData) {
   const q = String(formData.get("q") ?? "").trim();
   const categoria = String(formData.get("categoria") ?? "").trim();
   const sku = String(formData.get("sku") ?? "").trim();
+
+  const policy = await evaluateAgentPolicy("AG-04");
+  if (!policy.ok) {
+    await recordAgentRun({
+      agentId: "AG-04",
+      status: "cancelled",
+      summary: policy.reason,
+      createdBy: access.user.id,
+    });
+    redirect(agentDeniedRedirect("AG-04", policy.reason, { q, categoria, sku, marginSku: focusSku || undefined }));
+  }
 
   const [margins, scenarios, orders] = await Promise.all([
     calculateMargin(focusSku || undefined),

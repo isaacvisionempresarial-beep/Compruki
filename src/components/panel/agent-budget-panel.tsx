@@ -34,8 +34,9 @@ export function AgentBudgetPanel({
         Presupuesto y activación (P0-IA)
       </h2>
       <p className="mt-1 text-sm text-muted">
-        Define activación y tope mensual por rol (HU-AG05). OpenAI no está conectado: el costo estimado
-        sigue en cero; las corridas locales sí cuentan.
+        Activación y tope mensual por rol (HU-AG05). Si un rol está apagado o sin presupuesto, Enrutar /
+        Buscar / Generar / Calcular se cancelan. OpenAI no está conectado: el costo estimado sigue en
+        cero.
       </p>
 
       <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
@@ -101,7 +102,7 @@ function AgentConfigForm({
         <input type="hidden" name="agentId" value={role.id} />
         <label className="flex items-center gap-2 text-sm font-semibold">
           <input type="checkbox" name="enabled" defaultChecked={enabled} className="h-4 w-4 accent-[var(--color-accent,#0d9488)]" />
-          Permitir este rol en el piloto
+          Rol activo (bloquea herramientas si está apagado)
         </label>
         <label className="block">
           <span className="mb-1 block text-sm font-semibold">Tope mensual (COP)</span>

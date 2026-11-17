@@ -16,11 +16,22 @@ export const dynamic = "force-dynamic";
 export default async function AgentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; categoria?: string; sku?: string; intent?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    categoria?: string;
+    sku?: string;
+    intent?: string;
+    agente?: string;
+    agenteError?: string;
+  }>;
 }) {
   const params = await searchParams;
   const selectedSku = (params.sku ?? "").trim().toUpperCase();
   const intent = (params.intent ?? "").trim();
+  const policyError =
+    params.agenteError?.trim()
+      ? { agentId: (params.agente ?? "").trim() || null, message: params.agenteError.trim() }
+      : null;
 
   const [view, analyst, explorer, products, packed, saved, central] = await Promise.all([
     getAgentCenterView(),
@@ -45,6 +56,7 @@ export default async function AgentsPage({
         saved,
       }}
       central={{ route: central, defaultIntent: intent }}
+      policyError={policyError}
     />
   );
 }

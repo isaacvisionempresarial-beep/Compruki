@@ -17,6 +17,7 @@ export function AgentsScreen({
   explorer,
   creator,
   central,
+  policyError = null,
 }: {
   view: AgentCenterView;
   analyst: AnalystToolkit;
@@ -29,6 +30,7 @@ export function AgentsScreen({
     saved: SavedContentDraft[];
   };
   central: { route: CentralRouteResult | null; defaultIntent: string };
+  policyError?: { agentId: string | null; message: string } | null;
 }) {
   const p0 = view.roles.filter((role) => role.priority === "P0-IA");
   const later = view.roles.filter((role) => role.priority !== "P0-IA");
@@ -44,6 +46,13 @@ export function AgentsScreen({
         <StatusChip label="Dropi" ok={view.status.dropiConnected} />
         <StatusChip label="Checkout independiente" ok={view.status.checkoutIndependent} positive />
       </div>
+
+      {policyError ? (
+        <p role="alert" className="mt-3 rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
+          {policyError.agentId ? `${policyError.agentId}: ` : null}
+          {policyError.message}
+        </p>
+      ) : null}
 
       <CentralRouterPanel route={central.route} defaultIntent={central.defaultIntent} />
 
