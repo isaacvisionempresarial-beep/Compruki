@@ -143,7 +143,13 @@ export async function applyApprovedContentDraft(
     sizeKind: product.sizeKind ?? "",
   };
 
-  const result = await saveProduct(draft, actorName);
+  const lead =
+    input.channel === "ficha"
+      ? "Borrador de ficha aprobado."
+      : input.channel === "anuncio"
+        ? "Borrador de anuncio aprobado."
+        : "Borrador de WhatsApp aprobado.";
+  const result = await saveProduct(draft, actorName, emptyMedia(), lead);
   if (result.error || !result.product) {
     return { error: result.error ?? "No se pudo aplicar el borrador al catálogo.", applied: false };
   }
@@ -338,7 +344,12 @@ export async function deactivateProduct(id: string, actorName = DEMO_USER.name) 
   return saveProduct(draft, actorName);
 }
 
-export async function saveProduct(draft: ProductDraft, actorName = DEMO_USER.name, media: MediaUpdate = emptyMedia()) {
+export async function saveProduct(
+  draft: ProductDraft,
+  actorName = DEMO_USER.name,
+  media: MediaUpdate = emptyMedia(),
+  historyLead = "",
+) {
   const products = await readProducts();
   const error = validateProduct(draft, products);
   if (error) return { error, product: null };
@@ -351,7 +362,7 @@ export async function saveProduct(draft: ProductDraft, actorName = DEMO_USER.nam
   const applied = applyMedia(current, productId, media);
   if (applied.error) return { error: applied.error, product: null };
 
-  const summary = [changeSummary(current ?? null, draft), ...applied.notes];
+  const summary = [historyLead.trim(), changeSummary(current ?? null, draft), ...applied.notes];
   const note = summary.filter(Boolean).join(" ");
   const next: CatalogProduct = {
     id: productId,

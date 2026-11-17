@@ -26,6 +26,7 @@ export function AgentsScreen({
   central,
   policyError = null,
   canApproveCatalog = false,
+  roleLabel = "Operador",
 }: {
   view: AgentCenterView;
   analyst: AnalystToolkit;
@@ -40,6 +41,7 @@ export function AgentsScreen({
   central: { route: CentralRouteResult | null; defaultIntent: string };
   policyError?: { agentId: string | null; message: string } | null;
   canApproveCatalog?: boolean;
+  roleLabel?: string;
 }) {
   const p0 = view.roles.filter((role) => role.priority === "P0-IA");
   const later = view.roles.filter((role) => role.priority !== "P0-IA");
@@ -53,6 +55,12 @@ export function AgentsScreen({
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Centro de agentes</h1>
       <p className="mt-1 max-w-2xl text-sm text-muted">{view.status.message}</p>
+      <p className="mt-1 text-sm text-muted">
+        Sesión: {roleLabel}.{" "}
+        {canApproveCatalog
+          ? "Puedes aprobar borradores y cambiar presupuesto."
+          : "Puedes usar las herramientas y rechazar borradores. Aprobar y el presupuesto los guarda el propietario."}
+      </p>
 
       <div className="mt-3 flex flex-wrap gap-2">
         <StatusChip label="OpenAI" ok={view.status.openaiConnected} />

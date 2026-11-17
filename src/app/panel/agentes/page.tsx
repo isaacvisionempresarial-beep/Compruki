@@ -60,6 +60,7 @@ export default async function AgentsPage({
       central={{ route: central, defaultIntent: intent }}
       policyError={policyError}
       canApproveCatalog={access.role === "owner"}
+      roleLabel={access.roleLabel}
     />
   );
 }
