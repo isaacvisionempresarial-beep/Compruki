@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { MAX_PRODUCT_VIDEO_BYTES, parsePesos, parseVariants, sniffImage, sniffVideo, type ProductDraft, type ProductImageType } from "@/lib/catalog";
+import { MAX_PRODUCT_VIDEO_BYTES, parsePesos, parseVariants, sniffImage, sniffVideo, type CatalogProduct, type ProductDraft, type ProductImageType } from "@/lib/catalog";
 import { assertPanelAccess } from "@/server/panel-auth";
 import { deactivateProduct, deleteProduct, getCatalogProductById, saveProduct, type MediaUpdate } from "@/server/catalog-store";
 import { countOrdersForSku } from "@/server/order-store";
@@ -51,6 +51,22 @@ export async function saveProductAction(_state: SaveProductState, formData: Form
     sizeKind: formData.get("sizeKind") === "tamano" ? "tamano" : formData.get("sizeKind") === "talla" ? "talla" : "",
   };
 
+  if (access.role !== "owner") {
+    if (!draft.id) {
+      return { error: "Solo el propietario puede crear productos.", productId: null, message: null };
+    }
+    const current = await getCatalogProductById(draft.id);
+    if (!current) return { error: "Ese producto ya no está en el catálogo.", productId: null, message: null };
+    const blocked = commercialChanges(current, draft);
+    if (blocked.length > 0) {
+      return {
+        error: `Solo el propietario puede cambiar ${blocked.join(", ")}.`,
+        productId: null,
+        message: null,
+      };
+    }
+  }
+
   const previousSku = String(formData.get("previousSku") ?? "");
   const result = await saveProduct(draft, access.actorName, media);
   if (result.error || !result.product) {
@@ -81,6 +97,10 @@ export async function deleteProductAction(
     if (!access) {
       return { error: "Tu sesión no permite cambiar el catálogo.", message: null };
     }
+
+  if (access.role !== "owner") {
+    return { error: "Solo el propietario puede eliminar productos.", message: null };
+  }
 
   const id = String(formData.get("id") ?? "").trim();
   if (!id) return { error: "No encontré ese producto.", message: null };
@@ -129,6 +149,17 @@ export async function deactivateProductAction(
     error: null,
     message: "Producto marcado como no disponible. Sigue en el catálogo, pero no se puede pedir.",
   };
+}
+
+function commercialChanges(current: CatalogProduct, draft: ProductDraft) {
+  const blocked: string[] = [];
+  if (draft.price !== current.price) blocked.push("el precio");
+  if (draft.cost !== current.cost) blocked.push("el costo");
+  if (draft.shipping !== current.shipping) blocked.push("el envío");
+  if (draft.commissions !== current.commissions) blocked.push("las comisiones");
+  if (draft.published !== current.published) blocked.push("la publicación");
+  if (draft.sku.trim().toUpperCase() !== current.sku) blocked.push("el SKU");
+  return blocked;
 }
 
 async function readMedia(formData: FormData): Promise<MediaUpdate | { error: string }> {
