@@ -7,15 +7,22 @@ import { resolvePendingApprovalAction, type ResolveApprovalState } from "@/serve
 
 const initial: ResolveApprovalState = { error: null, message: null };
 
-export function PendingApprovalsPanel({ items }: { items: PendingApproval[] }) {
+export function PendingApprovalsPanel({
+  items,
+  canApproveCatalog = false,
+}: {
+  items: PendingApproval[];
+  canApproveCatalog?: boolean;
+}) {
   return (
     <section className="mt-4" aria-labelledby="pendientes-humanos">
       <h2 id="pendientes-humanos" className="text-base font-bold">
         Pendientes humanos
       </h2>
       <p className="mt-1 text-sm text-muted">
-        Bandeja de AG-01 · list_pending_approvals. Al editar el borrador, «si apruebas» muestra el texto
-        que se escribirá en el catálogo. Pedidos se atienden en Pedidos. OpenAI no está conectado.
+        Bandeja de AG-01 · list_pending_approvals. Solo el propietario aprueba un borrador y lo escribe en
+        el catálogo. Un operador puede rechazarlo. Pedidos se atienden en Pedidos. OpenAI no está
+        conectado.
       </p>
 
       {items.length === 0 ? (
@@ -44,6 +51,7 @@ export function PendingApprovalsPanel({ items }: { items: PendingApproval[] }) {
                   id={item.id}
                   preview={item.preview}
                   approveDisabled={Boolean(item.preview.catalogError)}
+                  canApproveCatalog={canApproveCatalog}
                 />
               ) : item.actionable ? (
                 <ApprovalButtons kind={item.kind} id={item.id} />
@@ -106,10 +114,12 @@ function DraftReviewForm({
   id,
   preview,
   approveDisabled,
+  canApproveCatalog,
 }: {
   id: string;
   preview: NonNullable<PendingApproval["preview"]>;
   approveDisabled: boolean;
+  canApproveCatalog: boolean;
 }) {
   const [state, action, pending] = useActionState(resolvePendingApprovalAction, initial);
   const [title, setTitle] = useState(preview.title === "(sin título)" ? "" : preview.title);
@@ -202,12 +212,17 @@ function DraftReviewForm({
           No se puede aprobar: el SKU no está en el catálogo local. Puedes rechazar el borrador.
         </p>
       ) : null}
+      {!canApproveCatalog ? (
+        <p role="status" className="text-sm font-medium text-coral">
+          Solo el propietario puede aprobar y escribir en el catálogo. Puedes rechazar el borrador.
+        </p>
+      ) : null}
       <div className="flex flex-wrap gap-2">
         <button
           type="submit"
           name="decision"
           value="approve"
-          disabled={pending || approveDisabled}
+          disabled={pending || approveDisabled || !canApproveCatalog}
           className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-xs font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
         >
           {pending ? "…" : "Aprobar y escribir"}

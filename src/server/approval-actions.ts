@@ -25,7 +25,7 @@ export async function resolvePendingApprovalAction(
   }
 
   if (kind === "borrador") {
-    return resolveDraft(id, decision, access.user.id, access.actorName, formData);
+    return resolveDraft(id, decision, access.user.id, access.actorName, access.role, formData);
   }
   if (kind === "agente") {
     return resolveAgentRun(id, decision, access.user.id);
@@ -39,8 +39,16 @@ async function resolveDraft(
   decision: "approve" | "reject",
   userId: string,
   actorName: string,
+  role: "owner" | "operator",
   formData: FormData,
 ): Promise<ResolveApprovalState> {
+  if (decision === "approve" && role !== "owner") {
+    return {
+      error: "Solo el propietario puede aprobar un borrador y escribirlo en el catálogo.",
+      message: null,
+    };
+  }
+
   try {
     const tenantId = await getPilotTenantId();
     const supabase = createAdminSupabase();

@@ -5,6 +5,7 @@ import { buildTemplateDrafts, listContentDrafts, listDraftableProducts } from "@
 import { searchLocalCatalog } from "@/server/agent-explorer";
 import { getAgentCenterView } from "@/server/agent-gateway";
 import { getAnalystToolkit } from "@/server/agent-tools";
+import { requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
   title: "Centro de agentes",
@@ -33,7 +34,8 @@ export default async function AgentsPage({
       ? { agentId: (params.agente ?? "").trim() || null, message: params.agenteError.trim() }
       : null;
 
-  const [view, analyst, explorer, products, packed, saved, central] = await Promise.all([
+  const [access, view, analyst, explorer, products, packed, saved, central] = await Promise.all([
+    requirePanelAccess(),
     getAgentCenterView(),
     getAnalystToolkit(),
     searchLocalCatalog(params.q ?? "", params.categoria ?? ""),
@@ -57,6 +59,7 @@ export default async function AgentsPage({
       }}
       central={{ route: central, defaultIntent: intent }}
       policyError={policyError}
+      canApproveCatalog={access.role === "owner"}
     />
   );
 }

@@ -25,6 +25,7 @@ export function AgentsScreen({
   creator,
   central,
   policyError = null,
+  canApproveCatalog = false,
 }: {
   view: AgentCenterView;
   analyst: AnalystToolkit;
@@ -38,6 +39,7 @@ export function AgentsScreen({
   };
   central: { route: CentralRouteResult | null; defaultIntent: string };
   policyError?: { agentId: string | null; message: string } | null;
+  canApproveCatalog?: boolean;
 }) {
   const p0 = view.roles.filter((role) => role.priority === "P0-IA");
   const later = view.roles.filter((role) => role.priority !== "P0-IA");
@@ -65,7 +67,7 @@ export function AgentsScreen({
         </p>
       ) : null}
 
-      <PendingApprovalsPanel items={view.pendingApprovals} />
+      <PendingApprovalsPanel items={view.pendingApprovals} canApproveCatalog={canApproveCatalog} />
 
       <CentralRouterPanel route={central.route} defaultIntent={central.defaultIntent} enabled={ag01} />
 
