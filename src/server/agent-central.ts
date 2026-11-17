@@ -4,6 +4,7 @@ import { createAdminSupabase } from "@/lib/supabase/admin";
 import { buildTemplateDrafts, listPendingContentDrafts } from "@/server/agent-content";
 import { searchLocalCatalog } from "@/server/agent-explorer";
 import { calculateMargin, comparePriceScenarios } from "@/server/agent-tools";
+import { previewContentDraftAgainstCatalog, type CatalogFieldDiff } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
 import { getPilotTenantId } from "@/server/tenant";
 
@@ -22,6 +23,8 @@ export type PendingApproval = {
     body: string;
     cta: string;
     applyTarget: string;
+    diffs: CatalogFieldDiff[];
+    catalogError: string | null;
   };
 };
 
@@ -72,28 +75,38 @@ export async function listPendingApprovals(): Promise<PendingApproval[]> {
 
 async function listPendingDraftApprovals(): Promise<PendingApproval[]> {
   const drafts = await listPendingContentDrafts(8);
-  return drafts.map((draft) => {
-    const applyTarget =
-      draft.channel === "ficha"
-        ? "título y descripción del producto"
-        : draft.channel === "anuncio"
-          ? "destacados del producto"
-          : "respuestas / WhatsApp del producto";
-    return {
-      id: draft.id,
-      kind: "borrador" as const,
-      label: `${draft.productSku} · ${draft.channel}`,
-      detail: `Al aprobar se escribe en ${applyTarget}.`,
-      href: `/panel/agentes?sku=${encodeURIComponent(draft.productSku)}`,
-      actionable: true,
-      preview: {
-        title: draft.title || "(sin título)",
-        body: draft.body || "(sin cuerpo)",
-        cta: draft.cta || "",
-        applyTarget,
-      },
-    };
-  });
+  return Promise.all(
+    drafts.map(async (draft) => {
+      const comparison = await previewContentDraftAgainstCatalog({
+        sku: draft.productSku,
+        channel: draft.channel,
+        title: draft.title,
+        body: draft.body,
+        cta: draft.cta,
+      });
+      const changed = comparison.diffs.filter((diff) => diff.changed).length;
+      return {
+        id: draft.id,
+        kind: "borrador" as const,
+        label: `${draft.productSku} · ${draft.channel}`,
+        detail: comparison.error
+          ? comparison.error
+          : `Al aprobar se escribe en ${comparison.applyTarget}${
+              changed > 0 ? ` · ${changed} campo(s) cambian` : " · sin cambios detectados"
+            }.`,
+        href: `/panel/agentes?sku=${encodeURIComponent(draft.productSku)}`,
+        actionable: true,
+        preview: {
+          title: draft.title || "(sin título)",
+          body: draft.body || "(sin cuerpo)",
+          cta: draft.cta || "",
+          applyTarget: comparison.applyTarget,
+          diffs: comparison.diffs,
+          catalogError: comparison.error,
+        },
+      };
+    }),
+  );
 }
 
 async function listAwaitingAgentApprovals(): Promise<PendingApproval[]> {

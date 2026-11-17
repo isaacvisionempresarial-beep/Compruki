@@ -46,29 +46,63 @@ export async function getProductBySku(sku: string) {
   return products.find((product) => product.sku === normalized) ?? null;
 }
 
+export type ContentDraftApplyInput = {
+  sku: string;
+  channel: "ficha" | "anuncio" | "whatsapp";
+  title: string;
+  body: string;
+  cta: string;
+};
+
+export type CatalogFieldDiff = {
+  field: string;
+  before: string;
+  after: string;
+  changed: boolean;
+};
+
+/** Calcula el texto que quedaría en catálogo si se aprueba el borrador. */
+export async function previewContentDraftAgainstCatalog(
+  input: ContentDraftApplyInput,
+): Promise<{ error: string | null; diffs: CatalogFieldDiff[]; applyTarget: string }> {
+  const product = await getProductBySku(input.sku);
+  if (!product) {
+    return {
+      error: `No encontré ${input.sku} en el catálogo local.`,
+      diffs: [],
+      applyTarget: applyTargetLabel(input.channel),
+    };
+  }
+
+  const proposed = proposeDraftFields(product, input);
+  const diffs: CatalogFieldDiff[] =
+    input.channel === "ficha"
+      ? [
+          fieldDiff("Título", product.title, proposed.title),
+          fieldDiff("Descripción", product.description, proposed.description),
+        ]
+      : input.channel === "anuncio"
+        ? [fieldDiff("Destacados", product.highlights, proposed.highlights)]
+        : [fieldDiff("Respuestas / WhatsApp", product.answers, proposed.answers)];
+
+  return { error: null, diffs, applyTarget: applyTargetLabel(input.channel) };
+}
+
 /** Aplica un borrador aprobado al catálogo local (escritura supervisada). */
 export async function applyApprovedContentDraft(
-  input: {
-    sku: string;
-    channel: "ficha" | "anuncio" | "whatsapp";
-    title: string;
-    body: string;
-    cta: string;
-  },
+  input: ContentDraftApplyInput,
   actorName: string,
 ): Promise<{ error: string | null; applied: boolean }> {
   const product = await getProductBySku(input.sku);
   if (!product) return { error: `No encontré ${input.sku} en el catálogo local.`, applied: false };
 
-  const title = input.title.trim().slice(0, 200) || product.title;
-  const body = input.body.trim().slice(0, 4000);
-  const cta = input.cta.trim().slice(0, 120);
+  const proposed = proposeDraftFields(product, input);
   const draft: ProductDraft = {
     id: product.id,
-    title: product.title,
-    description: product.description,
-    highlights: product.highlights,
-    answers: product.answers,
+    title: proposed.title,
+    description: proposed.description,
+    highlights: proposed.highlights,
+    answers: proposed.answers,
     sku: product.sku,
     externalRef: product.externalRef,
     category: product.category,
@@ -82,20 +116,45 @@ export async function applyApprovedContentDraft(
     sizeKind: product.sizeKind ?? "",
   };
 
-  if (input.channel === "ficha") {
-    draft.title = title;
-    draft.description = [body, cta ? `CTA: ${cta}` : ""].filter(Boolean).join("\n\n");
-  } else if (input.channel === "anuncio") {
-    draft.highlights = [title, body, cta ? `CTA: ${cta}` : ""].filter(Boolean).join("\n");
-  } else {
-    draft.answers = [title, body, cta ? `CTA: ${cta}` : ""].filter(Boolean).join("\n\n");
-  }
-
   const result = await saveProduct(draft, actorName);
   if (result.error || !result.product) {
     return { error: result.error ?? "No se pudo aplicar el borrador al catálogo.", applied: false };
   }
   return { error: null, applied: true };
+}
+
+function proposeDraftFields(product: CatalogProduct, input: ContentDraftApplyInput) {
+  const title = input.title.trim().slice(0, 200) || product.title;
+  const body = input.body.trim().slice(0, 4000);
+  const cta = input.cta.trim().slice(0, 120);
+  const next = {
+    title: product.title,
+    description: product.description,
+    highlights: product.highlights,
+    answers: product.answers,
+  };
+
+  if (input.channel === "ficha") {
+    next.title = title;
+    next.description = [body, cta ? `CTA: ${cta}` : ""].filter(Boolean).join("\n\n");
+  } else if (input.channel === "anuncio") {
+    next.highlights = [title, body, cta ? `CTA: ${cta}` : ""].filter(Boolean).join("\n");
+  } else {
+    next.answers = [title, body, cta ? `CTA: ${cta}` : ""].filter(Boolean).join("\n\n");
+  }
+  return next;
+}
+
+function applyTargetLabel(channel: ContentDraftApplyInput["channel"]) {
+  if (channel === "ficha") return "título y descripción del producto";
+  if (channel === "anuncio") return "destacados del producto";
+  return "respuestas / WhatsApp del producto";
+}
+
+function fieldDiff(field: string, before: string, after: string): CatalogFieldDiff {
+  const left = before.trim() || "(vacío)";
+  const right = after.trim() || "(vacío)";
+  return { field, before: left, after: right, changed: left !== right };
 }
 
 export type PublicProduct = {

@@ -14,9 +14,8 @@ export function PendingApprovalsPanel({ items }: { items: PendingApproval[] }) {
         Pendientes humanos
       </h2>
       <p className="mt-1 text-sm text-muted">
-        Bandeja de AG-01 · list_pending_approvals. Revisa el texto del borrador antes de aprobar; al
-        aprobar se escribe en el catálogo local. Pedidos se atienden en Pedidos. OpenAI no está
-        conectado.
+        Bandeja de AG-01 · list_pending_approvals. Revisa el antes/después contra el catálogo antes de
+        aprobar. Pedidos se atienden en Pedidos. OpenAI no está conectado.
       </p>
 
       {items.length === 0 ? (
@@ -56,31 +55,67 @@ function DraftPreview({
   preview: NonNullable<PendingApproval["preview"]>;
 }) {
   const [open, setOpen] = useState(true);
-  const bodyPreview = preview.body.length > 420 ? `${preview.body.slice(0, 420)}…` : preview.body;
+  const bodyPreview = preview.body.length > 320 ? `${preview.body.slice(0, 320)}…` : preview.body;
 
   return (
     <div className="mt-2 rounded-[10px] border border-line bg-canvas px-3 py-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
-          Vista previa → {preview.applyTarget}
+          Antes / después → {preview.applyTarget}
         </p>
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
           className="text-xs font-semibold text-accent-strong"
         >
-          {open ? "Ocultar" : "Ver texto"}
+          {open ? "Ocultar" : "Ver comparación"}
         </button>
       </div>
       {open ? (
-        <div className="mt-2 space-y-1.5">
-          <p className="font-semibold text-ink">{preview.title}</p>
-          <p className="whitespace-pre-wrap text-muted">{bodyPreview}</p>
-          {preview.cta ? <p className="font-semibold text-ink">CTA: {preview.cta}</p> : null}
+        <div className="mt-2 space-y-3">
+          {preview.catalogError ? (
+            <p role="alert" className="font-medium text-danger">
+              {preview.catalogError}
+            </p>
+          ) : (
+            preview.diffs.map((diff) => (
+              <div key={diff.field} className="grid gap-2 sm:grid-cols-2">
+                <div>
+                  <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
+                    {diff.field} · ahora
+                  </p>
+                  <p className="mt-1 whitespace-pre-wrap text-muted">{clip(diff.before)}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
+                    {diff.field} · si apruebas
+                    {diff.changed ? "" : " · igual"}
+                  </p>
+                  <p
+                    className={`mt-1 whitespace-pre-wrap ${
+                      diff.changed ? "font-medium text-ink" : "text-muted"
+                    }`}
+                  >
+                    {clip(diff.after)}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
+          <div className="border-t border-line pt-2">
+            <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">Borrador fuente</p>
+            <p className="mt-1 font-semibold text-ink">{preview.title}</p>
+            <p className="mt-1 whitespace-pre-wrap text-muted">{bodyPreview}</p>
+            {preview.cta ? <p className="mt-1 font-semibold text-ink">CTA: {preview.cta}</p> : null}
+          </div>
         </div>
       ) : null}
     </div>
   );
+}
+
+function clip(text: string, max = 280) {
+  return text.length > max ? `${text.slice(0, max)}…` : text;
 }
 
 function ApprovalButtons({ kind, id }: { kind: PendingApproval["kind"]; id: string }) {
