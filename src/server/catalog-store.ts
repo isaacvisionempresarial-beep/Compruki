@@ -61,11 +61,28 @@ export type CatalogFieldDiff = {
   changed: boolean;
 };
 
+export type ContentDraftComparison = {
+  error: string | null;
+  diffs: CatalogFieldDiff[];
+  applyTarget: string;
+};
+
 /** Calcula el texto que quedaría en catálogo si se aprueba el borrador. */
-export async function previewContentDraftAgainstCatalog(
-  input: ContentDraftApplyInput,
-): Promise<{ error: string | null; diffs: CatalogFieldDiff[]; applyTarget: string }> {
-  const product = await getProductBySku(input.sku);
+export async function previewContentDraftAgainstCatalog(input: ContentDraftApplyInput): Promise<ContentDraftComparison> {
+  return compareDraftToProduct(await getProductBySku(input.sku), input);
+}
+
+/** Una sola lectura del catálogo para varios borradores pendientes. */
+export async function previewContentDraftsAgainstCatalog(
+  inputs: ContentDraftApplyInput[],
+): Promise<ContentDraftComparison[]> {
+  if (inputs.length === 0) return [];
+  const products = await readProducts();
+  const bySku = new Map(products.map((product) => [product.sku, product]));
+  return inputs.map((input) => compareDraftToProduct(bySku.get(input.sku.trim().toUpperCase()) ?? null, input));
+}
+
+function compareDraftToProduct(product: CatalogProduct | null, input: ContentDraftApplyInput): ContentDraftComparison {
   if (!product) {
     return {
       error: `No encontré ${input.sku} en el catálogo local.`,
