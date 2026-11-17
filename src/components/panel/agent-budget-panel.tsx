@@ -97,6 +97,16 @@ function AgentConfigForm({
         Este mes: {spend.runCount} corrida{spend.runCount === 1 ? "" : "s"} · costo {formatCop(spend.costEstimateCop)}
         {budget > 0 ? ` · tope ${formatCop(budget)}` : ""}
       </p>
+      {budget > 0 ? (
+        <div className="mt-2" aria-hidden="true">
+          <div className="h-1.5 overflow-hidden rounded-full bg-subtle">
+            <div
+              className="h-full rounded-full bg-accent"
+              style={{ width: `${Math.min(100, Math.round((spend.costEstimateCop / budget) * 100))}%` }}
+            />
+          </div>
+        </div>
+      ) : null}
 
       <form action={action} className="mt-3 grid gap-2">
         <input type="hidden" name="agentId" value={role.id} />

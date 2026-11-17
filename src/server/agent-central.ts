@@ -1,9 +1,11 @@
 import { formatCop } from "@/lib/format";
+import { orderFocusHref } from "@/lib/store-order";
+import { createAdminSupabase } from "@/lib/supabase/admin";
 import { buildTemplateDrafts } from "@/server/agent-content";
 import { searchLocalCatalog } from "@/server/agent-explorer";
 import { calculateMargin, comparePriceScenarios } from "@/server/agent-tools";
 import { listOrders } from "@/server/order-store";
-import { orderFocusHref } from "@/lib/store-order";
+import { getPilotTenantId } from "@/server/tenant";
 
 export type RoutedAgent = "AG-01" | "AG-02" | "AG-03" | "AG-04";
 
@@ -34,9 +36,10 @@ const AGENT_LABEL: Record<RoutedAgent, string> = {
   "AG-04": "Analista",
 };
 
-/** AG-01 · list_pending_approvals (pedidos + cola de agentes vacía por ahora). */
+/** AG-01 · list_pending_approvals (pedidos + corridas awaiting_approval). */
 export async function listPendingApprovals(): Promise<PendingApproval[]> {
-  const orders = await listOrders();
+  const [orders, agentItems] = await Promise.all([listOrders(), listAwaitingAgentApprovals()]);
+
   const pendingOrders = orders
     .filter((order) => order.status === "pendiente_confirmacion" || order.status === "incidencia")
     .slice(0, 8)
@@ -51,7 +54,33 @@ export async function listPendingApprovals(): Promise<PendingApproval[]> {
       href: orderFocusHref(order.number),
     }));
 
-  return pendingOrders;
+  return [...pendingOrders, ...agentItems];
+}
+
+async function listAwaitingAgentApprovals(): Promise<PendingApproval[]> {
+  try {
+    const tenantId = await getPilotTenantId();
+    const supabase = createAdminSupabase();
+    const { data, error } = await supabase
+      .from("agent_runs")
+      .select("id, agent_id, summary, created_at")
+      .eq("tenant_id", tenantId)
+      .eq("status", "awaiting_approval")
+      .order("created_at", { ascending: false })
+      .limit(8);
+
+    if (error || !data) return [];
+
+    return data.map((row) => ({
+      id: String(row.id),
+      kind: "agente" as const,
+      label: String(row.agent_id),
+      detail: typeof row.summary === "string" && row.summary ? row.summary : "Corrida en espera de aprobación humana",
+      href: "/panel/agentes#corridas",
+    }));
+  } catch {
+    return [];
+  }
 }
 
 /**

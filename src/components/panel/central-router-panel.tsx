@@ -5,9 +5,11 @@ import { routeCentralAction } from "@/server/central-actions";
 export function CentralRouterPanel({
   route,
   defaultIntent = "",
+  enabled = true,
 }: {
   route: CentralRouteResult | null;
   defaultIntent?: string;
+  enabled?: boolean;
 }) {
   return (
     <section className="mt-4" aria-labelledby="central">
@@ -18,6 +20,11 @@ export function CentralRouterPanel({
         AG-01 enruta con reglas a Explorador, Analista y Creador. Cada «Enrutar» deja una corrida en el
         historial. No usa modelo ni Dropi en vivo.
       </p>
+      {!enabled ? (
+        <p role="status" className="mt-2 text-sm font-medium text-coral">
+          AG-01 está apagado. Actívalo en Presupuesto y activación.
+        </p>
+      ) : null}
 
       <form
         action={routeCentralAction}
@@ -28,14 +35,16 @@ export function CentralRouterPanel({
           <input
             name="intent"
             defaultValue={defaultIntent}
+            disabled={!enabled}
             placeholder="Ej. margen LAM-MES-01, borrador faja, buscar ropa"
-            className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
+            className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
           />
         </label>
         <div className="flex items-end">
           <button
             type="submit"
-            className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft sm:w-auto"
+            disabled={!enabled}
+            className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55 sm:w-auto"
           >
             Enrutar
           </button>

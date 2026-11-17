@@ -15,6 +15,7 @@ export function ContentCreatorPanel({
   saved,
   preserveQuery = "",
   preserveCategory = "",
+  enabled = true,
 }: {
   products: Array<{ sku: string; title: string }>;
   selectedSku: string;
@@ -23,6 +24,7 @@ export function ContentCreatorPanel({
   saved: SavedContentDraft[];
   preserveQuery?: string;
   preserveCategory?: string;
+  enabled?: boolean;
 }) {
   return (
     <section className="mt-6" aria-labelledby="creador">
@@ -33,6 +35,11 @@ export function ContentCreatorPanel({
         AG-03 sin OpenAI: arma borradores con hechos del catálogo. Generar o guardar deja corrida en el
         historial. Revisa antes de publicar.
       </p>
+      {!enabled ? (
+        <p role="status" className="mt-2 text-sm font-medium text-coral">
+          AG-03 está apagado. Actívalo en Presupuesto y activación.
+        </p>
+      ) : null}
 
       <form
         action={generateContentDraftsAction}
@@ -45,7 +52,8 @@ export function ContentCreatorPanel({
           <select
             name="sku"
             defaultValue={selectedSku}
-            className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
+            disabled={!enabled}
+            className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
           >
             <option value="">Elige un SKU</option>
             {products.map((product) => (
@@ -58,7 +66,8 @@ export function ContentCreatorPanel({
         <div className="flex items-end gap-2">
           <button
             type="submit"
-            className="inline-flex h-10 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft"
+            disabled={!enabled}
+            className="inline-flex h-10 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
           >
             Generar borradores
           </button>
@@ -96,7 +105,7 @@ export function ContentCreatorPanel({
           <ul className="mt-3 grid gap-3 lg:grid-cols-3">
             {drafts.map((draft) => (
               <li key={draft.channel}>
-                <DraftCard sku={facts.sku} draft={draft} />
+                <DraftCard sku={facts.sku} draft={draft} enabled={enabled} />
               </li>
             ))}
           </ul>
@@ -128,7 +137,7 @@ export function ContentCreatorPanel({
   );
 }
 
-function DraftCard({ sku, draft }: { sku: string; draft: ContentDraft }) {
+function DraftCard({ sku, draft, enabled }: { sku: string; draft: ContentDraft; enabled: boolean }) {
   const [state, action, pending] = useActionState(saveContentDraftAction, initial);
 
   return (
@@ -146,7 +155,7 @@ function DraftCard({ sku, draft }: { sku: string; draft: ContentDraft }) {
         <input type="hidden" name="cta" value={draft.cta} />
         <button
           type="submit"
-          disabled={pending}
+          disabled={pending || !enabled}
           className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-55"
         >
           {pending ? "Guardando…" : "Guardar borrador"}

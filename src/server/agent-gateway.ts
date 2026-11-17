@@ -1,5 +1,6 @@
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { AGENT_ROLES, type AgentRoleDefinition } from "@/lib/agents/roles";
+import { listPendingApprovals, type PendingApproval } from "@/server/agent-central";
 import { listProducts } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
 import { getPilotTenantId } from "@/server/tenant";
@@ -39,6 +40,7 @@ export type AgentCenterView = {
     totalRuns: number;
     byAgent: AgentMonthSpend[];
   };
+  pendingApprovals: PendingApproval[];
   recentRuns: Array<{
     id: string;
     agentId: string;
@@ -64,11 +66,12 @@ export async function getAgentCenterView(): Promise<AgentCenterView> {
   const configs = await loadAgentConfigs();
   const configById = new Map(configs.map((row) => [row.agentId, row]));
 
-  const [products, orders, recentRuns, monthSpend] = await Promise.all([
+  const [products, orders, recentRuns, monthSpend, pendingApprovals] = await Promise.all([
     listProducts(),
     listOrders(),
     loadRecentRuns(),
     loadMonthSpend(),
+    listPendingApprovals(),
   ]);
 
   return {
@@ -84,6 +87,7 @@ export async function getAgentCenterView(): Promise<AgentCenterView> {
       pendingConfirmation: orders.filter((order) => order.status === "pendiente_confirmacion").length,
     },
     monthSpend,
+    pendingApprovals,
     recentRuns,
   };
 }

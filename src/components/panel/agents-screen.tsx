@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AgentBudgetPanel } from "@/components/panel/agent-budget-panel";
 import { CentralRouterPanel } from "@/components/panel/central-router-panel";
 import { ContentCreatorPanel } from "@/components/panel/content-creator-panel";
+import { PendingApprovalsPanel } from "@/components/panel/pending-approvals-panel";
 import { publicationLabel } from "@/lib/catalog";
 import { formatCop } from "@/lib/format";
 import type { CentralRouteResult } from "@/server/agent-central";
@@ -10,6 +11,12 @@ import type { ExplorerShortlist } from "@/server/agent-explorer";
 import type { AgentCenterView } from "@/server/agent-gateway";
 import { runAnalystAction, searchExplorerAction } from "@/server/agent-panel-actions";
 import type { AnalystToolkit } from "@/server/agent-tools";
+
+function agentIsOn(view: AgentCenterView, agentId: string) {
+  const role = view.roles.find((item) => item.id === agentId);
+  if (!role?.config) return true;
+  return role.config.enabled === true;
+}
 
 export function AgentsScreen({
   view,
@@ -34,6 +41,10 @@ export function AgentsScreen({
 }) {
   const p0 = view.roles.filter((role) => role.priority === "P0-IA");
   const later = view.roles.filter((role) => role.priority !== "P0-IA");
+  const ag01 = agentIsOn(view, "AG-01");
+  const ag02 = agentIsOn(view, "AG-02");
+  const ag03 = agentIsOn(view, "AG-03");
+  const ag04 = agentIsOn(view, "AG-04");
 
   return (
     <div className="mx-auto max-w-[1100px] pb-8">
@@ -54,7 +65,9 @@ export function AgentsScreen({
         </p>
       ) : null}
 
-      <CentralRouterPanel route={central.route} defaultIntent={central.defaultIntent} />
+      <PendingApprovalsPanel items={view.pendingApprovals} />
+
+      <CentralRouterPanel route={central.route} defaultIntent={central.defaultIntent} enabled={ag01} />
 
       <section className="elevate-1 mt-4 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="resumen-tienda">
         <h2 id="resumen-tienda" className="text-sm font-semibold">
@@ -88,6 +101,11 @@ export function AgentsScreen({
           AG-02 en modo local. Fuente: {explorer.sourceLabel}. Cada búsqueda deja corrida en el historial. No
           es Dropi en vivo.
         </p>
+        {!ag02 ? (
+          <p role="status" className="mt-2 text-sm font-medium text-coral">
+            AG-02 está apagado. Actívalo en Presupuesto y activación.
+          </p>
+        ) : null}
 
         <form
           action={searchExplorerAction}
@@ -99,8 +117,9 @@ export function AgentsScreen({
             <input
               name="q"
               defaultValue={explorer.query}
+              disabled={!ag02}
               placeholder="SKU, título o variante"
-              className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
+              className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
             />
           </label>
           <label className="block">
@@ -108,7 +127,8 @@ export function AgentsScreen({
             <select
               name="categoria"
               defaultValue={explorer.category}
-              className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
+              disabled={!ag02}
+              className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
             >
               <option value="">Todas</option>
               {explorer.categories.map((category) => (
@@ -121,7 +141,8 @@ export function AgentsScreen({
           <div className="flex items-end">
             <button
               type="submit"
-              className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft"
+              disabled={!ag02}
+              className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
             >
               Buscar
             </button>
@@ -178,6 +199,7 @@ export function AgentsScreen({
         saved={creator.saved}
         preserveQuery={explorer.query}
         preserveCategory={explorer.category}
+        enabled={ag03}
       />
 
       <section className="mt-6" aria-labelledby="analista">
@@ -188,6 +210,11 @@ export function AgentsScreen({
           Herramientas deterministas AG-04: margen estimado y escenarios ±10 %. «Calcular» deja corrida
           auditable. No es utilidad realizada.
         </p>
+        {!ag04 ? (
+          <p role="status" className="mt-2 text-sm font-medium text-coral">
+            AG-04 está apagado. Actívalo en Presupuesto y activación.
+          </p>
+        ) : null}
 
         <form
           action={runAnalystAction}
@@ -200,14 +227,16 @@ export function AgentsScreen({
             <span className="mb-1 block text-sm font-semibold">SKU (opcional)</span>
             <input
               name="marginSku"
+              disabled={!ag04}
               placeholder="Vacío = todos los productos"
-              className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
+              className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
             />
           </label>
           <div className="flex items-end">
             <button
               type="submit"
-              className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft sm:w-auto"
+              disabled={!ag04}
+              className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55 sm:w-auto"
             >
               Calcular
             </button>
