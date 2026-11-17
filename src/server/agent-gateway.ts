@@ -18,6 +18,12 @@ export type AgentConfigRow = {
   notes: string;
 };
 
+export type AgentMonthSpend = {
+  agentId: string;
+  runCount: number;
+  costEstimateCop: number;
+};
+
 export type AgentCenterView = {
   status: AgentGatewayStatus;
   roles: Array<AgentRoleDefinition & { config: AgentConfigRow | null }>;
@@ -26,6 +32,12 @@ export type AgentCenterView = {
     availableProducts: number;
     openOrders: number;
     pendingConfirmation: number;
+  };
+  monthSpend: {
+    periodLabel: string;
+    totalCostEstimateCop: number;
+    totalRuns: number;
+    byAgent: AgentMonthSpend[];
   };
   recentRuns: Array<{
     id: string;
@@ -52,10 +64,11 @@ export async function getAgentCenterView(): Promise<AgentCenterView> {
   const configs = await loadAgentConfigs();
   const configById = new Map(configs.map((row) => [row.agentId, row]));
 
-  const [products, orders, recentRuns] = await Promise.all([
+  const [products, orders, recentRuns, monthSpend] = await Promise.all([
     listProducts(),
     listOrders(),
     loadRecentRuns(),
+    loadMonthSpend(),
   ]);
 
   return {
@@ -70,6 +83,7 @@ export async function getAgentCenterView(): Promise<AgentCenterView> {
       openOrders: orders.filter((order) => !["entregado", "cancelado", "devuelto"].includes(order.status)).length,
       pendingConfirmation: orders.filter((order) => order.status === "pendiente_confirmacion").length,
     },
+    monthSpend,
     recentRuns,
   };
 }
@@ -121,5 +135,46 @@ async function loadRecentRuns() {
     }));
   } catch {
     return [];
+  }
+}
+
+function monthStartIso() {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+}
+
+async function loadMonthSpend(): Promise<AgentCenterView["monthSpend"]> {
+  const periodLabel = new Date().toLocaleDateString("es-CO", { month: "long", year: "numeric" });
+  const empty = { periodLabel, totalCostEstimateCop: 0, totalRuns: 0, byAgent: [] as AgentMonthSpend[] };
+
+  try {
+    const tenantId = await getPilotTenantId();
+    const supabase = createAdminSupabase();
+    const { data, error } = await supabase
+      .from("agent_runs")
+      .select("agent_id, cost_estimate_cop")
+      .eq("tenant_id", tenantId)
+      .gte("created_at", monthStartIso());
+
+    if (error || !data) return empty;
+
+    const map = new Map<string, AgentMonthSpend>();
+    for (const row of data) {
+      const agentId = String(row.agent_id);
+      const current = map.get(agentId) ?? { agentId, runCount: 0, costEstimateCop: 0 };
+      current.runCount += 1;
+      current.costEstimateCop += Math.max(0, Number(row.cost_estimate_cop) || 0);
+      map.set(agentId, current);
+    }
+
+    const byAgent = [...map.values()].sort((a, b) => a.agentId.localeCompare(b.agentId));
+    return {
+      periodLabel,
+      totalCostEstimateCop: byAgent.reduce((sum, row) => sum + row.costEstimateCop, 0),
+      totalRuns: byAgent.reduce((sum, row) => sum + row.runCount, 0),
+      byAgent,
+    };
+  } catch {
+    return empty;
   }
 }

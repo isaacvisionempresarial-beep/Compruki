@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AgentBudgetPanel } from "@/components/panel/agent-budget-panel";
 import { CentralRouterPanel } from "@/components/panel/central-router-panel";
 import { ContentCreatorPanel } from "@/components/panel/content-creator-panel";
 import { publicationLabel } from "@/lib/catalog";
@@ -255,31 +256,15 @@ export function AgentsScreen({
         </div>
       </section>
 
-      <section className="mt-6" aria-labelledby="p0-ia">
-        <h2 id="p0-ia" className="text-base font-bold">
-          Piloto P0-IA
-        </h2>
-        <p className="mt-1 text-sm text-muted">Roles planificados. Quedan apagados hasta conectar OpenAI con presupuesto y aprobación.</p>
-        <ul className="mt-3 grid gap-3 md:grid-cols-2">
-          {p0.map((role) => (
-            <li key={role.id} className="elevate-1 rounded-[14px] border border-line bg-card px-4 py-3">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{role.id}</p>
-                  <h3 className="mt-0.5 text-sm font-semibold">{role.name}</h3>
-                </div>
-                <span className="shrink-0 rounded-[10px] border border-line px-2 py-1 text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
-                  {role.config?.enabled ? "Activo" : "Apagado"}
-                </span>
-              </div>
-              <p className="mt-2 text-sm leading-5 text-muted">{role.job}</p>
-              <p className="mt-2 text-xs text-muted">
-                Herramientas: {role.tools.join(", ")}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <AgentBudgetPanel
+        roles={p0.map((role) => ({
+          id: role.id,
+          name: role.name,
+          job: role.job,
+          config: role.config,
+        }))}
+        monthSpend={view.monthSpend}
+      />
 
       <section className="mt-6" aria-labelledby="mas-adelante">
         <h2 id="mas-adelante" className="text-base font-bold">
