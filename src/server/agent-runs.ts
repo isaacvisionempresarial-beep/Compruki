@@ -56,7 +56,8 @@ export function agentRunsToCsv(rows: AgentRunExportRow[]): string {
       ].join(","),
     );
   }
-  return `${lines.join("\r\n")}\r\n`;
+  // BOM para que Excel (es-CO) abra UTF-8 sin romper tildes.
+  return `\uFEFF${lines.join("\r\n")}\r\n`;
 }
 
 function csvCell(value: string) {

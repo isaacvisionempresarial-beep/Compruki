@@ -22,13 +22,29 @@ export default async function PanelPage() {
     listSizeGuides(),
     listPendingApprovals(),
   ]);
+
+  const pendingSummary = {
+    total: pendingApprovals.length,
+    pedidos: pendingApprovals.filter((item) => item.kind === "pedido").length,
+    borradores: pendingApprovals.filter((item) => item.kind === "borrador").length,
+    agentes: pendingApprovals.filter((item) => item.kind === "agente").length,
+    preview: pendingApprovals.slice(0, 4).map((item) => ({
+      id: item.id,
+      kind: item.kind,
+      label: item.label,
+      detail: item.detail,
+      href: item.href ?? "/panel/agentes#pendientes-humanos",
+    })),
+  };
+
   return (
     <Dashboard
       storeOrders={storeOrders}
       sizeGuides={sizeGuides}
       today={today}
       greetingName={greetingName}
-      agentPendingCount={pendingApprovals.length}
+      agentPendingCount={pendingSummary.total}
+      agentPendingSummary={pendingSummary}
     />
   );
 }

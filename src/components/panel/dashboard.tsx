@@ -12,18 +12,34 @@ import { awaitsDropiNumber, confirmQueueNote, lineName, missingSizeNote, needsCa
 
 const homeProductGrid = "md:grid-cols-[minmax(0,1.5fr)_8.75rem_8.75rem_8.75rem]";
 
+export type AgentPendingSummary = {
+  total: number;
+  pedidos: number;
+  borradores: number;
+  agentes: number;
+  preview: Array<{
+    id: string;
+    kind: "pedido" | "agente" | "borrador";
+    label: string;
+    detail: string;
+    href: string;
+  }>;
+};
+
 export function Dashboard({
   storeOrders,
   sizeGuides,
   today,
   greetingName,
   agentPendingCount = 0,
+  agentPendingSummary = null,
 }: {
   storeOrders: StoreOrder[];
   sizeGuides: SizeGuide[];
   today: string;
   greetingName: string;
   agentPendingCount?: number;
+  agentPendingSummary?: AgentPendingSummary | null;
 }) {
   const [storePeriod, setStorePeriod] = useState<Period>("7d");
   const query = usePanelQuery().trim().toLocaleLowerCase("es");
@@ -101,7 +117,7 @@ export function Dashboard({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Link
-            href="/panel/agentes"
+            href={agentPendingCount > 0 ? "/panel/agentes#pendientes-humanos" : "/panel/agentes"}
             className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle"
           >
             Centro de agentes
@@ -119,6 +135,44 @@ export function Dashboard({
           </Link>
         </div>
       </header>
+
+      {agentPendingSummary && agentPendingSummary.total > 0 ? (
+        <section
+          className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3"
+          aria-labelledby="pendientes-agentes-home"
+        >
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 id="pendientes-agentes-home" className="text-sm font-semibold">
+                Pendientes humanos ({agentPendingSummary.total})
+              </h2>
+              <p className="mt-0.5 text-xs text-muted">
+                {agentPendingSummary.pedidos} pedido{agentPendingSummary.pedidos === 1 ? "" : "s"}
+                {" · "}
+                {agentPendingSummary.borradores} borrador{agentPendingSummary.borradores === 1 ? "" : "es"}
+                {" · "}
+                {agentPendingSummary.agentes} corrida{agentPendingSummary.agentes === 1 ? "" : "s"}
+              </p>
+            </div>
+            <Link href="/panel/agentes#pendientes-humanos" className="text-sm font-semibold text-accent-strong">
+              Abrir bandeja
+            </Link>
+          </div>
+          <ul className="mt-2 space-y-1.5">
+            {agentPendingSummary.preview.map((item) => (
+              <li key={`${item.kind}-${item.id}`} className="text-sm">
+                <span className="mr-2 rounded-[8px] border border-line px-1.5 py-0.5 text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
+                  {item.kind}
+                </span>
+                <Link href={item.href} className="font-semibold text-accent-strong">
+                  {item.label}
+                </Link>
+                <span className="text-muted"> · {item.detail}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
       <div className="order-2 min-w-0 xl:order-1">
