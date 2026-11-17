@@ -25,7 +25,7 @@ export async function resolvePendingApprovalAction(
   }
 
   if (kind === "borrador") {
-    return resolveDraft(id, decision, access.user.id, access.actorName);
+    return resolveDraft(id, decision, access.user.id, access.actorName, formData);
   }
   if (kind === "agente") {
     return resolveAgentRun(id, decision, access.user.id);
@@ -39,14 +39,48 @@ async function resolveDraft(
   decision: "approve" | "reject",
   userId: string,
   actorName: string,
+  formData: FormData,
 ): Promise<ResolveApprovalState> {
   try {
     const tenantId = await getPilotTenantId();
     const supabase = createAdminSupabase();
+    const { data: current, error: loadError } = await supabase
+      .from("content_drafts")
+      .select("id, product_sku, channel, title, body, cta")
+      .eq("tenant_id", tenantId)
+      .eq("id", id)
+      .eq("review_status", "pending")
+      .maybeSingle();
+
+    if (loadError) {
+      return {
+        error:
+          loadError.message.includes("review_status") || loadError.message.includes("schema cache")
+            ? "Falta review_status. Ejecuta supabase/migrations/007_content_draft_review.sql."
+            : loadError.message,
+        message: null,
+      };
+    }
+    if (!current) return { error: "Ese borrador ya no está pendiente.", message: null };
+
+    const title = clipField(formData.get("title"), current.title, 200);
+    const body = clipField(formData.get("body"), current.body, 4000);
+    const cta = clipField(formData.get("cta"), current.cta, 120);
+    const edited = title !== String(current.title ?? "") || body !== String(current.body ?? "") || cta !== String(current.cta ?? "");
+
+    if (decision === "approve" && !title.trim() && !body.trim()) {
+      return { error: "El borrador necesita título o cuerpo para escribirse en el catálogo.", message: null };
+    }
+
     const reviewStatus = decision === "approve" ? "approved" : "rejected";
     const { data, error } = await supabase
       .from("content_drafts")
-      .update({ review_status: reviewStatus })
+      .update({
+        review_status: reviewStatus,
+        title,
+        body,
+        cta,
+      })
       .eq("tenant_id", tenantId)
       .eq("id", id)
       .eq("review_status", "pending")
@@ -71,9 +105,9 @@ async function resolveDraft(
         {
           sku: String(data.product_sku),
           channel,
-          title: String(data.title ?? ""),
-          body: String(data.body ?? ""),
-          cta: String(data.cta ?? ""),
+          title,
+          body,
+          cta,
         },
         actorName,
       );
@@ -96,13 +130,14 @@ async function resolveDraft(
       revalidatePath("/tienda");
     }
 
+    const editNote = edited ? " · texto editado en bandeja" : "";
     await recordAgentRun({
       agentId: "AG-03",
       status: decision === "approve" ? "succeeded" : "cancelled",
       summary:
         decision === "approve"
-          ? `Borrador aprobado · ${data.product_sku} · ${data.channel} · ${applyNote}`
-          : `Borrador rechazado · ${data.product_sku} · ${data.channel}`,
+          ? `Borrador aprobado · ${data.product_sku} · ${data.channel} · ${applyNote}${editNote}`
+          : `Borrador rechazado · ${data.product_sku} · ${data.channel}${editNote}`,
       createdBy: userId,
     });
 
@@ -112,7 +147,7 @@ async function resolveDraft(
       error: null,
       message:
         decision === "approve"
-          ? `Borrador ${data.channel} de ${data.product_sku} aprobado. ${applyNote}`
+          ? `Borrador ${data.channel} de ${data.product_sku} aprobado. ${applyNote}${edited ? " Se usó el texto editado." : ""}`
           : `Borrador ${data.channel} de ${data.product_sku} rechazado.`,
     };
   } catch (error) {
@@ -179,4 +214,9 @@ async function resolveAgentRun(
       message: null,
     };
   }
+}
+
+function clipField(value: FormDataEntryValue | null, fallback: unknown, max: number) {
+  const raw = typeof value === "string" ? value : fallback == null ? "" : String(fallback);
+  return raw.trim().slice(0, max);
 }

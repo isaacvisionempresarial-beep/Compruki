@@ -14,8 +14,8 @@ export function PendingApprovalsPanel({ items }: { items: PendingApproval[] }) {
         Pendientes humanos
       </h2>
       <p className="mt-1 text-sm text-muted">
-        Bandeja de AG-01 · list_pending_approvals. Revisa el antes/después contra el catálogo antes de
-        aprobar. Pedidos se atienden en Pedidos. OpenAI no está conectado.
+        Bandeja de AG-01 · list_pending_approvals. Puedes editar el texto del borrador: al aprobar se
+        escribe esa versión en el catálogo. Pedidos se atienden en Pedidos. OpenAI no está conectado.
       </p>
 
       {items.length === 0 ? (
@@ -40,12 +40,14 @@ export function PendingApprovalsPanel({ items }: { items: PendingApproval[] }) {
               </div>
               <p className="mt-0.5 text-muted">{item.detail}</p>
               {item.preview ? <DraftPreview preview={item.preview} /> : null}
-              {item.actionable ? (
-                <ApprovalButtons
-                  kind={item.kind}
+              {item.kind === "borrador" && item.preview ? (
+                <DraftReviewForm
                   id={item.id}
-                  approveDisabled={Boolean(item.preview?.catalogError)}
+                  preview={item.preview}
+                  approveDisabled={Boolean(item.preview.catalogError)}
                 />
+              ) : item.actionable ? (
+                <ApprovalButtons kind={item.kind} id={item.id} />
               ) : null}
             </li>
           ))}
@@ -61,7 +63,6 @@ function DraftPreview({
   preview: NonNullable<PendingApproval["preview"]>;
 }) {
   const [open, setOpen] = useState(true);
-  const bodyPreview = preview.body.length > 320 ? `${preview.body.slice(0, 320)}…` : preview.body;
 
   return (
     <div className="mt-2 rounded-[10px] border border-line bg-canvas px-3 py-2">
@@ -108,12 +109,9 @@ function DraftPreview({
               </div>
             ))
           )}
-          <div className="border-t border-line pt-2">
-            <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">Borrador fuente</p>
-            <p className="mt-1 font-semibold text-ink">{preview.title}</p>
-            <p className="mt-1 whitespace-pre-wrap text-muted">{bodyPreview}</p>
-            {preview.cta ? <p className="mt-1 font-semibold text-ink">CTA: {preview.cta}</p> : null}
-          </div>
+          <p className="border-t border-line pt-2 text-xs text-muted">
+            La comparación es del texto guardado. El formulario de abajo es el que se escribe si apruebas.
+          </p>
         </div>
       ) : null}
     </div>
@@ -122,6 +120,88 @@ function DraftPreview({
 
 function clip(text: string, max = 280) {
   return text.length > max ? `${text.slice(0, max)}…` : text;
+}
+
+function DraftReviewForm({
+  id,
+  preview,
+  approveDisabled,
+}: {
+  id: string;
+  preview: NonNullable<PendingApproval["preview"]>;
+  approveDisabled: boolean;
+}) {
+  const [state, action, pending] = useActionState(resolvePendingApprovalAction, initial);
+
+  return (
+    <form action={action} className="mt-2 grid gap-2">
+      <input type="hidden" name="kind" value="borrador" />
+      <input type="hidden" name="id" value={id} />
+      <label className="block">
+        <span className="mb-1 block text-sm font-semibold">Título a escribir</span>
+        <input
+          name="title"
+          defaultValue={preview.title === "(sin título)" ? "" : preview.title}
+          maxLength={200}
+          className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
+        />
+      </label>
+      <label className="block">
+        <span className="mb-1 block text-sm font-semibold">Cuerpo a escribir</span>
+        <textarea
+          name="body"
+          defaultValue={preview.body === "(sin cuerpo)" ? "" : preview.body}
+          maxLength={4000}
+          rows={5}
+          className="w-full rounded-[10px] border border-line bg-card px-3 py-2 text-sm focus:border-accent focus:outline-none"
+        />
+      </label>
+      <label className="block">
+        <span className="mb-1 block text-sm font-semibold">CTA</span>
+        <input
+          name="cta"
+          defaultValue={preview.cta}
+          maxLength={120}
+          className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
+        />
+      </label>
+      {approveDisabled ? (
+        <p role="status" className="text-sm font-medium text-coral">
+          No se puede aprobar: el SKU no está en el catálogo local. Puedes rechazar el borrador.
+        </p>
+      ) : null}
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="submit"
+          name="decision"
+          value="approve"
+          disabled={pending || approveDisabled}
+          className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-xs font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
+        >
+          {pending ? "…" : "Aprobar y escribir"}
+        </button>
+        <button
+          type="submit"
+          name="decision"
+          value="reject"
+          disabled={pending}
+          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-xs font-semibold text-ink hover:bg-subtle disabled:opacity-55"
+        >
+          {pending ? "…" : "Rechazar"}
+        </button>
+      </div>
+      {state.error ? (
+        <p role="alert" className="text-sm font-medium text-danger">
+          {state.error}
+        </p>
+      ) : null}
+      {state.message ? (
+        <p role="status" className="text-sm font-medium text-accent-strong">
+          {state.message}
+        </p>
+      ) : null}
+    </form>
+  );
 }
 
 function ApprovalButtons({
