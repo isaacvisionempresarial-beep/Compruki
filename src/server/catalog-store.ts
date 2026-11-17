@@ -65,6 +65,8 @@ export type ContentDraftComparison = {
   error: string | null;
   diffs: CatalogFieldDiff[];
   applyTarget: string;
+  /** Título actual del producto. Si el borrador deja el título vacío, se conserva este. */
+  fallbackTitle: string;
 };
 
 /** Calcula el texto que quedaría en catálogo si se aprueba el borrador. */
@@ -88,6 +90,7 @@ function compareDraftToProduct(product: CatalogProduct | null, input: ContentDra
       error: `No encontré ${input.sku} en el catálogo local.`,
       diffs: [],
       applyTarget: applyTargetLabel(input.channel),
+      fallbackTitle: "",
     };
   }
 
@@ -102,7 +105,7 @@ function compareDraftToProduct(product: CatalogProduct | null, input: ContentDra
         ? [fieldDiff("Destacados", product.highlights, proposed.highlights)]
         : [fieldDiff("Respuestas / WhatsApp", product.answers, proposed.answers)];
 
-  return { error: null, diffs, applyTarget: applyTargetLabel(input.channel) };
+  return { error: null, diffs, applyTarget: applyTargetLabel(input.channel), fallbackTitle: product.title };
 }
 
 /** Aplica un borrador aprobado al catálogo local (escritura supervisada). */

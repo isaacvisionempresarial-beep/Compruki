@@ -14,8 +14,8 @@ export function PendingApprovalsPanel({ items }: { items: PendingApproval[] }) {
         Pendientes humanos
       </h2>
       <p className="mt-1 text-sm text-muted">
-        Bandeja de AG-01 · list_pending_approvals. Puedes editar el texto del borrador: al aprobar se
-        escribe esa versión en el catálogo. Pedidos se atienden en Pedidos. OpenAI no está conectado.
+        Bandeja de AG-01 · list_pending_approvals. Al editar el borrador, «si apruebas» muestra el texto
+        que se escribirá en el catálogo. Pedidos se atienden en Pedidos. OpenAI no está conectado.
       </p>
 
       {items.length === 0 ? (
@@ -39,7 +39,6 @@ export function PendingApprovalsPanel({ items }: { items: PendingApproval[] }) {
                 )}
               </div>
               <p className="mt-0.5 text-muted">{item.detail}</p>
-              {item.preview ? <DraftPreview preview={item.preview} /> : null}
               {item.kind === "borrador" && item.preview ? (
                 <DraftReviewForm
                   id={item.id}
@@ -57,65 +56,46 @@ export function PendingApprovalsPanel({ items }: { items: PendingApproval[] }) {
   );
 }
 
-function DraftPreview({
-  preview,
-}: {
-  preview: NonNullable<PendingApproval["preview"]>;
-}) {
-  const [open, setOpen] = useState(true);
+function liveDiffs(
+  preview: NonNullable<PendingApproval["preview"]>,
+  title: string,
+  body: string,
+  cta: string,
+) {
+  const resolvedTitle = title.trim().slice(0, 200) || preview.fallbackTitle;
+  const resolvedBody = body.trim().slice(0, 4000);
+  const resolvedCta = cta.trim().slice(0, 120);
+  const ctaLine = resolvedCta ? `CTA: ${resolvedCta}` : "";
+  const before = new Map(preview.diffs.map((diff) => [diff.field, diff.before]));
 
-  return (
-    <div className="mt-2 rounded-[10px] border border-line bg-canvas px-3 py-2">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
-          Antes / después → {preview.applyTarget}
-        </p>
-        <button
-          type="button"
-          onClick={() => setOpen((value) => !value)}
-          className="text-xs font-semibold text-accent-strong"
-        >
-          {open ? "Ocultar" : "Ver comparación"}
-        </button>
-      </div>
-      {open ? (
-        <div className="mt-2 space-y-3">
-          {preview.catalogError ? (
-            <p role="alert" className="font-medium text-danger">
-              {preview.catalogError}
-            </p>
-          ) : (
-            preview.diffs.map((diff) => (
-              <div key={diff.field} className="grid gap-2 sm:grid-cols-2">
-                <div>
-                  <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
-                    {diff.field} · ahora
-                  </p>
-                  <p className="mt-1 whitespace-pre-wrap text-muted">{clip(diff.before)}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
-                    {diff.field} · si apruebas
-                    {diff.changed ? "" : " · igual"}
-                  </p>
-                  <p
-                    className={`mt-1 whitespace-pre-wrap ${
-                      diff.changed ? "font-medium text-ink" : "text-muted"
-                    }`}
-                  >
-                    {clip(diff.after)}
-                  </p>
-                </div>
-              </div>
-            ))
-          )}
-          <p className="border-t border-line pt-2 text-xs text-muted">
-            La comparación es del texto guardado. El formulario de abajo es el que se escribe si apruebas.
-          </p>
-        </div>
-      ) : null}
-    </div>
-  );
+  const rows: Array<{ field: string; before: string; after: string }> = [];
+  if (before.has("Título")) {
+    rows.push(
+      { field: "Título", before: before.get("Título") ?? "(vacío)", after: show(resolvedTitle) },
+      {
+        field: "Descripción",
+        before: before.get("Descripción") ?? "(vacío)",
+        after: show([resolvedBody, ctaLine].filter(Boolean).join("\n\n")),
+      },
+    );
+  } else if (before.has("Destacados")) {
+    rows.push({
+      field: "Destacados",
+      before: before.get("Destacados") ?? "(vacío)",
+      after: show([resolvedTitle, resolvedBody, ctaLine].filter(Boolean).join("\n")),
+    });
+  } else if (before.has("Respuestas / WhatsApp")) {
+    rows.push({
+      field: "Respuestas / WhatsApp",
+      before: before.get("Respuestas / WhatsApp") ?? "(vacío)",
+      after: show([resolvedTitle, resolvedBody, ctaLine].filter(Boolean).join("\n\n")),
+    });
+  }
+  return rows.map((row) => ({ ...row, changed: row.before !== row.after }));
+}
+
+function show(value: string) {
+  return value.trim() || "(vacío)";
 }
 
 function clip(text: string, max = 280) {
@@ -132,16 +112,66 @@ function DraftReviewForm({
   approveDisabled: boolean;
 }) {
   const [state, action, pending] = useActionState(resolvePendingApprovalAction, initial);
+  const [title, setTitle] = useState(preview.title === "(sin título)" ? "" : preview.title);
+  const [body, setBody] = useState(preview.body === "(sin cuerpo)" ? "" : preview.body);
+  const [cta, setCta] = useState(preview.cta);
+  const [open, setOpen] = useState(true);
+  const diffs = liveDiffs(preview, title, body, cta);
 
   return (
     <form action={action} className="mt-2 grid gap-2">
+      <div className="rounded-[10px] border border-line bg-canvas px-3 py-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
+            Antes / después → {preview.applyTarget || "catálogo"}
+          </p>
+          <button
+            type="button"
+            onClick={() => setOpen((value) => !value)}
+            className="text-xs font-semibold text-accent-strong"
+          >
+            {open ? "Ocultar" : "Ver comparación"}
+          </button>
+        </div>
+        {open ? (
+          <div className="mt-2 space-y-3">
+            {preview.catalogError ? (
+              <p role="alert" className="font-medium text-danger">
+                {preview.catalogError}
+              </p>
+            ) : (
+              diffs.map((diff) => (
+                <div key={diff.field} className="grid gap-2 sm:grid-cols-2">
+                  <div>
+                    <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">{diff.field} · ahora</p>
+                    <p className="mt-1 whitespace-pre-wrap text-muted">{clip(diff.before)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
+                      {diff.field} · si apruebas
+                      {diff.changed ? "" : " · igual"}
+                    </p>
+                    <p className={`mt-1 whitespace-pre-wrap ${diff.changed ? "font-medium text-ink" : "text-muted"}`}>
+                      {clip(diff.after)}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
+            <p className="border-t border-line pt-2 text-xs text-muted">
+              «Si apruebas» sigue el texto de este formulario. Un título vacío conserva el del catálogo.
+            </p>
+          </div>
+        ) : null}
+      </div>
       <input type="hidden" name="kind" value="borrador" />
       <input type="hidden" name="id" value={id} />
       <label className="block">
         <span className="mb-1 block text-sm font-semibold">Título a escribir</span>
         <input
           name="title"
-          defaultValue={preview.title === "(sin título)" ? "" : preview.title}
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
           maxLength={200}
           className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
         />
@@ -150,7 +180,8 @@ function DraftReviewForm({
         <span className="mb-1 block text-sm font-semibold">Cuerpo a escribir</span>
         <textarea
           name="body"
-          defaultValue={preview.body === "(sin cuerpo)" ? "" : preview.body}
+          value={body}
+          onChange={(event) => setBody(event.target.value)}
           maxLength={4000}
           rows={5}
           className="w-full rounded-[10px] border border-line bg-card px-3 py-2 text-sm focus:border-accent focus:outline-none"
@@ -160,7 +191,8 @@ function DraftReviewForm({
         <span className="mb-1 block text-sm font-semibold">CTA</span>
         <input
           name="cta"
-          defaultValue={preview.cta}
+          value={cta}
+          onChange={(event) => setCta(event.target.value)}
           maxLength={120}
           className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
         />

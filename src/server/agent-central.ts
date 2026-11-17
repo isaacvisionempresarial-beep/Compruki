@@ -25,6 +25,7 @@ export type PendingApproval = {
     applyTarget: string;
     diffs: CatalogFieldDiff[];
     catalogError: string | null;
+    fallbackTitle: string;
   };
 };
 
@@ -90,6 +91,7 @@ async function listPendingDraftApprovals(): Promise<PendingApproval[]> {
       error: `No encontré ${draft.productSku} en el catálogo local.`,
       diffs: [],
       applyTarget: "",
+      fallbackTitle: "",
     };
     const changed = comparison.diffs.filter((diff) => diff.changed).length;
     return {
@@ -107,10 +109,11 @@ async function listPendingDraftApprovals(): Promise<PendingApproval[]> {
         title: draft.title || "(sin título)",
         body: draft.body || "(sin cuerpo)",
         cta: draft.cta || "",
-        applyTarget: comparison.applyTarget,
-        diffs: comparison.diffs,
-        catalogError: comparison.error,
-      },
+          applyTarget: comparison.applyTarget,
+          diffs: comparison.diffs,
+          catalogError: comparison.error,
+          fallbackTitle: comparison.fallbackTitle,
+        },
     };
   });
 }
