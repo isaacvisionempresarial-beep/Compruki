@@ -1,16 +1,25 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getHealthSnapshot } from "@/server/health";
 import { requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
   title: "Configuración",
-  description: "Cuenta y tenant de la tienda piloto. Dropi no está conectado.",
+  description: "Cuenta, tenant y readiness del piloto. Dropi no está conectado.",
 };
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
-  const access = await requirePanelAccess();
+  const [access, health] = await Promise.all([requirePanelAccess(), getHealthSnapshot()]);
+
+  const checkLabels: Array<{ key: keyof typeof health.checks; label: string }> = [
+    { key: "siteUrl", label: "NEXT_PUBLIC_SITE_URL" },
+    { key: "supabaseUrl", label: "Supabase URL" },
+    { key: "supabaseAnon", label: "Clave anon / publishable" },
+    { key: "serviceRole", label: "Service role" },
+    { key: "tenantPilot", label: "Tenant tienda-piloto" },
+  ];
 
   return (
     <div className="mx-auto max-w-[720px] pb-8">
@@ -43,6 +52,40 @@ export default async function SettingsPage() {
         </div>
       </dl>
 
+      <section className="elevate-1 mt-4 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="readiness">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 id="readiness" className="text-sm font-semibold">
+            Readiness del entorno
+          </h2>
+          <span
+            className={`rounded-[10px] border px-2 py-1 text-[10px] font-bold tracking-[0.06em] uppercase ${
+              health.ok ? "border-line text-ink" : "border-line text-coral"
+            }`}
+          >
+            {health.ok ? "Listo" : "Incompleto"}
+          </span>
+        </div>
+        <p className="mt-1 text-sm text-muted">
+          Misma señal que <span className="font-semibold">GET /api/health</span>. No expone secretos.
+        </p>
+        <ul className="mt-3 space-y-1.5 text-sm">
+          {checkLabels.map((item) => (
+            <li key={item.key} className="flex items-center justify-between gap-3">
+              <span className="text-muted">{item.label}</span>
+              <span className="font-semibold">{health.checks[item.key] ? "OK" : "Falta"}</span>
+            </li>
+          ))}
+          <li className="flex items-center justify-between gap-3">
+            <span className="text-muted">OpenAI</span>
+            <span className="font-semibold">No</span>
+          </li>
+          <li className="flex items-center justify-between gap-3">
+            <span className="text-muted">Dropi</span>
+            <span className="font-semibold">No</span>
+          </li>
+        </ul>
+      </section>
+
       <div className="mt-4 flex flex-wrap gap-3 text-sm font-semibold">
         <Link href="/ingresar?modo=nueva-clave" className="text-accent-strong">
           Cambiar contraseña
@@ -50,6 +93,12 @@ export default async function SettingsPage() {
         <Link href="/tienda" className="text-accent-strong">
           Abrir tienda
         </Link>
+        <Link href="/panel/agentes" className="text-accent-strong">
+          Centro de agentes
+        </Link>
+        <a href="/api/health" className="text-accent-strong">
+          Ver /api/health
+        </a>
       </div>
     </div>
   );

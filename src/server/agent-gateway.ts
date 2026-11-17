@@ -43,7 +43,7 @@ export function getAgentGatewayStatus(): AgentGatewayStatus {
     dropiConnected: false,
     checkoutIndependent: true,
     message:
-      "Centro de agentes en esqueleto. OpenAI no está conectado. Dropi no está conectado. Pedidos y checkout siguen por su cuenta.",
+      "Piloto P0-IA en modo determinista: Central, Explorador, Creador y Analista usan datos locales. OpenAI no está conectado. Dropi no está conectado. Pedidos y checkout siguen por su cuenta.",
   };
 }
 

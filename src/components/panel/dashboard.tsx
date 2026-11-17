@@ -17,11 +17,13 @@ export function Dashboard({
   sizeGuides,
   today,
   greetingName,
+  agentPendingCount = 0,
 }: {
   storeOrders: StoreOrder[];
   sizeGuides: SizeGuide[];
   today: string;
   greetingName: string;
+  agentPendingCount?: number;
 }) {
   const [storePeriod, setStorePeriod] = useState<Period>("7d");
   const query = usePanelQuery().trim().toLocaleLowerCase("es");
@@ -87,7 +89,7 @@ export function Dashboard({
 
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
-      <header className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
         <div className="min-w-0">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Resumen</p>
           <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">
@@ -96,6 +98,25 @@ export function Dashboard({
           <p className="mt-1 text-sm text-muted">
             Cifras y pendientes de los pedidos de la tienda. Dropi no está conectado.
           </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href="/panel/agentes"
+            className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle"
+          >
+            Centro de agentes
+            {agentPendingCount > 0 ? (
+              <span className="ml-2 rounded-[8px] bg-coral/15 px-2 py-0.5 text-xs font-bold text-coral">
+                {agentPendingCount}
+              </span>
+            ) : null}
+          </Link>
+          <Link
+            href="/panel/agentes?intent=margen%20LAM-MES-01"
+            className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-accent-strong hover:bg-subtle"
+          >
+            Probar Central
+          </Link>
         </div>
       </header>
 
