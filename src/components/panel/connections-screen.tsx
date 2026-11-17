@@ -9,7 +9,13 @@ import { probeOfficialDropi, type DropiProbe } from "@/server/dropi-read";
 const initial: DropiProbe | null = null;
 const capabilityGrid = "md:grid-cols-[minmax(0,1fr)_7.5rem_minmax(0,1.4fr)]";
 
-export function ConnectionsScreen() {
+export function ConnectionsScreen({
+  healthOk,
+  tenantPilotOk,
+}: {
+  healthOk: boolean;
+  tenantPilotOk: boolean;
+}) {
   const [probe, action, pending] = useActionState(probeOfficialDropi, initial);
 
   return (
@@ -21,7 +27,37 @@ export function ConnectionsScreen() {
       </p>
 
       <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_14rem]">
-        <div className="order-2 min-w-0 xl:order-1">
+        <div className="order-2 min-w-0 xl:order-1 space-y-3">
+          <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="plataforma">
+            <h2 id="plataforma" className="text-sm font-semibold">
+              Plataforma COMPRUKI
+            </h2>
+            <p className="mt-1 text-xs leading-5 text-muted">
+              Estado local del piloto. OpenAI no está conectado. El checkout no depende de Dropi.
+            </p>
+            <ul className="mt-3 grid gap-2 sm:grid-cols-2 text-sm">
+              <li className="rounded-[10px] border border-line px-3 py-2">
+                <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">Readiness</p>
+                <p className="mt-0.5 font-semibold">{healthOk ? "OK · /api/health" : "Incompleto"}</p>
+              </li>
+              <li className="rounded-[10px] border border-line px-3 py-2">
+                <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">Tenant piloto</p>
+                <p className="mt-0.5 font-semibold">{tenantPilotOk ? "tienda-piloto" : "No responde"}</p>
+              </li>
+              <li className="rounded-[10px] border border-line px-3 py-2">
+                <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">OpenAI</p>
+                <p className="mt-0.5 font-semibold text-warning">No conectado</p>
+              </li>
+              <li className="rounded-[10px] border border-line px-3 py-2">
+                <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">Agentes P0-IA</p>
+                <p className="mt-0.5 font-semibold">Modo determinista</p>
+                <Link href="/panel/agentes" className="mt-1 inline-flex text-sm font-semibold text-accent-strong">
+                  Abrir centro de agentes
+                </Link>
+              </li>
+            </ul>
+          </section>
+
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="consultas-bloqueadas">
             <h2 id="consultas-bloqueadas" className="text-sm font-semibold">
               Consultas bloqueadas
