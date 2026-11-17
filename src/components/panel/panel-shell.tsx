@@ -17,7 +17,7 @@ export function usePanelQuery() {
 
 const items: Array<{ id: string; label: string; icon: IconName; href?: string }> = [
   { id: "panel", label: "Panel principal", icon: "panel", href: "/panel" },
-  { id: "agentes", label: "Centro de agentes", icon: "spark" },
+  { id: "agentes", label: "Centro de agentes", icon: "spark", href: "/panel/agentes" },
   { id: "pedidos", label: "Pedidos", icon: "orders", href: "/panel/pedidos" },
   { id: "sincronizacion", label: "Sincronización", icon: "sync", href: "/panel/sincronizacion" },
   { id: "catalogo", label: "Catálogo", icon: "catalog", href: "/panel/catalogo" },

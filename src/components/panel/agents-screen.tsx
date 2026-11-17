@@ -1,0 +1,328 @@
+import Link from "next/link";
+import { CentralRouterPanel } from "@/components/panel/central-router-panel";
+import { ContentCreatorPanel } from "@/components/panel/content-creator-panel";
+import { publicationLabel } from "@/lib/catalog";
+import { formatCop } from "@/lib/format";
+import type { CentralRouteResult } from "@/server/agent-central";
+import type { ContentDraft, ProductFacts, SavedContentDraft } from "@/server/agent-content";
+import type { ExplorerShortlist } from "@/server/agent-explorer";
+import type { AgentCenterView } from "@/server/agent-gateway";
+import type { AnalystToolkit } from "@/server/agent-tools";
+
+export function AgentsScreen({
+  view,
+  analyst,
+  explorer,
+  creator,
+  central,
+}: {
+  view: AgentCenterView;
+  analyst: AnalystToolkit;
+  explorer: ExplorerShortlist;
+  creator: {
+    products: Array<{ sku: string; title: string }>;
+    selectedSku: string;
+    facts: ProductFacts | null;
+    drafts: ContentDraft[];
+    saved: SavedContentDraft[];
+  };
+  central: { route: CentralRouteResult | null; defaultIntent: string };
+}) {
+  const p0 = view.roles.filter((role) => role.priority === "P0-IA");
+  const later = view.roles.filter((role) => role.priority !== "P0-IA");
+
+  return (
+    <div className="mx-auto max-w-[1100px] pb-8">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
+      <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Centro de agentes</h1>
+      <p className="mt-1 max-w-2xl text-sm text-muted">{view.status.message}</p>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        <StatusChip label="OpenAI" ok={view.status.openaiConnected} />
+        <StatusChip label="Dropi" ok={view.status.dropiConnected} />
+        <StatusChip label="Checkout independiente" ok={view.status.checkoutIndependent} positive />
+      </div>
+
+      <CentralRouterPanel route={central.route} defaultIntent={central.defaultIntent} />
+
+      <section className="elevate-1 mt-4 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="resumen-tienda">
+        <h2 id="resumen-tienda" className="text-sm font-semibold">
+          Resumen determinista de la tienda
+        </h2>
+        <p className="mt-1 text-sm text-muted">Cifras del catálogo y pedidos locales. No pasan por un modelo.</p>
+        <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <Stat label="Publicados" value={view.storeSummary.publishedProducts} />
+          <Stat label="Disponibles" value={view.storeSummary.availableProducts} />
+          <Stat label="Pedidos abiertos" value={view.storeSummary.openOrders} />
+          <Stat label="Pendiente confirmación" value={view.storeSummary.pendingConfirmation} />
+        </dl>
+        <div className="mt-3 flex flex-wrap gap-3 text-sm font-semibold">
+          <Link href="/panel/catalogo" className="text-accent-strong">
+            Ir al catálogo
+          </Link>
+          <Link href="/panel/pedidos" className="text-accent-strong">
+            Ir a pedidos
+          </Link>
+          <Link href="/panel/conexiones" className="text-accent-strong">
+            Ver conexiones
+          </Link>
+        </div>
+      </section>
+
+      <section className="mt-6" aria-labelledby="explorador">
+        <h2 id="explorador" className="text-base font-bold">
+          Explorador de productos (catálogo local)
+        </h2>
+        <p className="mt-1 text-sm text-muted">
+          AG-02 en modo local. Fuente: {explorer.sourceLabel}. No es una consulta en vivo a Dropi.
+        </p>
+
+        <form method="get" action="/panel/agentes" className="elevate-1 mt-3 grid gap-2 rounded-[14px] border border-line bg-card px-4 py-3 sm:grid-cols-[1fr_12rem_auto]">
+          <label className="block">
+            <span className="mb-1 block text-sm font-semibold">Buscar</span>
+            <input
+              name="q"
+              defaultValue={explorer.query}
+              placeholder="SKU, título o variante"
+              className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-sm font-semibold">Categoría</span>
+            <select
+              name="categoria"
+              defaultValue={explorer.category}
+              className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
+            >
+              <option value="">Todas</option>
+              {explorer.categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="flex items-end">
+            <button
+              type="submit"
+              className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft"
+            >
+              Buscar
+            </button>
+          </div>
+        </form>
+
+        <p className="mt-2 text-sm text-muted">
+          Shortlist: {explorer.results.length} producto{explorer.results.length === 1 ? "" : "s"}
+          {explorer.query ? ` · «${explorer.query}»` : ""}
+          {explorer.category ? ` · ${explorer.category}` : ""}
+        </p>
+
+        {explorer.results.length === 0 ? (
+          <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3 text-sm text-muted">
+            No hay coincidencias en el catálogo local.
+          </p>
+        ) : (
+          <ul className="mt-3 grid gap-2 md:grid-cols-2">
+            {explorer.results.map((product) => (
+              <li key={product.sku} className="elevate-1 rounded-[14px] border border-line bg-card px-4 py-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-sm font-semibold">{product.title}</h3>
+                    <p className="mt-0.5 text-xs text-muted">
+                      {product.sku}
+                      {product.externalRef ? ` · ref ${product.externalRef}` : ""}
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-[10px] border border-line px-2 py-1 text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
+                    local
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-muted">
+                  {product.category} · {publicationLabel(product)} · {formatCop(product.price)}
+                </p>
+                <p className="mt-1 text-sm">
+                  Margen estimado {formatCop(product.margin)}
+                  {product.variants.length > 0 ? ` · ${product.variants.length} variantes` : ""}
+                </p>
+                <Link href={`/panel/catalogo/${encodeURIComponent(product.sku)}`} className="mt-2 inline-flex text-sm font-semibold text-accent-strong">
+                  Abrir en catálogo
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <ContentCreatorPanel
+        products={creator.products}
+        selectedSku={creator.selectedSku}
+        facts={creator.facts}
+        drafts={creator.drafts}
+        saved={creator.saved}
+        preserveQuery={explorer.query}
+        preserveCategory={explorer.category}
+      />
+
+      <section className="mt-6" aria-labelledby="analista">
+        <h2 id="analista" className="text-base font-bold">
+          Analista de rentabilidad (sin OpenAI)
+        </h2>
+        <p className="mt-1 text-sm text-muted">
+          Herramientas deterministas AG-04: margen estimado del catálogo y escenarios ±10 %. No es utilidad
+          realizada.
+        </p>
+
+        <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
+          <h3 className="text-sm font-semibold">Pedidos acumulados</h3>
+          <dl className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <MoneyStat label="Ingresos líneas" value={analyst.orders.revenue} />
+            <MoneyStat label="Margen estimado" value={analyst.orders.estimatedMargin} />
+            <Stat label="Pedidos" value={analyst.orders.orderCount} />
+            <Stat label="Líneas sin costo" value={analyst.orders.missingCostLines} />
+          </dl>
+        </div>
+
+        <div className="mt-3 overflow-x-auto rounded-[14px] border border-line bg-card">
+          <table className="min-w-full text-left text-sm">
+            <caption className="sr-only">Margen estimado por producto</caption>
+            <thead className="border-b border-line text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
+              <tr>
+                <th className="px-3 py-2">Producto</th>
+                <th className="px-3 py-2">Precio</th>
+                <th className="px-3 py-2">Margen</th>
+                <th className="px-3 py-2">−10 %</th>
+                <th className="px-3 py-2">+10 %</th>
+              </tr>
+            </thead>
+            <tbody>
+              {analyst.scenarios.map((row) => {
+                const down = row.scenarios[0];
+                const up = row.scenarios[2];
+                return (
+                  <tr key={row.sku} className="border-b border-line last:border-0">
+                    <td className="px-3 py-2">
+                      <span className="font-semibold">{row.title}</span>
+                      <span className="mt-0.5 block text-xs text-muted">{row.sku}</span>
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap">{formatCop(row.base.price)}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      {formatCop(row.base.margin)}
+                      {row.base.marginRate !== null ? (
+                        <span className="mt-0.5 block text-xs text-muted">{pct(row.base.marginRate)}</span>
+                      ) : null}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-muted">
+                      {down ? formatCop(down.margin) : "—"}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-muted">{up ? formatCop(up.margin) : "—"}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="mt-6" aria-labelledby="p0-ia">
+        <h2 id="p0-ia" className="text-base font-bold">
+          Piloto P0-IA
+        </h2>
+        <p className="mt-1 text-sm text-muted">Roles planificados. Quedan apagados hasta conectar OpenAI con presupuesto y aprobación.</p>
+        <ul className="mt-3 grid gap-3 md:grid-cols-2">
+          {p0.map((role) => (
+            <li key={role.id} className="elevate-1 rounded-[14px] border border-line bg-card px-4 py-3">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{role.id}</p>
+                  <h3 className="mt-0.5 text-sm font-semibold">{role.name}</h3>
+                </div>
+                <span className="shrink-0 rounded-[10px] border border-line px-2 py-1 text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
+                  {role.config?.enabled ? "Activo" : "Apagado"}
+                </span>
+              </div>
+              <p className="mt-2 text-sm leading-5 text-muted">{role.job}</p>
+              <p className="mt-2 text-xs text-muted">
+                Herramientas: {role.tools.join(", ")}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mt-6" aria-labelledby="mas-adelante">
+        <h2 id="mas-adelante" className="text-base font-bold">
+          Más adelante (P1 / P2)
+        </h2>
+        <ul className="mt-3 space-y-2">
+          {later.map((role) => (
+            <li key={role.id} className="rounded-[14px] border border-line bg-card px-4 py-2.5">
+              <p className="text-sm font-semibold">
+                <span className="text-muted">{role.id} · </span>
+                {role.name}
+                <span className="ml-2 text-[10px] font-bold tracking-[0.06em] text-muted uppercase">{role.priority}</span>
+              </p>
+              <p className="mt-0.5 text-sm text-muted">{role.job}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mt-6" aria-labelledby="corridas">
+        <h2 id="corridas" className="text-base font-bold">
+          Corridas recientes
+        </h2>
+        {view.recentRuns.length === 0 ? (
+          <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3 text-sm text-muted">
+            Todavía no hay corridas. Cuando exista OpenAI, aquí verás costo estimado y estado de aprobación.
+          </p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {view.recentRuns.map((run) => (
+              <li key={run.id} className="rounded-[14px] border border-line bg-card px-4 py-2.5 text-sm">
+                <span className="font-semibold">{run.agentId}</span>
+                <span className="text-muted"> · {run.status}</span>
+                <p className="mt-0.5 text-muted">{run.summary || "Sin resumen."}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function StatusChip({ label, ok, positive = false }: { label: string; ok: boolean; positive?: boolean }) {
+  const tone = ok || positive ? "border-line text-ink" : "border-line text-muted";
+  return (
+    <span className={`inline-flex h-9 items-center rounded-[10px] border bg-card px-3 text-xs font-semibold ${tone}`}>
+      <span
+        className={`mr-2 h-2 w-2 rounded-full ${ok ? "bg-accent" : positive ? "bg-accent" : "bg-coral"}`}
+        aria-hidden="true"
+      />
+      {label}: {ok ? "sí" : positive ? "sí" : "no"}
+    </span>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: number }) {
+  return (
+    <div>
+      <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{label}</dt>
+      <dd className="mt-0.5 text-xl font-extrabold tracking-tight">{value}</dd>
+    </div>
+  );
+}
+
+function MoneyStat({ label, value }: { label: string; value: number }) {
+  return (
+    <div>
+      <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{label}</dt>
+      <dd className="mt-0.5 text-xl font-extrabold tracking-tight">{formatCop(value)}</dd>
+    </div>
+  );
+}
+
+function pct(rate: number) {
+  return `${Math.round(rate * 1000) / 10} %`;
+}

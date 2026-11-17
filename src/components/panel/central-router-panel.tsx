@@ -1,0 +1,95 @@
+import Link from "next/link";
+import type { CentralRouteResult } from "@/server/agent-central";
+
+export function CentralRouterPanel({
+  route,
+  defaultIntent = "",
+}: {
+  route: CentralRouteResult | null;
+  defaultIntent?: string;
+}) {
+  return (
+    <section className="mt-4" aria-labelledby="central">
+      <h2 id="central" className="text-base font-bold">
+        COMPRUKI Central (sin OpenAI)
+      </h2>
+      <p className="mt-1 text-sm text-muted">
+        AG-01 enruta con reglas a Explorador, Analista y Creador. No usa modelo ni Dropi en vivo.
+      </p>
+
+      <form
+        method="get"
+        action="/panel/agentes"
+        className="elevate-1 mt-3 grid gap-2 rounded-[14px] border border-line bg-card px-4 py-3 sm:grid-cols-[1fr_auto]"
+      >
+        <label className="block">
+          <span className="mb-1 block text-sm font-semibold">Intención o SKU</span>
+          <input
+            name="intent"
+            defaultValue={defaultIntent}
+            placeholder="Ej. margen LAM-MES-01, borrador faja, buscar ropa"
+            className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
+          />
+        </label>
+        <div className="flex items-end">
+          <button
+            type="submit"
+            className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft sm:w-auto"
+          >
+            Enrutar
+          </button>
+        </div>
+      </form>
+
+      {!route ? (
+        <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3 text-sm text-muted">
+          Escribe una intención para ver el paquete coordinado.
+        </p>
+      ) : (
+        <div className="elevate-1 mt-3 space-y-3 rounded-[14px] border border-line bg-card px-4 py-3">
+          <p className="text-sm">
+            <span className="font-semibold">Pedido:</span> {route.intent}
+          </p>
+          <p className="text-xs font-bold tracking-[0.06em] text-muted uppercase">
+            OpenAI: no · Agentes: {route.agents.join(", ")}
+          </p>
+          <ul className="space-y-1.5 text-sm text-muted">
+            {route.summary.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+
+          {route.pending.length > 0 ? (
+            <div>
+              <p className="text-sm font-semibold">Aprobaciones pendientes</p>
+              <ul className="mt-1 space-y-1 text-sm">
+                {route.pending.map((item) => (
+                  <li key={item.id}>
+                    {item.href ? (
+                      <Link href={item.href} className="font-semibold text-accent-strong">
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <span className="font-semibold">{item.label}</span>
+                    )}
+                    <span className="text-muted"> · {item.detail}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {route.suggestedLinks.length > 0 ? (
+            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+              {route.suggestedLinks.map((link) => (
+                <Link key={link.href + link.label} href={link.href} className="text-accent-strong">
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      )}
+    </section>
+  );
+}
