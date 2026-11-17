@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { assertPanelAccess } from "@/server/panel-auth";
 import { saveContentDraft, type ContentChannel } from "@/server/agent-content";
+import { recordAgentRun } from "@/server/agent-runs";
 
 export type SaveDraftState = { error: string | null; message: string | null };
 
@@ -11,8 +12,9 @@ export async function saveContentDraftAction(_state: SaveDraftState, formData: F
   if (!access) return { error: "Tu sesión no permite guardar borradores.", message: null };
 
   const channel = String(formData.get("channel") ?? "") as ContentChannel;
+  const sku = String(formData.get("sku") ?? "");
   const result = await saveContentDraft({
-    sku: String(formData.get("sku") ?? ""),
+    sku,
     channel,
     title: String(formData.get("title") ?? ""),
     body: String(formData.get("body") ?? ""),
@@ -21,8 +23,21 @@ export async function saveContentDraftAction(_state: SaveDraftState, formData: F
   });
 
   if (result.error || !result.draft) {
+    await recordAgentRun({
+      agentId: "AG-03",
+      status: "failed",
+      summary: `Guardar borrador falló · ${sku || "sin SKU"} · ${channel || "sin canal"} · ${result.error ?? "error"}`,
+      createdBy: access.user.id,
+    });
     return { error: result.error ?? "No se pudo guardar el borrador.", message: null };
   }
+
+  await recordAgentRun({
+    agentId: "AG-03",
+    status: "succeeded",
+    summary: `Borrador guardado · ${result.draft.productSku} · ${result.draft.channel}`,
+    createdBy: access.user.id,
+  });
 
   revalidatePath("/panel/agentes");
   return {

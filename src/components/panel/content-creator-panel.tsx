@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import type { ContentDraft, ProductFacts, SavedContentDraft } from "@/server/agent-content";
+import { generateContentDraftsAction } from "@/server/agent-panel-actions";
 import { saveContentDraftAction, type SaveDraftState } from "@/server/content-actions";
 
 const initial: SaveDraftState = { error: null, message: null };
@@ -29,10 +30,14 @@ export function ContentCreatorPanel({
         Creador de contenido (plantillas)
       </h2>
       <p className="mt-1 text-sm text-muted">
-        AG-03 sin OpenAI: arma borradores solo con hechos del catálogo. Revisa antes de publicar.
+        AG-03 sin OpenAI: arma borradores con hechos del catálogo. Generar o guardar deja corrida en el
+        historial. Revisa antes de publicar.
       </p>
 
-      <form method="get" action="/panel/agentes" className="elevate-1 mt-3 grid gap-2 rounded-[14px] border border-line bg-card px-4 py-3 sm:grid-cols-[1fr_auto]">
+      <form
+        action={generateContentDraftsAction}
+        className="elevate-1 mt-3 grid gap-2 rounded-[14px] border border-line bg-card px-4 py-3 sm:grid-cols-[1fr_auto]"
+      >
         {preserveQuery ? <input type="hidden" name="q" value={preserveQuery} /> : null}
         {preserveCategory ? <input type="hidden" name="categoria" value={preserveCategory} /> : null}
         <label className="block">

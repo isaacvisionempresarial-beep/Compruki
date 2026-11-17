@@ -7,6 +7,7 @@ import type { CentralRouteResult } from "@/server/agent-central";
 import type { ContentDraft, ProductFacts, SavedContentDraft } from "@/server/agent-content";
 import type { ExplorerShortlist } from "@/server/agent-explorer";
 import type { AgentCenterView } from "@/server/agent-gateway";
+import { runAnalystAction, searchExplorerAction } from "@/server/agent-panel-actions";
 import type { AnalystToolkit } from "@/server/agent-tools";
 
 export function AgentsScreen({
@@ -74,10 +75,15 @@ export function AgentsScreen({
           Explorador de productos (catálogo local)
         </h2>
         <p className="mt-1 text-sm text-muted">
-          AG-02 en modo local. Fuente: {explorer.sourceLabel}. No es una consulta en vivo a Dropi.
+          AG-02 en modo local. Fuente: {explorer.sourceLabel}. Cada búsqueda deja corrida en el historial. No
+          es Dropi en vivo.
         </p>
 
-        <form method="get" action="/panel/agentes" className="elevate-1 mt-3 grid gap-2 rounded-[14px] border border-line bg-card px-4 py-3 sm:grid-cols-[1fr_12rem_auto]">
+        <form
+          action={searchExplorerAction}
+          className="elevate-1 mt-3 grid gap-2 rounded-[14px] border border-line bg-card px-4 py-3 sm:grid-cols-[1fr_12rem_auto]"
+        >
+          {creator.selectedSku ? <input type="hidden" name="sku" value={creator.selectedSku} /> : null}
           <label className="block">
             <span className="mb-1 block text-sm font-semibold">Buscar</span>
             <input
@@ -169,9 +175,34 @@ export function AgentsScreen({
           Analista de rentabilidad (sin OpenAI)
         </h2>
         <p className="mt-1 text-sm text-muted">
-          Herramientas deterministas AG-04: margen estimado del catálogo y escenarios ±10 %. No es utilidad
-          realizada.
+          Herramientas deterministas AG-04: margen estimado y escenarios ±10 %. «Calcular» deja corrida
+          auditable. No es utilidad realizada.
         </p>
+
+        <form
+          action={runAnalystAction}
+          className="elevate-1 mt-3 grid gap-2 rounded-[14px] border border-line bg-card px-4 py-3 sm:grid-cols-[1fr_auto]"
+        >
+          {explorer.query ? <input type="hidden" name="q" value={explorer.query} /> : null}
+          {explorer.category ? <input type="hidden" name="categoria" value={explorer.category} /> : null}
+          {creator.selectedSku ? <input type="hidden" name="sku" value={creator.selectedSku} /> : null}
+          <label className="block">
+            <span className="mb-1 block text-sm font-semibold">SKU (opcional)</span>
+            <input
+              name="marginSku"
+              placeholder="Vacío = todos los productos"
+              className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
+            />
+          </label>
+          <div className="flex items-end">
+            <button
+              type="submit"
+              className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft sm:w-auto"
+            >
+              Calcular
+            </button>
+          </div>
+        </form>
 
         <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
           <h3 className="text-sm font-semibold">Pedidos acumulados</h3>
@@ -274,8 +305,8 @@ export function AgentsScreen({
         </h2>
         {view.recentRuns.length === 0 ? (
           <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3 text-sm text-muted">
-            Todavía no hay corridas. Usa «Enrutar» en Central arriba para dejar el primer registro auditable
-            (sin OpenAI).
+            Todavía no hay corridas. Usa Enrutar, Buscar, Generar borradores o Calcular para dejar el
+            primer registro (sin OpenAI).
           </p>
         ) : (
           <ul className="mt-3 space-y-2">
