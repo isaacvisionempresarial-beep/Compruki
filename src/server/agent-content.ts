@@ -208,7 +208,7 @@ export async function listContentDrafts(sku?: string, limit = 12): Promise<Saved
         .limit(limit);
       if (sku?.trim()) fallback = fallback.eq("product_sku", sku.trim().toUpperCase());
       const retry = await fallback;
-      data = retry.data;
+      data = retry.data as typeof data;
       error = retry.error;
     }
     if (error || !data) return [];
@@ -238,7 +238,7 @@ export async function listPendingContentDrafts(limit = 8): Promise<SavedContentD
         .eq("review_status", "pending")
         .order("created_at", { ascending: false })
         .limit(limit);
-      data = retry.data;
+      data = retry.data as typeof data;
       error = retry.error;
     }
 

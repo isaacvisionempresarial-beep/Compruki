@@ -34,6 +34,7 @@ export async function searchExplorerAction(formData: FormData) {
       status: "cancelled",
       summary: policy.reason,
       createdBy: access.user.id,
+      actorName: access.actorName,
     });
     redirect(agentDeniedRedirect("AG-02", policy.reason, { q, categoria, sku }));
   }
@@ -56,6 +57,7 @@ export async function searchExplorerAction(formData: FormData) {
       shortlist.sourceLabel,
     ].join(" · "),
     createdBy: access.user.id,
+    actorName: access.actorName,
   });
 
   redirect(agentesRedirect({ q, categoria, sku }));
@@ -78,6 +80,7 @@ export async function generateContentDraftsAction(formData: FormData) {
       status: "cancelled",
       summary: policy.reason,
       createdBy: access.user.id,
+      actorName: access.actorName,
     });
     redirect(agentDeniedRedirect("AG-03", policy.reason, { q, categoria, sku }));
   }
@@ -92,6 +95,7 @@ export async function generateContentDraftsAction(formData: FormData) {
       ? `Creador plantilla · ${sku} · borradores: ${channels.join(", ") || "ninguno"}`
       : `Creador plantilla · SKU ${sku} no encontrado en catálogo local`,
     createdBy: access.user.id,
+    actorName: access.actorName,
   });
 
   redirect(agentesRedirect({ q, categoria, sku }));
@@ -113,6 +117,7 @@ export async function runAnalystAction(formData: FormData) {
       status: "cancelled",
       summary: policy.reason,
       createdBy: access.user.id,
+      actorName: access.actorName,
     });
     redirect(agentDeniedRedirect("AG-04", policy.reason, { q, categoria, sku, marginSku: focusSku || undefined }));
   }
@@ -146,6 +151,7 @@ export async function runAnalystAction(formData: FormData) {
       `Pedidos: margen estimado ${formatCop(orders.estimatedMargin)} (${orders.orderCount} pedido(s))`,
     ].join(" · "),
     createdBy: access.user.id,
+    actorName: access.actorName,
   });
 
   redirect(agentesRedirect({ q, categoria, sku, marginSku: focusSku || undefined }));

@@ -339,7 +339,9 @@ export function AgentsScreen({
             <h2 id="corridas" className="text-base font-bold">
               Corridas recientes
             </h2>
-            <p className="mt-1 text-sm text-muted">Últimas 8 en pantalla. El CSV trae hasta 500 del tenant.</p>
+            <p className="mt-1 text-sm text-muted">
+              Últimas 8 en pantalla. Las corridas nuevas guardan quién las lanzó. El CSV trae hasta 500 del tenant.
+            </p>
           </div>
           <a
             href="/panel/agentes/export"
@@ -360,6 +362,7 @@ export function AgentsScreen({
                 <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                   <span className="font-semibold">{run.agentId}</span>
                   <span className="text-muted">· {run.status}</span>
+                  {run.actorName ? <span className="text-muted">· {run.actorName}</span> : null}
                   {run.createdAt ? (
                     <time className="text-xs text-muted" dateTime={run.createdAt}>
                       {new Date(run.createdAt).toLocaleString("es-CO", {

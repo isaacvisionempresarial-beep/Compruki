@@ -22,6 +22,7 @@ export async function saveContentDraftAction(_state: SaveDraftState, formData: F
       status: "cancelled",
       summary: policy.reason,
       createdBy: access.user.id,
+      actorName: access.actorName,
     });
     return { error: policy.reason, message: null };
   }
@@ -41,6 +42,7 @@ export async function saveContentDraftAction(_state: SaveDraftState, formData: F
       status: "failed",
       summary: `Guardar borrador falló · ${sku || "sin SKU"} · ${channel || "sin canal"} · ${result.error ?? "error"}`,
       createdBy: access.user.id,
+      actorName: access.actorName,
     });
     return { error: result.error ?? "No se pudo guardar el borrador.", message: null };
   }
@@ -50,6 +52,7 @@ export async function saveContentDraftAction(_state: SaveDraftState, formData: F
     status: "succeeded",
     summary: `Borrador guardado · pendiente revisión humana · ${result.draft.productSku} · ${result.draft.channel}`,
     createdBy: access.user.id,
+    actorName: access.actorName,
   });
 
   revalidatePath("/panel/agentes");

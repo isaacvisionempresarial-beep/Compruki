@@ -47,6 +47,7 @@ export type AgentCenterView = {
     status: string;
     summary: string;
     createdAt: string;
+    actorName: string;
   }>;
 };
 
@@ -121,21 +122,31 @@ async function loadRecentRuns() {
   try {
     const tenantId = await getPilotTenantId();
     const supabase = createAdminSupabase();
-    const { data, error } = await supabase
+    const first = await supabase
       .from("agent_runs")
-      .select("id, agent_id, status, summary, created_at")
+      .select("id, agent_id, status, summary, created_at, actor_name")
       .eq("tenant_id", tenantId)
       .order("created_at", { ascending: false })
       .limit(8);
 
-    if (error || !data) return [];
+    const loaded = first.error && first.error.message.includes("actor_name")
+      ? await supabase
+          .from("agent_runs")
+          .select("id, agent_id, status, summary, created_at")
+          .eq("tenant_id", tenantId)
+          .order("created_at", { ascending: false })
+          .limit(8)
+      : first;
 
-    return data.map((row) => ({
+    if (loaded.error || !loaded.data) return [];
+
+    return loaded.data.map((row) => ({
       id: String(row.id),
       agentId: String(row.agent_id),
       status: String(row.status),
       summary: typeof row.summary === "string" ? row.summary : "",
       createdAt: String(row.created_at),
+      actorName: "actor_name" in row && typeof row.actor_name === "string" ? row.actor_name.trim() : "",
     }));
   } catch {
     return [];

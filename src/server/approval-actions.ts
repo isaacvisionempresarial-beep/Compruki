@@ -28,7 +28,7 @@ export async function resolvePendingApprovalAction(
     return resolveDraft(id, decision, access.user.id, access.actorName, access.role, formData);
   }
   if (kind === "agente") {
-    return resolveAgentRun(id, decision, access.user.id);
+    return resolveAgentRun(id, decision, access.user.id, access.actorName);
   }
 
   return { error: "Este pendiente se resuelve en Pedidos.", message: null };
@@ -172,6 +172,7 @@ async function resolveDraft(
           ? `Borrador aprobado · ${data.product_sku} · ${data.channel} · ${applyNote}${editNote}`
           : `Borrador rechazado · ${data.product_sku} · ${data.channel}${editNote}`,
       createdBy: userId,
+      actorName,
     });
 
     revalidatePath("/panel/agentes");
@@ -195,6 +196,7 @@ async function resolveAgentRun(
   id: string,
   decision: "approve" | "reject",
   userId: string,
+  actorName: string,
 ): Promise<ResolveApprovalState> {
   try {
     const tenantId = await getPilotTenantId();
@@ -230,6 +232,7 @@ async function resolveAgentRun(
       status: decision === "approve" ? "succeeded" : "cancelled",
       summary: `${prefix} · corrida ${current.agent_id} (${id.slice(0, 8)})`,
       createdBy: userId,
+      actorName,
     });
 
     revalidatePath("/panel/agentes");

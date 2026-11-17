@@ -20,6 +20,7 @@ export async function routeCentralAction(formData: FormData) {
       status: "cancelled",
       summary: policy.reason,
       createdBy: access.user.id,
+      actorName: access.actorName,
     });
     redirect(agentDeniedRedirect("AG-01", policy.reason, { intent }));
   }
@@ -37,6 +38,7 @@ export async function routeCentralAction(formData: FormData) {
     summary,
     costEstimateCop: 0,
     createdBy: access.user.id,
+    actorName: access.actorName,
   });
 
   redirect(`/panel/agentes?intent=${encodeURIComponent(intent)}`);
