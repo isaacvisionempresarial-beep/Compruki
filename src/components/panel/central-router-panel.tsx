@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CentralRouteResult } from "@/server/agent-central";
+import { routeCentralAction } from "@/server/central-actions";
 
 export function CentralRouterPanel({
   route,
@@ -14,12 +15,12 @@ export function CentralRouterPanel({
         COMPRUKI Central (sin OpenAI)
       </h2>
       <p className="mt-1 text-sm text-muted">
-        AG-01 enruta con reglas a Explorador, Analista y Creador. No usa modelo ni Dropi en vivo.
+        AG-01 enruta con reglas a Explorador, Analista y Creador. Cada «Enrutar» deja una corrida en el
+        historial. No usa modelo ni Dropi en vivo.
       </p>
 
       <form
-        method="get"
-        action="/panel/agentes"
+        action={routeCentralAction}
         className="elevate-1 mt-3 grid gap-2 rounded-[14px] border border-line bg-card px-4 py-3 sm:grid-cols-[1fr_auto]"
       >
         <label className="block">

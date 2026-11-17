@@ -274,14 +274,25 @@ export function AgentsScreen({
         </h2>
         {view.recentRuns.length === 0 ? (
           <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3 text-sm text-muted">
-            Todavía no hay corridas. Cuando exista OpenAI, aquí verás costo estimado y estado de aprobación.
+            Todavía no hay corridas. Usa «Enrutar» en Central arriba para dejar el primer registro auditable
+            (sin OpenAI).
           </p>
         ) : (
           <ul className="mt-3 space-y-2">
             {view.recentRuns.map((run) => (
               <li key={run.id} className="rounded-[14px] border border-line bg-card px-4 py-2.5 text-sm">
-                <span className="font-semibold">{run.agentId}</span>
-                <span className="text-muted"> · {run.status}</span>
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                  <span className="font-semibold">{run.agentId}</span>
+                  <span className="text-muted">· {run.status}</span>
+                  {run.createdAt ? (
+                    <time className="text-xs text-muted" dateTime={run.createdAt}>
+                      {new Date(run.createdAt).toLocaleString("es-CO", {
+                        dateStyle: "short",
+                        timeStyle: "short",
+                      })}
+                    </time>
+                  ) : null}
+                </div>
                 <p className="mt-0.5 text-muted">{run.summary || "Sin resumen."}</p>
               </li>
             ))}
