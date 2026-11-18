@@ -40,6 +40,7 @@ export type SavedContentDraft = ContentDraft & {
   reviewStatus: DraftReviewStatus;
   reviewedBy: string | null;
   reviewedAt: string | null;
+  authorName: string | null;
 };
 
 const BRAND_NOTES = [
@@ -124,6 +125,7 @@ export async function saveContentDraft(input: {
   body: string;
   cta: string;
   createdBy?: string | null;
+  authorName?: string | null;
 }): Promise<{ error: string | null; draft: SavedContentDraft | null }> {
   const facts = await getProductFacts(input.sku);
   if (!facts) return { error: "No encontré ese producto en el catálogo local.", draft: null };
@@ -136,30 +138,54 @@ export async function saveContentDraft(input: {
   try {
     const tenantId = await getPilotTenantId();
     const supabase = createAdminSupabase();
-    const { data, error } = await supabase
+    const authorName = input.authorName?.trim().slice(0, 120) || null;
+    const row = {
+      tenant_id: tenantId,
+      product_sku: facts.sku,
+      channel,
+      title: input.title.trim().slice(0, 200),
+      body: input.body.trim().slice(0, 4000),
+      cta: input.cta.trim().slice(0, 120),
+      source: "plantilla",
+      review_status: "pending",
+      created_by: input.createdBy ?? null,
+      ...(authorName ? { author_name: authorName } : {}),
+    };
+    let storedAuthor = authorName;
+    let { data, error } = await supabase
       .from("content_drafts")
-      .insert({
-        tenant_id: tenantId,
-        product_sku: facts.sku,
-        channel,
-        title: input.title.trim().slice(0, 200),
-        body: input.body.trim().slice(0, 4000),
-        cta: input.cta.trim().slice(0, 120),
-        source: "plantilla",
-        review_status: "pending",
-        created_by: input.createdBy ?? null,
-      })
+      .insert(row)
       .select("id, product_sku, channel, title, body, cta, source, review_status, created_at")
       .single();
+    if (error && authorName && error.message.includes("author_name")) {
+      storedAuthor = null;
+      const withoutAuthor = {
+        tenant_id: row.tenant_id,
+        product_sku: row.product_sku,
+        channel: row.channel,
+        title: row.title,
+        body: row.body,
+        cta: row.cta,
+        source: row.source,
+        review_status: row.review_status,
+        created_by: row.created_by,
+      };
+      ({ data, error } = await supabase
+        .from("content_drafts")
+        .insert(withoutAuthor)
+        .select("id, product_sku, channel, title, body, cta, source, review_status, created_at")
+        .single());
+    }
 
-    if (error) {
+    if (error || !data) {
+      const message = error?.message ?? "No se pudo guardar el borrador.";
       return {
         error:
-          error.message.includes("schema cache") || error.message.includes("does not exist")
+          message.includes("schema cache") || message.includes("does not exist")
             ? "Falta la tabla content_drafts. Ejecuta supabase/migrations/005_content_drafts.sql."
-            : error.message.includes("review_status")
+            : message.includes("review_status")
               ? "Falta review_status. Ejecuta supabase/migrations/007_content_draft_review.sql."
-              : `No se pudo guardar: ${error.message}`,
+              : `No se pudo guardar: ${message}`,
         draft: null,
       };
     }
@@ -178,6 +204,7 @@ export async function saveContentDraft(input: {
         reviewStatus: mapReviewStatus(data.review_status),
         reviewedBy: null,
         reviewedAt: null,
+        authorName: storedAuthor,
       },
     };
   } catch (error) {
@@ -188,31 +215,8 @@ export async function saveContentDraft(input: {
 
 export async function listContentDrafts(sku?: string, limit = 12): Promise<SavedContentDraft[]> {
   try {
-    const tenantId = await getPilotTenantId();
-    const supabase = createAdminSupabase();
-    let query = supabase
-      .from("content_drafts")
-      .select(DRAFT_LIST_COLUMNS)
-      .eq("tenant_id", tenantId)
-      .order("created_at", { ascending: false })
-      .limit(limit);
-    if (sku?.trim()) query = query.eq("product_sku", sku.trim().toUpperCase());
-
-    let { data, error } = await query;
-    if (error && isMissingReviewerColumn(error.message)) {
-      let fallback = supabase
-        .from("content_drafts")
-        .select(DRAFT_LIST_COLUMNS_WITHOUT_REVIEWER)
-        .eq("tenant_id", tenantId)
-        .order("created_at", { ascending: false })
-        .limit(limit);
-      if (sku?.trim()) fallback = fallback.eq("product_sku", sku.trim().toUpperCase());
-      const retry = await fallback;
-      data = retry.data as typeof data;
-      error = retry.error;
-    }
-    if (error || !data) return [];
-    return data.map((row) => mapSavedDraft(row));
+    const rows = await loadDraftRows({ sku, limit });
+    return rows.map((row) => mapSavedDraft(row));
   } catch {
     return [];
   }
@@ -220,41 +224,43 @@ export async function listContentDrafts(sku?: string, limit = 12): Promise<Saved
 
 export async function listPendingContentDrafts(limit = 8): Promise<SavedContentDraft[]> {
   try {
-    const tenantId = await getPilotTenantId();
-    const supabase = createAdminSupabase();
-    let { data, error } = await supabase
-      .from("content_drafts")
-      .select(DRAFT_LIST_COLUMNS)
-      .eq("tenant_id", tenantId)
-      .eq("review_status", "pending")
-      .order("created_at", { ascending: false })
-      .limit(limit);
-
-    if (error && isMissingReviewerColumn(error.message)) {
-      const retry = await supabase
-        .from("content_drafts")
-        .select(DRAFT_LIST_COLUMNS_WITHOUT_REVIEWER)
-        .eq("tenant_id", tenantId)
-        .eq("review_status", "pending")
-        .order("created_at", { ascending: false })
-        .limit(limit);
-      data = retry.data as typeof data;
-      error = retry.error;
-    }
-
-    if (error || !data) return [];
-    return data.map((row) => mapSavedDraft(row));
+    const rows = await loadDraftRows({ pendingOnly: true, limit });
+    return rows.map((row) => mapSavedDraft(row));
   } catch {
     return [];
   }
 }
 
 const DRAFT_LIST_COLUMNS =
+  "id, product_sku, channel, title, body, cta, source, review_status, reviewed_by, reviewed_at, author_name, created_at";
+const DRAFT_LIST_COLUMNS_WITHOUT_AUTHOR =
   "id, product_sku, channel, title, body, cta, source, review_status, reviewed_by, reviewed_at, created_at";
 const DRAFT_LIST_COLUMNS_WITHOUT_REVIEWER =
   "id, product_sku, channel, title, body, cta, source, review_status, created_at";
 
-function mapSavedDraft(row: {
+async function loadDraftRows(options: { sku?: string; pendingOnly?: boolean; limit: number }) {
+  const tenantId = await getPilotTenantId();
+  const supabase = createAdminSupabase();
+  const columnSets = [DRAFT_LIST_COLUMNS, DRAFT_LIST_COLUMNS_WITHOUT_AUTHOR, DRAFT_LIST_COLUMNS_WITHOUT_REVIEWER];
+
+  for (const columns of columnSets) {
+    let query = supabase
+      .from("content_drafts")
+      .select(columns)
+      .eq("tenant_id", tenantId)
+      .order("created_at", { ascending: false })
+      .limit(options.limit);
+    if (options.pendingOnly) query = query.eq("review_status", "pending");
+    if (options.sku?.trim()) query = query.eq("product_sku", options.sku.trim().toUpperCase());
+    const { data, error } = await query;
+    if (!error) return (data ?? []) as unknown as DraftListRow[];
+    if (!isOptionalDraftColumn(error.message)) return [];
+  }
+
+  return [];
+}
+
+type DraftListRow = {
   id: unknown;
   product_sku: unknown;
   channel: unknown;
@@ -265,7 +271,10 @@ function mapSavedDraft(row: {
   review_status?: unknown;
   reviewed_by?: unknown;
   reviewed_at?: unknown;
-}): SavedContentDraft {
+  author_name?: unknown;
+};
+
+function mapSavedDraft(row: DraftListRow): SavedContentDraft {
   return {
     id: String(row.id),
     productSku: String(row.product_sku),
@@ -278,11 +287,12 @@ function mapSavedDraft(row: {
     reviewStatus: mapReviewStatus(row.review_status),
     reviewedBy: typeof row.reviewed_by === "string" && row.reviewed_by.trim() ? row.reviewed_by.trim() : null,
     reviewedAt: typeof row.reviewed_at === "string" && row.reviewed_at ? row.reviewed_at : null,
+    authorName: typeof row.author_name === "string" && row.author_name.trim() ? row.author_name.trim() : null,
   };
 }
 
-function isMissingReviewerColumn(message: string) {
-  return message.includes("reviewed_by") || message.includes("reviewed_at");
+function isOptionalDraftColumn(message: string) {
+  return message.includes("author_name") || message.includes("reviewed_by") || message.includes("reviewed_at");
 }
 
 function mapReviewStatus(value: unknown): DraftReviewStatus {

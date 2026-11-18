@@ -41,6 +41,10 @@ export type CentralRouteResult = {
   suggestedLinks: Array<{ label: string; href: string }>;
 };
 
+function authorLine(name: string | null) {
+  return `Guardó ${name?.trim() || "el panel"}.`;
+}
+
 const AGENT_LABEL: Record<RoutedAgent, string> = {
   "AG-01": "Central",
   "AG-02": "Explorador",
@@ -99,8 +103,8 @@ async function listPendingDraftApprovals(): Promise<PendingApproval[]> {
       kind: "borrador" as const,
       label: `${draft.productSku} · ${draft.channel}`,
       detail: comparison.error
-        ? comparison.error
-        : `Al aprobar se escribe en ${comparison.applyTarget}${
+        ? `${authorLine(draft.authorName)} ${comparison.error}`
+        : `${authorLine(draft.authorName)} Al aprobar se escribe en ${comparison.applyTarget}${
             changed > 0 ? ` · ${changed} campo(s) cambian` : " · sin cambios detectados"
           }.`,
       href: `/panel/agentes?sku=${encodeURIComponent(draft.productSku)}`,

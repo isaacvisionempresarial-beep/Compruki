@@ -34,6 +34,7 @@ export async function saveContentDraftAction(_state: SaveDraftState, formData: F
     body: String(formData.get("body") ?? ""),
     cta: String(formData.get("cta") ?? ""),
     createdBy: access.user.id,
+    authorName: access.actorName,
   });
 
   if (result.error || !result.draft) {
