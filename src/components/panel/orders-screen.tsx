@@ -421,7 +421,11 @@ export function OrderEditor({
         {canEditLines(order) ? (
           <>
             <LinesForm order={order} products={products} canManageOrderMoney={canManageOrderMoney} />
-            <AddProductForm order={order} products={products} canManageOrderMoney={canManageOrderMoney} />
+            {canManageOrderMoney ? (
+              <AddProductForm order={order} products={products} />
+            ) : (
+              <p className="mt-3 text-sm text-muted">Solo el propietario agrega productos a este pedido.</p>
+            )}
           </>
         ) : (
           <ul className="mt-3 space-y-1 text-sm">
@@ -880,7 +884,11 @@ function CatalogCostForm({
   const preview = ready ? previewMarginsWithCatalogCosts(order, guides) : null;
 
   return (
-    <form action={costAction} className="mt-3 grid gap-2 rounded-[10px] border border-line bg-canvas px-3 py-2">
+    <form
+      action={canManageOrderMoney ? costAction : undefined}
+      onSubmit={canManageOrderMoney ? undefined : (event) => event.preventDefault()}
+      className="mt-3 grid gap-2 rounded-[10px] border border-line bg-canvas px-3 py-2"
+    >
       <input type="hidden" name="orderId" value={order.id} />
       <p className="text-sm font-semibold">Costo de la ficha</p>
       <ul className="space-y-1 text-sm leading-5">
@@ -921,15 +929,17 @@ function CatalogCostForm({
             : "Sin las cifras de la ficha el botón queda bloqueado."
           : "Solo el propietario copia estas cifras."}
       </p>
+      {canManageOrderMoney ? (
       <button
         type="submit"
-        disabled={costPending || !canSave || !canManageOrderMoney}
+        disabled={costPending || !canSave}
         className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           costPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
         }`}
       >
         {costPending ? "Guardando…" : "Usar las cifras de la ficha"}
       </button>
+      ) : null}
     </form>
   );
 }
@@ -995,7 +1005,11 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
       : null;
 
   return (
-    <form action={freightAction} className="mt-3 grid gap-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
+    <form
+      action={canManageOrderMoney ? freightAction : undefined}
+      onSubmit={canManageOrderMoney ? undefined : (event) => event.preventDefault()}
+      className="mt-3 grid gap-3 rounded-[10px] border border-line bg-canvas px-3 py-2"
+    >
       <input type="hidden" name="orderId" value={order.id} />
       {showShipping ? (
         <label className="text-sm font-semibold" htmlFor={`flete-${order.id}`}>
@@ -1005,14 +1019,16 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
             name="actualShipping"
             inputMode="numeric"
             value={shipping}
+            readOnly={!canManageOrderMoney}
             onChange={(event) => setShipping(event.target.value)}
-            className={freightInput}
+            className={moneyInput(canManageOrderMoney)}
           />
           <span className="mt-1 block font-normal leading-5 text-muted">
-            {withoutCost
-              ? "Ya está cobrado. Sin el costo del producto, este flete no entra en la utilidad realizada. El margen estimado no cambia."
-              : "Vacío: la utilidad usa el flete estimado. El margen estimado no cambia."}{" "}
-            Sin un cambio válido el botón queda bloqueado.
+            {canManageOrderMoney
+              ? withoutCost
+                ? "Ya está cobrado. Sin el costo del producto, este flete no entra en la utilidad realizada. El margen estimado no cambia. Sin un cambio válido el botón queda bloqueado."
+                : "Vacío: la utilidad usa el flete estimado. El margen estimado no cambia. Sin un cambio válido el botón queda bloqueado."
+              : "Lo anota el propietario. El margen estimado no cambia."}
           </span>
         </label>
       ) : (
@@ -1026,13 +1042,16 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
             name="collectionCost"
             inputMode="numeric"
             value={collection}
+            readOnly={!canManageOrderMoney}
             onChange={(event) => setCollection(event.target.value)}
-            className={freightInput}
+            className={moneyInput(canManageOrderMoney)}
           />
           <span className="mt-1 block font-normal leading-5 text-muted">
-            {withoutCost
-              ? "Ya está cobrado. Sin el costo del producto, este recaudo no entra en la utilidad realizada. El margen estimado no cambia."
-              : "Lo cobrado por recaudar el contraentrega. Reemplaza las comisiones estimadas en la utilidad. Vacío: siguen las estimadas. El margen estimado no cambia."}
+            {canManageOrderMoney
+              ? withoutCost
+                ? "Ya está cobrado. Sin el costo del producto, este recaudo no entra en la utilidad realizada. El margen estimado no cambia."
+                : "Lo cobrado por recaudar el contraentrega. Reemplaza las comisiones estimadas en la utilidad. Vacío: siguen las estimadas. El margen estimado no cambia."
+              : "Lo anota el propietario. El margen estimado no cambia."}
           </span>
         </label>
       ) : null}
@@ -1044,15 +1063,18 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
             name="returnFreight"
             inputMode="numeric"
             value={returning}
+            readOnly={!canManageOrderMoney}
             onChange={(event) => setReturning(event.target.value)}
-            className={freightInput}
+            className={moneyInput(canManageOrderMoney)}
           />
           <span className="mt-1 block font-normal leading-5 text-muted">
-            {canSaveReturn
-              ? "Es un gasto. Resta de la utilidad realizada."
-              : returnReady
-                ? "Es el mismo valor ya anotado: el botón queda bloqueado hasta que lo cambies."
-                : "Vacío no resta nada y no queda decidido: el botón queda bloqueado. Si no hubo flete, anota 0."}
+            {canManageOrderMoney
+              ? canSaveReturn
+                ? "Es un gasto. Resta de la utilidad realizada."
+                : returnReady
+                  ? "Es el mismo valor ya anotado: el botón queda bloqueado hasta que lo cambies."
+                  : "Vacío no resta nada y no queda decidido: el botón queda bloqueado. Si no hubo flete, anota 0."
+              : "Lo anota el propietario. Vacío no resta."}
           </span>
         </label>
       ) : (
@@ -1066,31 +1088,24 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
           {freightState.error}
         </p>
       ) : null}
-      {!canManageOrderMoney ? (
-        <p className="text-sm leading-5 text-muted">Solo el propietario guarda el flete y el recaudo.</p>
-      ) : null}
+      {canManageOrderMoney ? (
       <button
         type="submit"
-        disabled={freightPending || !canSave || !canManageOrderMoney}
+        disabled={freightPending || !canSave}
         className={`inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           freightPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
         }`}
       >
         {showCollection ? "Guardar flete y recaudo" : "Guardar flete"}
       </button>
+      ) : (
+        <p className="text-sm leading-5 text-muted">Solo el propietario guarda el flete y el recaudo.</p>
+      )}
     </form>
   );
 }
 
-function AddProductForm({
-  order,
-  products,
-  canManageOrderMoney,
-}: {
-  order: StoreOrder;
-  products: OrderableProduct[];
-  canManageOrderMoney: boolean;
-}) {
+function AddProductForm({ order, products }: { order: StoreOrder; products: OrderableProduct[] }) {
   const [sku, setSku] = useState("");
   const [variant, setVariant] = useState("");
   const [quantity, setQuantity] = useState("1");
@@ -1179,12 +1194,9 @@ function AddProductForm({
           {addState.error}
         </p>
       ) : null}
-      {!canManageOrderMoney ? (
-        <p className="text-sm leading-5 text-muted">Solo el propietario agrega productos a este pedido.</p>
-      ) : null}
       <button
         type="submit"
-        disabled={addPending || !canAdd || !canManageOrderMoney}
+        disabled={addPending || !canAdd}
         className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           addPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
         }`}
@@ -1326,10 +1338,11 @@ function LinesForm({
                     id={`cantidad-${order.id}-${index}`}
                     inputMode="numeric"
                     value={line.quantity}
+                    readOnly={!canManageOrderMoney}
                     onChange={(event) =>
                       setLines((current) => current.map((item, position) => (position === index ? { ...item, quantity: event.target.value } : item)))
                     }
-                    className={freightInput}
+                    className={moneyInput(canManageOrderMoney)}
                   />
                 </label>
                 {canManageOrderMoney && lines.length > 1 ? (
@@ -1842,6 +1855,10 @@ function CustomerNotice({ order }: { order: StoreOrder }) {
 
 const freightInput =
   "mt-1 h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none";
+
+function moneyInput(canEdit: boolean) {
+  return canEdit ? freightInput : freightInput.replace(" bg-card ", " bg-subtle ");
+}
 
 type WorkQueueRow = {
   order: StoreOrder;
