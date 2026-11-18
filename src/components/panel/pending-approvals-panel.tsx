@@ -54,7 +54,7 @@ export function PendingApprovalsPanel({
                   canApproveCatalog={canApproveCatalog}
                 />
               ) : item.actionable ? (
-                <ApprovalButtons kind={item.kind} id={item.id} />
+                <ApprovalButtons kind={item.kind} id={item.id} canApproveCatalog={canApproveCatalog} />
               ) : null}
             </li>
           ))}
@@ -158,7 +158,7 @@ function DraftReviewForm({
                   </div>
                   <div>
                     <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
-                      {diff.field} · si apruebas
+                      {diff.field} · {canApproveCatalog ? "si apruebas" : "si el propietario aprueba"}
                       {diff.changed ? "" : " · igual"}
                     </p>
                     <p className={`mt-1 whitespace-pre-wrap ${diff.changed ? "font-medium text-ink" : "text-muted"}`}>
@@ -169,7 +169,9 @@ function DraftReviewForm({
               ))
             )}
             <p className="border-t border-line pt-2 text-xs text-muted">
-              «Si apruebas» sigue el texto de este formulario. Un título vacío conserva el del catálogo.
+              {canApproveCatalog
+                ? "«Si apruebas» sigue el texto de este formulario. Un título vacío conserva el del catálogo."
+                : "El texto queda como está. Solo el propietario lo aprueba y lo escribe. Un título vacío conserva el del catálogo."}
             </p>
           </div>
         ) : null}
@@ -183,7 +185,8 @@ function DraftReviewForm({
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           maxLength={200}
-          className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
+          readOnly={!canApproveCatalog}
+          className={`h-10 w-full rounded-[10px] border border-line px-3 text-sm focus:border-accent focus:outline-none ${canApproveCatalog ? "bg-card" : "bg-subtle"}`}
         />
       </label>
       <label className="block">
@@ -194,7 +197,8 @@ function DraftReviewForm({
           onChange={(event) => setBody(event.target.value)}
           maxLength={4000}
           rows={5}
-          className="w-full rounded-[10px] border border-line bg-card px-3 py-2 text-sm focus:border-accent focus:outline-none"
+          readOnly={!canApproveCatalog}
+          className={`w-full rounded-[10px] border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none ${canApproveCatalog ? "bg-card" : "bg-subtle"}`}
         />
       </label>
       <label className="block">
@@ -204,7 +208,8 @@ function DraftReviewForm({
           value={cta}
           onChange={(event) => setCta(event.target.value)}
           maxLength={120}
-          className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
+          readOnly={!canApproveCatalog}
+          className={`h-10 w-full rounded-[10px] border border-line px-3 text-sm focus:border-accent focus:outline-none ${canApproveCatalog ? "bg-card" : "bg-subtle"}`}
         />
       </label>
       {approveDisabled ? (
@@ -255,18 +260,26 @@ function ApprovalButtons({
   kind,
   id,
   approveDisabled = false,
+  canApproveCatalog = false,
 }: {
   kind: PendingApproval["kind"];
   id: string;
   approveDisabled?: boolean;
+  canApproveCatalog?: boolean;
 }) {
   const [state, action, pending] = useActionState(resolvePendingApprovalAction, initial);
+  const approveBlocked = approveDisabled || !canApproveCatalog;
 
   return (
     <div className="mt-2">
       {approveDisabled ? (
         <p role="status" className="mb-2 text-sm font-medium text-coral">
           No se puede aprobar: el SKU no está en el catálogo local. Puedes rechazar el borrador.
+        </p>
+      ) : null}
+      {!canApproveCatalog ? (
+        <p role="status" className="mb-2 text-sm font-medium text-coral">
+          Solo el propietario puede aprobar esta corrida. Puedes rechazarla.
         </p>
       ) : null}
       <div className="flex flex-wrap gap-2">
@@ -276,7 +289,7 @@ function ApprovalButtons({
           <input type="hidden" name="decision" value="approve" />
           <button
             type="submit"
-            disabled={pending || approveDisabled}
+            disabled={pending || approveBlocked}
             className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-xs font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
           >
             {pending ? "…" : "Aprobar"}

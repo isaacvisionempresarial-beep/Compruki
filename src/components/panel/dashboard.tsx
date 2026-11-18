@@ -32,6 +32,7 @@ export function Dashboard({
   today,
   greetingName,
   canManageOrderMoney = false,
+  canApproveCatalog = false,
   agentPendingCount = 0,
   agentPendingSummary = null,
 }: {
@@ -40,6 +41,7 @@ export function Dashboard({
   today: string;
   greetingName: string;
   canManageOrderMoney?: boolean;
+  canApproveCatalog?: boolean;
   agentPendingCount?: number;
   agentPendingSummary?: AgentPendingSummary | null;
 }) {
@@ -163,6 +165,7 @@ export function Dashboard({
                 {agentPendingSummary.borradores} borrador{agentPendingSummary.borradores === 1 ? "" : "es"}
                 {" · "}
                 {agentPendingSummary.agentes} corrida{agentPendingSummary.agentes === 1 ? "" : "s"}
+                {canApproveCatalog ? "" : ". Puedes rechazar. Aprobar un borrador o una corrida lo guarda el propietario."}
               </p>
             </div>
             <Link href="/panel/agentes#pendientes-humanos" className="text-sm font-semibold text-accent-strong">
@@ -243,7 +246,8 @@ export function Dashboard({
             </dd>
             {storeSummary.estimatedMargin.missingNumbers.length > 0 ? (
               <dd className="mt-1 text-xs leading-5 text-muted">
-                Sin costo: <OrderListPhrase numbers={storeSummary.estimatedMargin.missingNumbers} lead=":" />
+                Sin costo{canManageOrderMoney ? "" : " · lo copia el propietario"}
+                <OrderListPhrase numbers={storeSummary.estimatedMargin.missingNumbers} lead=":" />
               </dd>
             ) : null}
           </div>
@@ -258,7 +262,7 @@ export function Dashboard({
               <dd className="mt-1 space-y-0.5 text-xs leading-5 text-muted">
                 {storeSummary.realized.missingNumbers.length > 0 ? (
                   <span className="block">
-                    Cobrado sin costo
+                    Cobrado sin costo{canManageOrderMoney ? "" : " · lo copia el propietario"}
                     <OrderListPhrase numbers={storeSummary.realized.missingNumbers} lead=":" />
                   </span>
                 ) : null}
@@ -342,7 +346,9 @@ export function Dashboard({
                     value={productFigure(row.realizedUnits, row.realizedMissingUnits, row.realizedMargin)}
                     detail={
                       row.realizedUnits > 0 && row.realizedMissingUnits === row.realizedUnits
-                        ? "Sin costo, no entra en la utilidad."
+                        ? canManageOrderMoney
+                          ? "Sin costo, no entra en la utilidad."
+                          : "Sin costo, no entra en la utilidad. Lo copia el propietario."
                         : row.realizedUnits > 0
                           ? `${row.realizedUnits === 1 ? "1 unidad entregada y cobrada" : `${row.realizedUnits} unidades entregadas y cobradas`}`
                           : "Todavía no entra en la utilidad."

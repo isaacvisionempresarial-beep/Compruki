@@ -28,7 +28,7 @@ export async function resolvePendingApprovalAction(
     return resolveDraft(id, decision, access.user.id, access.actorName, access.role, formData);
   }
   if (kind === "agente") {
-    return resolveAgentRun(id, decision, access.user.id, access.actorName);
+    return resolveAgentRun(id, decision, access.user.id, access.actorName, access.role);
   }
 
   return { error: "Este pendiente se resuelve en Pedidos.", message: null };
@@ -197,7 +197,12 @@ async function resolveAgentRun(
   decision: "approve" | "reject",
   userId: string,
   actorName: string,
+  role: "owner" | "operator",
 ): Promise<ResolveApprovalState> {
+  if (decision === "approve" && role !== "owner") {
+    return { error: "Solo el propietario puede aprobar una corrida.", message: null };
+  }
+
   try {
     const tenantId = await getPilotTenantId();
     const supabase = createAdminSupabase();

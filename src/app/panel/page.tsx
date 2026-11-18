@@ -44,6 +44,7 @@ export default async function PanelPage() {
       today={today}
       greetingName={greetingName}
       canManageOrderMoney={access.role === "owner"}
+      canApproveCatalog={access.role === "owner"}
       agentPendingCount={pendingSummary.total}
       agentPendingSummary={pendingSummary}
     />
