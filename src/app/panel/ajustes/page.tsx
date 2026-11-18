@@ -50,6 +50,14 @@ export default async function SettingsPage() {
           <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Nombre en historial</dt>
           <dd className="mt-0.5 text-sm font-semibold">{access.actorName}</dd>
         </div>
+        <div>
+          <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Qué puede esta sesión</dt>
+          <dd className="mt-0.5 text-sm text-muted">
+            {access.role === "owner"
+              ? "Puedes cambiar precios, publicación, alta y eliminación del catálogo; el flete, el costo y el cobro de los pedidos; y aprobar borradores y presupuestos de agentes."
+              : "Puedes editar textos, fotos y disponibilidad, y seguir pedidos: estado, entrega, talla o tamaño y aviso. Precio, flete, costo, cobro, alta, eliminación, aprobar borradores y presupuestos los guarda el propietario."}
+          </dd>
+        </div>
       </dl>
 
       <section className="elevate-1 mt-4 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="readiness">

@@ -3,6 +3,7 @@ import { ProfitabilityScreen } from "@/components/panel/profitability-screen";
 import { bogotaNow } from "@/lib/catalog";
 import { listProducts } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
+import { requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
   title: "Rentabilidad",
@@ -14,5 +15,13 @@ export const dynamic = "force-dynamic";
 
 export default async function ProfitabilityPage() {
   const today = bogotaNow().slice(0, 10);
-  return <ProfitabilityScreen products={await listProducts()} orders={await listOrders()} today={today} />;
+  const [products, orders, access] = await Promise.all([listProducts(), listOrders(), requirePanelAccess()]);
+  return (
+    <ProfitabilityScreen
+      products={products}
+      orders={orders}
+      today={today}
+      canManageOrderMoney={access.role === "owner"}
+    />
+  );
 }

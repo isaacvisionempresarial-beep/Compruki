@@ -26,10 +26,12 @@ export function ProfitabilityScreen({
   products,
   orders,
   today,
+  canManageOrderMoney = false,
 }: {
   products: CatalogProduct[];
   orders: StoreOrder[];
   today: string;
+  canManageOrderMoney?: boolean;
 }) {
   const [storePeriod, setStorePeriod] = useState<Period>("7d");
   const query = usePanelQuery().trim().toLocaleLowerCase("es");
@@ -56,7 +58,9 @@ export function ProfitabilityScreen({
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Resultados</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Rentabilidad</h1>
       <p className="mt-1 text-sm text-muted">
-        Lo que dejaron los pedidos · no es el margen del precio actual. Dropi no está conectado.
+        {canManageOrderMoney
+          ? "Lo que dejaron los pedidos · no es el margen del precio actual. Dropi no está conectado."
+          : "Lo que dejaron los pedidos · no es el margen del precio actual. Esta página solo lee. El flete, el costo y el cobro los guarda el propietario. Dropi no está conectado."}
       </p>
 
       <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
@@ -188,7 +192,8 @@ export function ProfitabilityScreen({
             <li>
               <span className="font-semibold text-sm">Pedidos</span>
               <span className="mt-0.5 block text-muted">
-                Bajo «Ver pedidos». Precio actual en{" "}
+                Bajo «Ver pedidos».{" "}
+                {canManageOrderMoney ? "Precio actual en " : "El precio de la ficha lo cambia el propietario en "}
                 <Link href="/panel/catalogo" className="font-semibold text-accent-strong">
                   Catálogo
                 </Link>
