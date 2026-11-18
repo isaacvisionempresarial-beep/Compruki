@@ -27,7 +27,15 @@ type FilterId = (typeof filters)[number]["id"];
 
 const lifecycleInitial: ProductLifecycleState = { error: null, message: null };
 
-export function CatalogScreen({ products, orders }: { products: CatalogProduct[]; orders: StoreOrder[] }) {
+export function CatalogScreen({
+  products,
+  orders,
+  canManageCommerce = false,
+}: {
+  products: CatalogProduct[];
+  orders: StoreOrder[];
+  canManageCommerce?: boolean;
+}) {
   const [filter, setFilter] = useState<FilterId>("todos");
   const query = usePanelQuery().trim().toLocaleLowerCase("es");
   const skusInOrders = useMemo(() => {
@@ -76,12 +84,16 @@ export function CatalogScreen({ products, orders }: { products: CatalogProduct[]
           </p>
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
-          <Link
-            href="/panel/catalogo/nuevo"
-            className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold hover:bg-subtle"
-          >
-            Nuevo producto
-          </Link>
+          {canManageCommerce ? (
+            <Link
+              href="/panel/catalogo/nuevo"
+              className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold hover:bg-subtle"
+            >
+              Nuevo producto
+            </Link>
+          ) : (
+            <p className="inline-flex h-10 items-center text-sm text-muted">Solo el propietario crea productos.</p>
+          )}
           <button
             type="button"
             disabled
@@ -121,8 +133,10 @@ export function CatalogScreen({ products, orders }: { products: CatalogProduct[]
 
           {visible.length === 0 ? (
             <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
-              <p className="text-sm leading-5 text-muted">{catalogEmptyMessage(products.length, searched.length, filter, query)}</p>
-              {products.length === 0 ? (
+              <p className="text-sm leading-5 text-muted">
+                {catalogEmptyMessage(products.length, searched.length, filter, query, canManageCommerce)}
+              </p>
+              {products.length === 0 && canManageCommerce ? (
                 <Link
                   href="/panel/catalogo/nuevo"
                   className="mt-3 inline-flex h-10 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark"
@@ -139,6 +153,7 @@ export function CatalogScreen({ products, orders }: { products: CatalogProduct[]
                   product={product}
                   hasOrders={skusInOrders.has(product.sku)}
                   hold={holds.get(product.sku) ?? null}
+                  canManageCommerce={canManageCommerce}
                 />
               ))}
             </ul>
@@ -151,7 +166,9 @@ export function CatalogScreen({ products, orders }: { products: CatalogProduct[]
             <li>
               <span className="font-semibold text-sm">Cada ficha</span>
               <span className="mt-0.5 block text-muted">
-                Precio, costo, publicación y fotos con historial. Se edita en su página.
+                {canManageCommerce
+                  ? "Precio, costo, publicación y fotos con historial. Se edita en su página."
+                  : "Textos, fotos y disponibilidad se editan en su página. Precio, publicación y alta los guarda el propietario."}
               </span>
             </li>
             <li>
@@ -182,10 +199,12 @@ function CatalogProductRow({
   product,
   hasOrders,
   hold,
+  canManageCommerce,
 }: {
   product: CatalogProduct;
   hasOrders: boolean;
   hold: { orders: number; kind: "talla" | "tamano" } | null;
+  canManageCommerce: boolean;
 }) {
   const margin = productMargin(product);
   const cover = product.assets.find((asset) => asset.kind === "image");
@@ -257,7 +276,7 @@ function CatalogProductRow({
               >
                 Editar
               </Link>
-              <CatalogRowLifecycle product={product} hasOrders={hasOrders} />
+              <CatalogRowLifecycle product={product} hasOrders={hasOrders} canManageCommerce={canManageCommerce} />
             </div>
           </div>
 
@@ -282,13 +301,40 @@ function CatalogProductRow({
   );
 }
 
-function CatalogRowLifecycle({ product, hasOrders }: { product: CatalogProduct; hasOrders: boolean }) {
+function CatalogRowLifecycle({
+  product,
+  hasOrders,
+  canManageCommerce,
+}: {
+  product: CatalogProduct;
+  hasOrders: boolean;
+  canManageCommerce: boolean;
+}) {
   const [deleteState, deleteAction, deletePending] = useActionState(deleteProductAction, lifecycleInitial);
   const [deactivateState, deactivateAction, deactivatePending] = useActionState(
     deactivateProductAction,
     lifecycleInitial,
   );
   const [confirmDelete, setConfirmDelete] = useState(false);
+
+  if (!canManageCommerce) {
+    if (!product.available) return <span className="text-xs font-semibold text-muted">Inactivo</span>;
+    return (
+      <form action={deactivateAction}>
+        <input type="hidden" name="id" value={product.id} />
+        <button
+          type="submit"
+          disabled={deactivatePending}
+          className={`inline-flex h-8 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas ${
+            deactivatePending ? "cursor-wait opacity-70" : ""
+          }`}
+        >
+          {deactivatePending ? "…" : "Desactivar"}
+        </button>
+        {deactivateState.error ? <span className="ml-2 text-xs font-semibold text-danger">{deactivateState.error}</span> : null}
+      </form>
+    );
+  }
 
   if (!hasOrders) {
     if (confirmDelete) {
@@ -350,8 +396,12 @@ function CatalogRowLifecycle({ product, hasOrders }: { product: CatalogProduct; 
   );
 }
 
-function catalogEmptyMessage(total: number, searched: number, filter: FilterId, query: string) {
-  if (total === 0) return "Todavía no hay productos en el catálogo. Crea uno a mano. Importar desde Dropi sigue pendiente de autorización.";
+function catalogEmptyMessage(total: number, searched: number, filter: FilterId, query: string, canManageCommerce: boolean) {
+  if (total === 0) {
+    return canManageCommerce
+      ? "Todavía no hay productos en el catálogo. Crea uno a mano. Importar desde Dropi sigue pendiente de autorización."
+      : "Todavía no hay productos en el catálogo. Solo el propietario puede crear uno. Importar desde Dropi sigue pendiente de autorización.";
+  }
   if (query && searched === 0) return "Ningún producto coincide con la búsqueda.";
   if (filter === "tienda") return "No hay productos en tienda.";
   if (filter === "ocultos") return "No hay borradores.";
@@ -1183,9 +1233,11 @@ const inputClass =
 export function ProductDangerZone({
   product,
   relatedOrderCount,
+  canManageCommerce = false,
 }: {
   product: CatalogProduct;
   relatedOrderCount: number;
+  canManageCommerce?: boolean;
 }) {
   const canDelete = relatedOrderCount === 0;
   const [deleteState, deleteAction, deletePending] = useActionState(deleteProductAction, lifecycleInitial);
@@ -1200,9 +1252,13 @@ export function ProductDangerZone({
       <h2 id="peligro-titulo" className="text-sm font-semibold">
         Eliminar o desactivar
       </h2>
-      {canDelete ? (
+      {canDelete && canManageCommerce ? (
         <p className="mt-1.5 max-w-2xl text-xs leading-5 text-muted">
           No hay pedidos con este SKU. Puedes eliminarlo del catálogo. Esta acción no se puede deshacer.
+        </p>
+      ) : canDelete ? (
+        <p className="mt-1.5 max-w-2xl text-xs leading-5 text-muted">
+          No hay pedidos con este SKU. Solo el propietario puede eliminarlo. Puedes marcarlo como no disponible.
         </p>
       ) : (
         <p className="mt-1.5 max-w-2xl text-xs leading-5 text-muted">
@@ -1223,7 +1279,7 @@ export function ProductDangerZone({
       ) : null}
 
       <div className="mt-3 flex flex-wrap gap-2">
-        {canDelete ? (
+        {canDelete && canManageCommerce ? (
           confirmDelete ? (
             <form action={deleteAction} className="flex flex-wrap items-center gap-2">
               <input type="hidden" name="id" value={product.id} />

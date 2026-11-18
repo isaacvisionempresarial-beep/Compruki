@@ -39,7 +39,13 @@ export function ProductEditorPage({
         error={state.error}
         relatedOrderCount={relatedOrderCount}
       />
-      {product ? <ProductDangerZone product={product} relatedOrderCount={relatedOrderCount} /> : null}
+      {product ? (
+        <ProductDangerZone
+          product={product}
+          relatedOrderCount={relatedOrderCount}
+          canManageCommerce={canManageCommerce}
+        />
+      ) : null}
     </div>
   );
 }

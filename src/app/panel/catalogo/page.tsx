@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CatalogScreen } from "@/components/panel/catalog-screen";
 import { listProducts } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
+import { requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
   title: "Catálogo",
@@ -11,5 +12,6 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function CatalogPage() {
-  return <CatalogScreen products={await listProducts()} orders={await listOrders()} />;
+  const [products, orders, access] = await Promise.all([listProducts(), listOrders(), requirePanelAccess()]);
+  return <CatalogScreen products={products} orders={orders} canManageCommerce={access.role === "owner"} />;
 }
