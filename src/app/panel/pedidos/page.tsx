@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { OrdersScreen } from "@/components/panel/orders-screen";
 import { listSizeGuides } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
+import { requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
   title: "Pedidos",
@@ -10,5 +11,8 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function OrdersPage() {
-  return <OrdersScreen orders={await listOrders()} sizeGuides={await listSizeGuides()} />;
+  const [orders, sizeGuides, access] = await Promise.all([listOrders(), listSizeGuides(), requirePanelAccess()]);
+  return (
+    <OrdersScreen orders={orders} sizeGuides={sizeGuides} canManageOrderMoney={access.role === "owner"} />
+  );
 }

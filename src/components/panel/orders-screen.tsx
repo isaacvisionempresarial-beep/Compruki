@@ -87,9 +87,11 @@ const queueGrid = "md:grid-cols-[6.75rem_minmax(0,1.2fr)_minmax(0,1.4fr)_4.25rem
 export function OrdersScreen({
   orders,
   sizeGuides,
+  canManageOrderMoney = false,
 }: {
   orders: StoreOrder[];
   sizeGuides: SizeGuide[];
+  canManageOrderMoney?: boolean;
 }) {
   const router = useRouter();
   const [status, setStatus] = useState<OrderStatus | "todos">("todos");
@@ -98,7 +100,7 @@ export function OrdersScreen({
   const searched = useMemo(() => orders.filter((order) => matchesOrder(order, query, sizeGuides)), [orders, query, sizeGuides]);
   const present = STATUS_SEQUENCE.filter((item) => orders.some((order) => order.status === item));
   const visible = searched.filter((order) => status === "todos" || order.status === status);
-  const work = workQueues(orders, sizeGuides);
+  const work = workQueues(orders, sizeGuides, canManageOrderMoney);
 
   useEffect(() => {
     function focusFromHash() {
@@ -175,6 +177,7 @@ export function OrdersScreen({
         </h2>
         <p className="mt-0.5 text-xs text-muted">
           Un pedido, un siguiente paso. Ábrelo para completar el dato o la acción.
+          {canManageOrderMoney ? "" : " El flete, el costo de la ficha y el cobro los guarda el propietario."}
         </p>
         {work.length === 0 ? (
           <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
@@ -278,7 +281,7 @@ export function OrdersScreen({
           </div>
           <ul className="divide-y divide-line">
           {visible.map((order) => {
-            const notes = rowWarnings(order, sizeGuides);
+            const notes = rowWarnings(order, sizeGuides, canManageOrderMoney);
             return (
               <li key={order.id}>
                 <a href={orderFocusHref(order.number)} className={cx("grid items-start gap-3 px-3 py-2 hover:bg-canvas md:gap-4", orderGrid)}>
@@ -332,7 +335,11 @@ export function OrdersScreen({
             </li>
             <li>
               <span className="font-semibold text-sm">Cada ficha</span>
-              <span className="mt-0.5 block text-muted">Ahí se confirma, entrega, despacho y cobro.</span>
+              <span className="mt-0.5 block text-muted">
+                {canManageOrderMoney
+                  ? "Ahí se confirma, entrega, despacho y cobro."
+                  : "Ahí se confirma, entrega y despacho. El cobro lo marca el propietario."}
+              </span>
             </li>
           </ul>
           <p className="mt-3 text-xs leading-5 text-muted">
@@ -485,7 +492,10 @@ export function OrderEditor({
           <p className="mt-1 text-xs leading-5 text-warning">Falta el motivo de la devolución.</p>
         ) : null}
         {needsReturnFreight(order) ? (
-          <p className="mt-1 text-xs leading-5 text-warning">Falta el flete de devolución. Vacío no resta.</p>
+          <p className="mt-1 text-xs leading-5 text-warning">
+            Falta el flete de devolución. Vacío no resta.
+            {canManageOrderMoney ? "" : " Lo anota el propietario."}
+          </p>
         ) : null}
         {order.campaignEntry ? (
           <p className="mt-1 text-xs text-accent-strong">Entró por campaña. No es gasto publicitario.</p>
@@ -1840,7 +1850,7 @@ type WorkQueueRow = {
   cta: string;
 };
 
-function workQueues(orders: StoreOrder[], guides: SizeGuide[]) {
+function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMoney: boolean) {
   const defs: Array<{
     id: string;
     title: string;
@@ -1925,20 +1935,28 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[]) {
     {
       id: "cola-flete-devolucion",
       title: "Falta anotar el flete de la devolución",
-      hint: "Vacío no resta. Si no hubo flete, anota 0; si lo hubo, anótalo.",
+      hint: canManageOrderMoney
+        ? "Vacío no resta. Si no hubo flete, anota 0; si lo hubo, anótalo."
+        : "Vacío no resta. Lo anota el propietario.",
       short: "flete devolución",
-      cta: "Anotar flete",
+      cta: canManageOrderMoney ? "Anotar flete" : "Ver pedido",
       match: needsReturnFreight,
-      note: () => "El flete no está anotado. Vacío no resta.",
+      note: () =>
+        canManageOrderMoney
+          ? "El flete no está anotado. Vacío no resta."
+          : "El flete no está anotado. Lo anota el propietario.",
     },
     {
       id: "cola-costo",
       title: "Sin costo en el pedido",
-      hint: "Sin costo, envío o comisiones de la ficha. Si ya está cobrado, falta para la utilidad realizada.",
+      hint: canManageOrderMoney
+        ? "Sin costo, envío o comisiones de la ficha. Si ya está cobrado, falta para la utilidad realizada."
+        : "Sin costo, envío o comisiones de la ficha. Lo copia el propietario.",
       short: "costo",
-      cta: "Copiar costo",
+      cta: canManageOrderMoney ? "Copiar costo" : "Ver pedido",
       match: needsCatalogCost,
-      note: (order) => costQueueWarning(order),
+      note: (order) =>
+        canManageOrderMoney ? costQueueWarning(order) : "Falta el costo en el pedido. Lo copia el propietario.",
     },
     {
       id: "cola-aviso",
@@ -1966,7 +1984,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[]) {
     .filter((queue) => queue.rows.length > 0);
 }
 
-function rowWarnings(order: StoreOrder, guides: SizeGuide[]) {
+function rowWarnings(order: StoreOrder, guides: SizeGuide[], canManageOrderMoney = true) {
   const notes: string[] = [];
   const confirm = confirmQueueNote(order, guides);
   if (confirm) notes.push(confirm);
@@ -1974,13 +1992,21 @@ function rowWarnings(order: StoreOrder, guides: SizeGuide[]) {
   if (size) notes.push(size);
   if (needsIncidenceReason(order)) notes.push("Falta el motivo de la incidencia.");
   if (needsReturnReason(order)) notes.push("Falta el motivo de la devolución.");
-  if (needsReturnFreight(order)) notes.push("Falta el flete de la devolución.");
+  if (needsReturnFreight(order)) {
+    notes.push(
+      canManageOrderMoney
+        ? "Falta el flete de la devolución."
+        : "Falta el flete de la devolución. Lo anota el propietario.",
+    );
+  }
   const department = missingDepartmentNote(order);
   if (department && !confirm) notes.push(department);
   if (readyToPrepare(order)) notes.push(prepareQueueNote(order));
   if (readyToDispatch(order)) notes.push(dispatchQueueNote(order));
   if (needsCustomerNotice(order)) notes.push("Falta avisarle al cliente.");
-  if (needsCatalogCost(order) && notes.length < 2) notes.push(costQueueWarning(order));
+  if (needsCatalogCost(order) && notes.length < 2) {
+    notes.push(canManageOrderMoney ? costQueueWarning(order) : "Falta el costo en el pedido. Lo copia el propietario.");
+  }
   return notes.slice(0, 2);
 }
 
