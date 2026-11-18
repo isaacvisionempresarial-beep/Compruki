@@ -555,12 +555,14 @@ export function ProductEditor({
   pending,
   error,
   relatedOrderCount = 0,
+  canManageCommerce = false,
 }: {
   product: CatalogProduct | null;
   formAction: (formData: FormData) => void;
   pending: boolean;
   error: string | null;
   relatedOrderCount?: number;
+  canManageCommerce?: boolean;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -859,13 +861,15 @@ export function ProductEditor({
             <div className="rounded-[14px] border border-line bg-canvas p-3">
               <p className="text-sm font-semibold">Cifras y estado</p>
               <p className="mt-1 text-xs leading-5 text-muted">
-                El precio, el costo y el margen son de esta ficha. Publicar y poder pedirlo son dos decisiones distintas.
+                {canManageCommerce
+                  ? "El precio, el costo y el margen son de esta ficha. Publicar y poder pedirlo son dos decisiones distintas."
+                  : "Precio, costo, envío y comisiones los guarda el propietario. Puedes cambiar la disponibilidad."}
               </p>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                <MoneyField label="Precio de venta" name="price" value={amounts.price} onValue={(price) => setAmounts((current) => ({ ...current, price }))} />
-                <MoneyField label="Costo del producto" name="cost" value={amounts.cost} onValue={(cost) => setAmounts((current) => ({ ...current, cost }))} />
-                <MoneyField label="Envío estimado" name="shipping" value={amounts.shipping} onValue={(shipping) => setAmounts((current) => ({ ...current, shipping }))} />
-                <MoneyField label="Comisiones estimadas" name="commissions" value={amounts.commissions} onValue={(commissions) => setAmounts((current) => ({ ...current, commissions }))} />
+                <MoneyField label="Precio de venta" name="price" value={amounts.price} readOnly={!canManageCommerce} onValue={(price) => setAmounts((current) => ({ ...current, price }))} />
+                <MoneyField label="Costo del producto" name="cost" value={amounts.cost} readOnly={!canManageCommerce} onValue={(cost) => setAmounts((current) => ({ ...current, cost }))} />
+                <MoneyField label="Envío estimado" name="shipping" value={amounts.shipping} readOnly={!canManageCommerce} onValue={(shipping) => setAmounts((current) => ({ ...current, shipping }))} />
+                <MoneyField label="Comisiones estimadas" name="commissions" value={amounts.commissions} readOnly={!canManageCommerce} onValue={(commissions) => setAmounts((current) => ({ ...current, commissions }))} />
               </div>
               <div className="mt-3 rounded-[10px] bg-card px-3 py-2 text-sm leading-5">
                 <p className="font-semibold">Margen estimado</p>
@@ -883,18 +887,26 @@ export function ProductEditor({
               </div>
               <fieldset className="mt-3 space-y-2">
                 <legend className="text-sm font-semibold">Publicación y disponibilidad</legend>
-                <label className="flex items-start gap-3 text-sm leading-5">
-                  <input
-                    type="checkbox"
-                    name="published"
-                    checked={published}
-                    className="mt-1 h-4 w-4"
-                    onChange={(event) => setPublished(event.target.checked)}
-                  />
-                  <span>
-                    <b className="font-semibold">Publicación.</b> Publicar en la tienda. Si queda sin marcar, el producto se guarda oculto.
-                  </span>
-                </label>
+                {canManageCommerce ? (
+                  <label className="flex items-start gap-3 text-sm leading-5">
+                    <input
+                      type="checkbox"
+                      name="published"
+                      checked={published}
+                      className="mt-1 h-4 w-4"
+                      onChange={(event) => setPublished(event.target.checked)}
+                    />
+                    <span>
+                      <b className="font-semibold">Publicación.</b> Publicar en la tienda. Si queda sin marcar, el producto se guarda oculto.
+                    </span>
+                  </label>
+                ) : (
+                  <p className="text-sm leading-5">
+                    {published ? <input type="hidden" name="published" value="on" /> : null}
+                    <b className="font-semibold">Publicación.</b>{" "}
+                    {published ? "Publicado en la tienda." : "Sin publicar."} Lo cambia el propietario.
+                  </p>
+                )}
                 <label className="flex items-start gap-3 text-sm leading-5">
                   <input
                     type="checkbox"
@@ -933,14 +945,15 @@ export function ProductEditor({
             </Field>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:col-span-2">
-              <Field label="SKU interno" htmlFor="sku">
+              <Field label="SKU interno" htmlFor="sku" hint={canManageCommerce ? undefined : "Lo cambia el propietario."}>
                 <input
                   id="sku"
                   name="sku"
                   required
+                  readOnly={!canManageCommerce}
                   value={sku}
                   autoCapitalize="characters"
-                  className={inputClass}
+                  className={canManageCommerce ? inputClass : `${inputClass} bg-subtle`}
                   onChange={(event) => setSku(event.target.value)}
                 />
               </Field>
@@ -1105,8 +1118,9 @@ export function ProductEditor({
             ) : null}
             {product ? (
               <p className="mb-2 text-xs leading-5 text-muted">
-                Precio, costo, envío y comisiones entran al margen estimado. Sin un cambio válido el botón queda
-                bloqueado.
+                {canManageCommerce
+                  ? "Precio, costo, envío y comisiones entran al margen estimado. Sin un cambio válido el botón queda bloqueado."
+                  : "Puedes guardar textos, fotos y disponibilidad. Precio, publicación y SKU quedan como están."}
               </p>
             ) : (
               <p className="mb-2 text-xs leading-5 text-muted">
@@ -1206,22 +1220,25 @@ function MoneyField({
   name,
   value,
   onValue,
+  readOnly = false,
 }: {
   label: string;
   name: string;
   value: string;
   onValue: (value: string) => void;
+  readOnly?: boolean;
 }) {
   return (
-    <Field label={label} htmlFor={name} hint="Pesos, sin centavos.">
+    <Field label={label} htmlFor={name} hint={readOnly ? "Lo guarda el propietario." : "Pesos, sin centavos."}>
       <input
         id={name}
         name={name}
         inputMode="numeric"
         required
+        readOnly={readOnly}
         value={value}
         onChange={(event) => onValue(event.target.value)}
-        className={inputClass}
+        className={readOnly ? `${inputClass} bg-subtle` : inputClass}
       />
     </Field>
   );

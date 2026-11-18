@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { ProductEditor, ProductDangerZone } from "@/components/panel/catalog-screen";
 import type { CatalogProduct } from "@/lib/catalog";
@@ -17,6 +18,22 @@ export function ProductEditorPage({
   canManageCommerce?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(saveProductAction, initialState);
+
+  if (!product && !canManageCommerce) {
+    return (
+      <div className="mx-auto max-w-[720px] pb-8">
+        <p className="text-xs text-muted">
+          <Link href="/panel/catalogo" className="font-semibold text-accent-strong">
+            Catálogo
+          </Link>
+        </p>
+        <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Nuevo producto</h1>
+        <p className="mt-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
+          Solo el propietario puede crear productos. Puedes editar textos, fotos y disponibilidad de los que ya están.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
@@ -38,6 +55,7 @@ export function ProductEditorPage({
         pending={pending}
         error={state.error}
         relatedOrderCount={relatedOrderCount}
+        canManageCommerce={canManageCommerce}
       />
       {product ? (
         <ProductDangerZone
