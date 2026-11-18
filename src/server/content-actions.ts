@@ -51,7 +51,7 @@ export async function saveContentDraftAction(_state: SaveDraftState, formData: F
   await recordAgentRun({
     agentId: "AG-03",
     status: "succeeded",
-    summary: `Borrador guardado · pendiente revisión humana · ${result.draft.productSku} · ${result.draft.channel}`,
+    summary: `Borrador guardado · pendiente revisión humana · no se publicó · ${result.draft.productSku} · ${result.draft.channel}`,
     createdBy: access.user.id,
     actorName: access.actorName,
   });

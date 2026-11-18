@@ -144,6 +144,11 @@ export function ContentCreatorPanel({
                   </span>
                 </p>
                 <p className="mt-0.5 text-muted">{item.title}</p>
+                {item.reviewStatus === "approved" ? (
+                  <p className="mt-0.5 text-xs text-muted">Escribió el texto en el catálogo. La publicación no cambió.</p>
+                ) : item.reviewStatus === "rejected" ? null : (
+                  <p className="mt-0.5 text-xs text-muted">Guardado para revisión. No se publicó.</p>
+                )}
                 <p className="mt-0.5 text-xs text-muted">
                   Guardó {item.authorName || "el panel"} ·{" "}
                   <time dateTime={item.createdAt}>
