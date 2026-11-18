@@ -222,6 +222,11 @@ function DraftReviewForm({
           Solo el propietario puede aprobar y escribir en el catálogo. Puedes rechazar el borrador.
         </p>
       ) : null}
+      <p className="text-xs leading-5 text-muted">
+        {canApproveCatalog
+          ? "Escribe el texto de la ficha. La publicación no cambia."
+          : "Si el propietario lo aprueba, escribe ese texto. La publicación no cambia."}
+      </p>
       <div className="flex flex-wrap gap-2">
         <button
           type="submit"
@@ -230,7 +235,7 @@ function DraftReviewForm({
           disabled={pending || approveDisabled || !canApproveCatalog}
           className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-xs font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
         >
-          {pending ? "…" : "Aprobar y escribir"}
+          {pending ? "…" : "Aprobar texto"}
         </button>
         <button
           type="submit"

@@ -274,7 +274,7 @@ function CatalogProductRow({
                 href={`/panel/catalogo/${product.sku}`}
                 className="inline-flex h-8 items-center justify-center rounded-[10px] border border-line bg-card px-2.5 text-xs font-semibold hover:bg-canvas"
               >
-                Editar
+                {canManageCommerce ? "Editar" : "Editar textos"}
               </Link>
               <CatalogRowLifecycle product={product} hasOrders={hasOrders} canManageCommerce={canManageCommerce} />
             </div>
@@ -1093,8 +1093,13 @@ export function ProductEditor({
             {product && product.history.length > 0 ? (
               <section aria-labelledby="historial-titulo" className="rounded-[14px] border border-line p-3">
                 <h3 id="historial-titulo" className="text-sm font-semibold">
-                  Historial de precio y publicación
+                  Historial de la ficha
                 </h3>
+                <p className="mt-0.5 text-xs leading-5 text-muted">
+                  {canManageCommerce
+                    ? "Cada guardado deja el precio y la publicación de ese momento."
+                    : "Un guardado de textos también queda aquí. El precio y la publicación los guarda el propietario."}
+                </p>
                 <div className="mt-2 hidden grid-cols-[7rem_minmax(0,1.4fr)_6.5rem_6.5rem_6.5rem] gap-3 border-b border-line pb-2 text-[11px] font-semibold tracking-[0.04em] text-muted uppercase md:grid">
                   <span>Fecha</span>
                   <span>Cambio</span>
