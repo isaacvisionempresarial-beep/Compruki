@@ -113,8 +113,9 @@ export function AgentsScreen({
           Explorador de productos (catálogo local)
         </h2>
         <p className="mt-1 text-sm text-muted">
-          AG-02 en modo local. Fuente: {explorer.sourceLabel}. Cada búsqueda deja corrida en el historial. No
-          es Dropi en vivo.
+          AG-02 en modo local. Fuente: {explorer.sourceLabel}. Cada búsqueda deja corrida en el historial y no
+          cambia el catálogo. No es Dropi en vivo.
+          {canApproveCatalog ? "" : " El precio y la publicación los guarda el propietario."}
         </p>
         {!ag02 ? (
           <p role="status" className="mt-2 text-sm font-medium text-coral">

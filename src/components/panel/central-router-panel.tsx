@@ -20,7 +20,7 @@ export function CentralRouterPanel({
       </h2>
       <p className="mt-1 text-sm text-muted">
         AG-01 enruta con reglas a Explorador, Analista y Creador. Cada «Enrutar» deja una corrida en el
-        historial. No usa modelo ni Dropi en vivo.
+        historial y no escribe el catálogo ni cambia el precio. No usa modelo ni Dropi en vivo.
       </p>
       {!enabled ? (
         <p role="status" className="mt-2 text-sm font-medium text-coral">

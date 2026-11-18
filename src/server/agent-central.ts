@@ -149,6 +149,11 @@ async function listAwaitingAgentApprovals(): Promise<PendingApproval[]> {
   }
 }
 
+function piece(count: number, one: string, many: string) {
+  if (count === 0) return "";
+  return `${count} ${count === 1 ? one : many}`;
+}
+
 /**
  * AG-01 · route_task — orquestación determinista sin LLM.
  * Detecta intención por palabras clave y arma un paquete con tools locales.
@@ -214,7 +219,7 @@ export async function routeTask(rawIntent: string): Promise<CentralRouteResult> 
           const up = scenario.scenarios[2];
           if (down && up) {
             summary.push(
-              `Escenarios ±10 %: ${formatCop(down.margin)} / ${formatCop(up.margin)} (estimado, no utilidad realizada).`,
+              `Escenarios ±10 %: ${formatCop(down.margin)} / ${formatCop(up.margin)} (lectura: no guarda el precio ni es utilidad realizada).`,
             );
           }
         }
@@ -235,11 +240,11 @@ export async function routeTask(rawIntent: string): Promise<CentralRouteResult> 
       draftChannels = packed?.drafts.map((draft) => draft.channel) ?? [];
       summary.push(
         draftChannels.length > 0
-          ? `Creador: borradores plantilla listos para ${targetSku} (${draftChannels.join(", ")}).`
+          ? `Creador: plantillas de ${targetSku} (${draftChannels.join(", ")}). No se guardaron ni se publicaron.`
           : `Creador: no se pudieron armar borradores para ${targetSku}.`,
       );
       suggestedLinks.push({
-        label: `Borradores ${targetSku}`,
+        label: `Plantillas ${targetSku}`,
         href: `/panel/agentes?sku=${encodeURIComponent(targetSku)}`,
       });
     } else {
@@ -249,9 +254,17 @@ export async function routeTask(rawIntent: string): Promise<CentralRouteResult> 
 
   const pending = await listPendingApprovals();
   if (pending.length > 0) {
-    summary.push(`Pendientes humanos: ${pending.length} pedido(s) por confirmar o en incidencia.`);
+    const pedidos = pending.filter((item) => item.kind === "pedido").length;
+    const borradores = pending.filter((item) => item.kind === "borrador").length;
+    const corridas = pending.filter((item) => item.kind === "agente").length;
+    const parts = [
+      piece(pedidos, "pedido", "pedidos"),
+      piece(borradores, "borrador", "borradores"),
+      piece(corridas, "corrida", "corridas"),
+    ].filter(Boolean);
+    summary.push(`Pendientes humanos: ${parts.join(", ")}.`);
   } else {
-    summary.push("Pendientes humanos: no hay pedidos en cola de confirmación/incidencia.");
+    summary.push("Pendientes humanos: no hay pedidos, borradores ni corridas en espera.");
   }
 
   return {
