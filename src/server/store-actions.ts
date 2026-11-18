@@ -118,9 +118,12 @@ function readPesos(raw: string, label: string) {
 export async function saveFreightAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
   const orderId = String(formData.get("orderId") ?? "");
   const access = await assertPanelAccess();
-    if (!access) {
-      return { error: "Tu sesión no permite anotar el flete.", orderId };
-    }
+  if (!access) {
+    return { error: "Tu sesión no permite anotar el flete.", orderId };
+  }
+  if (access.role !== "owner") {
+    return { error: "Solo el propietario puede anotar el flete y el recaudo.", orderId };
+  }
 
   const shipping = readPesos(String(formData.get("actualShipping") ?? ""), "el flete");
   const returning = readPesos(String(formData.get("returnFreight") ?? ""), "el flete");
@@ -148,9 +151,12 @@ export async function saveFreightAction(_state: UpdateOrderState, formData: Form
 export async function applyCatalogCostAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
   const orderId = String(formData.get("orderId") ?? "");
   const access = await assertPanelAccess();
-    if (!access) {
-      return { error: "Tu sesión no permite anotar el costo.", orderId };
-    }
+  if (!access) {
+    return { error: "Tu sesión no permite anotar el costo.", orderId };
+  }
+  if (access.role !== "owner") {
+    return { error: "Solo el propietario puede copiar el costo de la ficha a este pedido.", orderId };
+  }
 
   const result = await applyCatalogCosts(orderId, access.actorName);
   if (result.error || !result.order) return { error: result.error ?? "No se pudo anotar el costo de la ficha.", orderId };

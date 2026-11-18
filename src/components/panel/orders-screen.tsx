@@ -351,12 +351,14 @@ export function OrderEditor({
   products,
   sizeGuides,
   costGuides,
+  canManageOrderMoney = false,
 }: {
   order: StoreOrder;
   orders: StoreOrder[];
   products: OrderableProduct[];
   sizeGuides: SizeGuide[];
   costGuides: CostGuide[];
+  canManageOrderMoney?: boolean;
 }) {
   const [state, action, pending] = useActionState(updateOrderAction, initialState);
   const margin = orderMargin(order);
@@ -369,6 +371,12 @@ export function OrderEditor({
   const sizeNote = missingSizeNote(order, sizeGuides);
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
+      {!canManageOrderMoney ? (
+        <p className="mb-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
+          Solo el propietario anota el flete, el recaudo y copia el costo de la ficha a este pedido. Puedes seguir el
+          estado, la entrega y el aviso al cliente.
+        </p>
+      ) : null}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div className="min-w-0">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedidos</p>
@@ -414,8 +422,8 @@ export function OrderEditor({
           </ul>
         )}
         <p className="mt-2 text-sm font-extrabold tabular-nums">Total al recibir {formatCop(order.total)}</p>
-        <CatalogCostForm order={order} guides={costGuides} />
-        <FreightForm order={order} />
+        <CatalogCostForm order={order} guides={costGuides} canManageOrderMoney={canManageOrderMoney} />
+        <FreightForm order={order} canManageOrderMoney={canManageOrderMoney} />
       </section>
 
       <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-entrega">
@@ -836,7 +844,15 @@ function moneyNote(order: StoreOrder, margin: number | null) {
   return `Margen estimado ${formatCop(margin)}. La utilidad realizada espera la entrega y el cobro.`;
 }
 
-function CatalogCostForm({ order, guides }: { order: StoreOrder; guides: CostGuide[] }) {
+function CatalogCostForm({
+  order,
+  guides,
+  canManageOrderMoney,
+}: {
+  order: StoreOrder;
+  guides: CostGuide[];
+  canManageOrderMoney: boolean;
+}) {
   const [costState, costAction, costPending] = useActionState(applyCatalogCostAction, initialState);
   const rows = catalogCostLines(order, guides);
   if (rows.length === 0) return null;
@@ -880,13 +896,15 @@ function CatalogCostForm({ order, guides }: { order: StoreOrder; guides: CostGui
         </p>
       ) : null}
       <p className="text-sm leading-5 text-muted">
-        {canSave
-          ? "Copia el costo, el envío y las comisiones de la ficha a este pedido."
-          : "Sin las cifras de la ficha el botón queda bloqueado."}
+        {canManageOrderMoney
+          ? canSave
+            ? "Copia el costo, el envío y las comisiones de la ficha a este pedido."
+            : "Sin las cifras de la ficha el botón queda bloqueado."
+          : "Solo el propietario copia estas cifras."}
       </p>
       <button
         type="submit"
-        disabled={costPending || !canSave}
+        disabled={costPending || !canSave || !canManageOrderMoney}
         className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           costPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
         }`}
@@ -897,7 +915,7 @@ function CatalogCostForm({ order, guides }: { order: StoreOrder; guides: CostGui
   );
 }
 
-function FreightForm({ order }: { order: StoreOrder }) {
+function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canManageOrderMoney: boolean }) {
   const showShipping = order.status === "entregado";
   const showCollection = order.status === "entregado" && order.collected;
   const showReturn = order.status === "devuelto";
@@ -1029,9 +1047,12 @@ function FreightForm({ order }: { order: StoreOrder }) {
           {freightState.error}
         </p>
       ) : null}
+      {!canManageOrderMoney ? (
+        <p className="text-sm leading-5 text-muted">Solo el propietario guarda el flete y el recaudo.</p>
+      ) : null}
       <button
         type="submit"
-        disabled={freightPending || !canSave}
+        disabled={freightPending || !canSave || !canManageOrderMoney}
         className={`inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           freightPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
         }`}
