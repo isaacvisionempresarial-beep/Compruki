@@ -47,6 +47,7 @@ import {
   prepareQueueNote,
   resolveIncidenceError,
   orderFocusHref,
+  payableTotalLabel,
   syncFocusHref,
   readyToConfirm,
   readyToDispatch,
@@ -442,7 +443,9 @@ export function OrderEditor({
             ))}
           </ul>
         )}
-        <p className="mt-2 text-sm font-extrabold tabular-nums">Total al recibir {formatCop(order.total)}</p>
+        <p className="mt-2 text-sm font-extrabold tabular-nums">
+          {payableTotalLabel(order.status)} {formatCop(order.total)}
+        </p>
         <CatalogCostForm order={order} guides={costGuides} canManageOrderMoney={canManageOrderMoney} />
         <FreightForm order={order} canManageOrderMoney={canManageOrderMoney} />
       </section>
@@ -836,13 +839,21 @@ function emptyListMessage(query: string, status: OrderStatus | "todos") {
 
 function moneyNote(order: StoreOrder, margin: number | null) {
   const realized = orderRealizedMargin(order);
+  if (order.status === "cancelado") {
+    const lead =
+      margin === null
+        ? "Cancelado. No entra en las ventas."
+        : `Margen estimado ${formatCop(margin)}. No entra en las ventas.`;
+    return `${lead} El total guardado sigue en ${formatCop(order.total)}.`;
+  }
   if (order.status === "devuelto") {
     const base =
       margin === null
         ? "Devuelto. No suma como venta. Este pedido no tenía el costo guardado."
         : `Devuelto. El margen estimado ${formatCop(margin)} deja de contar como utilidad realizada.`;
     const freight = recordedReturnFreight(order);
-    return freight > 0 ? `${base} El flete de la devolución, ${formatCop(freight)}, sí resta.` : base;
+    const kept = ` El total guardado sigue en ${formatCop(order.total)}.`;
+    return freight > 0 ? `${base} El flete de la devolución, ${formatCop(freight)}, sí resta.${kept}` : `${base}${kept}`;
   }
   if (margin === null) {
     if (order.status === "entregado" && order.collected) {
@@ -869,7 +880,7 @@ function moneyNote(order: StoreOrder, margin: number | null) {
   if (order.status === "entregado" && order.collected) {
     return `Margen estimado ${formatCop(margin)}. Cuenta como utilidad realizada.`;
   }
-  if (order.status === "cancelado" || order.status === "incidencia" || order.status === "pendiente_confirmacion") {
+  if (order.status === "incidencia" || order.status === "pendiente_confirmacion") {
     return `Margen estimado ${formatCop(margin)}. Entra al total cuando el pedido esté confirmado y sin incidencia.`;
   }
   return `Margen estimado ${formatCop(margin)}. La utilidad realizada espera la entrega y el cobro.`;

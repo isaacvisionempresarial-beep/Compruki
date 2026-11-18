@@ -15,6 +15,7 @@ import {
   customerSteps,
   dropiHandoffText,
   lineName,
+  payableTotalLabel,
   validateBuyerNote,
   validateDelivery,
   type CustomerOrder,
@@ -154,7 +155,10 @@ export function ConfirmationScreen({
             <p className="text-lg font-extrabold tabular-nums">{formatCop(order.total)}</p>
           </div>
           <p className="mt-2 text-xs leading-5 text-muted">
-            Pagas al recibir. Dropi no está conectado. Sin guía ni fecha exacta.
+            {order.status === "cancelado" || order.status === "devuelto"
+              ? "Este pedido ya no se cobra. El total guardado no cambió. "
+              : "Pagas al recibir. "}
+            Dropi no está conectado. Sin guía ni fecha exacta.
           </p>
           <Link
             href="/tienda"
@@ -390,7 +394,7 @@ function ProductList({ order, images }: { order: CustomerOrder; images: Customer
         })}
       </ul>
       <p className="mt-2 flex justify-between border-t border-line pt-2.5 text-sm font-extrabold">
-        <span>Total al recibir</span>
+        <span>{payableTotalLabel(order.status)}</span>
         <span className="tabular-nums">{formatCop(order.total)}</span>
       </p>
     </section>
@@ -610,7 +614,7 @@ function CustomerCancel({ order, token }: { order: CustomerOrder; token: string 
         />
       </label>
       <p className="mt-1 text-xs leading-5 text-muted">
-        Solo mientras sigue pendiente. Hasta 160 caracteres. Vacío no cancela.
+        Solo mientras sigue pendiente. Hasta 160 caracteres. Vacío no cancela. El total guardado no cambia.
       </p>
       {preview ? (
         <p className="mt-2 text-sm leading-5 text-ink">

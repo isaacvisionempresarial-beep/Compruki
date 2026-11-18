@@ -235,7 +235,7 @@ export async function cancelOrderByCustomer(id: string, token: string, rawReason
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName: current.customerName,
-        summary: "Canceló su pedido antes de la confirmación.",
+        summary: "Canceló su pedido antes de la confirmación. Deja de sumar en las ventas. El total guardado no cambió.",
       },
       ...current.history,
     ],

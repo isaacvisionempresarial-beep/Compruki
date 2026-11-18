@@ -963,6 +963,11 @@ export function canEditLines(order: Pick<StoreOrder, "status">) {
   return order.status === "pendiente_confirmacion";
 }
 
+export function payableTotalLabel(status: OrderStatus) {
+  if (status === "cancelado" || status === "devuelto") return "Total guardado";
+  return "Total al recibir";
+}
+
 export type LineEdit = {
   sku: string;
   variant: string;
@@ -1266,16 +1271,16 @@ export function customerStatusNote(status: OrderStatus, reason = "", byCustomer 
     case "cancelado":
       if (byCustomer) {
         return detail
-          ? `Cancelaste este pedido: ${detail} No se va a despachar.`
-          : "Cancelaste este pedido. No se va a despachar.";
+          ? `Cancelaste este pedido: ${detail} No se va a despachar. El total guardado no cambió.`
+          : "Cancelaste este pedido. No se va a despachar. El total guardado no cambió.";
       }
       return detail
-        ? `La tienda canceló este pedido: ${detail} No se va a despachar.`
-        : "La tienda canceló este pedido. No se va a despachar.";
+        ? `La tienda canceló este pedido: ${detail} No se va a despachar. El total guardado no cambió.`
+        : "La tienda canceló este pedido. No se va a despachar. El total guardado no cambió.";
     case "devuelto":
       return detail
-        ? `La tienda registró la devolución de este pedido: ${detail} Ya no sigue como entrega cobrada.`
-        : "La tienda registró la devolución de este pedido. Ya no sigue como entrega cobrada.";
+        ? `La tienda registró la devolución de este pedido: ${detail} Ya no sigue como entrega cobrada. El total guardado no cambió.`
+        : "La tienda registró la devolución de este pedido. Ya no sigue como entrega cobrada. El total guardado no cambió.";
     default:
       return "La tienda está revisando este pedido. Dropi no está conectado. No hay guía ni fecha de entrega.";
   }
