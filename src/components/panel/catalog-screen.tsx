@@ -768,7 +768,15 @@ export function ProductEditor({
                 uso. No viene de Dropi.
               </p>
               {savedImages.length === 0 && pendingPreviews.length === 0 ? (
-                <p className="mt-2 text-sm leading-5">Todavía no hay fotos. Agrega una o varias para verlas aquí y en la tienda.</p>
+                <p className="mt-2 text-sm leading-5">
+                  {published && !unavailable
+                    ? "Todavía no hay fotos. Agrega una o varias para verlas aquí y en la tienda."
+                    : published
+                      ? "Todavía no hay fotos. Agrega una o varias para verlas aquí. En la tienda no se puede pedir mientras esté no disponible."
+                      : canManageCommerce
+                        ? "Todavía no hay fotos. Agrega una o varias para verlas aquí. Siguen ocultas hasta que publiques."
+                        : "Todavía no hay fotos. Agrega una o varias para verlas aquí. Siguen ocultas: la publicación la cambia el propietario."}
+                </p>
               ) : (
                 <div className="mt-3">
                   <PhotoCarousel

@@ -225,8 +225,10 @@ export function AgentsScreen({
           Analista de rentabilidad (sin OpenAI)
         </h2>
         <p className="mt-1 text-sm text-muted">
-          Herramientas deterministas AG-04: margen estimado y escenarios ±10 %. «Calcular» deja corrida
-          auditable. No es utilidad realizada.
+          Herramientas deterministas AG-04: margen estimado y escenarios ±10 %. «Calcular» solo lee y deja
+          corrida auditable: no cambia el precio
+          {canApproveCatalog ? "" : " (lo guarda el propietario)"} ni el costo del pedido. No es utilidad
+          realizada.
         </p>
         {!ag04 ? (
           <p role="status" className="mt-2 text-sm font-medium text-coral">
@@ -271,9 +273,18 @@ export function AgentsScreen({
             <Stat label="Pedidos" value={analyst.orders.orderCount} />
             <Stat label="Líneas sin costo" value={analyst.orders.missingCostLines} />
           </dl>
+          {!canApproveCatalog && analyst.orders.missingCostLines > 0 ? (
+            <p className="mt-2 text-xs leading-5 text-muted">
+              Esas líneas las copia el propietario desde la ficha.
+            </p>
+          ) : null}
         </div>
 
-        <div className="mt-3 overflow-x-auto rounded-[14px] border border-line bg-card">
+        <p className="mt-3 text-xs leading-5 text-muted">
+          −10 % y +10 % leen el precio actual. Calcular no lo guarda
+          {canApproveCatalog ? "." : ". El precio lo guarda el propietario."}
+        </p>
+        <div className="mt-2 overflow-x-auto rounded-[14px] border border-line bg-card">
           <table className="min-w-full text-left text-sm">
             <caption className="sr-only">Margen estimado por producto</caption>
             <thead className="border-b border-line text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
