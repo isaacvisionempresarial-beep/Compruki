@@ -77,7 +77,12 @@ export function AgentsScreen({
 
       <PendingApprovalsPanel items={view.pendingApprovals} canApproveCatalog={canApproveCatalog} />
 
-      <CentralRouterPanel route={central.route} defaultIntent={central.defaultIntent} enabled={ag01} />
+      <CentralRouterPanel
+        route={central.route}
+        defaultIntent={central.defaultIntent}
+        enabled={ag01}
+        canTurnOn={canApproveCatalog}
+      />
 
       <section className="elevate-1 mt-4 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="resumen-tienda">
         <h2 id="resumen-tienda" className="text-sm font-semibold">
@@ -113,7 +118,9 @@ export function AgentsScreen({
         </p>
         {!ag02 ? (
           <p role="status" className="mt-2 text-sm font-medium text-coral">
-            AG-02 está apagado. Actívalo en Presupuesto y activación.
+            {canApproveCatalog
+              ? "AG-02 está apagado. Actívalo en Presupuesto y activación."
+              : "AG-02 está apagado. Lo enciende el propietario en Presupuesto y activación."}
           </p>
         ) : null}
 
@@ -210,6 +217,7 @@ export function AgentsScreen({
         preserveQuery={explorer.query}
         preserveCategory={explorer.category}
         enabled={ag03}
+        canTurnOn={canApproveCatalog}
       />
 
       <section className="mt-6" aria-labelledby="analista">
@@ -222,7 +230,9 @@ export function AgentsScreen({
         </p>
         {!ag04 ? (
           <p role="status" className="mt-2 text-sm font-medium text-coral">
-            AG-04 está apagado. Actívalo en Presupuesto y activación.
+            {canApproveCatalog
+              ? "AG-04 está apagado. Actívalo en Presupuesto y activación."
+              : "AG-04 está apagado. Lo enciende el propietario en Presupuesto y activación."}
           </p>
         ) : null}
 

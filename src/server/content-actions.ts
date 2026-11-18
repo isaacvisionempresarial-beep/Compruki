@@ -60,6 +60,6 @@ export async function saveContentDraftAction(_state: SaveDraftState, formData: F
   revalidatePath("/panel");
   return {
     error: null,
-    message: `Borrador ${result.draft.channel} guardado para ${result.draft.productSku}. Quedó en Pendientes humanos.`,
+    message: `Borrador ${result.draft.channel} guardado para ${result.draft.productSku}. Quedó en Pendientes humanos. No se publicó.`,
   };
 }

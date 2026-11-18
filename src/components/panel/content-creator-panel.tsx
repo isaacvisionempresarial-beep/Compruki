@@ -16,6 +16,7 @@ export function ContentCreatorPanel({
   preserveQuery = "",
   preserveCategory = "",
   enabled = true,
+  canTurnOn = false,
 }: {
   products: Array<{ sku: string; title: string }>;
   selectedSku: string;
@@ -25,6 +26,7 @@ export function ContentCreatorPanel({
   preserveQuery?: string;
   preserveCategory?: string;
   enabled?: boolean;
+  canTurnOn?: boolean;
 }) {
   return (
     <section className="mt-6" aria-labelledby="creador">
@@ -33,11 +35,16 @@ export function ContentCreatorPanel({
       </h2>
       <p className="mt-1 text-sm text-muted">
         AG-03 sin OpenAI: arma borradores con hechos del catálogo. Generar o guardar deja corrida en el
-        historial. Revisa antes de publicar.
+        historial. Guardar no publica.{" "}
+        {canTurnOn
+          ? "El borrador espera tu aprobación para escribirse en el catálogo."
+          : "No escribe el catálogo. Lo aprueba el propietario."}
       </p>
       {!enabled ? (
         <p role="status" className="mt-2 text-sm font-medium text-coral">
-          AG-03 está apagado. Actívalo en Presupuesto y activación.
+          {canTurnOn
+            ? "AG-03 está apagado. Actívalo en Presupuesto y activación."
+            : "AG-03 está apagado. Lo enciende el propietario en Presupuesto y activación."}
         </p>
       ) : null}
 

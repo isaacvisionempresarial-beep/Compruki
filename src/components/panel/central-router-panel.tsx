@@ -6,10 +6,12 @@ export function CentralRouterPanel({
   route,
   defaultIntent = "",
   enabled = true,
+  canTurnOn = false,
 }: {
   route: CentralRouteResult | null;
   defaultIntent?: string;
   enabled?: boolean;
+  canTurnOn?: boolean;
 }) {
   return (
     <section className="mt-4" aria-labelledby="central">
@@ -22,7 +24,9 @@ export function CentralRouterPanel({
       </p>
       {!enabled ? (
         <p role="status" className="mt-2 text-sm font-medium text-coral">
-          AG-01 está apagado. Actívalo en Presupuesto y activación.
+          {canTurnOn
+            ? "AG-01 está apagado. Actívalo en Presupuesto y activación."
+            : "AG-01 está apagado. Lo enciende el propietario en Presupuesto y activación."}
         </p>
       ) : null}
 
