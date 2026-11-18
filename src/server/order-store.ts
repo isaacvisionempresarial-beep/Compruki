@@ -186,7 +186,7 @@ export async function updateOrder(id: string, action: OrderAction, actorName: st
         summary:
           action === "cobrar" || action === "quitar_cobro"
             ? collectionMarkSummary(current, action === "cobrar")
-            : result.summary,
+            : saleStopSummary(action, result.summary, current.collected),
       },
       ...current.history,
     ],
@@ -197,6 +197,13 @@ export async function updateOrder(id: string, action: OrderAction, actorName: st
 
   await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order };
+}
+
+function saleStopSummary(action: OrderAction, summary: string, wasCollected: boolean) {
+  if (action !== "incidencia" && action !== "cancelar" && action !== "devolver") return summary;
+  const note = `${summary} El total guardado no cambió.`;
+  if (action === "devolver" && wasCollected) return `${note} Se quitó la marca de cobro.`;
+  return note;
 }
 
 export async function cancelOrderByCustomer(id: string, token: string, rawReason: string) {

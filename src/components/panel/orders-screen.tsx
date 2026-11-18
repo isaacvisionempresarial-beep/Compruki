@@ -764,7 +764,8 @@ function ReasonAction({
           className="mt-1 min-h-20 w-full rounded-[10px] border border-line bg-card px-3 py-2 text-sm leading-5 font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
         />
         <span className="mt-1 block text-xs font-normal leading-5 text-muted">
-          Hasta 160 caracteres. Vacío bloquea el botón. No sale en Dropi.
+          Hasta 160 caracteres. Vacío bloquea el botón. No sale en Dropi. El total guardado no cambia.
+          {item.id === "devolver" && order.collected ? " Se quita la marca de cobro." : ""}
         </span>
       </label>
       <MotivoMessagePreview
