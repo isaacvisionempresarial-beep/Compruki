@@ -618,7 +618,7 @@ export function ProductEditor({
     const kept = savedImages.filter((asset) => !removed.includes(asset.id)).length;
     const queued = imagesRef.current?.files?.length ?? 0;
     if (kept + queued + picked.length > MAX_PRODUCT_IMAGES) {
-      setImageError(`Puedes publicar hasta ${MAX_PRODUCT_IMAGES} fotos.`);
+      setImageError(`Puedes guardar hasta ${MAX_PRODUCT_IMAGES} fotos.`);
       return;
     }
     const prepared: File[] = [];
@@ -643,11 +643,7 @@ export function ProductEditor({
     setPhotoIndex(savedImages.length + pendingPreviews.length);
     setPendingPreviews((current) => [...current, ...urls]);
     setImageError(null);
-    setImageNote(
-      reduced
-        ? "Alguna foto pesaba demasiado y quedó reducida. Pulsa Guardar producto para publicarla."
-        : "Fotos listas. Pulsa Guardar producto para que se vean completas en la tienda.",
-    );
+    setImageNote(savedMediaNote("fotos", reduced));
   }
 
   function onPickVideo(event: ChangeEvent<HTMLInputElement>) {
@@ -671,7 +667,7 @@ export function ProductEditor({
     setVideoPreview(url);
     setClearVideo(false);
     setImageError(null);
-    setImageNote("Video listo. Pulsa Guardar producto para publicarlo.");
+    setImageNote(savedMediaNote("video", false));
   }
 
   const price = parsePesos(amounts.price);
@@ -707,6 +703,24 @@ export function ProductEditor({
       commissions === product.commissions,
   );
   const canSave = fieldsReady && !unchanged;
+
+  function savedMediaNote(kind: "fotos" | "video", reduced: boolean) {
+    const ready =
+      kind === "fotos" && reduced
+        ? "Alguna foto pesaba demasiado y quedó reducida."
+        : kind === "fotos"
+          ? "Fotos listas."
+          : "Video listo.";
+    if (!published) {
+      return canManageCommerce
+        ? `${ready} Pulsa Guardar producto. Sigue oculto hasta que lo publiques.`
+        : `${ready} Pulsa Guardar producto. Sigue oculto: la publicación la cambia el propietario.`;
+    }
+    if (unavailable) {
+      return `${ready} Pulsa Guardar producto. En la tienda no se puede pedir mientras esté no disponible.`;
+    }
+    return `${ready} Pulsa Guardar producto para que se vea en la tienda.`;
+  }
   const photoCount = savedImages.length + pendingPreviews.length;
   const shownPhoto = photoCount === 0 ? 0 : ((photoIndex % photoCount) + photoCount) % photoCount;
 
@@ -882,7 +896,11 @@ export function ProductEditor({
                     : "Precio de venta menos costo, envío y comisiones. No es dinero cobrado."}
                 </p>
                 {margin !== null && margin < 0 ? (
-                  <p className="mt-1 text-warning">El margen estimado es negativo. Revísalo antes de publicarlo.</p>
+                  <p className="mt-1 text-warning">
+                    {canManageCommerce
+                      ? "El margen estimado es negativo. Revísalo antes de publicarlo."
+                      : "El margen estimado es negativo. El precio y la publicación los guarda el propietario."}
+                  </p>
                 ) : null}
               </div>
               <fieldset className="mt-3 space-y-2">
@@ -1112,8 +1130,9 @@ export function ProductEditor({
           <div className="border-t border-line px-3 py-2">
             {canSave && margin !== null ? (
               <p className="mb-2 text-sm leading-5 text-ink">
-                Si guardas, el margen estimado de este producto queda en {formatCop(margin)}. No es dinero cobrado. Los
-                pedidos ya anotados siguen con sus cifras.
+                {canManageCommerce
+                  ? `Si guardas, el margen estimado de este producto queda en ${formatCop(margin)}. No es dinero cobrado. Los pedidos ya anotados siguen con sus cifras.`
+                  : `Si guardas, el margen estimado sigue en ${formatCop(margin)}. El precio lo guarda el propietario. No es dinero cobrado.`}
               </p>
             ) : null}
             {product ? (
