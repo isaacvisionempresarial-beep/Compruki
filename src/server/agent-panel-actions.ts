@@ -9,6 +9,10 @@ import { calculateMargin, comparePriceScenarios, getOrderFinancials } from "@/se
 import { assertPanelAccess } from "@/server/panel-auth";
 import { formatCop } from "@/lib/format";
 
+function countWord(count: number, one: string, many: string) {
+  return `${count} ${count === 1 ? one : many}`;
+}
+
 function agentesRedirect(params: Record<string, string | undefined>) {
   const sp = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
@@ -53,7 +57,8 @@ export async function searchExplorerAction(formData: FormData) {
     summary: [
       "Explorador local",
       filters || "sin filtros",
-      `${shortlist.results.length} producto(s) en shortlist`,
+      `${countWord(shortlist.results.length, "producto", "productos")} en shortlist`,
+      "no cambia el catálogo",
       shortlist.sourceLabel,
     ].join(" · "),
     createdBy: access.user.id,
@@ -92,7 +97,7 @@ export async function generateContentDraftsAction(formData: FormData) {
     agentId: "AG-03",
     status: packed ? "succeeded" : "failed",
     summary: packed
-      ? `Creador plantilla · ${sku} · borradores: ${channels.join(", ") || "ninguno"}`
+      ? `Creador plantilla · ${sku} · ${channels.join(", ") || "ninguno"} · no se guardaron ni se publicaron`
       : `Creador plantilla · SKU ${sku} no encontrado en catálogo local`,
     createdBy: access.user.id,
     actorName: access.actorName,
@@ -136,7 +141,7 @@ export async function runAnalystAction(formData: FormData) {
   const productNote = row
     ? focusSku
       ? `${row.sku}: margen ${formatCop(row.margin)}` +
-        (down && up ? ` · ±10 % ${formatCop(down.margin)} / ${formatCop(up.margin)}` : "")
+        (down && up ? ` · ±10 % ${formatCop(down.margin)} / ${formatCop(up.margin)} · no guarda el precio` : "")
       : `${margins.length} productos; ${margins.filter((m) => m.margin > 0).length} con margen positivo`
     : focusSku
       ? `SKU ${focusSku} no está en el catálogo local`
@@ -148,7 +153,7 @@ export async function runAnalystAction(formData: FormData) {
     summary: [
       "Analista rentabilidad",
       productNote,
-      `Pedidos: margen estimado ${formatCop(orders.estimatedMargin)} (${orders.orderCount} pedido(s))`,
+      `Pedidos: margen estimado ${formatCop(orders.estimatedMargin)} (${countWord(orders.orderCount, "pedido", "pedidos")}) · lectura`,
     ].join(" · "),
     createdBy: access.user.id,
     actorName: access.actorName,

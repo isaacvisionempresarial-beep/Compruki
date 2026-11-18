@@ -198,7 +198,7 @@ export async function routeTask(rawIntent: string): Promise<CentralRouteResult> 
     summary.push(
       explorerCount === 0
         ? "Explorador: sin coincidencias en el catálogo local."
-        : `Explorador: ${explorerCount} producto(s) en shortlist local (no es Dropi en vivo).`,
+        : `Explorador: ${piece(explorerCount, "producto", "productos")} en shortlist local (no es Dropi en vivo, no cambia el catálogo).`,
     );
     const params = new URLSearchParams();
     if (sku) params.set("q", sku);

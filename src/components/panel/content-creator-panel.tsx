@@ -109,6 +109,7 @@ export function ContentCreatorPanel({
             </ul>
           </div>
 
+          <p className="mt-3 text-sm text-muted">Estas plantillas no están guardadas. Guardar no publica.</p>
           <ul className="mt-3 grid gap-3 lg:grid-cols-3">
             {drafts.map((draft) => (
               <li key={draft.channel}>
