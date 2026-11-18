@@ -91,6 +91,9 @@ export async function updateOrderAction(_state: UpdateOrderState, formData: Form
   if (!ORDER_ACTIONS.includes(intent as OrderAction)) {
     return { error: "Esa acción no existe.", orderId };
   }
+  if ((intent === "cobrar" || intent === "quitar_cobro") && access.role !== "owner") {
+    return { error: "Solo el propietario puede marcar o quitar el cobro.", orderId };
+  }
 
   const result = await updateOrder(orderId, intent as OrderAction, access.actorName, String(formData.get("customerReason") ?? ""));
   if (result.error || !result.order) {

@@ -76,6 +76,10 @@ const buttonTone = {
   danger: "border border-danger/30 bg-danger-tint text-danger",
 } as const;
 
+function moneyStatusAction(id: string) {
+  return id === "cobrar" || id === "quitar_cobro";
+}
+
 const orderGrid = "md:grid-cols-[6.75rem_minmax(0,1.5fr)_7rem_12.5rem_4.25rem]";
 const historyGrid = "md:grid-cols-[7rem_9rem_minmax(0,1fr)]";
 const queueGrid = "md:grid-cols-[6.75rem_minmax(0,1.2fr)_minmax(0,1.4fr)_4.25rem]";
@@ -373,8 +377,8 @@ export function OrderEditor({
     <div className="mx-auto max-w-[1600px] pb-8">
       {!canManageOrderMoney ? (
         <p className="mb-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-          Solo el propietario anota el flete, el recaudo, copia el costo de la ficha y cambia cantidades o productos.
-          Puedes seguir el estado, la entrega, la talla o el tamaño y el aviso al cliente.
+          Solo el propietario anota el flete, el recaudo, copia el costo de la ficha, cambia cantidades o productos y
+          marca o quita el cobro. Puedes seguir el estado, la entrega, la talla o el tamaño y el aviso al cliente.
         </p>
       ) : null}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
@@ -540,8 +544,10 @@ export function OrderEditor({
                   <input type="hidden" name="intent" value={item.id} />
                   <button
                     type="submit"
-                    disabled={pending}
-                    className={`inline-flex h-10 w-full items-center justify-center rounded-[10px] px-3 text-sm font-semibold disabled:cursor-wait ${buttonTone[item.tone]}`}
+                    disabled={pending || (moneyStatusAction(item.id) && !canManageOrderMoney)}
+                    className={`inline-flex h-10 w-full items-center justify-center rounded-[10px] px-3 text-sm font-semibold ${
+                      pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+                    } ${buttonTone[item.tone]}`}
                   >
                     {item.label}
                   </button>
@@ -549,6 +555,9 @@ export function OrderEditor({
               ),
             )}
           </div>
+          {!canManageOrderMoney && actions.some((item) => moneyStatusAction(item.id)) ? (
+            <p className="mt-2 text-sm leading-5 text-muted">Solo el propietario marca o quita el cobro.</p>
+          ) : null}
           {confirmBlocked || prepareDropiError(order) || resolveBlocked ? (
             <details className="mt-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
               <summary className="cursor-pointer text-sm font-semibold text-muted">
