@@ -263,7 +263,9 @@ export async function saveOrderLinesAction(_state: UpdateOrderState, formData: F
   const drafts = lineEditsFrom(formData.get("lines"));
   if (!drafts) return { error: "No se pudieron leer los productos.", orderId };
 
-  const result = await saveOrderLines(orderId, drafts, access.actorName);
+  const result = await saveOrderLines(orderId, drafts, access.actorName, {
+    restrictMoney: access.role !== "owner",
+  });
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudieron guardar las cantidades.", orderId };
   }
@@ -279,9 +281,12 @@ export async function saveOrderLinesAction(_state: UpdateOrderState, formData: F
 export async function addOrderLineAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
   const orderId = String(formData.get("orderId") ?? "");
   const access = await assertPanelAccess();
-    if (!access) {
-      return { error: "Tu sesión no permite corregir este pedido.", orderId };
-    }
+  if (!access) {
+    return { error: "Tu sesión no permite corregir este pedido.", orderId };
+  }
+  if (access.role !== "owner") {
+    return { error: "Solo el propietario puede agregar productos al pedido.", orderId };
+  }
 
   const result = await addOrderLine(
     orderId,

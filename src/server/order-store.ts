@@ -691,7 +691,12 @@ export async function saveDelivery(id: string, input: DeliveryDraft, actorName: 
   return { error: null, order };
 }
 
-export async function saveOrderLines(id: string, drafts: LineEdit[], actorName: string) {
+export async function saveOrderLines(
+  id: string,
+  drafts: LineEdit[],
+  actorName: string,
+  options?: { restrictMoney?: boolean },
+) {
   const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
   if (!current) return { error: "No encontré ese pedido.", order: null };
@@ -703,6 +708,9 @@ export async function saveOrderLines(id: string, drafts: LineEdit[], actorName: 
   });
   if (checked.error || !checked.lines) return { error: checked.error ?? "Revisa las cantidades.", order: null };
   const lines = checked.lines;
+  if (options?.restrictMoney && lineMoneyTouched(current.lines, drafts)) {
+    return { error: "Solo el propietario puede cambiar la cantidad o quitar productos.", order: null };
+  }
   const same =
     current.lines.length === lines.length &&
     current.lines.every(
@@ -756,6 +764,14 @@ export async function saveOrderLines(id: string, drafts: LineEdit[], actorName: 
   };
   await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order };
+}
+
+function lineMoneyTouched(lines: StoreOrder["lines"], drafts: LineEdit[]) {
+  if (drafts.length !== lines.length) return true;
+  return drafts.some((draft) => {
+    const previous = lines.find((item) => item.sku === draft.sku.trim() && (item.variant ?? "") === draft.variant.trim());
+    return previous !== undefined && previous.quantity !== draft.quantity;
+  });
 }
 
 export async function addOrderLine(

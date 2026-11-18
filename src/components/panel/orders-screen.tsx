@@ -373,8 +373,8 @@ export function OrderEditor({
     <div className="mx-auto max-w-[1600px] pb-8">
       {!canManageOrderMoney ? (
         <p className="mb-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-          Solo el propietario anota el flete, el recaudo y copia el costo de la ficha a este pedido. Puedes seguir el
-          estado, la entrega y el aviso al cliente.
+          Solo el propietario anota el flete, el recaudo, copia el costo de la ficha y cambia cantidades o productos.
+          Puedes seguir el estado, la entrega, la talla o el tamaño y el aviso al cliente.
         </p>
       ) : null}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
@@ -409,8 +409,8 @@ export function OrderEditor({
         <h2 id="pedido-productos" className="text-sm font-semibold">Productos</h2>
         {canEditLines(order) ? (
           <>
-            <LinesForm order={order} products={products} />
-            <AddProductForm order={order} products={products} />
+            <LinesForm order={order} products={products} canManageOrderMoney={canManageOrderMoney} />
+            <AddProductForm order={order} products={products} canManageOrderMoney={canManageOrderMoney} />
           </>
         ) : (
           <ul className="mt-3 space-y-1 text-sm">
@@ -1063,7 +1063,15 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
   );
 }
 
-function AddProductForm({ order, products }: { order: StoreOrder; products: OrderableProduct[] }) {
+function AddProductForm({
+  order,
+  products,
+  canManageOrderMoney,
+}: {
+  order: StoreOrder;
+  products: OrderableProduct[];
+  canManageOrderMoney: boolean;
+}) {
   const [sku, setSku] = useState("");
   const [variant, setVariant] = useState("");
   const [quantity, setQuantity] = useState("1");
@@ -1152,9 +1160,12 @@ function AddProductForm({ order, products }: { order: StoreOrder; products: Orde
           {addState.error}
         </p>
       ) : null}
+      {!canManageOrderMoney ? (
+        <p className="text-sm leading-5 text-muted">Solo el propietario agrega productos a este pedido.</p>
+      ) : null}
       <button
         type="submit"
-        disabled={addPending || !canAdd}
+        disabled={addPending || !canAdd || !canManageOrderMoney}
         className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           addPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
         }`}
@@ -1165,7 +1176,15 @@ function AddProductForm({ order, products }: { order: StoreOrder; products: Orde
   );
 }
 
-function LinesForm({ order, products }: { order: StoreOrder; products: OrderableProduct[] }) {
+function LinesForm({
+  order,
+  products,
+  canManageOrderMoney,
+}: {
+  order: StoreOrder;
+  products: OrderableProduct[];
+  canManageOrderMoney: boolean;
+}) {
   const [lines, setLines] = useState(() =>
     order.lines.map((line) => ({ ...line, sourceVariant: line.variant ?? "", quantity: String(line.quantity) })),
   );
@@ -1197,7 +1216,13 @@ function LinesForm({ order, products }: { order: StoreOrder; products: Orderable
     .map((line) => `${line.sku}:${line.variant ?? ""}:${line.sizeKind ?? ""}:${line.quantity}`)
     .join("|");
   const unchanged = draftSignature === signature;
-  const canSave = !sizeHold && !unchanged && Number.isFinite(preview);
+  const moneyTouched =
+    lines.length !== order.lines.length ||
+    lines.some((line) => {
+      const previous = order.lines.find((item) => item.sku === line.sku && (item.variant ?? "") === line.sourceVariant);
+      return previous !== undefined && String(previous.quantity) !== line.quantity.trim();
+    });
+  const canSave = !sizeHold && !unchanged && Number.isFinite(preview) && (canManageOrderMoney || !moneyTouched);
   const quantityInvalid = !Number.isFinite(preview);
   const draftLines = Number.isFinite(preview)
     ? lines.map((line) => ({
@@ -1288,7 +1313,7 @@ function LinesForm({ order, products }: { order: StoreOrder; products: Orderable
                     className={freightInput}
                   />
                 </label>
-                {lines.length > 1 ? (
+                {canManageOrderMoney && lines.length > 1 ? (
                   <button
                     type="button"
                     className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
@@ -1306,6 +1331,7 @@ function LinesForm({ order, products }: { order: StoreOrder; products: Orderable
         De 1 a 5 por producto. El precio no cambia. Si tiene tallas o tamaños, eliges uno antes de guardar. Sin eso el
         botón queda bloqueado y el pedido no se confirma. Sin un cambio el botón queda bloqueado. Para anular el pedido
         completo, usa Cancelar. Guardar aquí no cambia nada en Dropi.
+        {canManageOrderMoney ? "" : " La cantidad y quitar un producto los guarda el propietario. La talla o el tamaño sí."}
         {quantityInvalid ? " Vacío, cero o más de 5 no se guarda: el botón queda bloqueado." : ""}
         {Number.isFinite(preview) && preview !== order.total ? ` Al guardar, el total de productos queda en ${formatCop(preview)}.` : ""}
         {marginDraft !== null && marginDraft !== currentMargin
