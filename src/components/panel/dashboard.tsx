@@ -72,24 +72,31 @@ export function Dashboard({
     );
   }, [storeOrders, sizeGuides, query]);
 
-  const orderWorkCount = useMemo(
-    () =>
-      storeOrders.filter(
-        (order) =>
-          readyToConfirm(order, sizeGuides) ||
-          needsSize(order, sizeGuides) ||
-          needsDepartment(order) ||
-          needsClosedDepartment(order) ||
-          readyToPrepare(order) ||
-          readyToDispatch(order) ||
-          needsIncidenceReason(order) ||
-          needsReturnReason(order) ||
-          needsReturnFreight(order) ||
-          needsCatalogCost(order) ||
-          needsCustomerNotice(order),
-      ).length,
-    [storeOrders, sizeGuides],
-  );
+  const orderWork = useMemo(() => {
+    let yours = 0;
+    let ownerMoney = 0;
+    for (const order of storeOrders) {
+      const yoursMatch =
+        readyToConfirm(order, sizeGuides) ||
+        needsSize(order, sizeGuides) ||
+        needsDepartment(order) ||
+        needsClosedDepartment(order) ||
+        readyToPrepare(order) ||
+        readyToDispatch(order) ||
+        needsIncidenceReason(order) ||
+        needsReturnReason(order) ||
+        needsCustomerNotice(order);
+      const moneyMatch = needsReturnFreight(order) || needsCatalogCost(order);
+      if (canManageOrderMoney) {
+        if (yoursMatch || moneyMatch) yours += 1;
+      } else if (yoursMatch) {
+        yours += 1;
+      } else if (moneyMatch) {
+        ownerMoney += 1;
+      }
+    }
+    return { yours, ownerMoney };
+  }, [storeOrders, sizeGuides, canManageOrderMoney]);
   const syncWorkCount = useMemo(
     () =>
       storeOrders.filter(
@@ -433,12 +440,14 @@ export function Dashboard({
             <Link href="/panel/pedidos" className="elevate-1 block rounded-[14px] border border-line bg-card px-3 py-2 hover:bg-canvas">
               <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedidos</span>
               <span className="mt-1 block text-sm font-bold">
-                {orderWorkCount} {orderWorkCount === 1 ? "pedido por atender" : "pedidos por atender"}
+                {orderWork.yours} {orderWork.yours === 1 ? "pedido por atender" : "pedidos por atender"}
               </span>
               <span className="mt-0.5 block text-xs leading-5 text-muted">
                 {canManageOrderMoney
                   ? "Cola «Por atender»: un pedido, un siguiente paso."
-                  : "En la cola, el flete y el costo de la ficha los guarda el propietario. Tú sigues estado, entrega, talla y aviso."}
+                  : orderWork.ownerMoney > 0
+                    ? `${orderWork.ownerMoney === 1 ? "1 pedido con flete o costo lo guarda el propietario." : `${orderWork.ownerMoney} pedidos con flete o costo los guarda el propietario.`} Tú sigues estado, entrega, talla y aviso.`
+                    : "Este número es lo que puedes hacer: estado, entrega, talla y aviso."}
               </span>
             </Link>
           </li>

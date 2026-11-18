@@ -177,7 +177,9 @@ export function OrdersScreen({
         </h2>
         <p className="mt-0.5 text-xs text-muted">
           Un pedido, un siguiente paso. Ábrelo para completar el dato o la acción.
-          {canManageOrderMoney ? "" : " El flete, el costo de la ficha y el cobro los guarda el propietario."}
+          {canManageOrderMoney
+            ? ""
+            : " Si puedes hacer algo, ese es el paso. El flete y el costo quedan después y los guarda el propietario."}
         </p>
         {work.length === 0 ? (
           <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
@@ -327,7 +329,11 @@ export function OrdersScreen({
           <ul className="mt-2 space-y-2 text-xs leading-5">
             <li>
               <span className="font-semibold text-sm">Por atender</span>
-              <span className="mt-0.5 block text-muted">Cada pedido sale una sola vez, en su siguiente paso.</span>
+              <span className="mt-0.5 block text-muted">
+                {canManageOrderMoney
+                  ? "Cada pedido sale una sola vez, en su siguiente paso."
+                  : "Cada pedido sale una sola vez. Si puedes hacer algo, ese es el paso; el flete y el costo quedan después."}
+              </span>
             </li>
             <li>
               <span className="font-semibold text-sm">Cifras</span>
@@ -1987,7 +1993,13 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
   ];
 
   const claimed = new Set<string>();
-  return defs
+  const ordered = canManageOrderMoney
+    ? defs
+    : [
+        ...defs.filter((def) => def.id !== "cola-flete-devolucion" && def.id !== "cola-costo"),
+        ...defs.filter((def) => def.id === "cola-flete-devolucion" || def.id === "cola-costo"),
+      ];
+  return ordered
     .map((def) => {
       const rows: WorkQueueRow[] = [];
       for (const order of orders) {
