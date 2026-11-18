@@ -1371,10 +1371,16 @@ function LinesForm({
         completo, usa Cancelar. Guardar aquí no cambia nada en Dropi.
         {canManageOrderMoney ? "" : " La cantidad y quitar un producto los guarda el propietario. La talla o el tamaño sí."}
         {quantityInvalid ? " Vacío, cero o más de 5 no se guarda: el botón queda bloqueado." : ""}
-        {Number.isFinite(preview) && preview !== order.total ? ` Al guardar, el total de productos queda en ${formatCop(preview)}.` : ""}
+        {Number.isFinite(preview) && preview !== order.total
+          ? ` Al guardar, el total de productos queda en ${formatCop(preview)}.`
+          : Number.isFinite(preview) && !unchanged
+            ? " Al guardar, el total no cambia."
+            : ""}
         {marginDraft !== null && marginDraft !== currentMargin
           ? ` Al guardar, el margen estimado queda en ${formatCop(marginDraft)}. No es dinero cobrado.`
-          : ""}
+          : !unchanged && preview === order.total && marginDraft === currentMargin
+            ? " El margen estimado no cambia."
+            : ""}
       </p>
       {linesState.orderId === order.id && linesState.error ? (
         <p role="alert" className="text-sm font-semibold text-danger">
