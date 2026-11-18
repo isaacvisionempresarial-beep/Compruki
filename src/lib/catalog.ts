@@ -187,6 +187,12 @@ export function changeSummary(previous: CatalogProduct | null, next: ProductDraf
   if (previous.published !== next.published) {
     changes.push(next.published ? "Quedó publicado en la tienda." : "Quedó oculto de la tienda.");
   }
+  if (previous.sku !== next.sku.trim().toUpperCase()) {
+    changes.push(`Cambió el SKU de ${previous.sku} a ${next.sku.trim().toUpperCase()}.`);
+  }
+  if (previous.externalRef.trim() !== next.externalRef.trim()) {
+    changes.push(next.externalRef.trim() ? "Cambió la referencia del proveedor." : "Quitó la referencia del proveedor.");
+  }
   if (previous.available !== next.available) {
     changes.push(next.available ? "Volvió a estar disponible." : "Quedó marcado como no disponible.");
   }

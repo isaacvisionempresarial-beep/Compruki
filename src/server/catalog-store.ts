@@ -362,8 +362,18 @@ export async function saveProduct(
   const applied = applyMedia(current, productId, media);
   if (applied.error) return { error: applied.error, product: null };
 
-  const summary = [historyLead.trim(), changeSummary(current ?? null, draft), ...applied.notes];
-  const note = summary.filter(Boolean).join(" ");
+  const parts = [historyLead.trim(), changeSummary(current ?? null, draft), ...applied.notes];
+  const moneySame =
+    !!current &&
+    current.price === draft.price &&
+    current.cost === draft.cost &&
+    current.shipping === draft.shipping &&
+    current.commissions === draft.commissions &&
+    current.published === draft.published;
+  if (moneySame && parts.some((part) => part.trim())) {
+    parts.push("El precio y la publicación no cambiaron.");
+  }
+  const note = parts.filter(Boolean).join(" ");
   const next: CatalogProduct = {
     id: productId,
     title: draft.title.trim(),
