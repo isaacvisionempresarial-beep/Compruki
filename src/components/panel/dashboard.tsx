@@ -31,6 +31,7 @@ export function Dashboard({
   sizeGuides,
   today,
   greetingName,
+  canManageOrderMoney = false,
   agentPendingCount = 0,
   agentPendingSummary = null,
 }: {
@@ -38,6 +39,7 @@ export function Dashboard({
   sizeGuides: SizeGuide[];
   today: string;
   greetingName: string;
+  canManageOrderMoney?: boolean;
   agentPendingCount?: number;
   agentPendingSummary?: AgentPendingSummary | null;
 }) {
@@ -112,7 +114,9 @@ export function Dashboard({
             Hola {greetingName}, tu tienda está en modo venta
           </h1>
           <p className="mt-1 text-sm text-muted">
-            Cifras y pendientes de los pedidos de la tienda. Dropi no está conectado.
+            {canManageOrderMoney
+              ? "Cifras y pendientes de los pedidos de la tienda. Dropi no está conectado."
+              : "Cifras de la tienda. El flete, el costo, el cobro y los precios los guarda el propietario. Dropi no está conectado."}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -432,7 +436,9 @@ export function Dashboard({
                 {orderWorkCount} {orderWorkCount === 1 ? "pedido por atender" : "pedidos por atender"}
               </span>
               <span className="mt-0.5 block text-xs leading-5 text-muted">
-                Cola «Por atender»: un pedido, un siguiente paso.
+                {canManageOrderMoney
+                  ? "Cola «Por atender»: un pedido, un siguiente paso."
+                  : "En la cola, el flete y el costo de la ficha los guarda el propietario. Tú sigues estado, entrega, talla y aviso."}
               </span>
             </Link>
           </li>
@@ -464,7 +470,9 @@ export function Dashboard({
             <li>
               <span className="font-semibold text-sm">Siguiente paso</span>
               <span className="mt-0.5 block text-muted">
-                Pendientes aquí; la cola completa en Pedidos → Por atender.
+                {canManageOrderMoney
+                  ? "Pendientes aquí; la cola completa en Pedidos → Por atender."
+                  : "Pendientes aquí. Flete, costo y cobro los guarda el propietario."}
               </span>
             </li>
             <li>

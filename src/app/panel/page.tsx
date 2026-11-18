@@ -43,6 +43,7 @@ export default async function PanelPage() {
       sizeGuides={sizeGuides}
       today={today}
       greetingName={greetingName}
+      canManageOrderMoney={access.role === "owner"}
       agentPendingCount={pendingSummary.total}
       agentPendingSummary={pendingSummary}
     />
