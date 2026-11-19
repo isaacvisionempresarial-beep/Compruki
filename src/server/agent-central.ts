@@ -229,7 +229,9 @@ export async function routeTask(rawIntent: string): Promise<CentralRouteResult> 
     } else {
       const margins = await calculateMargin();
       const positive = margins.filter((row) => row.margin > 0).length;
-      summary.push(`Analista: ${margins.length} productos; ${positive} con margen estimado positivo.`);
+      summary.push(
+        `Analista: ${margins.length} productos; ${positive} con margen estimado positivo de la ficha. No es dinero cobrado.`,
+      );
     }
   }
 

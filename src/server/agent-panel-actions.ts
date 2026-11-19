@@ -140,9 +140,11 @@ export async function runAnalystAction(formData: FormData) {
 
   const productNote = row
     ? focusSku
-      ? `${row.sku}: margen ${formatCop(row.margin)}` +
-        (down && up ? ` · ±10 % ${formatCop(down.margin)} / ${formatCop(up.margin)} · no guarda el precio` : "")
-      : `${margins.length} productos; ${margins.filter((m) => m.margin > 0).length} con margen positivo`
+      ? `${row.sku}: margen estimado ${formatCop(row.margin)} sobre el precio de la ficha ${formatCop(row.price)}. No es dinero cobrado` +
+        (down && up
+          ? `. ±10 % ${formatCop(down.margin)} / ${formatCop(up.margin)}. No guarda el precio ni es utilidad realizada`
+          : "")
+      : `${margins.length} productos; ${margins.filter((m) => m.margin > 0).length} con margen estimado positivo de la ficha. No es dinero cobrado`
     : focusSku
       ? `SKU ${focusSku} no está en el catálogo local`
       : "Sin productos en catálogo";
@@ -153,7 +155,7 @@ export async function runAnalystAction(formData: FormData) {
     summary: [
       "Analista rentabilidad",
       productNote,
-      `Pedidos: margen estimado ${formatCop(orders.estimatedMargin)} (${countWord(orders.orderCount, "pedido", "pedidos")}) · lectura`,
+      `Pedidos: margen estimado ${formatCop(orders.estimatedMargin)} (${countWord(orders.orderCount, "pedido", "pedidos")}). Lectura. No es utilidad realizada ni el total guardado`,
     ].join(" · "),
     createdBy: access.user.id,
     actorName: access.actorName,
