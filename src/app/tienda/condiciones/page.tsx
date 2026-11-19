@@ -23,15 +23,15 @@ export const metadata: Metadata = {
 const points = [
   {
     label: "El pedido",
-    text: "Queda pendiente hasta que la tienda lo confirme. En este paso nadie cobra. Mientras sigue pendiente, puedes cancelarlo desde el pedido.",
+    text: "Queda pendiente hasta que la tienda lo confirme. Confirmar no cobra. Mientras sigue pendiente, puedes cancelarlo desde el pedido: deja de cobrarse y el total guardado no cambia.",
   },
   {
     label: "La talla",
-    text: "Si el producto tiene tallas o tamaños, eliges uno antes de que la tienda confirme. Mientras sigue pendiente, puedes cambiarlo desde el pedido.",
+    text: "Si el producto tiene tallas o tamaños, eliges uno antes de que la tienda confirme. Mientras sigue pendiente, puedes cambiarlo desde el pedido. Eso no cambia el precio guardado.",
   },
   {
     label: "El pago",
-    text: "Es efectivo contra entrega, por el total de los productos. Transferencia y tarjeta no están conectadas.",
+    text: "Es efectivo contra entrega, por el precio publicado de los productos. Ese monto queda guardado en el pedido. Nadie lo cobra en esta tienda. Transferencia y tarjeta no están conectadas.",
   },
   {
     label: "El envío",
@@ -51,7 +51,7 @@ const points = [
   },
   {
     label: "Devolución",
-    text: "Si la tienda la anota, el motivo queda en el pedido. Esta página no fija un plazo de retracto.",
+    text: "Si la tienda la anota, el motivo queda en el pedido y ya no se cobra. El total guardado no cambia. Esta página no fija un plazo de retracto.",
   },
 ];
 
@@ -86,7 +86,7 @@ export default function ConditionsPage() {
           <ul className="mt-2 space-y-2 text-xs leading-5">
             <li>
               <span className="font-semibold text-sm">Nadie cobra aquí</span>
-              <span className="mt-0.5 block text-muted">Pagas al recibir, en efectivo.</span>
+              <span className="mt-0.5 block text-muted">Pagas al recibir el precio publicado, en efectivo. Confirmar no cobra.</span>
             </li>
             <li>
               <span className="font-semibold text-sm">Envío aparte</span>

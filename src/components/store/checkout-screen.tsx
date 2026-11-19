@@ -210,7 +210,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                 <input type="radio" name="payment" value="contra_entrega" defaultChecked className="mt-1" />
                 <span>
                   <span className="block font-semibold">Efectivo contra entrega</span>
-                  <span className="text-muted">Pagas el total de los productos cuando los recibes.</span>
+                  <span className="text-muted">Pagas el precio publicado cuando los recibes.</span>
                 </span>
               </label>
               <p className="rounded-[10px] border border-line bg-subtle px-3 py-2 text-sm text-muted">
@@ -230,8 +230,8 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
               />
               <p>
                 <label htmlFor="accepted">
-                  Acepto las condiciones: el pedido queda pendiente, el envío se acuerda antes de despachar y pago los
-                  productos al recibirlos.
+                  Acepto las condiciones: el pedido queda pendiente, el envío se acuerda antes de despachar y pago el precio
+                  publicado al recibir.
                 </label>{" "}
                 <Link href="/tienda/condiciones" className="scroll-mb-24 font-semibold text-accent-strong">
                   Leerlas

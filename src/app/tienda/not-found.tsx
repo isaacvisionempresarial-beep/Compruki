@@ -29,7 +29,7 @@ export default function StoreNotFound() {
         },
         {
           label: "Pago",
-          text: "Nadie cobra en COMPRUKI. El pago es contra entrega cuando la tienda confirma.",
+          text: "Nadie cobra en COMPRUKI. Pagas al recibir el precio publicado. Confirmar no cobra.",
         },
       ]}
     />
