@@ -630,7 +630,7 @@ export function OrderEditor({
               </div>
               {confirmBlocked ? (
                 <p className="mt-3 max-w-xl text-sm leading-5 text-ink">
-                  «Confirmar pedido» sigue bloqueado. {confirmBlocked} Si más adelante anotas esa elección y usas
+                  «Confirmar pedido» sigue bloqueado. {confirmBlocked} Confirmar no cambia el total guardado. Si más adelante anotas esa elección y usas
                   el botón, el mensaje para el cliente queda así.
                   <span className="mt-1 block font-normal text-muted">
                     {customerMessage({ ...order, status: "confirmado" })}
@@ -640,7 +640,7 @@ export function OrderEditor({
               {prepareDropiError(order) ? (
                 <p className="mt-3 max-w-xl text-sm leading-5 text-ink">
                   «Pasar a preparación» sigue bloqueado hasta anotar un número en Sincronización.{" "}
-                  {blockedDropiAnswer("createOrder").detail} Si más adelante anotas ese número y usas el botón, el
+                  {blockedDropiAnswer("createOrder").detail} Pasar a preparación no cambia el total guardado. Si más adelante anotas ese número y usas el botón, el
                   mensaje para el cliente queda así.
                   <span className="mt-1 block font-normal text-muted">
                     {customerMessage({ ...order, status: "en_preparacion" })}
@@ -649,7 +649,7 @@ export function OrderEditor({
               ) : null}
               {resolveBlocked ? (
                 <p className="mt-3 max-w-xl text-sm leading-5 text-ink">
-                  «Resolver incidencia» sigue bloqueado. {resolveBlocked} Si más adelante guardas un motivo y usas el
+                  «Resolver incidencia» sigue bloqueado. {resolveBlocked} Resolverla no cobra y el total guardado no cambia. Si más adelante guardas un motivo y usas el
                   botón, el pedido vuelve a confirmado.
                   {prepareDropiError({ ...order, status: "confirmado" })
                     ? " «Pasar a preparación» seguiría bloqueado hasta anotar un número a mano."
@@ -675,7 +675,7 @@ export function OrderEditor({
                   const previewOrder = item.id === "resolver" ? next.order : { ...next.order, customerReason: undefined };
                   return (
                     <p key={`aviso-${item.id}`} className="mt-3 max-w-xl text-sm leading-5 text-ink">
-                      Si usas «{item.label}», el mensaje para el cliente queda así.
+                      Si usas «{item.label}», el mensaje para el cliente queda así. El total guardado no cambia.
                       <span className="mt-1 block font-normal text-muted">{customerMessage(previewOrder)}</span>
                     </p>
                   );
