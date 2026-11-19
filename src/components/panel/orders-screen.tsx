@@ -871,12 +871,12 @@ function moneyNote(order: StoreOrder, margin: number | null) {
       const saved = notes.length
         ? ` ${joined.charAt(0).toUpperCase()}${joined.slice(1)} ${notes.length === 1 ? "quedó anotado" : "quedaron anotados"}.`
         : "";
-      return `Ya está cobrado. Sin el costo del producto no entra en la utilidad realizada.${saved}`;
+      return `Ya está cobrado. Sin el costo del producto no entra en la utilidad realizada.${saved} El total guardado sigue en ${formatCop(order.total)}.`;
     }
     if (order.status === "entregado") {
       return `Entregado. Sin el costo del producto no entra en la utilidad realizada. El cobro sigue pendiente. El total guardado sigue en ${formatCop(order.total)}.`;
     }
-    return "Este pedido se guardó sin costo, envío ni comisiones. El margen queda fuera del total.";
+    return `Este pedido se guardó sin costo, envío ni comisiones. El margen no entra en el estimado ni en la utilidad. El total guardado sigue en ${formatCop(order.total)}.`;
   }
   if (order.status === "entregado" && order.collected && realized !== null && realized !== margin) {
     const because: string[] = [];
@@ -885,18 +885,18 @@ function moneyNote(order: StoreOrder, margin: number | null) {
       because.push(`el recaudo real en ${formatCop(order.collectionCost)}, en lugar de las comisiones estimadas`);
     }
     const why = because.length ? ` Con ${because.join(" y ")},` : "";
-    return `Margen estimado ${formatCop(margin)}.${why} la utilidad de este pedido es ${formatCop(realized)}.`;
+    return `Margen estimado ${formatCop(margin)}.${why} la utilidad de este pedido es ${formatCop(realized)}. El total guardado sigue en ${formatCop(order.total)}.`;
   }
   if (order.status === "entregado" && order.collected) {
-    return `Margen estimado ${formatCop(margin)}. Cuenta como utilidad realizada.`;
+    return `Margen estimado ${formatCop(margin)}. Cuenta como utilidad realizada. El total guardado sigue en ${formatCop(order.total)}.`;
   }
   if (order.status === "entregado") {
     return `Margen estimado ${formatCop(margin)}. La entrega ya está anotada. La utilidad realizada espera el cobro. El total guardado sigue en ${formatCop(order.total)}.`;
   }
   if (order.status === "pendiente_confirmacion") {
-    return `Margen estimado ${formatCop(margin)}. Entra al total cuando el pedido esté confirmado y sin incidencia.`;
+    return `Margen estimado ${formatCop(margin)}. Cuenta como estimado cuando el pedido esté confirmado y sin incidencia. No es utilidad realizada. El total guardado sigue en ${formatCop(order.total)}.`;
   }
-  return `Margen estimado ${formatCop(margin)}. La utilidad realizada espera la entrega y el cobro.`;
+  return `Margen estimado ${formatCop(margin)}. La utilidad realizada espera la entrega y el cobro. El total guardado sigue en ${formatCop(order.total)}.`;
 }
 
 function CatalogCostForm({

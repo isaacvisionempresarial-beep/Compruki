@@ -493,7 +493,7 @@ export function Dashboard({
             <li>
               <span className="font-semibold text-sm">Estimado vs cobrado</span>
               <span className="mt-0.5 block text-muted">
-                Estimado = confirmados. Utilidad = entregado y cobrado.
+                Estimado = margen de pedidos confirmados. Utilidad = entregado y cobrado. No es el total del pedido.
               </span>
             </li>
           </ul>
