@@ -53,7 +53,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
           Pagas al recibir
         </h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Elige, deja el pedido y confirma el envío aparte. Dropi no está conectado.
+          Elige, deja el pedido y confirma el envío aparte. Los precios son los publicados. Nadie cobra aquí. Dropi no está conectado.
         </p>
       </section>
 
@@ -170,12 +170,15 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
                         </p>
                       ) : null}
                       <div className="mt-2 flex items-end justify-between gap-2">
-                        <p className="text-base font-extrabold tabular-nums">{formatCop(product.price)}</p>
+                        <div>
+                          <p className="text-[11px] leading-4 text-muted">Precio publicado</p>
+                          <p className="text-base font-extrabold tabular-nums">{formatCop(product.price)}</p>
+                        </div>
                         <span className="inline-flex h-8 shrink-0 items-center rounded-[8px] bg-primary px-2.5 text-xs font-semibold text-on-dark transition-colors group-hover:bg-primary-soft">
                           Ver
                         </span>
                       </div>
-                      <p className="mt-1 text-[11px] leading-4 text-muted">Envío se confirma aparte</p>
+                      <p className="mt-1 text-[11px] leading-4 text-muted">Pagas al recibir. Envío aparte.</p>
                     </div>
                   </Link>
                 </li>

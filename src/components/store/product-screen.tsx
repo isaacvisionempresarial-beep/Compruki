@@ -232,9 +232,10 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
           ) : null}
 
           <div className="mt-2 border-y border-line py-2">
+            <p className="text-[11px] font-semibold text-muted">Precio publicado</p>
             <p className="text-lg font-extrabold tracking-tight tabular-nums">{formatCop(product.price)}</p>
             <p className="mt-1 text-xs leading-5 text-muted">
-              Pagas al recibir. Envío aparte. Dropi no está conectado.
+              Pagas al recibir. Envío aparte. No es dinero cobrado. Dropi no está conectado.
             </p>
           </div>
 
@@ -337,9 +338,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               </div>
               {canBuy && cart.ready ? (
                 <p className="text-xs leading-5 text-muted">
-                  Quedarán {nextQuantity} {nextQuantity === 1 ? "unidad" : "unidades"} · {formatCop(product.price * nextQuantity)}
-                  {already > 0 ? ` (ya había ${already})` : ""}
-                  {capped ? " · máx. 5" : ""}. No registra pedido.
+                  {`Quedarán ${nextQuantity} ${nextQuantity === 1 ? "unidad" : "unidades"} · ${formatCop(product.price * nextQuantity)} al recibir${already > 0 ? ` (ya había ${already})` : ""}${capped ? " · máx. 5" : ""}. No registra pedido ni es dinero cobrado.`}
                 </p>
               ) : null}
 
