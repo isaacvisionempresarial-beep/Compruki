@@ -933,20 +933,21 @@ function CatalogCostForm({
         ))}
       </ul>
       <p className="text-sm leading-5 text-muted">
-        El precio de este pedido no cambia. Siguen siendo cifras estimadas. Al usarlas se anotan en este pedido; no es un
-        guardado vacío.
+        El precio de este pedido no cambia. El total guardado no cambia. Siguen siendo cifras estimadas. Al usarlas se
+        anotan en este pedido; no es un guardado vacío.
       </p>
       {preview && preview.estimated !== null ? (
         <p className="text-sm leading-5 text-ink">
-          Si las usas, el margen estimado de este pedido queda en {formatCop(preview.estimated)}. No es dinero cobrado.
+          Si las usas, el margen estimado de este pedido queda en {formatCop(preview.estimated)}. No es dinero cobrado. El
+          total guardado no cambia.
         </p>
       ) : null}
       {order.status === "entregado" && order.collected && ready ? (
         <p className="text-sm leading-5 text-muted">
           Este pedido ya está cobrado.
           {preview && preview.realized !== null
-            ? ` Si las usas, la utilidad realizada de este pedido queda en ${formatCop(preview.realized)}, con el flete y el recaudo que ya están anotados.`
-            : " Si las usas, la utilidad realizada pasa a contarlas, con el flete y el recaudo que ya están anotados."}
+            ? ` Si las usas, la utilidad realizada de este pedido queda en ${formatCop(preview.realized)}, con el flete y el recaudo que ya están anotados. El total guardado no cambia.`
+            : " Si las usas, la utilidad realizada pasa a contarlas, con el flete y el recaudo que ya están anotados. El total guardado no cambia."}
         </p>
       ) : null}
       {costState.orderId === order.id && costState.error ? (
@@ -957,9 +958,9 @@ function CatalogCostForm({
       <p className="text-sm leading-5 text-muted">
         {canManageOrderMoney
           ? canSave
-            ? "Copia el costo, el envío y las comisiones de la ficha a este pedido."
+            ? "Copia el costo, el envío y las comisiones de la ficha a este pedido. El total guardado no cambia."
             : "Sin las cifras de la ficha el botón queda bloqueado."
-          : "Solo el propietario copia estas cifras."}
+          : "Solo el propietario copia estas cifras. El total guardado no cambia."}
       </p>
       {canManageOrderMoney ? (
       <button
@@ -2008,8 +2009,8 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
       id: "cola-costo",
       title: "Sin costo en el pedido",
       hint: canManageOrderMoney
-        ? "Sin costo, envío o comisiones de la ficha. Si ya está cobrado, falta para la utilidad realizada."
-        : "Sin costo, envío o comisiones de la ficha. Lo copia el propietario.",
+        ? "Sin costo, envío o comisiones de la ficha. Si ya está cobrado, falta para la utilidad realizada. Copiarlas no cambia el total guardado."
+        : "Sin costo, envío o comisiones de la ficha. Lo copia el propietario. El total guardado no cambia.",
       short: "costo",
       cta: canManageOrderMoney ? "Copiar costo" : "Ver pedido",
       match: needsCatalogCost,

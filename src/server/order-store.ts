@@ -505,7 +505,7 @@ export async function applyCatalogCosts(id: string, actorName: string) {
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName,
-        summary: "Anotó el costo, el envío y las comisiones de la ficha. El precio del pedido no cambió.",
+        summary: "Anotó el costo, el envío y las comisiones de la ficha. El precio del pedido no cambió. El total guardado no cambió.",
       },
       ...current.history,
     ],
