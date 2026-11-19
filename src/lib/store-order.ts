@@ -964,8 +964,25 @@ export function canEditLines(order: Pick<StoreOrder, "status">) {
 }
 
 export function payableTotalLabel(status: OrderStatus) {
-  if (status === "cancelado" || status === "devuelto") return "Total guardado";
+  if (status === "cancelado" || status === "devuelto" || status === "entregado" || status === "incidencia") {
+    return "Total guardado";
+  }
   return "Total al recibir";
+}
+
+export function customerPayLine(status: OrderStatus, collected = false) {
+  if (status === "cancelado" || status === "devuelto") {
+    return "Este pedido ya no se cobra. El total guardado no cambió. ";
+  }
+  if (status === "entregado") {
+    return collected
+      ? "La tienda anotó el cobro. El total guardado no cambió. "
+      : "El cobro contra entrega todavía no está anotado. El total guardado no cambió. ";
+  }
+  if (status === "incidencia") {
+    return "Mientras dure la incidencia no se cobra. Si continúa, pagas al recibir. El total guardado no cambió. ";
+  }
+  return "Pagas al recibir. ";
 }
 
 export type LineEdit = {
@@ -1262,12 +1279,12 @@ export function customerStatusNote(status: OrderStatus, reason = "", byCustomer 
       return "La tienda anotó el despacho. Dropi no está conectado. Sin guía ni una fecha exacta de llegada.";
     case "entregado":
       return collected
-        ? "La tienda marcó el pedido como entregado y anotó el cobro contra entrega. Dropi no está conectado: sin guía."
-        : "La tienda marcó el pedido como entregado. El cobro contra entrega todavía no está anotado. Dropi no está conectado: sin guía.";
+        ? "La tienda marcó el pedido como entregado y anotó el cobro contra entrega. El total guardado no cambió. Dropi no está conectado: sin guía."
+        : "La tienda marcó el pedido como entregado. El cobro contra entrega todavía no está anotado. El total guardado no cambió. Dropi no está conectado: sin guía.";
     case "incidencia":
       return detail
-        ? `La tienda marcó una incidencia: ${detail} El pedido no sigue su curso hasta que lo resuelva.`
-        : "La tienda marcó una incidencia. El pedido no sigue su curso hasta que lo resuelva.";
+        ? `La tienda marcó una incidencia: ${detail} El pedido no sigue su curso hasta que lo resuelva. El total guardado no cambió.`
+        : "La tienda marcó una incidencia. El pedido no sigue su curso hasta que lo resuelva. El total guardado no cambió.";
     case "cancelado":
       if (byCustomer) {
         return detail

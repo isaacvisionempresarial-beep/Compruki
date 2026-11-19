@@ -839,6 +839,13 @@ function emptyListMessage(query: string, status: OrderStatus | "todos") {
 
 function moneyNote(order: StoreOrder, margin: number | null) {
   const realized = orderRealizedMargin(order);
+  if (order.status === "incidencia") {
+    const lead =
+      margin === null
+        ? "Incidencia. No suma como venta confirmada mientras dure."
+        : `Margen estimado ${formatCop(margin)}. No suma como venta confirmada mientras dure la incidencia.`;
+    return `${lead} El total guardado sigue en ${formatCop(order.total)}.`;
+  }
   if (order.status === "cancelado") {
     const lead =
       margin === null
@@ -866,6 +873,9 @@ function moneyNote(order: StoreOrder, margin: number | null) {
         : "";
       return `Ya está cobrado. Sin el costo del producto no entra en la utilidad realizada.${saved}`;
     }
+    if (order.status === "entregado") {
+      return `Entregado. Sin el costo del producto no entra en la utilidad realizada. El cobro sigue pendiente. El total guardado sigue en ${formatCop(order.total)}.`;
+    }
     return "Este pedido se guardó sin costo, envío ni comisiones. El margen queda fuera del total.";
   }
   if (order.status === "entregado" && order.collected && realized !== null && realized !== margin) {
@@ -880,7 +890,10 @@ function moneyNote(order: StoreOrder, margin: number | null) {
   if (order.status === "entregado" && order.collected) {
     return `Margen estimado ${formatCop(margin)}. Cuenta como utilidad realizada.`;
   }
-  if (order.status === "incidencia" || order.status === "pendiente_confirmacion") {
+  if (order.status === "entregado") {
+    return `Margen estimado ${formatCop(margin)}. La entrega ya está anotada. La utilidad realizada espera el cobro. El total guardado sigue en ${formatCop(order.total)}.`;
+  }
+  if (order.status === "pendiente_confirmacion") {
     return `Margen estimado ${formatCop(margin)}. Entra al total cuando el pedido esté confirmado y sin incidencia.`;
   }
   return `Margen estimado ${formatCop(margin)}. La utilidad realizada espera la entrega y el cobro.`;

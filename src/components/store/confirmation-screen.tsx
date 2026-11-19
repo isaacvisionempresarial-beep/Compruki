@@ -9,6 +9,7 @@ import { formatCop, formatDay } from "@/lib/format";
 import { sizeChoiceLabel, type SizeKind } from "@/lib/catalog";
 import {
   customerMissingReasonNote,
+  customerPayLine,
   customerProgressNote,
   customerSizeHoldNote,
   customerStatusNote,
@@ -155,9 +156,7 @@ export function ConfirmationScreen({
             <p className="text-lg font-extrabold tabular-nums">{formatCop(order.total)}</p>
           </div>
           <p className="mt-2 text-xs leading-5 text-muted">
-            {order.status === "cancelado" || order.status === "devuelto"
-              ? "Este pedido ya no se cobra. El total guardado no cambió. "
-              : "Pagas al recibir. "}
+            {customerPayLine(order.status, order.collected)}
             Dropi no está conectado. Sin guía ni fecha exacta.
           </p>
           <Link
