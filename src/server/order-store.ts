@@ -574,7 +574,7 @@ export async function saveFreight(
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName,
-        summary: notes.join(" "),
+        summary: `${notes.join(" ")} El total guardado no cambió.`,
       },
       ...current.history,
     ],

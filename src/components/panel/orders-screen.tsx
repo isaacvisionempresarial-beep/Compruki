@@ -1024,7 +1024,7 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
         : null;
   const returnPreview =
     showReturn && canSaveReturn && returnAmount !== null
-      ? `Si anotas, el flete de la devolución resta ${formatCop(returnAmount)} de la utilidad realizada.`
+      ? `Si anotas, el flete de la devolución resta ${formatCop(returnAmount)} de la utilidad realizada. El total guardado no cambia.`
       : null;
   const realizedPreview =
     showShipping &&
@@ -1033,7 +1033,7 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
     draftFreight &&
     draftFreight.realized !== null &&
     draftFreight.realized !== currentRealized
-      ? `Si anotas, la utilidad realizada de este pedido queda en ${formatCop(draftFreight.realized)}. El margen estimado no cambia.`
+      ? `Si anotas, la utilidad realizada de este pedido queda en ${formatCop(draftFreight.realized)}. El margen estimado no cambia. El total guardado no cambia.`
       : null;
 
   return (
@@ -1058,9 +1058,9 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
           <span className="mt-1 block font-normal leading-5 text-muted">
             {canManageOrderMoney
               ? withoutCost
-                ? "Ya está cobrado. Sin el costo del producto, este flete no entra en la utilidad realizada. El margen estimado no cambia. Sin un cambio válido el botón queda bloqueado."
-                : "Vacío: la utilidad usa el flete estimado. El margen estimado no cambia. Sin un cambio válido el botón queda bloqueado."
-              : "Lo anota el propietario. El margen estimado no cambia."}
+                ? "Ya está cobrado. Sin el costo del producto, este flete no entra en la utilidad realizada. El margen estimado no cambia. Sin un cambio válido el botón queda bloqueado. El total guardado no cambia."
+                : "Vacío: la utilidad usa el flete estimado. El margen estimado no cambia. Sin un cambio válido el botón queda bloqueado. El total guardado no cambia."
+              : "Lo anota el propietario. El margen estimado no cambia. El total guardado no cambia."}
           </span>
         </label>
       ) : (
@@ -1081,9 +1081,9 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
           <span className="mt-1 block font-normal leading-5 text-muted">
             {canManageOrderMoney
               ? withoutCost
-                ? "Ya está cobrado. Sin el costo del producto, este recaudo no entra en la utilidad realizada. El margen estimado no cambia."
-                : "Lo cobrado por recaudar el contraentrega. Reemplaza las comisiones estimadas en la utilidad. Vacío: siguen las estimadas. El margen estimado no cambia."
-              : "Lo anota el propietario. El margen estimado no cambia."}
+                ? "Ya está cobrado. Sin el costo del producto, este recaudo no entra en la utilidad realizada. El margen estimado no cambia. El total guardado no cambia."
+                : "Lo cobrado por recaudar el contraentrega. Reemplaza las comisiones estimadas en la utilidad. Vacío: siguen las estimadas. El margen estimado no cambia. El total guardado no cambia."
+              : "Lo anota el propietario. El margen estimado no cambia. El total guardado no cambia."}
           </span>
         </label>
       ) : null}
@@ -1102,11 +1102,11 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
           <span className="mt-1 block font-normal leading-5 text-muted">
             {canManageOrderMoney
               ? canSaveReturn
-                ? "Es un gasto. Resta de la utilidad realizada."
+                ? "Es un gasto. Resta de la utilidad realizada. El total guardado no cambia."
                 : returnReady
-                  ? "Es el mismo valor ya anotado: el botón queda bloqueado hasta que lo cambies."
-                  : "Vacío no resta nada y no queda decidido: el botón queda bloqueado. Si no hubo flete, anota 0."
-              : "Lo anota el propietario. Vacío no resta."}
+                  ? "Es el mismo valor ya anotado: el botón queda bloqueado hasta que lo cambies. El total guardado no cambia."
+                  : "Vacío no resta nada y no queda decidido: el botón queda bloqueado. Si no hubo flete, anota 0. El total guardado no cambia."
+              : "Lo anota el propietario. Vacío no resta. El total guardado no cambia."}
           </span>
         </label>
       ) : (
