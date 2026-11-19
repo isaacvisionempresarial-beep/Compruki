@@ -725,6 +725,15 @@ export function ProductEditor({
     }
     return `${ready} Pulsa Guardar producto. El producto ya está publicado: estas fotos se verán en la tienda. El precio y la publicación no cambian.`;
   }
+  function mediaRemovalNote(noun: "foto" | "video") {
+    const lead = noun === "foto" ? "Quitar esta foto al guardar." : "Quitar el video al guardar.";
+    if (!published) {
+      return canManageCommerce
+        ? `${lead} El precio no cambia.`
+        : `${lead} El precio no cambia. La publicación la cambia el propietario.`;
+    }
+    return `${lead} No cambia el precio ni la publicación.`;
+  }
   const photoCount = savedImages.length + pendingPreviews.length;
   const shownPhoto = photoCount === 0 ? 0 : ((photoIndex % photoCount) + photoCount) % photoCount;
 
@@ -824,7 +833,7 @@ export function ProductEditor({
                           )
                         }
                       />
-                      <span>Quitar esta foto al guardar.</span>
+                      <span>{mediaRemovalNote("foto")}</span>
                     </label>
                   ))}
                 </div>
@@ -874,7 +883,7 @@ export function ProductEditor({
                       className="mt-1 h-4 w-4"
                       onChange={(event) => setClearVideo(event.target.checked)}
                     />
-                    <span>Quitar el video al guardar.</span>
+                    <span>{mediaRemovalNote("video")}</span>
                   </label>
                 ) : null}
               </div>
@@ -964,7 +973,7 @@ export function ProductEditor({
               <p className="text-sm font-semibold">Identidad</p>
               <div className="mt-3 grid gap-3 lg:grid-cols-2">
             <div className="lg:col-span-2">
-            <Field label="Nombre" htmlFor="title">
+            <Field label="Nombre" htmlFor="title" hint="Lo ve el comprador en la ficha. No es el precio ni la publicación.">
               <input
                 id="title"
                 name="title"
