@@ -376,7 +376,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
           <ul className="mt-2 space-y-2 border-t border-line pt-2 text-sm leading-5">
             <li>
               <span className="font-semibold">Pagas al recibir</span>
-              <span className="mt-0.5 block text-xs text-muted">Solo el valor de los productos. El envío se acuerda aparte.</span>
+              <span className="mt-0.5 block text-xs text-muted">Es el precio publicado. Nadie cobra aquí. El envío se acuerda aparte.</span>
             </li>
             <li>
               <span className="font-semibold">Información clara</span>
@@ -414,7 +414,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
           <dl className="mt-2 divide-y divide-line overflow-hidden rounded-[14px] border border-line bg-card">
             {[
               ["Envío", "No incluido. Se confirma con la dirección. Sin fecha prometida."],
-              ["Pago", "Pagas al recibir. El pedido queda pendiente de confirmación."],
+              ["Pago", "Pagas al recibir el precio publicado. Nadie cobra aquí. El pedido queda pendiente de confirmación."],
               ["Cambios", "Se acuerdan con la tienda. No se inventa una política aquí."],
               ["Dropi", "No está conectado. Esta ficha no crea pedido en Dropi."],
             ].map(([label, value]) => (

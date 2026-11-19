@@ -65,7 +65,7 @@ export function answerProductQuestion(product: AnswerableProduct, raw: string) {
   if (matched.length > 0 && !isBarePrice(question)) return joinLines(matched);
 
   if (isPrice(question)) {
-    return `El precio de venta es ${formatCop(product.price)}. Se paga al recibir.`;
+    return `El precio publicado es ${formatCop(product.price)}. Pagas al recibir. Nadie cobra aquí.`;
   }
   if (/\b(disponible|agotado|stock)\b/.test(question) || question.includes("se puede pedir")) {
     return product.available
@@ -76,12 +76,12 @@ export function answerProductQuestion(product: AnswerableProduct, raw: string) {
     return "El envío no está incluido y se confirma antes de despachar. No hay una fecha prometida.";
   }
   if (/\b(pagar|pago|contraentrega)\b/.test(question) || question.includes("contra entrega")) {
-    return "Pagas el valor de los productos cuando los recibes. El pedido queda pendiente de confirmación.";
+    return "Pagas el precio publicado cuando los recibes. Nadie cobra aquí. El pedido queda pendiente de confirmación.";
   }
   if (/\b(variante|variantes|color|colores|talla|tallas|medida|medidas|tamano|tamanos|modelo)\b/.test(question)) {
     if (product.variants.length > 0) {
       const noun = product.sizeKind === "tamano" ? "Los tamaños son" : "Las tallas son";
-      return `${noun} ${joinNames(product.variants)}. El precio es el mismo para todas. Eliges una antes de pedir.`;
+      return `${noun} ${joinNames(product.variants)}. El precio publicado es el mismo para todas. Eliges una antes de pedir.`;
     }
     return "En la ficha no hay tallas ni tamaños.";
   }
