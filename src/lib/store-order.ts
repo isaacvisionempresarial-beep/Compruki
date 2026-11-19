@@ -324,9 +324,9 @@ export function confirmQueueNote(
   const gaps: string[] = [];
   if (needsDepartment(order)) gaps.push("el departamento");
   if (needsCatalogCost(order)) gaps.push("el costo");
-  if (gaps.length === 0) return "Se puede confirmar desde la ficha.";
-  if (gaps.length === 1) return `Se puede confirmar. Falta ${gaps[0]}.`;
-  return `Se puede confirmar. Faltan ${gaps.join(" y ")}.`;
+  if (gaps.length === 0) return "Se puede confirmar desde la ficha. El total guardado no cambia.";
+  if (gaps.length === 1) return `Se puede confirmar. Falta ${gaps[0]}. El total guardado no cambia.`;
+  return `Se puede confirmar. Faltan ${gaps.join(" y ")}. El total guardado no cambia.`;
 }
 
 export function missingSizeQueueNote(order: Pick<StoreOrder, "status" | "lines">, guides: SizeGuide[]) {
@@ -902,12 +902,12 @@ export function readyToDispatch(order: { status: OrderStatus }) {
 
 export function prepareQueueNote(order: { status: OrderStatus; providerRef?: string }) {
   if (!readyToPrepare(order)) return "";
-  return "Ya tiene el número de Dropi. Se puede pasar a preparación. Dropi no está conectado: eso no lo envía.";
+  return "Ya tiene el número de Dropi. Se puede pasar a preparación. Dropi no está conectado: eso no lo envía. El total guardado no cambia.";
 }
 
 export function dispatchQueueNote(order: { status: OrderStatus }) {
   if (!readyToDispatch(order)) return "";
-  return "Está en preparación. Anota el despacho a mano. Dropi no está conectado: sin guía.";
+  return "Está en preparación. Anota el despacho a mano. Dropi no está conectado: sin guía. El total guardado no cambia.";
 }
 
 export function resolveIncidenceError(order: { status: OrderStatus; customerReason?: string }) {
@@ -981,6 +981,9 @@ export function customerPayLine(status: OrderStatus, collected = false) {
   }
   if (status === "incidencia") {
     return "Mientras dure la incidencia no se cobra. Si continúa, pagas al recibir. El total guardado no cambió. ";
+  }
+  if (status === "confirmado" || status === "en_preparacion" || status === "en_transporte") {
+    return "Pagas al recibir. El total guardado no cambió. ";
   }
   return "Pagas al recibir. ";
 }
@@ -1272,11 +1275,11 @@ export function customerStatusNote(status: OrderStatus, reason = "", byCustomer 
     case "pendiente_confirmacion":
       return "Quedó pendiente de confirmación. La tienda revisará la dirección antes de despachar. No hay guía ni fecha de entrega: Dropi no está conectado. Si ya no lo quieres, cancélalo al consultar el pedido.";
     case "confirmado":
-      return "La tienda confirmó el pedido. Dropi no está conectado. Todavía no hay guía ni fecha de entrega. El despacho se anota a mano.";
+      return "La tienda confirmó el pedido. Dropi no está conectado. Todavía no hay guía ni fecha de entrega. El despacho se anota a mano. El total guardado no cambió. Pagas al recibir.";
     case "en_preparacion":
-      return "La tienda está preparando el pedido. Dropi no está conectado. Todavía no hay guía ni fecha de entrega.";
+      return "La tienda está preparando el pedido. Dropi no está conectado. Todavía no hay guía ni fecha de entrega. El total guardado no cambió. Pagas al recibir.";
     case "en_transporte":
-      return "La tienda anotó el despacho. Dropi no está conectado. Sin guía ni una fecha exacta de llegada.";
+      return "La tienda anotó el despacho. Dropi no está conectado. Sin guía ni una fecha exacta de llegada. El total guardado no cambió. Pagas al recibir.";
     case "entregado":
       return collected
         ? "La tienda marcó el pedido como entregado y anotó el cobro contra entrega. El total guardado no cambió. Dropi no está conectado: sin guía."

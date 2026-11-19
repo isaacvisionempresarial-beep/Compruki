@@ -152,7 +152,7 @@ export function ConfirmationScreen({
             })}
           </ul>
           <div className="mt-3 flex items-baseline justify-between gap-2 border-t border-line pt-3">
-            <p className="text-xs text-muted">Total</p>
+            <p className="text-xs text-muted">{payableTotalLabel(order.status)}</p>
             <p className="text-lg font-extrabold tabular-nums">{formatCop(order.total)}</p>
           </div>
           <p className="mt-2 text-xs leading-5 text-muted">
