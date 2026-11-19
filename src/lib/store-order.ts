@@ -987,7 +987,12 @@ export function customerPayLine(status: OrderStatus, collected = false) {
   if (status === "incidencia") {
     return "Mientras dure la incidencia no se cobra. Si continúa, pagas al recibir. El total guardado no cambió. ";
   }
-  if (status === "confirmado" || status === "en_preparacion" || status === "en_transporte") {
+  if (
+    status === "pendiente_confirmacion" ||
+    status === "confirmado" ||
+    status === "en_preparacion" ||
+    status === "en_transporte"
+  ) {
     return "Pagas al recibir. El total guardado no cambió. ";
   }
   return "Pagas al recibir. ";
@@ -1258,7 +1263,7 @@ export function customerSizeHoldNote(
 export function customerProgressNote(status: OrderStatus, collected = false) {
   switch (status) {
     case "pendiente_confirmacion":
-      return "No hay guía ni fecha. Pagas al recibir. Dropi no está conectado.";
+      return "No hay guía ni fecha. Pagas al recibir. El total guardado no cambió. Dropi no está conectado.";
     case "confirmado":
     case "en_preparacion":
       return "Dropi no está conectado. Todavía no hay guía ni fecha. El despacho se anota a mano. El total guardado no cambió. Pagas al recibir.";
