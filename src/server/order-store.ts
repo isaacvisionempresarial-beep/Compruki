@@ -129,8 +129,8 @@ export async function placeOrder(input: CheckoutInput) {
         actorName: customerName,
         summary:
           campaignSkus.length > 0
-            ? "Dejó el pedido, pendiente de confirmación. Entró por el enlace de campaña."
-            : "Dejó el pedido, pendiente de confirmación.",
+            ? "Dejó el pedido, pendiente de confirmación. Entró por el enlace de campaña. No es gasto publicitario. El total guardado es el precio publicado de ese momento. Nadie cobró aquí."
+            : "Dejó el pedido, pendiente de confirmación. El total guardado es el precio publicado de ese momento. Nadie cobró aquí.",
       },
     ],
   };

@@ -174,7 +174,7 @@ export function CatalogScreen({
             <li>
               <span className="font-semibold text-sm">La tienda</span>
               <span className="mt-0.5 block text-muted">
-                Lo publicado se ve afuera. Aquí solo se copia el enlace de campaña.
+                Lo publicado se ve afuera. Copiar el enlace no cambia el precio ni crea una campaña.
               </span>
             </li>
             <li>
@@ -478,6 +478,7 @@ function CampaignLink({
         >
           {copied === "ok" ? "Copiado" : "Copiar enlace"}
         </button>
+        {copied === "ok" ? <span className="text-accent-strong">No cambia el precio ni crea la campaña.</span> : null}
         {product.available ? null : <span className="text-warning">Se abre, pero no se puede pedir.</span>}
         {copied === "fail" ? (
           <span role="alert" className="text-danger">
@@ -517,7 +518,7 @@ function CampaignLink({
       </div>
       {copied === "ok" ? (
         <p role="status" className="mt-1 text-xs leading-5 text-accent-strong">
-          Pégalo en el anuncio. Desde aquí no se crea la campaña.
+          Pégalo en el anuncio. No crea la campaña, no cambia el precio publicado y no es gasto.
         </p>
       ) : null}
       {copied === "fail" ? (

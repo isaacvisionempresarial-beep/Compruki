@@ -516,7 +516,9 @@ export function OrderEditor({
           </p>
         ) : null}
         {order.campaignEntry ? (
-          <p className="mt-1 text-xs text-accent-strong">Entró por campaña. No es gasto publicitario.</p>
+          <p className="mt-1 text-xs text-accent-strong">
+            Entró por campaña. No es gasto publicitario. El total guardado es el precio publicado de ese momento.
+          </p>
         ) : null}
         {awaitsDropiNumber(order) || needsIncidenceDropiNumber(order) || needsClosedDropiNumber(order) ? (
           <p className="mt-1 text-xs leading-5 text-warning">Falta número Dropi — ver Sincronización.</p>
