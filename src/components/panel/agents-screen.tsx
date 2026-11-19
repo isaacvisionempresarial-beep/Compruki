@@ -194,10 +194,10 @@ export function AgentsScreen({
                   </span>
                 </div>
                 <p className="mt-2 text-sm text-muted">
-                  {product.category} · {publicationLabel(product)} · {formatCop(product.price)}
+                  {product.category} · {publicationLabel(product)} · Precio de la ficha {formatCop(product.price)}
                 </p>
                 <p className="mt-1 text-sm">
-                  Margen estimado {formatCop(product.margin)}
+                  Margen estimado {formatCop(product.margin)}. No es dinero cobrado.
                   {product.variants.length > 0 ? ` · ${product.variants.length} variantes` : ""}
                 </p>
                 <Link href={`/panel/catalogo/${encodeURIComponent(product.sku)}`} className="mt-2 inline-flex text-sm font-semibold text-accent-strong">

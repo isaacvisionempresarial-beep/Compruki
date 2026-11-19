@@ -720,9 +720,9 @@ export function ProductEditor({
         : `${ready} Pulsa Guardar producto. Sigue oculto: la publicación la cambia el propietario.`;
     }
     if (unavailable) {
-      return `${ready} Pulsa Guardar producto. En la tienda no se puede pedir mientras esté no disponible.`;
+      return `${ready} Pulsa Guardar producto. Sigue publicado, pero no se puede pedir. El precio y la publicación no cambian.`;
     }
-    return `${ready} Pulsa Guardar producto para que se vea en la tienda.`;
+    return `${ready} Pulsa Guardar producto. El producto ya está publicado: estas fotos se verán en la tienda. El precio y la publicación no cambian.`;
   }
   const photoCount = savedImages.length + pendingPreviews.length;
   const shownPhoto = photoCount === 0 ? 0 : ((photoIndex % photoCount) + photoCount) % photoCount;
@@ -773,7 +773,7 @@ export function ProductEditor({
               {savedImages.length === 0 && pendingPreviews.length === 0 ? (
                 <p className="mt-2 text-sm leading-5">
                   {published && !unavailable
-                    ? "Todavía no hay fotos. Agrega una o varias para verlas aquí y en la tienda."
+                    ? "Todavía no hay fotos. Agrega una o varias para verlas aquí y en la tienda. El producto ya está publicado. Guardarlas no cambia el precio ni la publicación."
                     : published
                       ? "Todavía no hay fotos. Agrega una o varias para verlas aquí. En la tienda no se puede pedir mientras esté no disponible."
                       : canManageCommerce
