@@ -1360,7 +1360,12 @@ export function ProductDangerZone({
             </button>
           )
         ) : product.available ? (
-          <form action={deactivateAction}>
+          <>
+            <p className="mt-2 max-w-2xl text-xs leading-5 text-muted">
+              Marcarlo como no disponible no cambia el precio ni la publicación.
+              {product.published ? " Sigue publicado, pero no se puede pedir." : " Sigue sin publicar."}
+            </p>
+            <form action={deactivateAction}>
             <input type="hidden" name="id" value={product.id} />
             <button
               type="submit"
@@ -1372,6 +1377,7 @@ export function ProductDangerZone({
               {deactivatePending ? "Guardando…" : "Marcar como no disponible"}
             </button>
           </form>
+          </>
         ) : (
           <p className="text-sm font-semibold text-muted">Ya está marcado como no disponible.</p>
         )}

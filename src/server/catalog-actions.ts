@@ -51,13 +51,14 @@ export async function saveProductAction(_state: SaveProductState, formData: Form
     sizeKind: formData.get("sizeKind") === "tamano" ? "tamano" : formData.get("sizeKind") === "talla" ? "talla" : "",
   };
 
+  const before = draft.id ? await getCatalogProductById(draft.id) : null;
+  if (draft.id && !before) return { error: "Ese producto ya no está en el catálogo.", productId: null, message: null };
+
   if (access.role !== "owner") {
-    if (!draft.id) {
+    if (!before) {
       return { error: "Solo el propietario puede crear productos.", productId: null, message: null };
     }
-    const current = await getCatalogProductById(draft.id);
-    if (!current) return { error: "Ese producto ya no está en el catálogo.", productId: null, message: null };
-    const blocked = commercialChanges(current, draft);
+    const blocked = commercialChanges(before, draft);
     if (blocked.length > 0) {
       return {
         error: `Solo el propietario puede cambiar ${blocked.join(", ")}.`,
@@ -85,7 +86,7 @@ export async function saveProductAction(_state: SaveProductState, formData: Form
   return {
     error: null,
     productId: result.product.id,
-    message: "Producto guardado. El precio, el costo, la categoría, las tallas o tamaños, las características, las respuestas, las fotos, el video y la publicación quedaron registrados.",
+    message: savedProductMessage(before, result.product),
   };
 }
 
@@ -147,8 +148,26 @@ export async function deactivateProductAction(
   revalidatePath(`/tienda/producto/${result.product.sku}`);
   return {
     error: null,
-    message: "Producto marcado como no disponible. Sigue en el catálogo, pero no se puede pedir.",
+    message: result.product.published
+      ? "Marcado como no disponible. No se puede pedir. Sigue publicado. El precio no cambió."
+      : "Marcado como no disponible. No se puede pedir. Sigue sin publicar. El precio no cambió.",
   };
+}
+
+function savedProductMessage(before: CatalogProduct | null, saved: CatalogProduct) {
+  const priceSame = !!before && before.price === saved.price;
+  const publishedSame = !!before && before.published === saved.published;
+  const kept = "El margen de la ficha no es dinero cobrado. Los pedidos ya anotados siguen con sus cifras.";
+  if (priceSame && publishedSame) {
+    return `Producto guardado. El precio y la publicación no cambiaron. ${kept}`;
+  }
+  if (!priceSame && !publishedSame) {
+    return `Producto guardado. Cambiaron el precio y la publicación de la ficha. ${kept}`;
+  }
+  if (!priceSame) {
+    return `Producto guardado. Cambió el precio de la ficha. La publicación no cambió. ${kept}`;
+  }
+  return `Producto guardado. Cambió la publicación de la ficha. El precio no cambió. ${kept}`;
 }
 
 function commercialChanges(current: CatalogProduct, draft: ProductDraft) {
