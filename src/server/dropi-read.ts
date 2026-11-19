@@ -70,18 +70,18 @@ export async function probeOfficialDropi(_previous: DropiProbe | null = null): P
     if (text.includes("mcp.dropi.co") && text.toLowerCase().includes("initialize") && text.includes("serverInfo")) {
       return {
         state: "saludo_sin_cuenta",
-        detail: "Contestó el saludo. No autoriza la cuenta ni devuelve pedidos o productos.",
+        detail: "Contestó el saludo. No autoriza la cuenta ni devuelve pedidos o productos. El total guardado no cambió.",
       };
     }
     if (text.includes('"result"') || text.includes("serverInfo") || text.startsWith("event:")) {
       return {
         state: "saludo_sin_cuenta",
-        detail: "Contestó el saludo MCP. Esta aplicación sigue sin autorización de la cuenta.",
+        detail: "Contestó el saludo MCP. Esta aplicación sigue sin autorización de la cuenta. El total guardado no cambió.",
       };
     }
     return {
       state: "respuesta_no_usable",
-      detail: "Contestó, pero no es una consulta de la cuenta. No hay pedidos ni productos.",
+      detail: "Contestó, pero no es una consulta de la cuenta. No hay pedidos ni productos. El total guardado no cambió.",
     };
   } catch {
     return {

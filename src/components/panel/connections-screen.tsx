@@ -23,7 +23,7 @@ export function ConnectionsScreen({
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Conexión</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Dropi</h1>
       <p className="mt-0.5 text-sm text-muted">
-        Dropi no está conectado. Nada aquí consulta la cuenta; falta autorización oficial.
+        Dropi no está conectado. Nada aquí consulta la cuenta; falta autorización oficial. El total guardado no cambia.
       </p>
 
       <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_14rem]">
@@ -124,7 +124,7 @@ export function ConnectionsScreen({
               </div>
               <div>
                 <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Qué no hace</dt>
-                <dd className="mt-0.5 text-muted">No crea pedidos ni marca la tienda como conectada.</dd>
+                <dd className="mt-0.5 text-muted">No crea pedidos, no cambia el total guardado ni marca la tienda como conectada.</dd>
               </div>
             </dl>
           </section>
@@ -134,7 +134,7 @@ export function ConnectionsScreen({
               Saludo al servidor
             </h2>
             <p className="mt-1 text-xs leading-5 text-muted">
-              Opcional. Solo prueba el saludo; no autoriza la cuenta.
+              Opcional. Solo prueba el saludo; no autoriza la cuenta. El total guardado no cambia.
             </p>
             <form action={action} className="mt-3">
               <button
@@ -161,7 +161,7 @@ export function ConnectionsScreen({
               Dónde se anota el número
             </h2>
             <p className="mt-1 text-xs leading-5 text-muted">
-              Dropi no está conectado. Los pedidos a crear a mano están en Sincronización; esta pantalla no los envía.
+              Dropi no está conectado. Los pedidos a crear a mano están en Sincronización; esta pantalla no los envía. El total guardado no cambia.
             </p>
             <Link
               href="/panel/sincronizacion"
