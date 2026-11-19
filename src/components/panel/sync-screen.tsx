@@ -28,7 +28,7 @@ export function SyncScreen({ orders }: { orders: StoreOrder[] }) {
     {
       id: "sync-crear",
       title: "Falta número Dropi",
-      hint: "Confirmados, en preparación o en transporte. Un confirmado no pasa a preparación hasta anotarlo.",
+      hint: "Confirmados, en preparación o en transporte. Un confirmado no pasa a preparación hasta anotarlo. El total guardado no cambia.",
       empty: "No hay pedidos de esa etapa sin número.",
       rows: orders.filter(awaitsDropiNumber),
       warning: (order: StoreOrder) =>
@@ -38,7 +38,7 @@ export function SyncScreen({ orders }: { orders: StoreOrder[] }) {
     {
       id: "sync-incidencia",
       title: "Incidencia sin número",
-      hint: "Anotar el número no resuelve la incidencia.",
+      hint: "Anotar el número no resuelve la incidencia. El total guardado no cambia.",
       empty: "No hay incidencias sin ese número.",
       rows: orders.filter(needsIncidenceDropiNumber),
       warning: () => "Falta el número.",
@@ -47,7 +47,7 @@ export function SyncScreen({ orders }: { orders: StoreOrder[] }) {
     {
       id: "sync-cerrado",
       title: "Entregado o devuelto sin número",
-      hint: "Ya salieron. Anotar el número no crea otro pedido.",
+      hint: "Ya salieron. Anotar el número no crea otro pedido. El total guardado no cambia.",
       empty: "No hay entregados ni devueltos sin ese número.",
       rows: orders.filter((order) => needsClosedDropiNumber(order) && !awaitsDropiNumber(order)),
       warning: () => "Falta el número.",
@@ -96,7 +96,7 @@ export function SyncScreen({ orders }: { orders: StoreOrder[] }) {
           Número ya anotado ({noted.length})
         </h2>
         <p className="mt-0.5 text-xs leading-5 text-muted">
-          Ábrelos para copiar datos o corregirlo.
+          Ábrelos para copiar datos o corregirlo. El total guardado no cambia.
         </p>
         {noted.filter((order) => matchesSync(order, query)).length === 0 ? (
           <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
@@ -128,7 +128,7 @@ export function SyncScreen({ orders }: { orders: StoreOrder[] }) {
             </li>
             <li>
               <span className="font-semibold text-sm">Qué haces aquí</span>
-              <span className="mt-0.5 block text-muted">Copiar entrega y anotar el número a mano.</span>
+              <span className="mt-0.5 block text-muted">Copiar entrega y anotar el número a mano. El total guardado no cambia.</span>
             </li>
           </ul>
           <p className="mt-3 text-xs leading-5 text-muted">
