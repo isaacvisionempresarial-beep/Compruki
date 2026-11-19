@@ -175,25 +175,27 @@ const STEP_WORD = { hecho: "Listo", ahora: "Ahora", despues: "Después" } as con
 
 function nextStepCopy(order: CustomerOrder) {
   if (order.status === "pendiente_confirmacion") {
-    return "Espera la confirmación de la tienda. Mientras tanto puedes corregir la entrega o la talla si falta.";
+    return "Espera la confirmación de la tienda. Pagas al recibir. Mientras tanto puedes corregir la entrega o la talla si falta.";
   }
   if (order.status === "confirmado" || order.status === "en_preparacion") {
-    return "La tienda prepara el envío. Te escriben a este celular si hace falta algo.";
+    return "La tienda prepara el envío. Pagas al recibir. El total guardado no cambió. Te escriben a este celular si hace falta algo.";
   }
   if (order.status === "en_transporte") {
-    return "El pedido va en camino. Pagas al recibirlo.";
+    return "El pedido va en camino. Pagas al recibirlo. El total guardado no cambió.";
   }
   if (order.status === "entregado") {
-    return order.collected ? "Pedido entregado y cobrado." : "Pedido entregado. El cobro queda con la tienda.";
+    return order.collected
+      ? "Pedido entregado. La tienda anotó el cobro. El total guardado no cambió."
+      : "Pedido entregado. El cobro contra entrega todavía no está anotado. El total guardado no cambió.";
   }
   if (order.status === "incidencia") {
-    return "La tienda está resolviendo una incidencia. Te escriben a este celular.";
+    return "La tienda está resolviendo una incidencia. Mientras dure, no se cobra. El total guardado no cambió.";
   }
   if (order.status === "devuelto") {
-    return "El pedido fue marcado como devuelto.";
+    return "El pedido fue marcado como devuelto. Ya no se cobra. El total guardado no cambió.";
   }
   if (order.status === "cancelado") {
-    return "Este pedido quedó cancelado.";
+    return "Este pedido quedó cancelado. Ya no se cobra. El total guardado no cambió.";
   }
   return "Consulta el avance abajo.";
 }
@@ -512,7 +514,7 @@ function CustomerSizeForm({
       <p className="mt-2 text-xs leading-5 text-muted">{hint}</p>
       {preview ? (
         <p className="mt-2 text-sm leading-5 text-ink">
-          Si guardas, queda así: {preview}. El total sigue en {formatCop(order.total)}.
+          Si guardas, queda así: {preview}. El total guardado sigue en {formatCop(order.total)}.
           {wasMissing
             ? onlySize
               ? " Con el tamaño anotado, la tienda puede confirmarlo."
