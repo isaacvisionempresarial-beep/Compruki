@@ -1253,16 +1253,16 @@ export function customerSizeHoldNote(
 export function customerProgressNote(status: OrderStatus, collected = false) {
   switch (status) {
     case "pendiente_confirmacion":
-      return "No hay guía ni fecha. Dropi no está conectado.";
+      return "No hay guía ni fecha. Pagas al recibir. Dropi no está conectado.";
     case "confirmado":
     case "en_preparacion":
-      return "Dropi no está conectado. Todavía no hay guía ni fecha. El despacho se anota a mano.";
+      return "Dropi no está conectado. Todavía no hay guía ni fecha. El despacho se anota a mano. El total guardado no cambió. Pagas al recibir.";
     case "en_transporte":
-      return "Dropi no está conectado. Sin guía ni una fecha exacta de llegada.";
+      return "Dropi no está conectado. Sin guía ni una fecha exacta de llegada. El total guardado no cambió. Pagas al recibir.";
     case "entregado":
       return collected
-        ? "La tienda anotó el cobro contra entrega. Dropi no está conectado: sin guía."
-        : "El cobro contra entrega todavía no está anotado. Dropi no está conectado: sin guía.";
+        ? "La tienda anotó el cobro contra entrega. El total guardado no cambió. Dropi no está conectado: sin guía."
+        : "El cobro contra entrega todavía no está anotado. El total guardado no cambió. Dropi no está conectado: sin guía.";
     default:
       return "";
   }

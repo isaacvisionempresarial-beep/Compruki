@@ -21,7 +21,7 @@ export function LookupScreen() {
         <p className="text-[10px] font-bold tracking-[0.08em] text-accent-strong uppercase">Seguimiento</p>
         <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">Consultar pedido</h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Número del pedido y celular de la entrega. Dropi no está conectado.
+          Número del pedido y celular de la entrega. Consultar no cobra ni cambia el total guardado. Dropi no está conectado.
         </p>
       </section>
 
@@ -95,7 +95,7 @@ export function LookupScreen() {
             </li>
           </ul>
           <p className="mt-3 text-xs leading-5 text-muted">
-            Solo estado en la tienda. Dropi no está conectado. Sin guía ni fecha exacta.
+            Solo estado en la tienda. Consultar no cobra ni cambia el total guardado. Dropi no está conectado. Sin guía ni fecha exacta.
           </p>
           <Link
             href="/tienda/condiciones"
