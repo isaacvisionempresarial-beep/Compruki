@@ -101,7 +101,7 @@ export function ProfitabilityScreen({
                 >
                   <span>Producto</span>
                   <span className="text-right">Estimado</span>
-                  <span className="text-right">Ya cobrado</span>
+                  <span className="text-right">Utilidad</span>
                   <span className="text-right">Devuelto</span>
                 </div>
                 <ul className="divide-y divide-line">
@@ -151,12 +151,12 @@ export function ProfitabilityScreen({
                         detail={`${confirmedLabel(row.confirmedUnits)}. Total guardado ${formatCop(row.confirmedAmount)}.`}
                       />
                       <ResultFigure
-                        label="Ya cobrado"
+                        label="Utilidad"
                         value={figureValue(row.realizedUnits, row.realizedMissingUnits, row.realizedMargin)}
                         detail={
                           row.realizedUnits > 0 && row.realizedMissingUnits === row.realizedUnits
-                            ? `Utilidad realizada · ${realizedLabel(row.realizedUnits)}. Sin costo, no entra.`
-                            : `Utilidad realizada · ${realizedLabel(row.realizedUnits)}`
+                            ? `Utilidad realizada · ${realizedLabel(row.realizedUnits)}. Sin costo, no entra. No es el total guardado.`
+                            : `Utilidad realizada · ${realizedLabel(row.realizedUnits)}. No es el total guardado.`
                         }
                       />
                       <ResultFigure
@@ -184,9 +184,9 @@ export function ProfitabilityScreen({
               <span className="mt-0.5 block text-muted">Confirmados y devoluciones. Devuelto es el total guardado, no el margen. La muestra no entra.</span>
             </li>
             <li>
-              <span className="font-semibold text-sm">Estimado vs cobrado</span>
+              <span className="font-semibold text-sm">Estimado vs utilidad</span>
               <span className="mt-0.5 block text-muted">
-                Estimado = margen confirmados. Cobrado = utilidad entregada cobrada. No es el total guardado del pedido.
+                Estimado = margen de confirmados. Utilidad = entregado y cobrado. Ninguna es el total guardado del pedido.
               </span>
             </li>
             <li>
