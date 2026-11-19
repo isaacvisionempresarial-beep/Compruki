@@ -242,7 +242,7 @@ export async function routeTask(rawIntent: string): Promise<CentralRouteResult> 
       draftChannels = packed?.drafts.map((draft) => draft.channel) ?? [];
       summary.push(
         draftChannels.length > 0
-          ? `Creador: plantillas de ${targetSku} (${draftChannels.join(", ")}). No se guardaron ni se publicaron.`
+          ? `Creador: plantillas de ${targetSku} (${draftChannels.join(", ")}). No se guardaron ni se publicaron. El precio no cambió.`
           : `Creador: no se pudieron armar borradores para ${targetSku}.`,
       );
       suggestedLinks.push({

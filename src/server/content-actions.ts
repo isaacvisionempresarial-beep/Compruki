@@ -51,7 +51,7 @@ export async function saveContentDraftAction(_state: SaveDraftState, formData: F
   await recordAgentRun({
     agentId: "AG-03",
     status: "succeeded",
-    summary: `Borrador guardado · pendiente revisión humana · no se publicó · ${result.draft.productSku} · ${result.draft.channel}`,
+    summary: `Borrador guardado · pendiente revisión humana · no se publicó · el precio no cambió · ${result.draft.productSku} · ${result.draft.channel}`,
     createdBy: access.user.id,
     actorName: access.actorName,
   });
@@ -60,6 +60,6 @@ export async function saveContentDraftAction(_state: SaveDraftState, formData: F
   revalidatePath("/panel");
   return {
     error: null,
-    message: `Borrador ${result.draft.channel} guardado para ${result.draft.productSku}. Quedó en Pendientes humanos. No se publicó.`,
+    message: `Borrador ${result.draft.channel} guardado para ${result.draft.productSku}. Quedó en Pendientes humanos. No se publicó. El precio no cambió.`,
   };
 }

@@ -35,7 +35,7 @@ export function ContentCreatorPanel({
       </h2>
       <p className="mt-1 text-sm text-muted">
         AG-03 sin OpenAI: arma borradores con hechos del catálogo. Generar o guardar deja corrida en el
-        historial. Guardar no publica.{" "}
+        historial. Guardar no publica ni cambia el precio de la ficha.{" "}
         {canTurnOn
           ? "El borrador espera tu aprobación para escribirse en el catálogo."
           : "No escribe el catálogo. Lo aprueba el propietario."}
@@ -95,8 +95,9 @@ export function ContentCreatorPanel({
             <h3 className="text-sm font-semibold">Hechos verificables · {facts.sku}</h3>
             <ul className="mt-2 space-y-1 text-sm text-muted">
               <li>
-                {facts.title} · {facts.priceLabel}
-                {facts.category ? ` · ${facts.category}` : ""}
+                {facts.title}
+                {facts.category ? ` · ${facts.category}` : ""} · Precio de la ficha {facts.priceLabel}. No es dinero
+                cobrado.
               </li>
               <li>
                 {facts.published ? "Publicado" : "Sin publicar"}
@@ -109,7 +110,9 @@ export function ContentCreatorPanel({
             </ul>
           </div>
 
-          <p className="mt-3 text-sm text-muted">Estas plantillas no están guardadas. Guardar no publica.</p>
+          <p className="mt-3 text-sm text-muted">
+            Estas plantillas no están guardadas. Guardar no publica ni cambia el precio.
+          </p>
           <ul className="mt-3 grid gap-3 lg:grid-cols-3">
             {drafts.map((draft) => (
               <li key={draft.channel}>
@@ -145,9 +148,11 @@ export function ContentCreatorPanel({
                 </p>
                 <p className="mt-0.5 text-muted">{item.title}</p>
                 {item.reviewStatus === "approved" ? (
-                  <p className="mt-0.5 text-xs text-muted">Escribió el texto en el catálogo. La publicación no cambió.</p>
+                  <p className="mt-0.5 text-xs text-muted">
+                    Escribió el texto en el catálogo. El precio y la publicación no cambiaron.
+                  </p>
                 ) : item.reviewStatus === "rejected" ? null : (
-                  <p className="mt-0.5 text-xs text-muted">Guardado para revisión. No se publicó.</p>
+                  <p className="mt-0.5 text-xs text-muted">Guardado para revisión. No se publicó. El precio no cambia.</p>
                 )}
                 <p className="mt-0.5 text-xs text-muted">
                   Guardó {item.authorName || "el panel"} ·{" "}

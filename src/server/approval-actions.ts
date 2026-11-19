@@ -156,7 +156,7 @@ async function resolveDraft(
           : channel === "anuncio"
             ? "Aplicado a destacados."
             : "Aplicado a respuestas / WhatsApp.";
-      applyNote = `${applyNote} La publicación no cambió.`;
+      applyNote = `${applyNote} El precio y la publicación no cambiaron.`;
       if (applied.applied) {
         revalidatePath("/panel/catalogo");
         revalidatePath(`/panel/catalogo/${encodeURIComponent(String(data.product_sku))}`);

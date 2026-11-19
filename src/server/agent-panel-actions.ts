@@ -97,7 +97,7 @@ export async function generateContentDraftsAction(formData: FormData) {
     agentId: "AG-03",
     status: packed ? "succeeded" : "failed",
     summary: packed
-      ? `Creador plantilla · ${sku} · ${channels.join(", ") || "ninguno"} · no se guardaron ni se publicaron`
+      ? `Creador plantilla · ${sku} · ${channels.join(", ") || "ninguno"} · no se guardaron ni se publicaron. El precio no cambió`
       : `Creador plantilla · SKU ${sku} no encontrado en catálogo local`,
     createdBy: access.user.id,
     actorName: access.actorName,

@@ -224,8 +224,8 @@ function DraftReviewForm({
       ) : null}
       <p className="text-xs leading-5 text-muted">
         {canApproveCatalog
-          ? "Escribe el texto de la ficha. La publicación no cambia."
-          : "Si el propietario lo aprueba, escribe ese texto. La publicación no cambia."}
+          ? "Escribe el texto de la ficha. El precio y la publicación no cambian."
+          : "Si el propietario lo aprueba, escribe ese texto. El precio y la publicación no cambian."}
       </p>
       <div className="flex flex-wrap gap-2">
         <button
