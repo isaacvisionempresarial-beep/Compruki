@@ -81,7 +81,7 @@ function moneyStatusAction(id: string) {
   return id === "cobrar" || id === "quitar_cobro";
 }
 
-const orderGrid = "md:grid-cols-[6.75rem_minmax(0,1.5fr)_7rem_12.5rem_4.25rem]";
+const orderGrid = "md:grid-cols-[6.75rem_minmax(0,1.5fr)_8.75rem_12.5rem_4.25rem]";
 const historyGrid = "md:grid-cols-[7rem_9rem_minmax(0,1fr)]";
 const queueGrid = "md:grid-cols-[6.75rem_minmax(0,1.2fr)_minmax(0,1.4fr)_4.25rem]";
 
@@ -278,7 +278,7 @@ export function OrdersScreen({
           <div className={cx("hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.04em] text-muted uppercase md:grid", orderGrid)}>
             <span>Pedido</span>
             <span>Cliente</span>
-            <span className="text-right">Total</span>
+            <span className="text-right">Total guardado</span>
             <span>Estado</span>
             <span>Abrir</span>
           </div>
@@ -303,7 +303,7 @@ export function OrdersScreen({
                     ))}
                   </span>
                   <span className="text-sm font-semibold tabular-nums md:pt-0.5 md:text-right">
-                    <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">Total</span>
+                    <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">Total guardado</span>
                     {formatCop(order.total)}
                   </span>
                   <span className="md:pt-0.5">
@@ -488,7 +488,7 @@ export function OrderEditor({
       <aside className="order-1 grid content-start gap-3 xl:sticky xl:top-[3.75rem] xl:order-2">
       <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-resumen">
         <h2 id="pedido-resumen" className="text-sm font-semibold">Estado</h2>
-        <p className="mt-2 text-sm font-extrabold tabular-nums">Total {formatCop(order.total)}</p>
+        <p className="mt-2 text-sm font-extrabold tabular-nums">Total guardado {formatCop(order.total)}</p>
         <p className={cx("mt-1 text-xs leading-5", collectedWithoutCost(order) ? "text-warning" : "text-muted")}>
           {moneyNote(order, margin)}
         </p>

@@ -418,7 +418,10 @@ export function Dashboard({
                       </span>
                     </span>
                     <span className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
-                      <span className="text-sm font-semibold tabular-nums whitespace-nowrap">{formatCop(order.total)}</span>
+                      <span className="text-right">
+                        <span className="block text-[10px] font-bold tracking-[0.06em] text-muted uppercase">Total guardado</span>
+                        <span className="text-sm font-semibold tabular-nums whitespace-nowrap">{formatCop(order.total)}</span>
+                      </span>
                       <span className="inline-flex flex-wrap items-center gap-1.5">
                         <StatusPill status={order.status} />
                         {order.collected ? <CollectedPill /> : null}
