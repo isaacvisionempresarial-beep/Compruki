@@ -125,11 +125,11 @@ export function needsClosedDepartment(order: { status: OrderStatus; department?:
 
 export function missingDepartmentNote(order: Pick<StoreOrder, "department" | "status">) {
   if (order.department?.trim()) return "";
-  if (canEditDelivery(order)) return "Falta el departamento. El texto para Dropi no lo lleva hasta que lo anotes.";
+  if (canEditDelivery(order)) return "Falta el departamento. El texto para Dropi no lo lleva hasta que lo anotes. El total guardado no cambia.";
   if (needsClosedDepartment(order)) {
-    return "Falta el departamento. La entrega ya no se corrige. El texto para Dropi no lo lleva hasta que lo anotes.";
+    return "Falta el departamento. La entrega ya no se corrige. El texto para Dropi no lo lleva hasta que lo anotes. El total guardado no cambia.";
   }
-  return "Este pedido no tiene departamento. El texto para Dropi no lo lleva.";
+  return "Este pedido no tiene departamento. El texto para Dropi no lo lleva. El total guardado no cambia.";
 }
 
 export type SizeGuide = {
@@ -166,8 +166,10 @@ export function collectedWithoutCost(order: { status: OrderStatus; collected: bo
 
 export function costQueueWarning(order: { status: OrderStatus; collected: boolean; lines: StoreOrder["lines"] }) {
   const base = catalogCostQueueNote(order);
-  if (!base || !collectedWithoutCost(order)) return base;
-  return `${base} Ya está cobrado y no entra en la utilidad realizada.`;
+  if (!base) return base;
+  const kept = " El total guardado no cambia.";
+  if (!collectedWithoutCost(order)) return `${base}${kept}`;
+  return `${base} Ya está cobrado y no entra en la utilidad realizada.${kept}`;
 }
 
 function historyClaimedRealizedUtility(history: Array<{ summary: string }> = []) {
@@ -338,7 +340,7 @@ export function missingSizeQueueNote(order: Pick<StoreOrder, "status" | "lines">
       return gap.chosen ? `${gap.title}: ese ${noun} ya no está.` : `Falta ${article} ${noun} de ${gap.title}.`;
     })
     .join(" ");
-  return notes ? `${notes} Confirmar queda bloqueado.` : "";
+  return notes ? `${notes} Confirmar queda bloqueado. El total guardado no cambia.` : "";
 }
 
 export function missingSizeNote(order: Pick<StoreOrder, "status" | "lines">, guides: SizeGuide[]) {

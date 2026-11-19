@@ -1957,7 +1957,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
       short: "departamento",
       cta: "Anotar departamento",
       match: needsDepartment,
-      note: () => "Falta el departamento.",
+      note: () => "Falta el departamento. El total guardado no cambia.",
     },
     {
       id: "cola-departamento-cerrado",
@@ -1966,7 +1966,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
       short: "departamento cerrado",
       cta: "Anotar departamento",
       match: needsClosedDepartment,
-      note: () => "Falta el departamento. La entrega ya no se corrige.",
+      note: () => "Falta el departamento. La entrega ya no se corrige. El total guardado no cambia.",
     },
     {
       id: "cola-preparacion",
@@ -1993,7 +1993,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
       short: "motivo incidencia",
       cta: "Anotar motivo",
       match: needsIncidenceReason,
-      note: () => "Falta el motivo. El cliente no ve la causa. Sin él no se resuelve.",
+      note: () => "Falta el motivo. El cliente no ve la causa. Sin él no se resuelve. El total guardado no cambia.",
     },
     {
       id: "cola-devolucion",
@@ -2002,7 +2002,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
       short: "motivo devolución",
       cta: "Anotar motivo",
       match: needsReturnReason,
-      note: () => "Falta el motivo. El cliente no ve la causa.",
+      note: () => "Falta el motivo. El cliente no ve la causa. El total guardado no cambia.",
     },
     {
       id: "cola-flete-devolucion",
@@ -2015,8 +2015,8 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
       match: needsReturnFreight,
       note: () =>
         canManageOrderMoney
-          ? "El flete no está anotado. Vacío no resta."
-          : "El flete no está anotado. Lo anota el propietario.",
+          ? "El flete no está anotado. Vacío no resta. El total guardado no cambia."
+          : "El flete no está anotado. Lo anota el propietario. El total guardado no cambia.",
     },
     {
       id: "cola-costo",
@@ -2028,7 +2028,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
       cta: canManageOrderMoney ? "Copiar costo" : "Ver pedido",
       match: needsCatalogCost,
       note: (order) =>
-        canManageOrderMoney ? costQueueWarning(order) : "Falta el costo en el pedido. Lo copia el propietario.",
+        canManageOrderMoney ? costQueueWarning(order) : "Falta el costo en el pedido. Lo copia el propietario. El total guardado no cambia.",
     },
     {
       id: "cola-aviso",
@@ -2037,7 +2037,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
       short: "aviso al cliente",
       cta: "Marcar aviso",
       match: needsCustomerNotice,
-      note: () => "Falta avisarle. El mensaje está en la ficha.",
+      note: () => "Falta avisarle. El mensaje está en la ficha. El total guardado no cambia.",
     },
   ];
 
@@ -2068,22 +2068,22 @@ function rowWarnings(order: StoreOrder, guides: SizeGuide[], canManageOrderMoney
   if (confirm) notes.push(confirm);
   const size = missingSizeNote(order, guides);
   if (size) notes.push(size);
-  if (needsIncidenceReason(order)) notes.push("Falta el motivo de la incidencia.");
-  if (needsReturnReason(order)) notes.push("Falta el motivo de la devolución.");
+  if (needsIncidenceReason(order)) notes.push("Falta el motivo de la incidencia. El total guardado no cambia.");
+  if (needsReturnReason(order)) notes.push("Falta el motivo de la devolución. El total guardado no cambia.");
   if (needsReturnFreight(order)) {
     notes.push(
       canManageOrderMoney
-        ? "Falta el flete de la devolución."
-        : "Falta el flete de la devolución. Lo anota el propietario.",
+        ? "Falta el flete de la devolución. El total guardado no cambia."
+        : "Falta el flete de la devolución. Lo anota el propietario. El total guardado no cambia.",
     );
   }
   const department = missingDepartmentNote(order);
   if (department && !confirm) notes.push(department);
   if (readyToPrepare(order)) notes.push(prepareQueueNote(order));
   if (readyToDispatch(order)) notes.push(dispatchQueueNote(order));
-  if (needsCustomerNotice(order)) notes.push("Falta avisarle al cliente.");
+  if (needsCustomerNotice(order)) notes.push("Falta avisarle al cliente. El total guardado no cambia.");
   if (needsCatalogCost(order) && notes.length < 2) {
-    notes.push(canManageOrderMoney ? costQueueWarning(order) : "Falta el costo en el pedido. Lo copia el propietario.");
+    notes.push(canManageOrderMoney ? costQueueWarning(order) : "Falta el costo en el pedido. Lo copia el propietario. El total guardado no cambia.");
   }
   return notes.slice(0, 2);
 }

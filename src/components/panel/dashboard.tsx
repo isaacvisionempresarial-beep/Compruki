@@ -516,21 +516,21 @@ export function Dashboard({
 function waitingNextStep(order: StoreOrder, guides: SizeGuide[]) {
   if (order.status === "incidencia") {
     if (needsIncidenceReason(order)) {
-      return { note: "Falta el motivo de la incidencia.", cta: "Anotar motivo" };
+      return { note: "Falta el motivo de la incidencia. El total guardado no cambia.", cta: "Anotar motivo" };
     }
-    return { note: "Incidencia abierta.", cta: "Ver pedido" };
+    return { note: "Incidencia abierta. El total guardado no cambia.", cta: "Ver pedido" };
   }
   if (needsSize(order, guides)) {
-    return { note: "Falta la talla o el tamaño.", cta: "Anotar talla" };
+    return { note: "Falta la talla o el tamaño. El total guardado no cambia.", cta: "Anotar talla" };
   }
   if (readyToConfirm(order, guides)) {
     const confirm = confirmQueueNote(order, guides);
-    return { note: confirm && confirm.length < 60 ? confirm : "Listo para confirmar.", cta: "Confirmar" };
+    return { note: confirm && confirm.length < 90 ? confirm : "Listo para confirmar. El total guardado no cambia.", cta: "Confirmar" };
   }
   if (needsDepartment(order)) {
-    return { note: "Falta el departamento.", cta: "Anotar departamento" };
+    return { note: "Falta el departamento. El total guardado no cambia.", cta: "Anotar departamento" };
   }
-  return { note: "Pendiente de confirmación.", cta: "Ver pedido" };
+  return { note: "Pendiente de confirmación. El total guardado no cambia.", cta: "Ver pedido" };
 }
 
 function HomeProductFigure({ label, value, detail }: { label: string; value: string; detail: string }) {
