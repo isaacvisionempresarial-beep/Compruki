@@ -989,7 +989,7 @@ export function ProductEditor({
                   onChange={(event) => setSku(event.target.value)}
                 />
               </Field>
-              <Field label="Referencia del proveedor" htmlFor="externalRef" hint="Opcional. Dropi no está conectado.">
+              <Field label="Referencia del proveedor" htmlFor="externalRef" hint="Opcional. Dropi no está conectado. No es el precio ni la publicación.">
                 <input
                   id="externalRef"
                   name="externalRef"
@@ -1000,7 +1000,7 @@ export function ProductEditor({
               </Field>
             </div>
             <div className="lg:col-span-2">
-            <Field label="Categoría" htmlFor="category" hint="Opcional. Agrupa el producto en la tienda. No viene de Dropi.">
+            <Field label="Categoría" htmlFor="category" hint="Opcional. Agrupa el producto en la tienda. No viene de Dropi. No es el precio ni la publicación.">
               <input
                 id="category"
                 name="category"
@@ -1015,7 +1015,7 @@ export function ProductEditor({
             </div>
 
             <div className="grid gap-3 xl:grid-cols-2">
-              <Field label="Descripción" htmlFor="description">
+              <Field label="Descripción" htmlFor="description" hint="La ve el comprador en la ficha. No es el precio ni la publicación.">
                 <textarea
                   id="description"
                   name="description"
@@ -1029,7 +1029,7 @@ export function ProductEditor({
               <Field
                 label="Características y beneficios"
                 htmlFor="highlights"
-                hint="Opcional. Una idea por línea. El comprador las ve en la página del producto. No vienen de Dropi."
+                hint="Opcional. Una idea por línea. El comprador las ve en la página del producto. No vienen de Dropi. No es el precio ni la publicación."
               >
                 <textarea
                   id="highlights"
@@ -1045,7 +1045,7 @@ export function ProductEditor({
             <Field
               label="Respuestas para el comprador"
               htmlFor="answers"
-              hint="Opcional. Escribe solo lo que se puede afirmar: medidas, material, qué incluye y qué no. El comprador lo ve en la ficha. El chat que responda con estos datos todavía no está conectado. No escribas aquí el costo ni las comisiones."
+              hint="Opcional. Escribe solo lo que se puede afirmar: medidas, material, qué incluye y qué no. El comprador lo ve en la ficha. El chat que responda con estos datos todavía no está conectado. No escribas aquí el costo ni las comisiones. No es el precio ni la publicación."
             >
               <textarea
                 id="answers"
@@ -1062,7 +1062,7 @@ export function ProductEditor({
               <Field
                 label="Tallas o tamaños"
                 htmlFor="variants"
-                hint="Opcional. Una por línea, hasta 12. Por ejemplo S, M, 38 o 50 cm. Si escribes alguna, elige el criterio: el comprador tiene que escoger una antes de pedir."
+                hint="Opcional. Una por línea, hasta 12. Por ejemplo S, M, 38 o 50 cm. Si escribes alguna, elige el criterio: el comprador tiene que escoger una antes de pedir. La talla o el tamaño no cambian el precio ni la publicación."
               >
                 <textarea
                   id="variants"
