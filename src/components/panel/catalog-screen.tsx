@@ -945,7 +945,7 @@ export function ProductEditor({
                     onChange={(event) => setUnavailable(event.target.checked)}
                   />
                   <span>
-                    <b className="font-semibold">Disponibilidad.</b> Marcar como no disponible. Sigue en el catálogo, pero no se puede pedir.
+                    <b className="font-semibold">Disponibilidad.</b> Marcar como no disponible. Sigue en el catálogo, pero no se puede pedir. No cambia el precio ni la publicación.
                     {product && relatedOrderCount > 0
                       ? ` Este producto tiene ${relatedOrderCount === 1 ? "1 pedido" : `${relatedOrderCount} pedidos`}: no se puede eliminar.`
                       : ""}
@@ -1100,15 +1100,15 @@ export function ProductEditor({
                 </h3>
                 <p className="mt-0.5 text-xs leading-5 text-muted">
                   {canManageCommerce
-                    ? "Cada guardado deja el precio y la publicación de ese momento."
-                    : "Un guardado de textos también queda aquí. El precio y la publicación los guarda el propietario."}
+                    ? "Cada guardado deja el precio y la publicación de ese momento. El precio y el margen de la tabla son de la ficha. No son un pedido ni dinero cobrado."
+                    : "Un guardado de textos también queda aquí. El precio y la publicación los guarda el propietario. El precio y el margen de la tabla son de la ficha, no de un pedido."}
                 </p>
                 <div className="mt-2 hidden grid-cols-[7rem_minmax(0,1.4fr)_6.5rem_6.5rem_6.5rem] gap-3 border-b border-line pb-2 text-[11px] font-semibold tracking-[0.04em] text-muted uppercase md:grid">
                   <span>Fecha</span>
                   <span>Cambio</span>
-                  <span className="text-right">Venta</span>
+                  <span className="text-right">Precio</span>
                   <span className="text-right">Costo</span>
-                  <span className="text-right">Margen</span>
+                  <span className="text-right">Margen est.</span>
                 </div>
                 <ol>
                   {[...product.history].reverse().map((entry) => {
@@ -1124,7 +1124,7 @@ export function ProductEditor({
                           <span className="mt-0.5 hidden text-xs text-muted md:block">{entry.actorName}</span>
                         </p>
                         <p className="tabular-nums md:text-right">
-                          <span className="mr-2 text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">Venta</span>
+                          <span className="mr-2 text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">Precio</span>
                           {formatCop(entry.price)}
                         </p>
                         <p className="tabular-nums text-muted md:text-right">
@@ -1132,7 +1132,7 @@ export function ProductEditor({
                           {formatCop(entry.cost)}
                         </p>
                         <p className={cx("font-semibold tabular-nums md:text-right", entryMargin < 0 ? "text-warning" : "text-accent-strong")}>
-                          <span className="mr-2 text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">Margen</span>
+                          <span className="mr-2 text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">Margen est.</span>
                           {formatCop(entryMargin)}
                         </p>
                       </li>
