@@ -332,8 +332,8 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                   </div>
                 </div>
                 <div className="pb-1 text-xs leading-5 text-muted">
-                  <p className="font-extrabold text-ink">Envío al confirmar</p>
-                  <p>Según tu ciudad y dirección. Sin fecha prometida.</p>
+                  <p className="font-extrabold text-ink">Envío aparte</p>
+                  <p>Según tu ciudad y dirección. Sin fecha prometida. No se cobra aquí.</p>
                 </div>
               </div>
               {canBuy && cart.ready ? (
@@ -413,7 +413,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
           <h2 className="text-base font-extrabold tracking-tight">Antes de comprar</h2>
           <dl className="mt-2 divide-y divide-line overflow-hidden rounded-[14px] border border-line bg-card">
             {[
-              ["Envío", "No incluido. Se confirma con la dirección. Sin fecha prometida."],
+              ["Envío", "No incluido. Se acuerda con la dirección. Sin fecha prometida. No se cobra aquí."],
               ["Pago", "Pagas al recibir el precio publicado. Nadie cobra aquí. El pedido queda pendiente de confirmación."],
               ["Cambios", "Se acuerdan con la tienda. No se inventa una política aquí."],
               ["Dropi", "No está conectado. Esta ficha no crea pedido en Dropi."],

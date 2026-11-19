@@ -194,14 +194,14 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                 : "Pagas al recibir. Envío aparte. Todavía no es dinero cobrado."}
             </p>
             <p className="mt-1.5 text-xs leading-5 text-muted">
-              El pedido se crea al confirmar en el pago. Dropi no está conectado.
+              El pedido se crea al confirmar en el pago y no cobra. Dropi no está conectado.
             </p>
             {canContinue ? (
               <Link
                 href="/tienda/pagar"
                 className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark"
               >
-                Continuar al pedido
+                Continuar · pagas al recibir
               </Link>
             ) : rows.length > 0 ? (
               <div className="mt-3">
@@ -209,7 +209,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                   className="inline-flex h-10 w-full cursor-not-allowed items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark opacity-55"
                   aria-disabled="true"
                 >
-                  Continuar al pedido
+                  Continuar · pagas al recibir
                 </p>
                 <p className="mt-2 text-sm leading-5 text-coral-strong">{blockedHint}</p>
               </div>
