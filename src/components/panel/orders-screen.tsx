@@ -1935,7 +1935,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
     {
       id: "cola-confirmar",
       title: "Se pueden confirmar",
-      hint: "Pendientes listos para confirmar. Puede faltar departamento o costo; no bloquean la confirmación.",
+      hint: "Pendientes listos para confirmar. Puede faltar departamento o costo; no bloquean la confirmación. El total guardado no cambia.",
       short: "confirmar",
       cta: "Confirmar",
       match: (order) => readyToConfirm(order, guides),
@@ -1944,7 +1944,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
     {
       id: "cola-talla",
       title: "Falta la talla o el tamaño",
-      hint: "Pendientes que no se confirman hasta anotar la talla o el tamaño.",
+      hint: "Pendientes que no se confirman hasta anotar la talla o el tamaño. El total guardado no cambia.",
       short: "talla",
       cta: "Anotar talla",
       match: (order) => needsSize(order, guides),
@@ -1953,7 +1953,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
     {
       id: "cola-departamento",
       title: "Falta el departamento",
-      hint: "Pedidos que todavía se pueden corregir y no tienen departamento.",
+      hint: "Pedidos que todavía se pueden corregir y no tienen departamento. El total guardado no cambia.",
       short: "departamento",
       cta: "Anotar departamento",
       match: needsDepartment,
@@ -1962,7 +1962,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
     {
       id: "cola-departamento-cerrado",
       title: "Falta el departamento y la entrega ya no se corrige",
-      hint: "Están en transporte, entregados o devueltos. Anotar el departamento no cambia el estado ni el cobro.",
+      hint: "Están en transporte, entregados o devueltos. Anotar el departamento no cambia el estado ni el cobro. El total guardado no cambia.",
       short: "departamento cerrado",
       cta: "Anotar departamento",
       match: needsClosedDepartment,
@@ -1971,7 +1971,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
     {
       id: "cola-preparacion",
       title: "Listos para preparación",
-      hint: "Confirmados con número de Dropi anotado. Pasarlos a preparación no los envía.",
+      hint: "Confirmados con número de Dropi anotado. Pasarlos a preparación no los envía. El total guardado no cambia.",
       short: "preparación",
       cta: "Preparar",
       match: readyToPrepare,
@@ -1980,7 +1980,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
     {
       id: "cola-despacho",
       title: "Por anotar despacho",
-      hint: "Pedidos en preparación. El despacho se anota a mano.",
+      hint: "Pedidos en preparación. El despacho se anota a mano. El total guardado no cambia.",
       short: "despacho",
       cta: "Anotar despacho",
       match: readyToDispatch,
@@ -1989,7 +1989,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
     {
       id: "cola-motivo",
       title: "Falta el motivo de la incidencia",
-      hint: "Sin motivo no se resuelve. El cliente ve que se detuvo, sin la causa.",
+      hint: "Sin motivo no se resuelve. El cliente ve que se detuvo, sin la causa. El total guardado no cambia.",
       short: "motivo incidencia",
       cta: "Anotar motivo",
       match: needsIncidenceReason,
@@ -1998,7 +1998,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
     {
       id: "cola-devolucion",
       title: "Falta el motivo de la devolución",
-      hint: "El cliente ve la devolución sin la causa. Anotarla no cambia el estado.",
+      hint: "El cliente ve la devolución sin la causa. Anotarla no cambia el estado. El total guardado no cambia.",
       short: "motivo devolución",
       cta: "Anotar motivo",
       match: needsReturnReason,
@@ -2008,8 +2008,8 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
       id: "cola-flete-devolucion",
       title: "Falta anotar el flete de la devolución",
       hint: canManageOrderMoney
-        ? "Vacío no resta. Si no hubo flete, anota 0; si lo hubo, anótalo."
-        : "Vacío no resta. Lo anota el propietario.",
+        ? "Vacío no resta. Si no hubo flete, anota 0; si lo hubo, anótalo. El total guardado no cambia."
+        : "Vacío no resta. Lo anota el propietario. El total guardado no cambia.",
       short: "flete devolución",
       cta: canManageOrderMoney ? "Anotar flete" : "Ver pedido",
       match: needsReturnFreight,
@@ -2033,7 +2033,7 @@ function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMon
     {
       id: "cola-aviso",
       title: "Falta avisarle al cliente",
-      hint: "El estado ya cambió y todavía no marcaste que le avisaste. Esa marca no envía el mensaje.",
+      hint: "El estado ya cambió y todavía no marcaste que le avisaste. Esa marca no envía el mensaje. El total guardado no cambia.",
       short: "aviso al cliente",
       cta: "Marcar aviso",
       match: needsCustomerNotice,
