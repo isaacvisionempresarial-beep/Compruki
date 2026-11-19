@@ -209,11 +209,11 @@ export function ProfitabilityScreen({
 }
 
 function sourceNote(source: ProductSource) {
-  if (source.returned) return "Sale del margen y de la utilidad.";
-  if (source.realized && source.missingCost) return "Sin costo guardado, no entra el monto en la utilidad.";
-  if (source.realized) return "Entra en el margen estimado y en la utilidad realizada.";
-  if (source.missingCost) return "Sin costo guardado, no suma margen.";
-  return "Entra en el margen estimado. Todavía no está en la utilidad realizada.";
+  if (source.returned) return "Sale del margen y de la utilidad. No es el total guardado.";
+  if (source.realized && source.missingCost) return "Sin costo guardado, no entra el monto en la utilidad. No es el total guardado.";
+  if (source.realized) return "Entra en el margen estimado y en la utilidad realizada. No es el total guardado.";
+  if (source.missingCost) return "Sin costo guardado, no suma margen. No es el total guardado.";
+  return "Entra en el margen estimado. Todavía no está en la utilidad realizada. No es el total guardado.";
 }
 
 function sizeCountPhrase(size: { confirmedUnits: number; returnedUnits: number }) {
