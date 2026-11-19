@@ -164,8 +164,8 @@ export function ProfitabilityScreen({
                         value={formatCop(row.returnedAmount)}
                         detail={
                           row.returnFreight > 0
-                            ? `${unitLabel(row.returnedUnits)}. Flete ${formatCop(row.returnFreight)}, resta.`
-                            : `${unitLabel(row.returnedUnits)}. No entra a la utilidad.`
+                            ? `${unitLabel(row.returnedUnits)}. Total guardado. Flete ${formatCop(row.returnFreight)} resta de la utilidad.`
+                            : `${unitLabel(row.returnedUnits)}. Total guardado. No entra a la utilidad.`
                         }
                       />
                     </li>
@@ -181,7 +181,7 @@ export function ProfitabilityScreen({
           <ul className="mt-2 space-y-2 text-xs leading-5">
             <li>
               <span className="font-semibold text-sm">Qué cuenta</span>
-              <span className="mt-0.5 block text-muted">Confirmados y devoluciones. La muestra no entra.</span>
+              <span className="mt-0.5 block text-muted">Confirmados y devoluciones. Devuelto es el total guardado, no el margen. La muestra no entra.</span>
             </li>
             <li>
               <span className="font-semibold text-sm">Estimado vs cobrado</span>

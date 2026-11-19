@@ -129,7 +129,7 @@ export function OrdersScreen({
         <SummaryCard label="Confirmados" value={formatCop(summary.confirmed.amount)} detail={countLabel(summary.confirmed.count)} numbers={summary.confirmed.numbers} />
         <SummaryCard label="Entregados" value={formatCop(summary.delivered.amount)} detail={countLabel(summary.delivered.count)} numbers={summary.delivered.numbers} />
         <SummaryCard label="Cobrados" value={formatCop(summary.collected.amount)} detail={countLabel(summary.collected.count)} numbers={summary.collected.numbers} />
-        <SummaryCard label="Devueltos" value={formatCop(summary.returned.amount)} detail={countLabel(summary.returned.count)} numbers={summary.returned.numbers} />
+        <SummaryCard label="Devueltos" value={formatCop(summary.returned.amount)} detail={`${countLabel(summary.returned.count)}. Total guardado. No entra a la utilidad.`} numbers={summary.returned.numbers} />
         <SummaryCard
           label="Margen estimado"
           value={formatCop(summary.estimatedMargin.amount)}

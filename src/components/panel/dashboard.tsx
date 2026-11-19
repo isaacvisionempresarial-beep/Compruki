@@ -285,7 +285,7 @@ export function Dashboard({
             <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Devueltos</dt>
             <dd className="mt-1 text-base font-extrabold tabular-nums">{formatCop(storeSummary.returned.amount)}</dd>
             <dd className="mt-1 text-xs leading-5 text-muted">
-              No entra a la utilidad
+              Total guardado. No entra a la utilidad.
               <OrderListPhrase numbers={storeSummary.returned.numbers} lead=":" />
             </dd>
           </div>
@@ -359,8 +359,8 @@ export function Dashboard({
                     value={formatCop(row.returnedAmount)}
                     detail={
                       row.returnFreight > 0
-                        ? `Flete de devolución ${formatCop(row.returnFreight)} que resta.`
-                        : "No entra a la utilidad."
+                        ? `Total guardado. Flete de devolución ${formatCop(row.returnFreight)} que resta de la utilidad.`
+                        : "Total guardado. No entra a la utilidad."
                     }
                   />
                 </li>
