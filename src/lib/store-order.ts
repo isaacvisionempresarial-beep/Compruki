@@ -1291,21 +1291,21 @@ export function customerStatusNote(status: OrderStatus, reason = "", byCustomer 
         : "La tienda marcó el pedido como entregado. El cobro contra entrega todavía no está anotado. El total guardado no cambió. Dropi no está conectado: sin guía.";
     case "incidencia":
       return detail
-        ? `La tienda marcó una incidencia: ${detail} El pedido no sigue su curso hasta que lo resuelva. El total guardado no cambió.`
-        : "La tienda marcó una incidencia. El pedido no sigue su curso hasta que lo resuelva. El total guardado no cambió.";
+        ? `La tienda marcó una incidencia: ${detail} El pedido no sigue su curso hasta que lo resuelva. Mientras dure, no se cobra. El total guardado no cambió.`
+        : "La tienda marcó una incidencia. El pedido no sigue su curso hasta que lo resuelva. Mientras dure, no se cobra. El total guardado no cambió.";
     case "cancelado":
       if (byCustomer) {
         return detail
-          ? `Cancelaste este pedido: ${detail} No se va a despachar. El total guardado no cambió.`
-          : "Cancelaste este pedido. No se va a despachar. El total guardado no cambió.";
+          ? `Cancelaste este pedido: ${detail} No se va a despachar. Ya no se cobra. El total guardado no cambió.`
+          : "Cancelaste este pedido. No se va a despachar. Ya no se cobra. El total guardado no cambió.";
       }
       return detail
-        ? `La tienda canceló este pedido: ${detail} No se va a despachar. El total guardado no cambió.`
-        : "La tienda canceló este pedido. No se va a despachar. El total guardado no cambió.";
+        ? `La tienda canceló este pedido: ${detail} No se va a despachar. Ya no se cobra. El total guardado no cambió.`
+        : "La tienda canceló este pedido. No se va a despachar. Ya no se cobra. El total guardado no cambió.";
     case "devuelto":
       return detail
-        ? `La tienda registró la devolución de este pedido: ${detail} Ya no sigue como entrega cobrada. El total guardado no cambió.`
-        : "La tienda registró la devolución de este pedido. Ya no sigue como entrega cobrada. El total guardado no cambió.";
+        ? `La tienda registró la devolución de este pedido: ${detail} Ya no se cobra. El total guardado no cambió.`
+        : "La tienda registró la devolución de este pedido. Ya no se cobra. El total guardado no cambió.";
     default:
       return "La tienda está revisando este pedido. Dropi no está conectado. No hay guía ni fecha de entrega.";
   }

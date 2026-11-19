@@ -215,7 +215,7 @@ function OrderProgress({ order, sizes }: { order: CustomerOrder; sizes: Customer
     return (
       <div className="mt-2">
         <p className="text-sm leading-5 text-muted">
-          {customerStatusNote(order.status, order.customerReason, order.cancelledByCustomer)}
+          {customerStatusNote(order.status, order.customerReason, order.cancelledByCustomer, order.collected)}
         </p>
         {missing ? <p className="mt-2 text-sm leading-5 font-semibold">{missing}</p> : null}
       </div>
