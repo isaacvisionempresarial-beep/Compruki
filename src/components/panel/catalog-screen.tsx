@@ -716,8 +716,8 @@ export function ProductEditor({
           : "Video listo.";
     if (!published) {
       return canManageCommerce
-        ? `${ready} Pulsa Guardar producto. Sigue oculto hasta que lo publiques.`
-        : `${ready} Pulsa Guardar producto. Sigue oculto: la publicación la cambia el propietario.`;
+        ? `${ready} Pulsa Guardar producto. Sigue oculto hasta que lo publiques. El precio no cambia.`
+        : `${ready} Pulsa Guardar producto. Sigue oculto: la publicación la cambia el propietario. El precio no cambia.`;
     }
     if (unavailable) {
       return `${ready} Pulsa Guardar producto. Sigue publicado, pero no se puede pedir. El precio y la publicación no cambian.`;
@@ -775,10 +775,10 @@ export function ProductEditor({
                   {published && !unavailable
                     ? "Todavía no hay fotos. Agrega una o varias para verlas aquí y en la tienda. El producto ya está publicado. Guardarlas no cambia el precio ni la publicación."
                     : published
-                      ? "Todavía no hay fotos. Agrega una o varias para verlas aquí. En la tienda no se puede pedir mientras esté no disponible."
+                      ? "Todavía no hay fotos. Agrega una o varias para verlas aquí. En la tienda no se puede pedir mientras esté no disponible. Guardarlas no cambia el precio ni la publicación."
                       : canManageCommerce
-                        ? "Todavía no hay fotos. Agrega una o varias para verlas aquí. Siguen ocultas hasta que publiques."
-                        : "Todavía no hay fotos. Agrega una o varias para verlas aquí. Siguen ocultas: la publicación la cambia el propietario."}
+                        ? "Todavía no hay fotos. Agrega una o varias para verlas aquí. Siguen ocultas hasta que publiques. El precio no cambia."
+                        : "Todavía no hay fotos. Agrega una o varias para verlas aquí. Siguen ocultas: la publicación la cambia el propietario. El precio no cambia."}
                 </p>
               ) : (
                 <div className="mt-3">
@@ -851,7 +851,9 @@ export function ProductEditor({
                 ) : savedVideo && !clearVideo ? (
                   <video src={`/panel/video/${product?.sku}`} controls className="mt-3 max-h-[32rem] w-full rounded-[10px] bg-card" />
                 ) : (
-                  <p className="mt-2 text-sm leading-5">Todavía no hay video.</p>
+                  <p className="mt-2 text-sm leading-5">
+                    Todavía no hay video. Agregarlo no cambia el precio ni la publicación.
+                  </p>
                 )}
                 <input ref={videoPickerRef} type="file" accept="video/mp4,.mp4" className="sr-only" onChange={onPickVideo} />
                 <input ref={videoRef} name="video" type="file" accept="video/mp4,.mp4" className="hidden" tabIndex={-1} aria-hidden="true" />
