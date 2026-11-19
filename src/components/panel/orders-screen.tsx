@@ -1465,7 +1465,7 @@ function ClosedDepartmentForm({ order }: { order: StoreOrder }) {
       </label>
       {previewText ? (
         <p className="text-sm leading-5 text-ink">
-          Si anotas el departamento, el texto para Dropi queda así. Dropi no está conectado: no crea el pedido ahí.
+          Si anotas el departamento, el texto para Dropi queda así. Dropi no está conectado: no crea el pedido ahí. El total guardado no cambia.
           <span className="mt-1 block whitespace-pre-line font-normal text-muted">{previewText}</span>
         </p>
       ) : null}
@@ -1589,7 +1589,7 @@ function DeliveryForm({ order }: { order: StoreOrder }) {
       </label>
       {previewText ? (
         <p className="text-sm leading-5 text-ink">
-          Si guardas, el texto para Dropi queda así. Dropi no está conectado: no crea el pedido ahí.
+          Si guardas, el texto para Dropi queda así. Dropi no está conectado: no crea el pedido ahí. El total guardado no cambia.
           <span className="mt-1 block whitespace-pre-line font-normal text-muted">{previewText}</span>
         </p>
       ) : null}

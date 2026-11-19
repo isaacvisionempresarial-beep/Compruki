@@ -921,16 +921,21 @@ export function canNoteDropiNumber(order: Pick<StoreOrder, "status">) {
 
 export function dropiCopyHint(order: { status: OrderStatus; department?: string }) {
   const missing = order.department?.trim() ? "" : "Falta el departamento. Este texto no lo lleva. ";
+  let body: string;
   switch (order.status) {
     case "incidencia":
-      return `${missing}El pedido está detenido. Dropi no está conectado: estos datos no lo resuelven ni lo crean ahí.`;
+      body = `${missing}El pedido está detenido. Dropi no está conectado: estos datos no lo resuelven ni lo crean ahí.`;
+      break;
     case "entregado":
-      return `${missing}Ya está entregado. Dropi no está conectado: estos datos no crean otro pedido ahí.`;
+      body = `${missing}Ya está entregado. Dropi no está conectado: estos datos no crean otro pedido ahí.`;
+      break;
     case "devuelto":
-      return `${missing}Ya está devuelto. Dropi no está conectado: estos datos no crean otro pedido ahí.`;
+      body = `${missing}Ya está devuelto. Dropi no está conectado: estos datos no crean otro pedido ahí.`;
+      break;
     default:
-      return `${missing}Nombre, celular, dirección y productos. Sin costos. Dropi no está conectado: pégalo ahí a mano; desde aquí no se crea el pedido.`;
+      body = `${missing}Nombre, celular, dirección y productos. Sin costos. Dropi no está conectado: pégalo ahí a mano; desde aquí no se crea el pedido.`;
   }
+  return `${body} El total guardado no cambia.`;
 }
 
 export function dropiNumberHint(order: { status: OrderStatus; providerRef?: string }) {

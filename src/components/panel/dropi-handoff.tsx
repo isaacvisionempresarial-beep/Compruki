@@ -19,7 +19,7 @@ export function DropiHandoff({ order }: { order: StoreOrder }) {
           Datos para Dropi
         </h2>
         <p className="mt-1 text-xs leading-5 text-muted">
-          Dropi no está conectado. Se copian a mano; desde aquí no se crea el pedido.
+          Dropi no está conectado. Se copian a mano; desde aquí no se crea el pedido ni cambia el total guardado.
         </p>
         <DropiCopy order={order} />
       </section>
@@ -99,7 +99,7 @@ function DropiCopy({ order }: { order: StoreOrder }) {
       </button>
       {copied === "ok" ? (
         <p role="status" className="text-sm text-accent-strong">
-          Listo para pegarlo en Dropi. Dropi no está conectado: desde aquí no se crea el pedido.
+          Listo para pegarlo en Dropi. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
         </p>
       ) : null}
       {copied === "fail" ? (
@@ -146,7 +146,7 @@ function DropiRefForm({ order }: { order: StoreOrder }) {
       </label>
       {previewText ? (
         <p className="text-sm leading-5 text-ink">
-          Si anotas, el texto para Dropi queda así. Dropi no está conectado: no crea el pedido ahí.
+          Si anotas, el texto para Dropi queda así. Dropi no está conectado: no crea el pedido ahí. El total guardado no cambia.
           {wouldUnlockPrepare
             ? " Con ese número el pedido queda listo para Pasar a preparación. Anotarlo no lo envía."
             : ""}
