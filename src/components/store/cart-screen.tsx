@@ -10,7 +10,7 @@ import { cx } from "@/lib/cx";
 import { formatCop } from "@/lib/format";
 import { orderTotal } from "@/lib/store-order";
 
-const cartGrid = "md:grid-cols-[minmax(0,1.5fr)_6.5rem_7rem_5rem]";
+const cartGrid = "md:grid-cols-[minmax(0,1.5fr)_6.5rem_9.5rem_5rem]";
 
 export function CartScreen({ products }: { products: PublicProduct[] }) {
   const cart = useCart();
@@ -47,7 +47,8 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
         <p className="text-[10px] font-bold tracking-[0.08em] text-accent-strong uppercase">Este navegador</p>
         <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">Carrito</h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Precios publicados · envío aparte · se guarda aquí. Dropi no está conectado.
+          Precios publicados de la ficha. Se guarda en este navegador. Pagas al recibir. Envío aparte. Todavía no es un
+          pedido. Dropi no está conectado.
         </p>
       </section>
       <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_15rem]">
@@ -69,7 +70,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
             >
               <span>Producto</span>
               <span>Cantidad</span>
-              <span className="text-right">Total</span>
+              <span className="text-right">Total al recibir</span>
               <span>Quitar</span>
             </div>
             <ul className="divide-y divide-line">
@@ -154,7 +155,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                       </div>
                       <div className="md:pt-0.5 md:text-right">
                         <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">
-                          Total
+                          Total al recibir
                         </span>
                         <p className="text-base font-extrabold tabular-nums">
                           {lineTotal === null ? "—" : formatCop(lineTotal)}
@@ -184,13 +185,13 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
           <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3rem] xl:order-2">
             <h2 className="text-sm font-semibold">Resumen</h2>
             <div className="mt-2 flex items-baseline justify-between gap-2">
-              <p className="text-xs text-muted">Total</p>
+              <p className="text-xs text-muted">Total al recibir</p>
               <p className="text-lg font-extrabold tabular-nums">{formatCop(total)}</p>
             </div>
             <p className="mt-2 text-xs leading-5 text-muted">
               {rows.length === 0
-                ? "Cuando agregues productos, el total aparece aquí."
-                : "Pagas al recibir. Envío aparte."}
+                ? "Cuando agregues productos, el total al recibir aparece aquí."
+                : "Pagas al recibir. Envío aparte. Todavía no es dinero cobrado."}
             </p>
             <p className="mt-1.5 text-xs leading-5 text-muted">
               El pedido se crea al confirmar en el pago. Dropi no está conectado.

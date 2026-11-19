@@ -299,10 +299,10 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
             ))}
           </ul>
           <p className="mt-3 flex items-baseline justify-between gap-2 border-t border-line pt-3">
-            <span className="text-xs text-muted">Total</span>
+            <span className="text-xs text-muted">Total al recibir</span>
             <span className="text-lg font-extrabold tabular-nums">{formatCop(total)}</span>
           </p>
-          <p className="mt-2 text-xs leading-5 text-muted">Pagas al recibir. Envío aparte.</p>
+          <p className="mt-2 text-xs leading-5 text-muted">Pagas al recibir. Envío aparte. Nadie cobra aquí.</p>
           <p className="mt-1.5 text-xs leading-5 text-muted">
             Confirmar registra en la tienda. Dropi no está conectado: no crea el pedido ahí.
           </p>
