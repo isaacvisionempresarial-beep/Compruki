@@ -125,15 +125,15 @@ export function OrdersScreen({
       <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
         <div className="order-2 min-w-0 xl:order-1">
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-        <SummaryCard label="Registrados" value={formatCop(summary.registered.amount)} detail={countLabel(summary.registered.count)} numbers={summary.registered.numbers} />
-        <SummaryCard label="Confirmados" value={formatCop(summary.confirmed.amount)} detail={countLabel(summary.confirmed.count)} numbers={summary.confirmed.numbers} />
-        <SummaryCard label="Entregados" value={formatCop(summary.delivered.amount)} detail={countLabel(summary.delivered.count)} numbers={summary.delivered.numbers} />
-        <SummaryCard label="Cobrados" value={formatCop(summary.collected.amount)} detail={countLabel(summary.collected.count)} numbers={summary.collected.numbers} />
+        <SummaryCard label="Registrados" value={formatCop(summary.registered.amount)} detail={`${countLabel(summary.registered.count)}. Total guardado.`} numbers={summary.registered.numbers} />
+        <SummaryCard label="Confirmados" value={formatCop(summary.confirmed.amount)} detail={`${countLabel(summary.confirmed.count)}. Total guardado.`} numbers={summary.confirmed.numbers} />
+        <SummaryCard label="Entregados" value={formatCop(summary.delivered.amount)} detail={`${countLabel(summary.delivered.count)}. Total guardado.`} numbers={summary.delivered.numbers} />
+        <SummaryCard label="Cobrados" value={formatCop(summary.collected.amount)} detail={`${countLabel(summary.collected.count)}. Total guardado. No es la utilidad.`} numbers={summary.collected.numbers} />
         <SummaryCard label="Devueltos" value={formatCop(summary.returned.amount)} detail={`${countLabel(summary.returned.count)}. Total guardado. No entra a la utilidad.`} numbers={summary.returned.numbers} />
         <SummaryCard
           label="Margen estimado"
           value={formatCop(summary.estimatedMargin.amount)}
-          detail="Solo ventas confirmadas, sin incidencia"
+          detail="Solo ventas confirmadas, sin incidencia. No es el total guardado."
           numbers={summary.estimatedMargin.numbers}
           extra={
             summary.estimatedMargin.missingNumbers.length > 0 ? (
@@ -2081,8 +2081,8 @@ function realizedDetail(summary: ReturnType<typeof summarizeStoreOrders>) {
   if (summary.collectionCost > 0) {
     notes.push(`usa ${formatCop(summary.collectionCost)} de recaudo real en lugar de las comisiones estimadas`);
   }
-  if (notes.length === 0) return "Entregado y cobrado, menos fletes de devolución anotados";
-  return `Ya ${notes.join(" y ")}`;
+  if (notes.length === 0) return "Entregado y cobrado, menos fletes de devolución anotados. No es el total guardado.";
+  return `Ya ${notes.join(" y ")}. No es el total guardado.`;
 }
 
 function countLabel(count: number) {

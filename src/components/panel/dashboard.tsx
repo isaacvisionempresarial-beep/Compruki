@@ -108,10 +108,10 @@ export function Dashboard({
   );
 
   const storeCards = [
-    { label: "Registrados", ...storeSummary.registered, hint: "Sin cancelados ni devueltos" },
-    { label: "Confirmados", ...storeSummary.confirmed, hint: "Ya confirmados" },
-    { label: "Entregados", ...storeSummary.delivered, hint: "Estado entregado" },
-    { label: "Cobrados", ...storeSummary.collected, hint: "Dinero que ya entró" },
+    { label: "Registrados", ...storeSummary.registered, hint: "Total guardado. Sin cancelados ni devueltos" },
+    { label: "Confirmados", ...storeSummary.confirmed, hint: "Total guardado. Ya confirmados" },
+    { label: "Entregados", ...storeSummary.delivered, hint: "Total guardado. Estado entregado" },
+    { label: "Cobrados", ...storeSummary.collected, hint: "Total guardado. No es la utilidad" },
   ];
 
   return (
@@ -241,7 +241,7 @@ export function Dashboard({
             <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Margen estimado</dt>
             <dd className="mt-1 text-base font-extrabold tabular-nums">{formatCop(storeSummary.estimatedMargin.amount)}</dd>
             <dd className="mt-1 text-xs leading-5 text-muted">
-              Confirmados · estimado
+              Margen de confirmados. No es el total guardado.
               <OrderListPhrase numbers={storeSummary.estimatedMargin.numbers} lead=":" />
             </dd>
             {storeSummary.estimatedMargin.missingNumbers.length > 0 ? (
@@ -255,7 +255,7 @@ export function Dashboard({
             <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Utilidad realizada</dt>
             <dd className="mt-1 text-base font-extrabold tabular-nums">{formatCop(storeSummary.realized.amount)}</dd>
             <dd className="mt-1 text-xs leading-5 text-muted">
-              Ya cobrado
+              Utilidad de lo cobrado. No es el total guardado.
               <OrderListPhrase numbers={storeSummary.realized.numbers} lead=":" />
             </dd>
             {storeSummary.realized.missingNumbers.length > 0 || storeSummary.returnFreight > 0 || storeSummary.collectionCost > 0 ? (
