@@ -148,7 +148,7 @@ export function ProfitabilityScreen({
                       <ResultFigure
                         label="Estimado"
                         value={figureValue(row.confirmedUnits, row.estimatedMissingUnits, row.estimatedMargin)}
-                        detail={`Margen estimado · ${confirmedLabel(row.confirmedUnits)} · ${formatCop(row.confirmedAmount)}`}
+                        detail={`${confirmedLabel(row.confirmedUnits)}. Total guardado ${formatCop(row.confirmedAmount)}.`}
                       />
                       <ResultFigure
                         label="Ya cobrado"
@@ -186,7 +186,7 @@ export function ProfitabilityScreen({
             <li>
               <span className="font-semibold text-sm">Estimado vs cobrado</span>
               <span className="mt-0.5 block text-muted">
-                Estimado = margen confirmados. Cobrado = utilidad entregada cobrada.
+                Estimado = margen confirmados. Cobrado = utilidad entregada cobrada. No es el total guardado del pedido.
               </span>
             </li>
             <li>

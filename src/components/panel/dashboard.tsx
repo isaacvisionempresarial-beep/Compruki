@@ -337,7 +337,7 @@ export function Dashboard({
                     value={productFigure(row.confirmedUnits, row.estimatedMissingUnits, row.estimatedMargin)}
                     detail={
                       row.confirmedUnits > 0
-                        ? `${row.confirmedUnits === 1 ? "1 unidad confirmada" : `${row.confirmedUnits} unidades confirmadas`} · ${formatCop(row.confirmedAmount)}`
+                        ? `${row.confirmedUnits === 1 ? "1 unidad confirmada" : `${row.confirmedUnits} unidades confirmadas`}. Total guardado ${formatCop(row.confirmedAmount)}.`
                         : "Sin unidades confirmadas en este período."
                     }
                   />
