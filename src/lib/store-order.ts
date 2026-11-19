@@ -1278,7 +1278,7 @@ export function customerStatusNote(status: OrderStatus, reason = "", byCustomer 
   const detail = spoken ? ( /[.!?]$/.test(spoken) ? spoken : `${spoken}.`) : "";
   switch (status) {
     case "pendiente_confirmacion":
-      return "Quedó pendiente de confirmación. La tienda revisará la dirección antes de despachar. No hay guía ni fecha de entrega: Dropi no está conectado. Si ya no lo quieres, cancélalo al consultar el pedido.";
+      return "Quedó pendiente de confirmación. La tienda revisará la dirección antes de despachar. No hay guía ni fecha de entrega: Dropi no está conectado. El total guardado no cambió. Pagas al recibir. Si ya no lo quieres, cancélalo al consultar el pedido.";
     case "confirmado":
       return "La tienda confirmó el pedido. Dropi no está conectado. Todavía no hay guía ni fecha de entrega. El despacho se anota a mano. El total guardado no cambió. Pagas al recibir.";
     case "en_preparacion":

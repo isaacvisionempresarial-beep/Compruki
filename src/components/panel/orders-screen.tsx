@@ -1835,7 +1835,7 @@ function CustomerNote({ order }: { order: StoreOrder }) {
           className="mt-1 min-h-24 w-full rounded-[10px] border border-line bg-card px-3 py-2 text-sm leading-5 font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
         />
         <span className="mt-1 block font-normal leading-5 text-muted">
-          Sale del estado del pedido. Lo envías tú. No hay una línea de WhatsApp conectada y no se manda solo.
+          Sale del estado del pedido. Lo envías tú. Copiarlo o abrir WhatsApp no lo envía, no cobra y el total guardado no cambia.
         </span>
       </label>
       <div className="flex flex-wrap gap-2">
@@ -1860,7 +1860,7 @@ function CustomerNote({ order }: { order: StoreOrder }) {
       </div>
       {copied === "ok" ? (
         <p role="status" className="text-sm text-accent-strong">
-          Listo para pegarlo. Desde aquí no se envía.
+          Listo para pegarlo. Desde aquí no se envía ni cambia el total guardado.
         </p>
       ) : null}
       {copied === "fail" ? (
