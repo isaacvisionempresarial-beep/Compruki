@@ -570,7 +570,7 @@ function CustomerBuyerNote({ orderId, token, note }: { orderId: string; token: s
       <p className="mt-1 text-xs leading-5 text-muted">Opcional. Hasta 160 caracteres. Vacío: se quita. El total guardado no cambia.</p>
       {canSave ? (
         <p className="mt-2 text-sm leading-5 text-ink">
-          {next ? "Si guardas, la tienda ve este aviso." : "Si guardas, se quita el aviso."}
+          {next ? "Si guardas, la tienda ve este aviso. El total guardado no cambia." : "Si guardas, se quita el aviso. El total guardado no cambia."}
           {next ? <span className="mt-1 block font-normal text-muted">{next}</span> : null}
         </p>
       ) : null}
@@ -620,7 +620,7 @@ function CustomerCancel({ order, token }: { order: CustomerOrder; token: string 
       </p>
       {preview ? (
         <p className="mt-2 text-sm leading-5 text-ink">
-          Si cancelas, en tu pedido queda así.
+          Si cancelas, ya no se cobra y el total guardado no cambia. En tu pedido queda así.
           <span className="mt-1 block font-normal text-muted">{preview}</span>
         </p>
       ) : null}

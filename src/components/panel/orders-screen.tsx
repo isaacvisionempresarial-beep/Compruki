@@ -788,7 +788,7 @@ function ReasonAction({
         next={spoken}
         canSave={canApply}
         status={nextStatus ?? undefined}
-        lead="Si aplicas, el mensaje para el cliente queda así."
+        lead="Si aplicas, el mensaje para el cliente queda así. El total guardado no cambia."
       />
       {error ? (
         <p role="alert" className="text-sm font-semibold text-danger">
@@ -1618,7 +1618,7 @@ function MotivoMessagePreview({
   next,
   canSave,
   status,
-  lead = "Si guardas, el mensaje para el cliente queda así.",
+  lead = "Si guardas, el mensaje para el cliente queda así. El total guardado no cambia.",
 }: {
   order: StoreOrder;
   next: string;
@@ -1774,8 +1774,8 @@ function InternalNoteForm({ order }: { order: StoreOrder }) {
       {canSave ? (
         <p className="text-sm leading-5 text-ink">
           {nextNote
-            ? "Si guardas, solo tú ves esta nota. No sale en el mensaje al cliente ni en el texto para Dropi."
-            : "Si guardas, se quita la nota. Dejas de verla aquí."}
+            ? "Si guardas, solo tú ves esta nota. No sale en el mensaje al cliente ni en el texto para Dropi. El total guardado no cambia."
+            : "Si guardas, se quita la nota. Dejas de verla aquí. El total guardado no cambia."}
           {nextNote ? <span className="mt-1 block font-normal whitespace-pre-wrap text-muted">{nextNote}</span> : null}
         </p>
       ) : null}
