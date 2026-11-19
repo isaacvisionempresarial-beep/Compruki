@@ -198,12 +198,12 @@ export function storedUtilityCaveat(order: {
 export function collectionMarkSummary(order: Pick<StoreOrder, "lines">, collected: boolean) {
   if (collected) {
     return needsCatalogCost(order)
-      ? "Marcó el recaudo contra entrega. Sin el costo del producto no entra en la utilidad realizada. El total del pedido no cambió."
-      : "Marcó el recaudo contra entrega. Entra en la utilidad realizada. El total del pedido no cambió.";
+      ? "Marcó el recaudo contra entrega. Sin el costo del producto no entra en la utilidad realizada. El total guardado no cambió."
+      : "Marcó el recaudo contra entrega. Entra en la utilidad realizada. El total guardado no cambió.";
   }
   return needsCatalogCost(order)
-    ? "Quitó el recaudo contra entrega. El pedido sigue fuera de la utilidad realizada. El total del pedido no cambió."
-    : "Quitó el recaudo. Deja de contar como utilidad realizada. El total del pedido no cambió.";
+    ? "Quitó el recaudo contra entrega. El pedido sigue fuera de la utilidad realizada. El total guardado no cambió."
+    : "Quitó el recaudo. Deja de contar como utilidad realizada. El total guardado no cambió.";
 }
 
 export function collectionAmountSummary(order: Pick<StoreOrder, "lines">, amount: number | null) {
@@ -766,28 +766,28 @@ const ACTIONS: ActionSpec[] = [
     id: "confirmar",
     label: "Confirmar pedido",
     tone: "primary",
-    summary: "Confirmó el pedido. El total no cambió. Dropi no está conectado: no se envió.",
+    summary: "Confirmó el pedido. El total guardado no cambió. Dropi no está conectado: no se envió.",
     status: "confirmado",
   },
   {
     id: "preparar",
     label: "Pasar a preparación",
     tone: "primary",
-    summary: "Pasó el pedido a preparación. El total no cambió.",
+    summary: "Pasó el pedido a preparación. El total guardado no cambió.",
     status: "en_preparacion",
   },
   {
     id: "despachar",
     label: "Anotar despacho",
     tone: "primary",
-    summary: "Anotó el despacho a mano. El total no cambió. Dropi no está conectado: sin guía.",
+    summary: "Anotó el despacho a mano. El total guardado no cambió. Dropi no está conectado: sin guía.",
     status: "en_transporte",
   },
   {
     id: "entregar",
     label: "Marcar entregado",
     tone: "primary",
-    summary: "Marcó el pedido como entregado. El total no cambió. El recaudo sigue pendiente.",
+    summary: "Marcó el pedido como entregado. El total guardado no cambió. El recaudo sigue pendiente. No es utilidad realizada.",
     status: "entregado",
   },
   {
@@ -824,7 +824,7 @@ const ACTIONS: ActionSpec[] = [
     id: "resolver",
     label: "Resolver incidencia",
     tone: "primary",
-    summary: "Resolvió la incidencia y lo dejó confirmado. El total no cambió.",
+    summary: "Resolvió la incidencia y lo dejó confirmado. El total guardado no cambió.",
     status: "confirmado",
   },
   {

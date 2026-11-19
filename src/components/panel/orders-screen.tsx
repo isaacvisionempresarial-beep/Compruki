@@ -583,7 +583,12 @@ export function OrderEditor({
               ),
             )}
           </div>
-          <p className="mt-2 text-xs leading-5 text-muted">Estas acciones no cambian el total del pedido.</p>
+          <p className="mt-2 text-xs leading-5 text-muted">
+            Estas acciones no cambian el total guardado ni el precio de las líneas.
+            {actions.some((item) => item.id === "entregar")
+              ? " Marcar entregado no anota el cobro ni la utilidad realizada."
+              : ""}
+          </p>
           {!canManageOrderMoney && actions.some((item) => moneyStatusAction(item.id)) ? (
             <p className="mt-2 text-sm leading-5 text-muted">Solo el propietario marca o quita el cobro.</p>
           ) : null}
