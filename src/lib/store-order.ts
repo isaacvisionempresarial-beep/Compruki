@@ -433,13 +433,13 @@ export function dropiHandoffText(
     `Ciudad: ${order.city}`,
     `Dirección: ${order.address}`,
     order.reference.trim() ? `Referencia: ${order.reference.trim()}` : "",
-    "Pago: contra entrega, el valor de los productos",
+    "Pago: contra entrega. Nadie cobra al copiar este texto.",
     "Productos:",
     ...products,
-    `Total de productos: ${formatCop(order.total)}`,
+    `Total guardado: ${formatCop(order.total)}`,
     "El envío no está incluido y se confirma aparte.",
     order.providerRef ? `Número ya anotado en Dropi: ${order.providerRef}` : "",
-    "Este texto no crea el pedido en Dropi.",
+    "Este texto no crea el pedido en Dropi ni cambia el total guardado.",
   ]
     .filter(Boolean)
     .join("\n");

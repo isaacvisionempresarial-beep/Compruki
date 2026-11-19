@@ -337,6 +337,7 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
         </div>
       </div>
       <p className="text-sm font-semibold">Pago contra entrega</p>
+      <p className="text-xs leading-5 text-muted">Guardar la entrega no cobra. El total guardado no cambia. Pagas al recibir.</p>
       {previewText ? (
         <details>
           <summary className="cursor-pointer text-sm font-semibold text-muted">Vista previa al guardar</summary>
@@ -455,10 +456,10 @@ function CustomerSizeForm({
         .join(". ")
     : "";
   const hint = onlySize
-    ? "Mientras sigue pendiente, puedes cambiar el tamaño. El precio no cambia. Sin una elección o sin un cambio el botón queda bloqueado."
+    ? "Mientras sigue pendiente, puedes cambiar el tamaño. El precio guardado no cambia. Sin una elección o sin un cambio el botón queda bloqueado."
     : onlyFit
-      ? "Mientras sigue pendiente, puedes cambiar la talla. El precio no cambia. Sin una elección o sin un cambio el botón queda bloqueado."
-      : "Mientras sigue pendiente, puedes cambiar la talla o el tamaño. El precio no cambia. Sin una elección o sin un cambio el botón queda bloqueado.";
+      ? "Mientras sigue pendiente, puedes cambiar la talla. El precio guardado no cambia. Sin una elección o sin un cambio el botón queda bloqueado."
+      : "Mientras sigue pendiente, puedes cambiar la talla o el tamaño. El precio guardado no cambia. Sin una elección o sin un cambio el botón queda bloqueado.";
 
   return (
     <form action={action} className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
