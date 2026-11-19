@@ -80,7 +80,7 @@ export function CatalogScreen({
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Catálogo interno</p>
           <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Catálogo</h1>
           <p className="mt-0.5 text-sm text-muted">
-            Margen de la ficha · no es dinero cobrado. Dropi no está conectado.
+            Precio y margen de la ficha. No son el total de un pedido ni dinero cobrado. Desactivar no cambia el precio ni la publicación. Dropi no está conectado.
           </p>
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
@@ -282,14 +282,14 @@ function CatalogProductRow({
 
           <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs tabular-nums">
             <span>
-              <span className="text-muted">Precio </span>
+              <span className="text-muted">Precio de la ficha </span>
               <span className="font-semibold">{formatCop(product.price)}</span>
             </span>
             <span className="text-muted">
               Costo <span className="tabular-nums">{formatCop(product.cost)}</span>
             </span>
             <span>
-              <span className="text-muted">Margen </span>
+              <span className="text-muted">Margen estimado </span>
               <span className={cx("font-bold", margin < 0 ? "text-warning" : "text-accent-strong")}>
                 {formatCop(margin)}
               </span>
@@ -318,13 +318,16 @@ function CatalogRowLifecycle({
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   if (!canManageCommerce) {
-    if (!product.available) return <span className="text-xs font-semibold text-muted">Inactivo</span>;
+    if (!product.available) {
+      return <span className="text-xs font-semibold text-muted">{deactivateState.message ?? "Inactivo"}</span>;
+    }
     return (
       <form action={deactivateAction}>
         <input type="hidden" name="id" value={product.id} />
         <button
           type="submit"
           disabled={deactivatePending}
+          title="No se puede pedir. No cambia el precio ni la publicación."
           className={`inline-flex h-8 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas ${
             deactivatePending ? "cursor-wait opacity-70" : ""
           }`}
@@ -373,7 +376,7 @@ function CatalogRowLifecycle({
   }
 
   if (!product.available) {
-    return <span className="text-xs font-semibold text-muted">Inactivo</span>;
+    return <span className="text-xs font-semibold text-muted">{deactivateState.message ?? "Inactivo"}</span>;
   }
 
   return (
@@ -382,7 +385,7 @@ function CatalogRowLifecycle({
       <button
         type="submit"
         disabled={deactivatePending}
-        title="Hay pedidos con este producto; no se puede eliminar"
+        title="Hay pedidos con este producto; no se puede eliminar. Desactivar no cambia el precio ni la publicación."
         className={`inline-flex h-8 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas ${
           deactivatePending ? "cursor-wait opacity-70" : ""
         }`}
