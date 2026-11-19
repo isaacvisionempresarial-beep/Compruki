@@ -268,8 +268,12 @@ export function AgentsScreen({
 
         <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
           <h3 className="text-sm font-semibold">Pedidos acumulados</h3>
+          <p className="mt-1 text-xs leading-5 text-muted">
+            El total de líneas suma lo guardado en cada línea, de todos los pedidos. No es dinero cobrado. El margen
+            estimado no es utilidad realizada.
+          </p>
           <dl className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <MoneyStat label="Ingresos líneas" value={analyst.orders.revenue} />
+            <MoneyStat label="Total de líneas" value={analyst.orders.revenue} />
             <MoneyStat label="Margen estimado" value={analyst.orders.estimatedMargin} />
             <Stat label="Pedidos" value={analyst.orders.orderCount} />
             <Stat label="Líneas sin costo" value={analyst.orders.missingCostLines} />
@@ -282,8 +286,9 @@ export function AgentsScreen({
         </div>
 
         <p className="mt-3 text-xs leading-5 text-muted">
-          −10 % y +10 % leen el precio actual. Calcular no lo guarda
-          {canApproveCatalog ? "." : ". El precio lo guarda el propietario."}
+          −10 % y +10 % leen el precio de la ficha. Calcular no lo guarda
+          {canApproveCatalog ? "." : ". El precio lo guarda el propietario."} El precio y el margen de la tabla son de
+          la ficha. No son un pedido ni dinero cobrado.
         </p>
         <div className="mt-2 overflow-x-auto rounded-[14px] border border-line bg-card">
           <table className="min-w-full text-left text-sm">
@@ -291,8 +296,8 @@ export function AgentsScreen({
             <thead className="border-b border-line text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
               <tr>
                 <th className="px-3 py-2">Producto</th>
-                <th className="px-3 py-2">Precio</th>
-                <th className="px-3 py-2">Margen</th>
+                <th className="px-3 py-2">Precio ficha</th>
+                <th className="px-3 py-2">Margen est.</th>
                 <th className="px-3 py-2">−10 %</th>
                 <th className="px-3 py-2">+10 %</th>
               </tr>

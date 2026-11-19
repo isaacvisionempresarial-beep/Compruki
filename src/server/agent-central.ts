@@ -212,7 +212,7 @@ export async function routeTask(rawIntent: string): Promise<CentralRouteResult> 
       const row = margins[0];
       const scenario = scenarios[0];
       if (row) {
-        marginNote = `${row.sku}: margen estimado ${formatCop(row.margin)} sobre ${formatCop(row.price)}.`;
+        marginNote = `${row.sku}: margen estimado ${formatCop(row.margin)} sobre el precio de la ficha ${formatCop(row.price)}. No es dinero cobrado.`;
         summary.push(`Analista: ${marginNote}`);
         if (scenario) {
           const down = scenario.scenarios[0];
