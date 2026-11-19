@@ -1448,7 +1448,7 @@ function ClosedDepartmentForm({ order }: { order: StoreOrder }) {
         />
         <span className="mt-1 block font-normal leading-5 text-muted">
           No es la ciudad. Vacío no se guarda: el botón queda bloqueado. Sale en el texto para Dropi. No cambia el estado
-          ni el cobro.
+          ni el cobro. El total guardado no cambia.
         </span>
       </label>
       {previewText ? (
@@ -1570,6 +1570,7 @@ function DeliveryForm({ order }: { order: StoreOrder }) {
         <input id={`entrega-referencia-${order.id}`} name="reference" autoComplete="off" value={reference} onChange={(event) => setReference(event.target.value)} className={freightInput} />
         <span className="mt-1 block font-normal leading-5 text-muted">
           Opcional. Vacío: se quita. El cliente ve estos datos en su confirmación. Guardar aquí no cambia nada en Dropi.
+          El total guardado no cambia.
           {order.providerRef ? " Si ya lo creaste allá, corrige también esa orden." : ""} Sin un cambio válido el botón
           queda bloqueado.
         </span>
@@ -1651,7 +1652,7 @@ function ReturnReasonForm({ order }: { order: StoreOrder }) {
         />
         <span className="mt-1 block font-normal leading-5 text-muted">
           Lo ve en su pedido y en el mensaje. Vacío o sin un cambio: el botón queda bloqueado. No cambia el estado ni
-          sale en el texto para Dropi.
+          sale en el texto para Dropi. El total guardado no cambia.
         </span>
       </label>
       <MotivoMessagePreview order={order} next={next} canSave={canSave} />
@@ -1703,7 +1704,7 @@ function IncidenceReasonForm({ order }: { order: StoreOrder }) {
         />
         <span className="mt-1 block font-normal leading-5 text-muted">
           Lo ve en su pedido y en el mensaje. Vacío o sin un cambio: el botón queda bloqueado. Sin este motivo no se
-          resuelve. Anotarlo no la resuelve ni sale en el texto para Dropi.
+          resuelve. Anotarlo no la resuelve ni sale en el texto para Dropi. El total guardado no cambia.
         </span>
       </label>
       <MotivoMessagePreview order={order} next={next} canSave={canSave} />
@@ -1753,7 +1754,7 @@ function InternalNoteForm({ order }: { order: StoreOrder }) {
         />
         <span className="mt-1 block font-normal leading-5 text-muted">
           Solo la ves tú, hasta 280 caracteres. No sale en el mensaje al cliente ni en el texto para Dropi. Vacío: se
-          quita. Sin un cambio el botón queda bloqueado.
+          quita. Sin un cambio el botón queda bloqueado. El total guardado no cambia.
         </span>
       </label>
       {canSave ? (
@@ -1868,11 +1869,13 @@ function CustomerNotice({ order }: { order: StoreOrder }) {
       {marked ? (
         <p className="text-sm leading-5 text-ink">
           Avisaste al cliente el {formatDay(order.customerNotifiedAt?.slice(0, 10) ?? "")}. Desde aquí no se envió. Si
-          quitas la marca, vuelve a la lista de los que faltan por avisar. No envía el mensaje ni abre WhatsApp.
+          quitas la marca, vuelve a la lista de los que faltan por avisar. No envía el mensaje ni abre WhatsApp. El
+          total guardado no cambia.
         </p>
       ) : (
         <p className="text-sm leading-5 text-ink">
           Si marcas, queda anotado que avisaste. El estado del pedido no cambia. No envía el mensaje ni abre WhatsApp.
+          El total guardado no cambia.
         </p>
       )}
       {noticeState.orderId === order.id && noticeState.error ? (

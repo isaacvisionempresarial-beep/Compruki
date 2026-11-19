@@ -328,7 +328,7 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
           <Field
             label="Barrio o referencia"
             htmlFor="reference"
-            hint="Opcional. Vacío: se quita. Sin un cambio válido el botón queda bloqueado."
+            hint="Opcional. Vacío: se quita. Sin un cambio válido el botón queda bloqueado. El total guardado no cambia."
           >
             <input id="reference" name="reference" autoComplete="off" value={reference} onChange={(event) => setReference(event.target.value)} className={fieldClass} />
           </Field>
@@ -564,7 +564,7 @@ function CustomerBuyerNote({ orderId, token, note }: { orderId: string; token: s
           className="mt-1 min-h-20 w-full rounded-[10px] border border-line bg-card px-3 py-2 text-sm font-normal leading-5 focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
         />
       </label>
-      <p className="mt-1 text-xs leading-5 text-muted">Opcional. Hasta 160 caracteres. Vacío: se quita.</p>
+      <p className="mt-1 text-xs leading-5 text-muted">Opcional. Hasta 160 caracteres. Vacío: se quita. El total guardado no cambia.</p>
       {canSave ? (
         <p className="mt-2 text-sm leading-5 text-ink">
           {next ? "Si guardas, la tienda ve este aviso." : "Si guardas, se quita el aviso."}

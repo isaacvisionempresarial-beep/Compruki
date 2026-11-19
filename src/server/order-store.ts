@@ -206,6 +206,10 @@ function saleStopSummary(action: OrderAction, summary: string, wasCollected: boo
   return note;
 }
 
+function keptTotalNote(summary: string) {
+  return `${summary} El total guardado no cambió.`;
+}
+
 export async function cancelOrderByCustomer(id: string, token: string, rawReason: string) {
   const orders = await readOrders();
   const current = orders.find((order) => order.id === id);
@@ -276,7 +280,7 @@ export async function correctDeliveryByCustomer(id: string, token: string, input
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName: current.customerName,
-        summary: "Corrigió sus datos de entrega. Dropi no está conectado: no se entera desde aquí.",
+        summary: keptTotalNote("Corrigió sus datos de entrega. Dropi no está conectado: no se entera desde aquí."),
       },
       ...current.history,
     ],
@@ -374,11 +378,13 @@ export async function saveBuyerNoteByCustomer(id: string, token: string, raw: st
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName: current.customerName,
-        summary: checked.value
-          ? previous
-            ? "Actualizó el aviso para la tienda."
-            : "Dejó un aviso para la tienda."
-          : "Quitó el aviso para la tienda.",
+        summary: keptTotalNote(
+          checked.value
+            ? previous
+              ? "Actualizó el aviso para la tienda."
+              : "Dejó un aviso para la tienda."
+            : "Quitó el aviso para la tienda.",
+        ),
       },
       ...current.history,
     ],
@@ -411,7 +417,7 @@ export async function saveIncidenceReason(id: string, rawReason: string, actorNa
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName,
-        summary: "Anotó el motivo de la incidencia. El cliente lo ve en el pedido. Dropi no está conectado: no se entera desde aquí.",
+        summary: keptTotalNote("Anotó el motivo de la incidencia. El cliente lo ve en el pedido. Dropi no está conectado: no se entera desde aquí."),
       },
       ...current.history,
     ],
@@ -443,7 +449,7 @@ export async function saveReturnReason(id: string, rawReason: string, actorName:
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName,
-        summary: "Anotó el motivo de la devolución. El cliente lo ve en el pedido. Dropi no está conectado: no se entera desde aquí.",
+        summary: keptTotalNote("Anotó el motivo de la devolución. El cliente lo ve en el pedido. Dropi no está conectado: no se entera desde aquí."),
       },
       ...current.history,
     ],
@@ -596,7 +602,7 @@ export async function saveProviderRef(id: string, raw: string | null, actorName:
           id: `evt_${randomUUID().slice(0, 8)}`,
           at: bogotaNow(),
           actorName,
-          summary: "Quitó el número de Dropi anotado a mano.",
+          summary: keptTotalNote("Quitó el número de Dropi anotado a mano."),
         },
         ...current.history,
       ],
@@ -617,7 +623,7 @@ export async function saveProviderRef(id: string, raw: string | null, actorName:
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName,
-        summary: `Anotó el número de Dropi cargado a mano: ${checked.value}. Desde aquí no se envió el pedido.`,
+        summary: keptTotalNote(`Anotó el número de Dropi cargado a mano: ${checked.value}. Desde aquí no se envió el pedido.`),
       },
       ...current.history,
     ],
@@ -646,7 +652,7 @@ export async function saveClosedDepartment(id: string, raw: string, actorName: s
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName,
-        summary: "Anotó el departamento. El texto para Dropi lo lleva. El estado no cambia y Dropi no está conectado: no se entera desde aquí.",
+        summary: keptTotalNote("Anotó el departamento. El texto para Dropi lo lleva. El estado no cambia y Dropi no está conectado: no se entera desde aquí."),
       },
       ...current.history,
     ],
@@ -689,7 +695,7 @@ export async function saveDelivery(id: string, input: DeliveryDraft, actorName: 
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName,
-        summary: "Actualizó los datos de entrega. Dropi no está conectado: no se entera desde aquí.",
+        summary: keptTotalNote("Actualizó los datos de entrega. Dropi no está conectado: no se entera desde aquí."),
       },
       ...current.history,
     ],
@@ -863,7 +869,7 @@ export async function saveInternalNote(id: string, raw: string, actorName: strin
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName,
-        summary: nextNote ? (previous ? "Actualizó la nota interna." : "Anotó una nota interna.") : "Quitó la nota interna.",
+        summary: keptTotalNote(nextNote ? (previous ? "Actualizó la nota interna." : "Anotó una nota interna.") : "Quitó la nota interna."),
       },
       ...current.history,
     ],
@@ -888,7 +894,7 @@ export async function markCustomerNotice(id: string, intent: "avisar" | "quitar"
           id: `evt_${randomUUID().slice(0, 8)}`,
           at: bogotaNow(),
           actorName,
-          summary: "Quitó la marca de aviso al cliente.",
+          summary: keptTotalNote("Quitó la marca de aviso al cliente."),
         },
         ...current.history,
       ],
@@ -906,7 +912,7 @@ export async function markCustomerNotice(id: string, intent: "avisar" | "quitar"
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName,
-        summary: "Marcó que avisó al cliente. Desde aquí no se envió el mensaje.",
+        summary: keptTotalNote("Marcó que avisó al cliente. Desde aquí no se envió el mensaje."),
       },
       ...current.history,
     ],

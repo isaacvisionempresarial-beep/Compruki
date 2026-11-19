@@ -140,7 +140,7 @@ function DropiRefForm({ order }: { order: StoreOrder }) {
           className={fieldClass}
         />
         <span className="mt-1 block font-normal leading-5 text-muted">
-          {dropiNumberHint(order)}
+          {dropiNumberHint(order)} El total guardado no cambia.
           {canSave ? "" : " Vacío o sin un cambio: el botón queda bloqueado."}
         </span>
       </label>
