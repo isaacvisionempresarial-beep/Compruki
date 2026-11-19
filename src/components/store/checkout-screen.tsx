@@ -111,7 +111,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
             </h2>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <Field label="Nombre de quien recibe" htmlFor="customerName">
+                <Field label="Nombre de quien recibe" htmlFor="customerName" hint="No es un pago. Al confirmar, el pedido queda pendiente.">
                   <input
                     id="customerName"
                     name="customerName"
@@ -257,7 +257,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
               </details>
             ) : (
               <p className="mt-3 text-xs leading-5 text-muted">
-                Completa los datos y acepta las condiciones. Sin eso el botón queda bloqueado.
+                Completa los datos y acepta las condiciones. Sin eso el botón queda bloqueado. Nadie cobra aquí.
               </p>
             )}
 
@@ -268,7 +268,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                 pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
               }`}
             >
-              {pending ? "Registrando…" : `Confirmar pedido · ${formatCop(total)}`}
+              {pending ? "Registrando…" : `Confirmar · pagas ${formatCop(total)} al recibir`}
             </button>
           </section>
         </div>
