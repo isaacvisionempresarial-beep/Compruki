@@ -435,13 +435,18 @@ export function OrderEditor({
             )}
           </>
         ) : (
-          <ul className="mt-3 space-y-1 text-sm">
-            {order.lines.map((line) => (
-              <li key={`${line.sku}:${line.variant ?? ""}`}>
-                {line.quantity} × {lineName(line)} · {formatCop(line.unitPrice * line.quantity)}
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul className="mt-3 space-y-1 text-sm">
+              {order.lines.map((line) => (
+                <li key={`${line.sku}:${line.variant ?? ""}`}>
+                  {line.quantity} × {lineName(line)} · precio guardado {formatCop(line.unitPrice * line.quantity)}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 text-xs leading-5 text-muted">
+              Es el precio guardado en este pedido. Cambiar la ficha después no lo reescribe. No es dinero cobrado.
+            </p>
+          </>
         )}
         <p className="mt-2 text-sm font-extrabold tabular-nums">
           {payableTotalLabel(order.status)} {formatCop(order.total)}
@@ -1177,7 +1182,7 @@ function AddProductForm({ order, products }: { order: StoreOrder; products: Orde
           <option value="">Elige un producto</option>
           {products.map((product) => (
             <option key={product.sku} value={product.sku}>
-              {product.title} · {formatCop(product.price)}
+              {product.title} · precio de la ficha {formatCop(product.price)}
             </option>
           ))}
         </select>
@@ -1329,7 +1334,7 @@ function LinesForm({
             <li key={`${line.sku}:${line.sourceVariant}:${index}`} className="grid gap-2">
               <p className="text-sm">
                 {lineName(line)}
-                <span className="mt-1 block text-muted">{formatCop(line.unitPrice)} cada uno</span>
+                <span className="mt-1 block text-muted">Precio guardado {formatCop(line.unitPrice)} cada uno</span>
               </p>
               {sized && product?.sizeKind ? (
                 <label className="text-sm font-semibold" htmlFor={`talla-${order.id}-${index}`}>
@@ -1393,7 +1398,8 @@ function LinesForm({
         })}
       </ul>
       <p className="text-sm leading-5 text-muted">
-        De 1 a 5 por producto. El precio no cambia. Si tiene tallas o tamaños, eliges uno antes de guardar. Sin eso el
+        De 1 a 5 por producto. Ese precio es el guardado en el pedido: la talla, el tamaño y un cambio posterior de la
+        ficha no lo reescriben. No es dinero cobrado. Si tiene tallas o tamaños, eliges uno antes de guardar. Sin eso el
         botón queda bloqueado y el pedido no se confirma. Sin un cambio el botón queda bloqueado. Para anular el pedido
         completo, usa Cancelar. Guardar aquí no cambia nada en Dropi.
         {canManageOrderMoney ? "" : " La cantidad y quitar un producto los guarda el propietario. La talla o el tamaño sí."}
