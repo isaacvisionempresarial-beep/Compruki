@@ -304,7 +304,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
           </p>
           <p className="mt-2 text-xs leading-5 text-muted">Pagas al recibir. Envío aparte. Nadie cobra aquí.</p>
           <p className="mt-1.5 text-xs leading-5 text-muted">
-            Confirmar registra en la tienda. Dropi no está conectado: no crea el pedido ahí.
+            Confirmar registra en la tienda y no cobra. Dropi no está conectado: no crea el pedido ahí.
           </p>
           <p className="mt-2 text-sm leading-5 text-muted">
             <Link href="/tienda/carrito" className="font-semibold text-accent-strong">

@@ -352,7 +352,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                   ? product.sizeKind === "tamano"
                     ? "Elige el tamaño"
                     : "Elige la talla"
-                  : "Pedir y pagar al recibir"}
+                  : "Pedir · pagas al recibir"}
               </button>
               <button
                 type="submit"
@@ -363,7 +363,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               </button>
               {added ? (
                 <p className="text-sm text-accent-strong" role="status">
-                  Quedó en el carrito.
+                  Quedó en el carrito. No registra pedido ni es dinero cobrado.
                 </p>
               ) : null}
             </form>
