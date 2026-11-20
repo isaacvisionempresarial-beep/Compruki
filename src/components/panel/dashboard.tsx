@@ -124,8 +124,8 @@ export function Dashboard({
           </h1>
           <p className="mt-1 text-sm text-muted">
             {canManageOrderMoney
-              ? "Cifras y pendientes de los pedidos de la tienda. Dropi no está conectado."
-              : "Cifras de la tienda. El flete, el costo, el cobro y los precios los guarda el propietario. Dropi no está conectado."}
+              ? "Cifras y pendientes de los pedidos de la tienda. Verlas no cobra ni cambia pedidos. Dropi no está conectado."
+              : "Cifras de la tienda. El flete, el costo, el cobro y los precios los guarda el propietario. Verlas no cobra ni cambia pedidos. Dropi no está conectado."}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">

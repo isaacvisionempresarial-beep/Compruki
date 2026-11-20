@@ -15,7 +15,7 @@ export function PeriodControl({
 }) {
   return (
     <fieldset className="w-full sm:w-auto">
-      <legend className="sr-only">{legend}</legend>
+      <legend className="sr-only">{legend}. Cambiar el período no cobra ni cambia pedidos.</legend>
       <div className="elevate-1 grid grid-cols-3 rounded-[10px] border border-line bg-card p-1">
         {PERIODS.map((item) => (
           <label key={item.id} className="cursor-pointer">

@@ -75,7 +75,7 @@ export function SyncScreen({ orders }: { orders: StoreOrder[] }) {
             <p className="mt-0.5 text-xs leading-5 text-muted">{group.hint}</p>
             {visible.length === 0 ? (
               <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-                {query && group.rows.length > 0 ? "Ningún pedido de esta lista coincide con la búsqueda." : group.empty}
+                {query && group.rows.length > 0 ? "Ningún pedido de esta lista coincide con la búsqueda. Buscar no cobra ni cambia el total guardado." : group.empty}
               </p>
             ) : (
               <div className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">

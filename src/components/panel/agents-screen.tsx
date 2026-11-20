@@ -58,8 +58,8 @@ export function AgentsScreen({
       <p className="mt-1 text-sm text-muted">
         Sesión: {roleLabel}.{" "}
         {canApproveCatalog
-          ? "Puedes aprobar borradores y cambiar presupuesto."
-          : "Puedes usar las herramientas y rechazar borradores. Aprobar y el presupuesto los guarda el propietario."}
+          ? "Puedes aprobar borradores y cambiar presupuesto. Usar el centro no cobra ni cambia pedidos."
+          : "Puedes usar las herramientas y rechazar borradores. Aprobar y el presupuesto los guarda el propietario. Usar el centro no cobra ni cambia pedidos."}
       </p>
 
       <div className="mt-3 flex flex-wrap gap-2">

@@ -133,6 +133,7 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Buscar pedido, SKU o producto"
+                  title="Buscar no cobra ni cambia pedidos."
                   className="h-10 w-full rounded-[10px] border border-line bg-card pr-3 pl-9 text-sm text-ink placeholder:text-muted focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
                 />
               </label>

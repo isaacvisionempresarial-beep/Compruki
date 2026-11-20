@@ -33,7 +33,7 @@ export function ConnectionsScreen({
               Plataforma COMPRUKI
             </h2>
             <p className="mt-1 text-xs leading-5 text-muted">
-              Estado local del piloto. OpenAI no está conectado. El checkout no depende de Dropi.
+              Estado local del piloto. OpenAI no está conectado. Ver este estado no cobra ni cambia pedidos. El checkout no depende de Dropi.
             </p>
             <ul className="mt-3 grid gap-2 sm:grid-cols-2 text-sm">
               <li className="rounded-[10px] border border-line px-3 py-2">

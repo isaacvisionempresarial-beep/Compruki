@@ -12,7 +12,7 @@ export default function StoreNotFound() {
     <StatusPage
       eyebrow="Tienda"
       title="No encontramos eso"
-      body="El producto o el pedido no está publicado aquí, o el enlace ya no sirve. El carrito de este navegador no cambia. Dropi no está conectado."
+      body="El producto o el pedido no está publicado aquí, o el enlace ya no sirve. El carrito de este navegador no cambia. No cobra. Dropi no está conectado."
       actions={[
         { href: "/tienda", label: "Ver productos", primary: true },
         { href: "/tienda/consultar", label: "Consultar un pedido" },
@@ -21,7 +21,7 @@ export default function StoreNotFound() {
       asideItems={[
         {
           label: "Productos",
-          text: "Solo se muestran los publicados y revisados por la tienda.",
+          text: "Solo se muestran los publicados y revisados por la tienda. El precio publicado no cambia.",
         },
         {
           label: "Pedidos",
