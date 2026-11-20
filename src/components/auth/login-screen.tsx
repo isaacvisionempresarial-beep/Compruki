@@ -90,7 +90,7 @@ function LoginForm({ onRecover, accessDenied }: { onRecover: () => void; accessD
     <>
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Iniciar sesión</h1>
-      <p className="mt-1 text-sm text-muted">Correo de tu comercio. Dropi no está conectado.</p>
+      <p className="mt-1 text-sm text-muted">Correo de tu comercio. Escribirlo no cobra ni cambia pedidos. Dropi no está conectado.</p>
 
       {accessDenied ? (
         <div className="mt-3 space-y-2">

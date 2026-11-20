@@ -592,7 +592,7 @@ export function OrderEditor({
               : ""}
           </p>
           {!canManageOrderMoney && actions.some((item) => moneyStatusAction(item.id)) ? (
-            <p className="mt-2 text-sm leading-5 text-muted">Solo el propietario marca o quita el cobro.</p>
+            <p className="mt-2 text-sm leading-5 text-muted">Solo el propietario marca o quita el cobro. No cobra en esta pantalla.</p>
           ) : null}
           {confirmBlocked || prepareDropiError(order) || resolveBlocked ? (
             <details className="mt-3 rounded-[10px] border border-line bg-canvas px-3 py-2">

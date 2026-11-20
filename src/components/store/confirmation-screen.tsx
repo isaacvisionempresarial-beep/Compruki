@@ -342,6 +342,7 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
       {previewText ? (
         <details>
           <summary className="cursor-pointer text-sm font-semibold text-muted">Vista previa al guardar</summary>
+          <p className="mt-1 text-xs leading-5 text-muted">Abrirla no cobra. El total guardado no cambia.</p>
           <p className="mt-2 text-sm leading-5 whitespace-pre-line text-muted">{previewText}</p>
         </details>
       ) : null}

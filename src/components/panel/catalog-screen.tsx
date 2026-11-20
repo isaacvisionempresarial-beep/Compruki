@@ -274,6 +274,7 @@ function CatalogProductRow({
               ) : null}
               <Link
                 href={`/panel/catalogo/${product.sku}`}
+                title="Abrirla no cobra ni cambia el precio ni la publicación."
                 className="inline-flex h-8 items-center justify-center rounded-[10px] border border-line bg-card px-2.5 text-xs font-semibold hover:bg-canvas"
               >
                 {canManageCommerce ? "Editar" : "Editar textos"}
@@ -297,6 +298,7 @@ function CatalogProductRow({
               </span>
             </span>
           </p>
+          <p className="mt-1 text-xs leading-5 text-muted">El precio y el margen son de la ficha. No son dinero cobrado.</p>
         </div>
       </div>
     </li>
@@ -1408,7 +1410,7 @@ export function ProductDangerZone({
           </form>
           </>
         ) : (
-          <p className="text-sm font-semibold text-muted">Ya está marcado como no disponible.</p>
+          <p className="text-sm font-semibold text-muted">Ya está marcado como no disponible. No cambia el precio ni la publicación. No cobra.</p>
         )}
       </div>
     </section>

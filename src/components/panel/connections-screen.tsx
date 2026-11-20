@@ -152,7 +152,7 @@ export function ConnectionsScreen({
                 {probe.detail}
               </p>
             ) : (
-              <p className="mt-3 text-xs leading-5 text-muted">Todavía no hay un saludo en esta visita.</p>
+              <p className="mt-3 text-xs leading-5 text-muted">Todavía no hay un saludo en esta visita. Probarlo no cobra ni cambia pedidos.</p>
             )}
           </section>
 
@@ -161,7 +161,7 @@ export function ConnectionsScreen({
               Dónde se anota el número
             </h2>
             <p className="mt-1 text-xs leading-5 text-muted">
-              Dropi no está conectado. Los pedidos a crear a mano están en Sincronización; esta pantalla no los envía. El total guardado no cambia.
+              Dropi no está conectado. Los pedidos a crear a mano están en Sincronización; esta pantalla no los envía. No cobra. El total guardado no cambia.
             </p>
             <Link
               href="/panel/sincronizacion"

@@ -155,7 +155,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
   return (
     <article>
       <nav className="flex items-center gap-2 overflow-hidden text-xs text-muted whitespace-nowrap" aria-label="Ruta">
-        <Link href="/tienda" className="font-semibold hover:text-accent-strong">
+        <Link href="/tienda" title="Volver al inicio no registra pedido ni cobra." className="font-semibold hover:text-accent-strong">
           Inicio
         </Link>
         <span aria-hidden="true">/</span>

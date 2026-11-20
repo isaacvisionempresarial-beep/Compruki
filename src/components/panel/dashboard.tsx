@@ -197,7 +197,7 @@ export function Dashboard({
             <h2 id="tienda-titulo" className="mt-0.5 text-base font-bold leading-7">
               Pedidos de la tienda
             </h2>
-            <p className="mt-0.5 text-xs text-muted">Cifras de {periodPhrase(storePeriod)}</p>
+            <p className="mt-0.5 text-xs text-muted">Cifras de {periodPhrase(storePeriod)}. Verlas no cobra ni cambia pedidos.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2 lg:justify-end">
             <PeriodControl
