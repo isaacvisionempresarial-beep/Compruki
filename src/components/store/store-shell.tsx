@@ -58,6 +58,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
             ) : null}
             <Link
               href="/tienda/carrito"
+              title="Abrir el carrito no cobra ni registra un pedido."
               aria-label={ready ? (count === 1 ? "Carrito, 1 producto" : `Carrito, ${count} productos`) : "Carrito"}
               className="inline-flex h-9 items-center gap-2 rounded-[10px] border border-line bg-canvas px-2.5 text-sm font-semibold"
             >
@@ -77,6 +78,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
         <div className={cx("mx-auto grid grid-cols-3", shellWidth)}>
           <Link
             href="/tienda"
+            title="Ir a inicio no cobra ni registra un pedido."
             aria-current={home ? "page" : undefined}
             className={cx(
               "flex h-11 items-center justify-center gap-2 text-sm font-semibold",
@@ -88,6 +90,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
           </Link>
           <Link
             href="/tienda/consultar"
+            title="Consultar no cobra ni cambia el total guardado."
             aria-current={order ? "page" : undefined}
             className={cx(
               "flex h-11 items-center justify-center gap-2 text-sm font-semibold",
@@ -99,6 +102,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
           </Link>
           <Link
             href="/tienda/carrito"
+            title="Abrir el carrito no cobra ni registra un pedido."
             aria-current={cart ? "page" : undefined}
             aria-label={ready ? (count === 1 ? "Carrito, 1 producto" : `Carrito, ${count} productos`) : "Carrito"}
             className={cx(

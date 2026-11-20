@@ -16,7 +16,7 @@ export default function StoreError({ error, retry }: { error: unknown; retry: ()
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda</p>
       <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">No se pudo mostrar esta pantalla</h1>
       <p className="mt-1.5 max-w-2xl text-sm leading-5 text-muted">
-        El carrito de este navegador no cambia por este error. Puedes intentar de nuevo o volver a los productos.
+        El carrito de este navegador no cambia por este error. No cobra. Puedes intentar de nuevo o volver a los productos.
       </p>
       <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
         <div className="elevate-1 order-2 rounded-[14px] border border-line bg-card px-3 py-2 xl:order-1">

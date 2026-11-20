@@ -74,7 +74,7 @@ export default async function SettingsPage() {
           </span>
         </div>
         <p className="mt-1 text-sm text-muted">
-          Misma señal que <span className="font-semibold">GET /api/health</span>. No expone secretos.
+          Misma señal que <span className="font-semibold">GET /api/health</span>. No expone secretos. Verla no cobra ni cambia pedidos.
         </p>
         <ul className="mt-3 space-y-1.5 text-sm">
           {checkLabels.map((item) => (

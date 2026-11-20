@@ -232,7 +232,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
 }
 
 function storeEmptyMessage(total: number, category: string, query: string) {
-  if (total === 0) return "Todavía no hay productos publicados. La tienda solo muestra lo que el comercio ya revisó.";
+  if (total === 0) return "Todavía no hay productos publicados. No cobra. La tienda solo muestra lo que el comercio ya revisó.";
   if (query.trim()) return "Ningún producto publicado coincide con esa búsqueda. Los precios no cambian y no se crea un pedido.";
   if (category !== "todas") return "No hay productos publicados en esta categoría. Los precios no cambian.";
   return "Ningún producto publicado coincide con el filtro. Los precios no cambian.";

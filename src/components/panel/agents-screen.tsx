@@ -114,7 +114,7 @@ export function AgentsScreen({
         </h2>
         <p className="mt-1 text-sm text-muted">
           AG-02 en modo local. Fuente: {explorer.sourceLabel}. Cada búsqueda deja corrida en el historial y no
-          cambia el catálogo. No es Dropi en vivo.
+          cambia el catálogo. Buscar no cobra ni cambia pedidos. No es Dropi en vivo.
           {canApproveCatalog ? "" : " El precio y la publicación los guarda el propietario."}
         </p>
         {!ag02 ? (
@@ -175,7 +175,7 @@ export function AgentsScreen({
 
         {explorer.results.length === 0 ? (
           <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3 text-sm text-muted">
-            No hay coincidencias en el catálogo local.
+            No hay coincidencias en el catálogo local. Buscar no cobra ni cambia el catálogo.
           </p>
         ) : (
           <ul className="mt-3 grid gap-2 md:grid-cols-2">
@@ -367,7 +367,7 @@ export function AgentsScreen({
               Corridas recientes
             </h2>
             <p className="mt-1 text-sm text-muted">
-              Últimas 8 en pantalla. Las corridas nuevas guardan quién las lanzó. El CSV trae hasta 500 del tenant.
+              Últimas 8 en pantalla. Las corridas nuevas guardan quién las lanzó. Verlas o bajar el CSV no cobra ni cambia pedidos. El CSV trae hasta 500 del tenant.
             </p>
           </div>
           <a

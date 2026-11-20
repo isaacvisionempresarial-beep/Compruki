@@ -40,7 +40,7 @@ export function ProductEditorPage({
       {!canManageCommerce ? (
         <p className="mb-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
           Solo el propietario cambia precio, costo, envío, comisiones, publicación, SKU, alta y eliminación.
-          Puedes editar textos, fotos y disponibilidad.
+          Puedes editar textos, fotos y disponibilidad. No es el precio ni la publicación. No cobra.
         </p>
       ) : null}
       {state.message ? (
