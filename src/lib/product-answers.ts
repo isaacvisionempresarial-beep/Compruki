@@ -69,11 +69,11 @@ export function answerProductQuestion(product: AnswerableProduct, raw: string) {
   }
   if (/\b(disponible|agotado|stock)\b/.test(question) || question.includes("se puede pedir")) {
     return product.available
-      ? "Está disponible para pedirlo. El pedido queda pendiente de confirmación."
-      : "Está publicado, pero ahora no se puede pedir.";
+      ? "Está disponible para pedirlo. El pedido queda pendiente de confirmación. Nadie cobra aquí."
+      : "Está publicado, pero ahora no se puede pedir. El precio publicado no cambia.";
   }
   if (/\b(envio|despacho|demora|llega|flete|domicilio)\b/.test(question)) {
-    return "El envío no está incluido y se confirma antes de despachar. No hay una fecha prometida.";
+    return "El envío no está incluido y se acuerda antes de despachar. No hay una fecha prometida. No se cobra aquí.";
   }
   if (/\b(pagar|pago|contraentrega)\b/.test(question) || question.includes("contra entrega")) {
     return "Pagas el precio publicado cuando los recibes. Nadie cobra aquí. El pedido queda pendiente de confirmación.";
@@ -86,7 +86,7 @@ export function answerProductQuestion(product: AnswerableProduct, raw: string) {
     return "En la ficha no hay tallas ni tamaños.";
   }
   if (matched.length > 0) return joinLines(matched);
-  return "Eso no está escrito en la ficha. La tienda lo confirma al revisar el pedido.";
+  return "Eso no está escrito en la ficha. La tienda lo aclara al revisar el pedido. Esta pregunta no se envía ni cobra.";
 }
 
 function factLines(product: AnswerableProduct) {

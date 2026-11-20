@@ -492,7 +492,7 @@ function ProductQuestion({ product }: { product: PublicProduct }) {
       <h3 id="pregunta-producto" className="text-sm font-semibold">
         Pregunta sobre este producto
       </h3>
-      <p className="mt-1 text-xs leading-5 text-muted">Solo responde con lo de esta ficha.</p>
+      <p className="mt-1 text-xs leading-5 text-muted">Solo responde con lo de esta ficha. No se envía a la tienda, no registra pedido y no cobra.</p>
       <form className="mt-2 space-y-2" onSubmit={ask}>
         <label className="block text-xs font-semibold" htmlFor="pregunta">
           Tu pregunta
