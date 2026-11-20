@@ -138,7 +138,7 @@ export function salesNote(order: DemoOrder) {
     return "Sigue registrado. Entra a ventas confirmadas cuando lo confirmes.";
   }
   if (order.status === "entregado" && order.collected) {
-    return "Entregado y cobrado. Su margen estimado también cuenta como utilidad realizada.";
+    return "Entregado y marcado como cobrado. La utilidad realizada no es el margen estimado si el flete o el recaudo real son distintos. No es dinero cobrado en el sitio.";
   }
   if (order.status === "entregado") {
     return "Entregado, con recaudo pendiente. Suma como entrega, no como venta cobrada.";

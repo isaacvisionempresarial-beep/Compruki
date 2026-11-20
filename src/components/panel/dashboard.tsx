@@ -108,10 +108,10 @@ export function Dashboard({
   );
 
   const storeCards = [
-    { label: "Registrados", ...storeSummary.registered, hint: "Total guardado. Sin cancelados ni devueltos" },
-    { label: "Confirmados", ...storeSummary.confirmed, hint: "Total guardado. Ya confirmados" },
-    { label: "Entregados", ...storeSummary.delivered, hint: "Total guardado. Estado entregado" },
-    { label: "Cobrados", ...storeSummary.collected, hint: "Total guardado. No es la utilidad" },
+    { label: "Registrados", ...storeSummary.registered, hint: "Total guardado. Sin cancelados ni devueltos. No es dinero cobrado." },
+    { label: "Confirmados", ...storeSummary.confirmed, hint: "Total guardado. Ya confirmados. No es dinero cobrado." },
+    { label: "Entregados", ...storeSummary.delivered, hint: "Total guardado. Estado entregado. No es dinero cobrado." },
+    { label: "Cobrados", ...storeSummary.collected, hint: "Total guardado de los marcados como cobrados. No es un cobro de este sitio ni la utilidad." },
   ];
 
   return (
@@ -244,7 +244,7 @@ export function Dashboard({
             <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Margen estimado</dt>
             <dd className="mt-1 text-base font-extrabold tabular-nums">{formatCop(storeSummary.estimatedMargin.amount)}</dd>
             <dd className="mt-1 text-xs leading-5 text-muted">
-              Margen de confirmados. No es el total guardado.
+              Margen de confirmados. No es dinero cobrado ni el total guardado.
               <OrderListPhrase numbers={storeSummary.estimatedMargin.numbers} lead=":" />
             </dd>
             {storeSummary.estimatedMargin.missingNumbers.length > 0 ? (
@@ -258,7 +258,7 @@ export function Dashboard({
             <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Utilidad realizada</dt>
             <dd className="mt-1 text-base font-extrabold tabular-nums">{formatCop(storeSummary.realized.amount)}</dd>
             <dd className="mt-1 text-xs leading-5 text-muted">
-              Utilidad de lo cobrado. No es el total guardado.
+              Utilidad de pedidos entregados y marcados como cobrados. No es un cobro de este sitio ni el total guardado.
               <OrderListPhrase numbers={storeSummary.realized.numbers} lead=":" />
             </dd>
             {storeSummary.realized.missingNumbers.length > 0 || storeSummary.returnFreight > 0 || storeSummary.collectionCost > 0 ? (
@@ -494,13 +494,13 @@ export function Dashboard({
               <span className="mt-0.5 block text-muted">
                 {canManageOrderMoney
                   ? "Pendientes aquí; la cola completa en Pedidos → Por atender."
-                  : "Pendientes aquí. Flete, costo y cobro los guarda el propietario."}
+                  : "Pendientes aquí. Flete, costo y marca de cobro los guarda el propietario. Nada de eso cobra en el sitio."}
               </span>
             </li>
             <li>
               <span className="font-semibold text-sm">Estimado vs utilidad</span>
               <span className="mt-0.5 block text-muted">
-                Estimado = margen de pedidos confirmados. Utilidad = entregado y cobrado. Ninguna es el total guardado del pedido.
+                Estimado = margen de pedidos confirmados. Utilidad = entregado y marcado como cobrado. Ninguna es dinero cobrado en el sitio ni el total guardado del pedido.
               </span>
             </li>
           </ul>

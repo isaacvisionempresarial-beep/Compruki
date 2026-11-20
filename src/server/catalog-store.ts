@@ -374,6 +374,8 @@ export async function saveProduct(
     parts.push("El precio y la publicación no cambiaron.");
   }
   const note = parts.filter(Boolean).join(" ");
+  const cashNote = "No es dinero cobrado. Los pedidos ya anotados siguen con sus cifras.";
+  const summary = note ? `${note} ${cashNote}` : `Alta del producto. ${cashNote}`;
   const next: CatalogProduct = {
     id: productId,
     title: draft.title.trim(),
@@ -411,7 +413,7 @@ export async function saveProduct(
         commissions: next.commissions,
         published: next.published,
         available: next.available,
-        summary: note || "Alta del producto.",
+        summary,
       },
     ];
   }

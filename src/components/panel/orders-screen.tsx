@@ -193,7 +193,7 @@ export function OrdersScreen({
                 <h3 id={queue.id} className="text-sm font-semibold">
                   {queue.title} ({queue.rows.length})
                 </h3>
-                <p className="mt-0.5 text-xs leading-5 text-muted">{queue.hint}</p>
+                <p className="mt-0.5 text-xs leading-5 text-muted">{queue.hint} No cobra.</p>
                 <div className="elevate-1 mt-2 overflow-hidden rounded-[14px] border border-line bg-card">
                   <div
                     className={cx(
