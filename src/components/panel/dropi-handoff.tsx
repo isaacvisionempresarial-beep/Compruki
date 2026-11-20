@@ -91,6 +91,7 @@ function DropiCopy({ order }: { order: StoreOrder }) {
       </label>
       <button
         type="button"
+        title="Copiar no cobra. El total guardado no cambia."
         className="inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
         aria-label={`Copiar datos de ${order.number}`}
         onClick={copy}
@@ -163,6 +164,7 @@ function DropiRefForm({ order }: { order: StoreOrder }) {
           type="submit"
           name="intent"
           value="guardar"
+          title="Anotarlo no envía el pedido ni cobra. El total guardado no cambia."
           disabled={refPending || !canSave}
           className={`inline-flex h-10 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark ${
             refPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
@@ -175,6 +177,7 @@ function DropiRefForm({ order }: { order: StoreOrder }) {
             type="submit"
             name="intent"
             value="quitar"
+            title="Quitarlo no cobra. El total guardado no cambia."
             disabled={refPending}
             className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold disabled:cursor-wait"
           >

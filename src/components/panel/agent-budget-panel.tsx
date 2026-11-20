@@ -155,6 +155,7 @@ function AgentConfigForm({
         ) : null}
         <button
           type="submit"
+          title="Guardarlo no cobra ni cambia pedidos."
           disabled={pending || !canEdit}
           className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-55"
         >

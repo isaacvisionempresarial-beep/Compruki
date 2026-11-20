@@ -284,6 +284,7 @@ function CartQuantity({
           }}
           onBlur={() => setDraft(String(quantity))}
           className="h-10 w-20 rounded-[10px] border border-line bg-card px-2 tabular-nums focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
+          title="Cambiarla no registra pedido ni cobra."
         />
       </label>
       <p className="mt-1 text-xs leading-5 text-muted">Cambiarla no registra pedido ni cobra.</p>

@@ -353,6 +353,7 @@ function CatalogRowLifecycle({
           <input type="hidden" name="id" value={product.id} />
           <button
             type="submit"
+            title="Quita el producto del catálogo. No cobra ni confirma un pedido."
             disabled={deletePending}
             className={`inline-flex h-8 items-center justify-center rounded-[10px] bg-danger px-3 text-sm font-semibold text-on-dark ${
               deletePending ? "cursor-wait opacity-70" : ""
@@ -362,6 +363,7 @@ function CatalogRowLifecycle({
           </button>
           <button
             type="button"
+            title="No lo quita ni cobra."
             className="inline-flex h-8 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
             onClick={() => setConfirmDelete(false)}
           >
@@ -870,6 +872,7 @@ export function ProductEditor({
               <input ref={imagesRef} name="images" type="file" multiple className="hidden" tabIndex={-1} aria-hidden="true" />
               <button
                 type="button"
+                title="Elegirlas no las publica solas. El precio no cambia."
                 className="mt-3 inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold hover:bg-canvas"
                 onClick={() => imagePickerRef.current?.click()}
               >
@@ -891,6 +894,7 @@ export function ProductEditor({
                 <input ref={videoRef} name="video" type="file" accept="video/mp4,.mp4" className="hidden" tabIndex={-1} aria-hidden="true" />
                 <button
                   type="button"
+                  title="Elegirlo no lo publica solo. El precio no cambia."
                   className="mt-3 inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold hover:bg-canvas"
                   onClick={() => videoPickerRef.current?.click()}
                 >
@@ -1200,6 +1204,7 @@ export function ProductEditor({
             )}
             <button
               type="submit"
+              title="Guardarlo no cobra. Los pedidos ya anotados siguen con sus cifras."
               disabled={pending || !canSave}
               className={`inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft sm:w-auto sm:min-w-56 ${
                 pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
@@ -1373,6 +1378,7 @@ export function ProductDangerZone({
               <p className="text-sm font-semibold text-danger">¿Eliminar {product.title}?</p>
               <button
                 type="submit"
+                title="Eliminarlo quita la ficha. No cobra."
                 disabled={deletePending}
                 className={`inline-flex h-10 items-center justify-center rounded-[10px] bg-danger px-3 text-sm font-semibold text-on-dark ${
                   deletePending ? "cursor-wait opacity-70" : ""
@@ -1382,6 +1388,7 @@ export function ProductDangerZone({
               </button>
               <button
                 type="button"
+                title="Cancelar no elimina el producto ni cobra."
                 className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
                 onClick={() => setConfirmDelete(false)}
               >
@@ -1391,6 +1398,7 @@ export function ProductDangerZone({
           ) : (
             <button
               type="button"
+              title="Todavía no elimina. No cobra."
               className="inline-flex h-10 items-center justify-center rounded-[10px] border border-danger bg-card px-3 text-sm font-semibold text-danger"
               onClick={() => setConfirmDelete(true)}
             >
@@ -1407,6 +1415,7 @@ export function ProductDangerZone({
             <input type="hidden" name="id" value={product.id} />
             <button
               type="submit"
+              title="No cambia el precio ni la publicación. No cobra."
               disabled={deactivatePending}
               className={`inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
                 deactivatePending ? "cursor-wait opacity-70" : ""

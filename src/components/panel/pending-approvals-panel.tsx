@@ -137,6 +137,7 @@ function DraftReviewForm({
           </p>
           <button
             type="button"
+            title="Verla no cobra ni cambia pedidos."
             onClick={() => setOpen((value) => !value)}
             className="text-xs font-semibold text-accent-strong"
           >
@@ -232,6 +233,7 @@ function DraftReviewForm({
           type="submit"
           name="decision"
           value="approve"
+          title="Aprobarlo escribe el texto. El precio y la publicación no cambian. No cobra."
           disabled={pending || approveDisabled || !canApproveCatalog}
           className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-xs font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
         >
@@ -241,6 +243,7 @@ function DraftReviewForm({
           type="submit"
           name="decision"
           value="reject"
+          title="Rechazarlo no escribe en el catálogo ni cobra."
           disabled={pending}
           className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-xs font-semibold text-ink hover:bg-subtle disabled:opacity-55"
         >
@@ -294,6 +297,7 @@ function ApprovalButtons({
           <input type="hidden" name="decision" value="approve" />
           <button
             type="submit"
+            title="Aprobarla no cobra ni cambia el total guardado."
             disabled={pending || approveBlocked}
             className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-xs font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
           >
@@ -306,6 +310,7 @@ function ApprovalButtons({
           <input type="hidden" name="decision" value="reject" />
           <button
             type="submit"
+            title="Rechazarla no cobra ni cambia pedidos."
             disabled={pending}
             className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-xs font-semibold text-ink hover:bg-subtle disabled:opacity-55"
           >

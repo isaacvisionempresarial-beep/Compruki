@@ -139,6 +139,7 @@ export function ConnectionsScreen({
             <form action={action} className="mt-3">
               <button
                 type="submit"
+                title="Probarlo no cobra ni cambia pedidos."
                 disabled={pending}
                 className={`inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-canvas ${
                   pending ? "cursor-wait opacity-70" : ""

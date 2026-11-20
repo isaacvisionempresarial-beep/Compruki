@@ -576,6 +576,7 @@ export function OrderEditor({
                   <input type="hidden" name="intent" value={item.id} />
                   <button
                     type="submit"
+                    title="No cambia el total guardado ni cobra en esta pantalla."
                     disabled={pending || (moneyStatusAction(item.id) && !canManageOrderMoney)}
                     className={`inline-flex h-10 w-full items-center justify-center rounded-[10px] px-3 text-sm font-semibold ${
                       pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
@@ -606,6 +607,7 @@ export function OrderEditor({
                   <button
                     type="button"
                     disabled
+                    title="Sigue bloqueado. No cobra ni cambia el total guardado."
                     className="inline-flex h-10 cursor-not-allowed items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-muted"
                   >
                     Confirmar pedido
@@ -615,6 +617,7 @@ export function OrderEditor({
                   <button
                     type="button"
                     disabled
+                    title="Sigue bloqueado. No cobra ni cambia el total guardado."
                     className="inline-flex h-10 cursor-not-allowed items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-muted"
                   >
                     Pasar a preparación
@@ -624,6 +627,7 @@ export function OrderEditor({
                   <button
                     type="button"
                     disabled
+                    title="Sigue bloqueado. No cobra ni cambia el total guardado."
                     className="inline-flex h-10 cursor-not-allowed items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-muted"
                   >
                     Resolver incidencia
@@ -799,6 +803,7 @@ function ReasonAction({
       ) : null}
       <button
         type="submit"
+        title="No cambia el total guardado ni cobra en esta pantalla."
         disabled={pending || !canApply}
         className={`inline-flex h-10 w-full items-center justify-center rounded-[10px] px-3 text-sm font-semibold ${
           pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
@@ -826,6 +831,7 @@ function StatusFilter({
       type="button"
       role="radio"
       aria-checked={selected}
+      title="Filtrar no cobra ni cambia el total guardado."
       className={cx(
         "min-h-9 rounded-[10px] px-2.5 text-sm font-semibold",
         selected ? "bg-primary text-on-dark" : "border border-line bg-card text-muted",
@@ -1910,6 +1916,7 @@ function CustomerNotice({ order }: { order: StoreOrder }) {
       ) : null}
       <button
         type="submit"
+        title="No envía el mensaje ni cobra. El total guardado no cambia."
         disabled={noticePending}
         className="inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold disabled:cursor-wait"
       >
