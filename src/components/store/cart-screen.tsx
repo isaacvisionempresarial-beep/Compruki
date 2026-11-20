@@ -31,11 +31,11 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
   const blockedHint =
     sizeGaps.length > 0
       ? sizeKinds.size === 1 && sizeKinds.has("tamano")
-        ? "Elige el tamaño para continuar."
+        ? "Elige el tamaño para continuar. No cambia el precio ni registra pedido."
         : sizeKinds.size === 1 && sizeKinds.has("talla")
-          ? "Elige la talla para continuar."
-          : "Elige la talla o el tamaño para continuar."
-      : "Quita lo que ya no se puede pedir para continuar.";
+          ? "Elige la talla para continuar. No cambia el precio ni registra pedido."
+          : "Elige la talla o el tamaño para continuar. No cambia el precio ni registra pedido."
+      : "Quita lo que ya no se puede pedir para continuar. No entra en el total al recibir ni registra pedido.";
 
   if (!cart.ready) {
     return <p className="text-sm text-muted">Cargando el carrito…</p>;
@@ -122,15 +122,20 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                                 </option>
                               ))}
                             </select>
+                            <span className="mt-1 block text-xs font-normal leading-5 text-muted">
+                              {product.sizeKind === "tamano"
+                                ? "Elegirlo no cambia el precio ni registra pedido."
+                                : "Elegirla no cambia el precio ni registra pedido."}
+                            </span>
                           </label>
                         ) : null}
                         {!payableLine ? (
                           <p className="mt-2 text-sm text-coral-strong">
                             {product?.available && product.variants.length > 0
                               ? product.sizeKind === "tamano"
-                                ? "Elige el tamaño para continuar."
-                                : "Elige la talla para continuar."
-                              : "Ya no se puede pedir. Quítalo para continuar."}
+                                ? "Elige el tamaño para continuar. No cambia el precio ni registra pedido."
+                                : "Elige la talla para continuar. No cambia el precio ni registra pedido."
+                              : "Ya no se puede pedir. Quítalo para continuar. No entra en el total al recibir ni registra pedido."}
                           </p>
                         ) : null}
                       </div>
