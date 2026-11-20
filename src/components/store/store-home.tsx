@@ -70,6 +70,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
               placeholder="Buscar por nombre o SKU"
               className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm shadow-[0_1px_0_rgb(34_38_56/0.02)] transition-[border-color,box-shadow] focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
             />
+            <span className="mt-1 block text-xs leading-5 text-muted">Buscar no cambia los precios publicados ni crea un pedido.</span>
           </label>
           {categories.length > 0 ? (
             <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Filtrar por categoría">
@@ -226,9 +227,9 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
 
 function storeEmptyMessage(total: number, category: string, query: string) {
   if (total === 0) return "Todavía no hay productos publicados. La tienda solo muestra lo que el comercio ya revisó.";
-  if (query.trim()) return "Ningún producto publicado coincide con esa búsqueda.";
-  if (category !== "todas") return "No hay productos publicados en esta categoría.";
-  return "Ningún producto publicado coincide con el filtro.";
+  if (query.trim()) return "Ningún producto publicado coincide con esa búsqueda. Los precios no cambian y no se crea un pedido.";
+  if (category !== "todas") return "No hay productos publicados en esta categoría. Los precios no cambian.";
+  return "Ningún producto publicado coincide con el filtro. Los precios no cambian.";
 }
 
 function CategoryChip({
