@@ -82,6 +82,7 @@ function DropiCopy({ order }: { order: StoreOrder }) {
         Texto para cargarlo a mano
         <textarea
           id={`dropi-texto-${order.id}`}
+          title="Leerlo no envía el pedido ni cobra. El total guardado no cambia."
           readOnly
           rows={12}
           value={text}
@@ -133,6 +134,7 @@ function DropiRefForm({ order }: { order: StoreOrder }) {
         Número en Dropi
         <input
           id={`dropi-${order.id}`}
+          title="Escribirlo no envía el pedido ni cobra. El total guardado no cambia."
           name="providerRef"
           value={value}
           onChange={(event) => setValue(event.target.value)}

@@ -58,6 +58,7 @@ export function ContentCreatorPanel({
           <span className="mb-1 block text-sm font-semibold">Producto</span>
           <select
             name="sku"
+            title="Elegirlo no genera ni publica. No cobra."
             defaultValue={selectedSku}
             disabled={!enabled}
             className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"

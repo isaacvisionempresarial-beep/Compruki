@@ -847,6 +847,7 @@ export function ProductEditor({
                       <input
                         type="checkbox"
                         name="removeAsset"
+                        title="Marcarla no quita la foto hasta guardar. No es el precio ni la publicación."
                         value={asset.id}
                         checked={removed.includes(asset.id)}
                         className="mt-1 h-4 w-4"
@@ -930,10 +931,10 @@ export function ProductEditor({
                   : "Precio, costo, envío y comisiones los guarda el propietario. Puedes cambiar la disponibilidad."}
               </p>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                <MoneyField label="Precio de venta" name="price" value={amounts.price} readOnly={!canManageCommerce} onValue={(price) => setAmounts((current) => ({ ...current, price }))} />
-                <MoneyField label="Costo del producto" name="cost" value={amounts.cost} readOnly={!canManageCommerce} onValue={(cost) => setAmounts((current) => ({ ...current, cost }))} />
-                <MoneyField label="Envío estimado" name="shipping" value={amounts.shipping} readOnly={!canManageCommerce} onValue={(shipping) => setAmounts((current) => ({ ...current, shipping }))} />
-                <MoneyField label="Comisiones estimadas" name="commissions" value={amounts.commissions} readOnly={!canManageCommerce} onValue={(commissions) => setAmounts((current) => ({ ...current, commissions }))} />
+                <MoneyField label="Precio de venta" name="price" title="Es el precio de la ficha. No es dinero cobrado." value={amounts.price} readOnly={!canManageCommerce} onValue={(price) => setAmounts((current) => ({ ...current, price }))} />
+                <MoneyField label="Costo del producto" name="cost" title="Es el costo de la ficha. No es dinero cobrado." value={amounts.cost} readOnly={!canManageCommerce} onValue={(cost) => setAmounts((current) => ({ ...current, cost }))} />
+                <MoneyField label="Envío estimado" name="shipping" title="Es el envío estimado de la ficha. No es dinero cobrado." value={amounts.shipping} readOnly={!canManageCommerce} onValue={(shipping) => setAmounts((current) => ({ ...current, shipping }))} />
+                <MoneyField label="Comisiones estimadas" name="commissions" title="Son las comisiones estimadas de la ficha. No es dinero cobrado." value={amounts.commissions} readOnly={!canManageCommerce} onValue={(commissions) => setAmounts((current) => ({ ...current, commissions }))} />
               </div>
               <div className="mt-3 rounded-[10px] bg-card px-3 py-2 text-sm leading-5">
                 <p className="font-semibold">Margen estimado</p>
@@ -960,6 +961,7 @@ export function ProductEditor({
                     <input
                       type="checkbox"
                       name="published"
+                      title="Marcarla no cobra. El precio de la ficha no cambia."
                       checked={published}
                       className="mt-1 h-4 w-4"
                       onChange={(event) => setPublished(event.target.checked)}
@@ -1003,6 +1005,7 @@ export function ProductEditor({
             <Field label="Nombre" htmlFor="title" hint="Lo ve el comprador en la ficha. No es el precio ni la publicación.">
               <input
                 id="title"
+                title="Escribirlo no es el precio ni la publicación."
                 name="title"
                 required
                 value={title}
@@ -1016,6 +1019,7 @@ export function ProductEditor({
               <Field label="SKU interno" htmlFor="sku" hint={canManageCommerce ? undefined : "Lo cambia el propietario."}>
                 <input
                   id="sku"
+                  title="Escribirlo no es el precio ni la publicación."
                   name="sku"
                   required
                   readOnly={!canManageCommerce}
@@ -1028,6 +1032,7 @@ export function ProductEditor({
               <Field label="Referencia del proveedor" htmlFor="externalRef" hint="Opcional. Dropi no está conectado. No es el precio ni la publicación.">
                 <input
                   id="externalRef"
+                  title="Escribirlo no es el precio ni la publicación."
                   name="externalRef"
                   value={externalRef}
                   className={inputClass}
@@ -1039,6 +1044,7 @@ export function ProductEditor({
             <Field label="Categoría" htmlFor="category" hint="Opcional. Agrupa el producto en la tienda. No viene de Dropi. No es el precio ni la publicación.">
               <input
                 id="category"
+                title="Escribirlo no es el precio ni la publicación."
                 name="category"
                 value={category}
                 maxLength={40}
@@ -1054,6 +1060,7 @@ export function ProductEditor({
               <Field label="Descripción" htmlFor="description" hint="La ve el comprador en la ficha. No es el precio ni la publicación.">
                 <textarea
                   id="description"
+                  title="Escribirla no es el precio ni la publicación."
                   name="description"
                   rows={6}
                   value={description}
@@ -1069,6 +1076,7 @@ export function ProductEditor({
               >
                 <textarea
                   id="highlights"
+                  title="Escribirlas no es el precio ni la publicación."
                   name="highlights"
                   rows={6}
                   value={highlights}
@@ -1085,6 +1093,7 @@ export function ProductEditor({
             >
               <textarea
                 id="answers"
+                title="Escribirlas no es el precio ni la publicación."
                 name="answers"
                 rows={3}
                 value={answers}
@@ -1102,6 +1111,7 @@ export function ProductEditor({
               >
                 <textarea
                   id="variants"
+                  title="Escribirlas no cambia el precio ni la publicación."
                   name="variants"
                   rows={3}
                   value={variantsText}
@@ -1296,18 +1306,21 @@ function MoneyField({
   value,
   onValue,
   readOnly = false,
+  title,
 }: {
   label: string;
   name: string;
   value: string;
   onValue: (value: string) => void;
   readOnly?: boolean;
+  title: string;
 }) {
   return (
     <Field label={label} htmlFor={name} hint={readOnly ? "Lo guarda el propietario." : "Pesos, sin centavos."}>
       <input
         id={name}
         name={name}
+        title={title}
         inputMode="numeric"
         required
         readOnly={readOnly}

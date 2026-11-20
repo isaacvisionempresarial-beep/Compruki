@@ -134,6 +134,7 @@ export function AgentsScreen({
             <span className="mb-1 block text-sm font-semibold">Buscar</span>
             <input
               name="q"
+              title="Escribirlo no cobra ni cambia el catálogo."
               defaultValue={explorer.query}
               disabled={!ag02}
               placeholder="SKU, título o variante"
@@ -144,6 +145,7 @@ export function AgentsScreen({
             <span className="mb-1 block text-sm font-semibold">Categoría</span>
             <select
               name="categoria"
+              title="Filtrar no cobra ni cambia el catálogo."
               defaultValue={explorer.category}
               disabled={!ag02}
               className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
@@ -251,6 +253,7 @@ export function AgentsScreen({
             <span className="mb-1 block text-sm font-semibold">SKU (opcional)</span>
             <input
               name="marginSku"
+              title="Escribirlo no cobra ni cambia pedidos."
               disabled={!ag04}
               placeholder="Vacío = todos los productos"
               className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"

@@ -183,6 +183,7 @@ function DraftReviewForm({
         <span className="mb-1 block text-sm font-semibold">Título a escribir</span>
         <input
           name="title"
+          title="Escribirlo no publica ni cobra. El precio y la publicación no cambian."
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           maxLength={200}
@@ -194,6 +195,7 @@ function DraftReviewForm({
         <span className="mb-1 block text-sm font-semibold">Cuerpo a escribir</span>
         <textarea
           name="body"
+          title="Escribirlo no publica ni cobra. El precio y la publicación no cambian."
           value={body}
           onChange={(event) => setBody(event.target.value)}
           maxLength={4000}
@@ -206,6 +208,7 @@ function DraftReviewForm({
         <span className="mb-1 block text-sm font-semibold">CTA</span>
         <input
           name="cta"
+          title="Escribirlo no publica ni cobra. El precio y la publicación no cambian."
           value={cta}
           onChange={(event) => setCta(event.target.value)}
           maxLength={120}

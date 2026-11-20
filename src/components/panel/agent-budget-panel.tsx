@@ -119,6 +119,7 @@ function AgentConfigForm({
           <input
             type="checkbox"
             name="enabled"
+            title="Marcarlo no cobra ni cambia pedidos."
             defaultChecked={enabled}
             disabled={!canEdit}
             className="h-4 w-4 accent-[var(--color-accent,#0d9488)] disabled:opacity-55"
@@ -129,6 +130,7 @@ function AgentConfigForm({
           <span className="mb-1 block text-sm font-semibold">Tope mensual (COP)</span>
           <input
             name="monthlyBudgetCop"
+            title="Escribirlo no cobra ni cambia pedidos. El tope no es dinero cobrado."
             type="number"
             min={0}
             step={1000}
@@ -141,6 +143,7 @@ function AgentConfigForm({
           <span className="mb-1 block text-sm font-semibold">Notas</span>
           <input
             name="notes"
+            title="Escribirlo no cobra ni cambia pedidos."
             defaultValue={notes}
             maxLength={500}
             placeholder="Ej. solo borradores, sin publicar"

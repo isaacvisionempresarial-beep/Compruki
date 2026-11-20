@@ -301,14 +301,14 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <Field label="Nombre de quien recibe" htmlFor="customerName" hint="Guardarlo no cobra. El total guardado no cambia.">
-            <input id="customerName" name="customerName" required autoComplete="name" value={customerName} onChange={(event) => setCustomerName(event.target.value)} className={fieldClass} />
+            <input id="customerName" name="customerName" title="Escribirlo no cobra. El total guardado no cambia." required autoComplete="name" value={customerName} onChange={(event) => setCustomerName(event.target.value)} className={fieldClass} />
           </Field>
         </div>
         <Field label="Celular" htmlFor="phone" hint="10 dígitos, empieza por 3. El total guardado no cambia.">
-          <input id="phone" name="phone" required inputMode="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} className={fieldClass} />
+          <input id="phone" name="phone" title="Escribirlo no cobra. El total guardado no cambia." required inputMode="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} className={fieldClass} />
         </Field>
         <Field label="Cédula de quien recibe" htmlFor="document" hint="Opcional. De 6 a 10 dígitos, sin puntos. Vacío: se quita. El total guardado no cambia.">
-          <input id="document" name="document" inputMode="numeric" autoComplete="off" value={documentId} onChange={(event) => setDocumentId(event.target.value)} className={fieldClass} />
+          <input id="document" name="document" title="Escribirlo no cobra. El total guardado no cambia." inputMode="numeric" autoComplete="off" value={documentId} onChange={(event) => setDocumentId(event.target.value)} className={fieldClass} />
         </Field>
         <Field
           label="Departamento"
@@ -319,14 +319,14 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
               : "Opcional. No es la ciudad. La tienda puede confirmar sin él. El total guardado no cambia."
           }
         >
-          <input id="department" name="department" autoComplete="address-level1" value={department} onChange={(event) => setDepartment(event.target.value)} className={fieldClass} />
+          <input id="department" name="department" title="Escribirlo no cobra. El total guardado no cambia." autoComplete="address-level1" value={department} onChange={(event) => setDepartment(event.target.value)} className={fieldClass} />
         </Field>
         <Field label="Ciudad" htmlFor="city" hint="Guardarla no cobra. El total guardado no cambia.">
-          <input id="city" name="city" required autoComplete="address-level2" value={city} onChange={(event) => setCity(event.target.value)} className={fieldClass} />
+          <input id="city" name="city" title="Escribirlo no cobra. El total guardado no cambia." required autoComplete="address-level2" value={city} onChange={(event) => setCity(event.target.value)} className={fieldClass} />
         </Field>
         <div className="sm:col-span-2">
           <Field label="Dirección" htmlFor="address" hint="Guardarla no cobra. El total guardado no cambia.">
-            <input id="address" name="address" required autoComplete="street-address" value={address} onChange={(event) => setAddress(event.target.value)} className={fieldClass} />
+            <input id="address" name="address" title="Escribirlo no cobra. El total guardado no cambia." required autoComplete="street-address" value={address} onChange={(event) => setAddress(event.target.value)} className={fieldClass} />
           </Field>
         </div>
         <div className="sm:col-span-2">
@@ -335,7 +335,7 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
             htmlFor="reference"
             hint="Opcional. Vacío: se quita. Sin un cambio válido el botón queda bloqueado. El total guardado no cambia."
           >
-            <input id="reference" name="reference" autoComplete="off" value={reference} onChange={(event) => setReference(event.target.value)} className={fieldClass} />
+            <input id="reference" name="reference" title="Escribirlo no cobra. El total guardado no cambia." autoComplete="off" value={reference} onChange={(event) => setReference(event.target.value)} className={fieldClass} />
           </Field>
         </div>
       </div>
@@ -491,6 +491,7 @@ function CustomerSizeForm({
                   {choice.sizeKind === "tamano" ? "Tamaño" : "Talla"}
                   <select
                     id={`linea-talla-${index}`}
+                    title={choice.sizeKind === "tamano" ? "Elegirlo no cambia el total guardado ni cobra." : "Elegirla no cambia el total guardado ni cobra."}
                     name="next"
                     value={picked[index] ?? ""}
                     onChange={(event) =>
@@ -565,6 +566,7 @@ function CustomerBuyerNote({ orderId, token, note }: { orderId: string; token: s
         Aviso para la tienda
         <textarea
           id="buyer-note"
+          title="Escribirlo no cobra. El total guardado no cambia."
           name="buyerNote"
           rows={3}
           maxLength={160}
@@ -615,6 +617,7 @@ function CustomerCancel({ order, token }: { order: CustomerOrder; token: string 
         <textarea
           id="cancel-reason"
           name="reason"
+          title="Escribirlo no cobra. El total guardado no cambia."
           rows={3}
           maxLength={160}
           value={reason}

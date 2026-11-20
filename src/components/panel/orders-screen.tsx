@@ -1192,6 +1192,7 @@ function AddProductForm({ order, products }: { order: StoreOrder; products: Orde
         Agregar producto
         <select
           id={`agregar-${order.id}`}
+          title="Elegirlo no agrega el producto ni cobra."
           name="sku"
           value={sku}
           onChange={(event) => {
@@ -1213,6 +1214,7 @@ function AddProductForm({ order, products }: { order: StoreOrder; products: Orde
           {chosen.sizeKind === "tamano" ? "Tamaño" : "Talla"}
           <select
             id={`variante-${order.id}`}
+            title={chosen.sizeKind === "tamano" ? "Elegirlo no agrega el producto ni cobra." : "Elegirla no agrega el producto ni cobra."}
             value={variant}
             onChange={(event) => setVariant(event.target.value)}
             className={freightInput}
@@ -1862,6 +1864,7 @@ function CustomerNote({ order }: { order: StoreOrder }) {
         Mensaje para el cliente
         <textarea
           id={`mensaje-${order.id}`}
+          title="Leerlo no envía el mensaje ni cobra. El total guardado no cambia."
           readOnly
           rows={4}
           value={text}

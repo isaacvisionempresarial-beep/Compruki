@@ -328,6 +328,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                     </button>
                     <input
                       id="cantidad"
+                      title="Cambiarla no registra pedido ni cobra."
                       type="number"
                       min={1}
                       max={5}

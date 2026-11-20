@@ -38,6 +38,7 @@ export function CentralRouterPanel({
           <span className="mb-1 block text-sm font-semibold">Intención o SKU</span>
           <input
             name="intent"
+            title="Escribirlo no cobra ni cambia pedidos."
             defaultValue={defaultIntent}
             disabled={!enabled}
             placeholder="Ej. margen LAM-MES-01, borrador faja, buscar ropa"
