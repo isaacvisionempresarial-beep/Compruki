@@ -725,6 +725,15 @@ export function ProductEditor({
     }
     return `${ready} Pulsa Guardar producto. El producto ya está publicado: estas fotos se verán en la tienda. El precio y la publicación no cambian.`;
   }
+  function mediaPickNote(noun: "fotos" | "video") {
+    const lead = noun === "fotos" ? "Elegirlas no las publica solas." : "Elegirlo no lo publica solo.";
+    if (!published) {
+      return canManageCommerce
+        ? `${lead} El precio no cambia.`
+        : `${lead} El precio no cambia. La publicación la cambia el propietario.`;
+    }
+    return `${lead} No cambia el precio ni la publicación.`;
+  }
   function mediaRemovalNote(noun: "foto" | "video") {
     const lead = noun === "foto" ? "Quitar esta foto al guardar." : "Quitar el video al guardar.";
     if (!published) {
@@ -854,6 +863,7 @@ export function ProductEditor({
               >
                 Agregar fotos
               </button>
+              <p className="mt-1 text-xs leading-5 text-muted">{mediaPickNote("fotos")}</p>
               <div className="mt-3 border-t border-line pt-2.5">
                 <p className="text-sm font-semibold">Video</p>
                 {videoPreview ? (
@@ -874,6 +884,7 @@ export function ProductEditor({
                 >
                   {savedVideo || videoPreview ? "Cambiar video" : "Agregar video"}
                 </button>
+                <p className="mt-1 text-xs leading-5 text-muted">{mediaPickNote("video")}</p>
                 {savedVideo ? (
                   <label className="mt-2 flex items-start gap-3 text-sm leading-5">
                     <input
