@@ -132,7 +132,7 @@ export function SyncScreen({ orders }: { orders: StoreOrder[] }) {
             </li>
           </ul>
           <p className="mt-3 text-xs leading-5 text-muted">
-            Dropi no está conectado. Estado de la cuenta en{" "}
+            Leer esto no cobra. Dropi no está conectado. Estado de la cuenta en{" "}
             <Link href="/panel/conexiones" className="font-semibold text-accent-strong">
               Conexiones
             </Link>

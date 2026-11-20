@@ -134,7 +134,7 @@ export function ConnectionsScreen({
               Saludo al servidor
             </h2>
             <p className="mt-1 text-xs leading-5 text-muted">
-              Opcional. Solo prueba el saludo; no autoriza la cuenta. El total guardado no cambia.
+              Opcional. Solo prueba el saludo; no autoriza la cuenta. Probarlo no cobra ni cambia pedidos. El total guardado no cambia.
             </p>
             <form action={action} className="mt-3">
               <button

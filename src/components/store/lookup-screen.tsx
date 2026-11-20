@@ -104,6 +104,7 @@ export function LookupScreen() {
           >
             Condiciones
           </Link>
+          <p className="mt-2 text-xs leading-5 text-muted">Leerlas no registra pedido ni cobra.</p>
         </aside>
       </div>
     </div>

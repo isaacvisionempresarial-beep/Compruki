@@ -338,7 +338,7 @@ export function OrdersScreen({
             </li>
             <li>
               <span className="font-semibold text-sm">Cifras</span>
-              <span className="mt-0.5 block text-muted">Son de todos. Buscar o filtrar solo cambia la lista.</span>
+              <span className="mt-0.5 block text-muted">Son de todos. Buscar o filtrar solo cambia la lista. No cobra ni cambia el total guardado.</span>
             </li>
             <li>
               <span className="font-semibold text-sm">Cada ficha</span>

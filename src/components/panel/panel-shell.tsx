@@ -154,6 +154,7 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
               </div>
               <a
                 href="/ingresar?modo=nueva-clave"
+                title="Abrirla no cobra ni cambia pedidos."
                 className="inline-flex h-10 items-center rounded-[10px] px-2 text-sm font-semibold text-accent-strong hover:bg-subtle"
               >
                 Clave
@@ -162,6 +163,7 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
                 <button
                   type="submit"
                   aria-label="Cerrar sesión"
+                  title="Salir no cobra ni cambia pedidos."
                   className="inline-flex h-10 items-center gap-2 rounded-[10px] px-2 text-sm font-semibold text-ink hover:bg-subtle"
                 >
                   <Icon name="logout" className="h-5 w-5" />

@@ -102,6 +102,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
             <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
               <p className="text-sm leading-5 text-muted">{storeEmptyMessage(products.length, category, query)}</p>
               {products.length > 0 && (category !== "todas" || query.trim()) ? (
+                <>
                 <button
                   type="button"
                   className="mt-3 inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-4 text-sm font-semibold"
@@ -112,6 +113,8 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
                 >
                   Ver todos los productos
                 </button>
+                <p className="mt-2 text-xs leading-5 text-muted">Verlos no cambia los precios publicados ni crea un pedido.</p>
+                </>
               ) : null}
             </div>
           ) : (

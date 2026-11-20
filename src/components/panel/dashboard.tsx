@@ -501,7 +501,7 @@ export function Dashboard({
             </li>
           </ul>
           <p className="mt-3 text-xs leading-5 text-muted">
-            Dropi no está conectado. El número se anota en{" "}
+            Leerlas no cobra ni cambia pedidos. Dropi no está conectado. El número se anota en{" "}
             <Link href="/panel/sincronizacion" className="font-semibold text-accent-strong">
               Sincronización
             </Link>

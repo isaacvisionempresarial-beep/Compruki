@@ -461,7 +461,7 @@ function CampaignLink({
 
   if (!product.published) {
     if (compact) return null;
-    return <p className="mt-1 text-xs leading-5 text-muted">Sin publicar: no tiene enlace para una campaña.</p>;
+    return <p className="mt-1 text-xs leading-5 text-muted">Sin publicar: no tiene enlace para una campaña. No cobra.</p>;
   }
 
   if (compact) {
@@ -483,7 +483,7 @@ function CampaignLink({
         {product.available ? null : <span className="text-warning">Se abre, pero no se puede pedir.</span>}
         {copied === "fail" ? (
           <span role="alert" className="text-danger">
-            No se pudo copiar.
+            No se pudo copiar. No cobra.
           </span>
         ) : null}
       </div>
@@ -524,7 +524,7 @@ function CampaignLink({
       ) : null}
       {copied === "fail" ? (
         <p role="alert" className="mt-1 text-xs leading-5 text-danger">
-          No se pudo copiar. Selecciona el enlace y cópialo a mano.
+          No se pudo copiar. Selecciona el enlace y cópialo a mano. No cobra.
         </p>
       ) : null}
     </div>

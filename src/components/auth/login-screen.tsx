@@ -146,6 +146,7 @@ function LoginForm({ onRecover, accessDenied }: { onRecover: () => void; accessD
               type="button"
               className="absolute top-1/2 right-2 h-10 -translate-y-1/2 rounded-[10px] px-2 text-sm font-semibold text-accent-strong"
               aria-pressed={visible}
+              title="Mostrarla u ocultarla no cobra ni cambia pedidos."
               onClick={() => setVisible((current) => !current)}
             >
               {visible ? "Ocultar" : "Mostrar"}
@@ -169,7 +170,7 @@ function LoginForm({ onRecover, accessDenied }: { onRecover: () => void; accessD
         ) : null}
 
         <p className="text-xs leading-5 text-muted">
-          {canEnter ? "Entras al panel de la tienda piloto." : "Sin correo y contraseña el botón queda bloqueado."} Entrar no cobra ni cambia pedidos.
+          {canEnter ? "Entras al panel de la tienda piloto." : "Sin correo y contraseña el botón queda bloqueado."} Entrar no cobra ni cambia pedidos. Mostrarla u ocultarla tampoco.
         </p>
 
         <button
@@ -226,7 +227,7 @@ function RecoveryForm({ onBack, linkError }: { onBack: () => void; linkError?: b
         {state.sent ? (
           <p role="status" className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 text-sm leading-5 text-ink">
             Si el correo existe, recibirás el enlace. Ábrelo en este mismo navegador; te traerá a «Nueva
-            contraseña».
+            contraseña». Recibirlo no cobra ni cambia pedidos.
           </p>
         ) : null}
         {state.error ? (
@@ -251,6 +252,7 @@ function RecoveryForm({ onBack, linkError }: { onBack: () => void; linkError?: b
         <button type="button" className="text-sm font-semibold text-accent-strong" onClick={onBack}>
           Volver a iniciar sesión
         </button>
+        <p className="text-xs leading-5 text-muted">Volver no envía el enlace ni cobra.</p>
       </div>
     </>
   );
@@ -320,6 +322,7 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
               type="button"
               className="absolute top-1/2 right-2 h-10 -translate-y-1/2 rounded-[10px] px-2 text-sm font-semibold text-accent-strong"
               aria-pressed={visible}
+              title="Mostrarla u ocultarla no cobra ni cambia pedidos."
               onClick={() => setVisible((current) => !current)}
             >
               {visible ? "Ocultar" : "Mostrar"}
@@ -363,6 +366,7 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
       <button type="button" className="mt-3 text-sm font-semibold text-accent-strong" onClick={onBack}>
         Volver a iniciar sesión
       </button>
+      <p className="mt-1 text-xs leading-5 text-muted">Volver no guarda la contraseña ni cobra.</p>
     </>
   );
 }

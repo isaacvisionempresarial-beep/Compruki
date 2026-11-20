@@ -127,6 +127,7 @@ export function ConfirmationScreen({
           <Link href="/tienda/condiciones" className="inline-flex text-sm font-semibold text-accent-strong">
             Condiciones de la compra
           </Link>
+          <p className="text-xs leading-5 text-muted">Leerlas no cobra. El total guardado no cambia.</p>
         </div>
 
         <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3rem] xl:order-2">

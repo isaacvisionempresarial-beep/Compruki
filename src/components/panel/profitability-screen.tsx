@@ -201,7 +201,7 @@ export function ProfitabilityScreen({
               </span>
             </li>
           </ul>
-          <p className="mt-3 text-xs leading-5 text-muted">Cifras de COMPRUKI. Dropi no está conectado.</p>
+          <p className="mt-3 text-xs leading-5 text-muted">Cifras de COMPRUKI. Leerlas no cobra ni cambia los pedidos. Dropi no está conectado.</p>
         </aside>
       </div>
     </div>

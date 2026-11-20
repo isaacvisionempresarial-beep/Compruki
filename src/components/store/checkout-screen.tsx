@@ -251,6 +251,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                 <summary className="cursor-pointer text-sm font-semibold text-muted">
                   Vista previa del texto de entrega
                 </summary>
+                <p className="mt-1 text-xs leading-5 text-muted">Abrirla no confirma el pedido ni cobra.</p>
                 <p className="mt-2 text-sm leading-5 text-ink">
                   Si confirmas, el pedido queda pendiente por {formatCop(total)}. Nadie cobra aquí.
                   <span className="mt-1 block font-normal whitespace-pre-wrap text-muted">{handoff}</span>

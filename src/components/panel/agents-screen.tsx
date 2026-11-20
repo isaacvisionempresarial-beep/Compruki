@@ -346,6 +346,7 @@ export function AgentsScreen({
         <h2 id="mas-adelante" className="text-base font-bold">
           Más adelante (P1 / P2)
         </h2>
+        <p className="mt-1 text-sm text-muted">Todavía no se usan. Verlos no cobra ni cambia pedidos.</p>
         <ul className="mt-3 space-y-2">
           {later.map((role) => (
             <li key={role.id} className="rounded-[14px] border border-line bg-card px-4 py-2.5">
