@@ -56,7 +56,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
         {rows.length === 0 ? (
           <p className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 text-sm leading-5 text-muted">
             El carrito está vacío. Vacío no registra pedido ni cobra.{" "}
-            <Link href="/tienda" className="font-semibold text-accent-strong">
+            <Link href="/tienda" title="Verlos no cambia los precios publicados ni crea un pedido." className="font-semibold text-accent-strong">
               Ver productos
             </Link>
           </p>
@@ -88,6 +88,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                             {product ? (
                               <Link
                                 href={`/tienda/producto/${product.sku}`}
+                                title="Abrirla no cambia el precio publicado ni crea un pedido."
                                 className="font-semibold text-ink underline-offset-2 hover:text-accent-strong hover:underline"
                               >
                                 {product.title}
@@ -227,6 +228,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
               <>
                 <Link
                   href="/tienda"
+                  title="Verlos no cambia los precios publicados ni crea un pedido."
                   className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary text-sm font-semibold text-on-dark"
                 >
                   Ver productos

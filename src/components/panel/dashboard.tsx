@@ -369,7 +369,7 @@ export function Dashboard({
           </div>
         )}
         <div className="mt-3">
-          <Link href="/panel/rentabilidad" className="text-sm font-semibold text-accent-strong">
+          <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="text-sm font-semibold text-accent-strong">
             Ver el detalle en Rentabilidad
           </Link>
         </div>
@@ -502,7 +502,7 @@ export function Dashboard({
           </ul>
           <p className="mt-3 text-xs leading-5 text-muted">
             Leerlas no cobra ni cambia pedidos. Dropi no está conectado. El número se anota en{" "}
-            <Link href="/panel/sincronizacion" className="font-semibold text-accent-strong">
+            <Link href="/panel/sincronizacion" title="Abrirla no cobra. El total guardado no cambia." className="font-semibold text-accent-strong">
               Sincronización
             </Link>
             .

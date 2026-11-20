@@ -133,7 +133,7 @@ export function SyncScreen({ orders }: { orders: StoreOrder[] }) {
           </ul>
           <p className="mt-3 text-xs leading-5 text-muted">
             Leer esto no cobra. Dropi no está conectado. Estado de la cuenta en{" "}
-            <Link href="/panel/conexiones" className="font-semibold text-accent-strong">
+            <Link href="/panel/conexiones" title="Verlas no cobra ni cambia pedidos." className="font-semibold text-accent-strong">
               Conexiones
             </Link>
             .
@@ -160,7 +160,7 @@ function SyncRow({ order, note, number, cta = "Anotar número" }: { order: Store
   const written = number?.trim() ?? "";
   return (
     <li>
-      <Link href={syncFocusHref(order.number)} className={cx("grid items-start gap-3 px-3 py-2 text-sm hover:bg-canvas md:gap-4", syncGrid)}>
+      <Link href={syncFocusHref(order.number)} title="Abrirla no cobra. El total guardado no cambia." className={cx("grid items-start gap-3 px-3 py-2 text-sm hover:bg-canvas md:gap-4", syncGrid)}>
         <span>
           <span className="text-sm font-bold">{order.number}</span>
           <span className="mt-0.5 block text-xs text-muted">{formatDay(order.createdAt.slice(0, 10))}</span>

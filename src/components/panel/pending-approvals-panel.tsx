@@ -38,7 +38,7 @@ export function PendingApprovalsPanel({
                   {item.kind}
                 </span>
                 {item.href ? (
-                  <Link href={item.href} className="font-semibold text-accent-strong">
+                  <Link href={item.href} title="Abrirlo no cobra ni cambia pedidos." className="font-semibold text-accent-strong">
                     {item.label}
                   </Link>
                 ) : (

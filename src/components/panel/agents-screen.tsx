@@ -200,7 +200,7 @@ export function AgentsScreen({
                   Margen estimado {formatCop(product.margin)}. No es dinero cobrado.
                   {product.variants.length > 0 ? ` · ${product.variants.length} variantes` : ""}
                 </p>
-                <Link href={`/panel/catalogo/${encodeURIComponent(product.sku)}`} className="mt-2 inline-flex text-sm font-semibold text-accent-strong">
+                <Link href={`/panel/catalogo/${encodeURIComponent(product.sku)}`} title="Abrirla no cobra ni cambia el precio ni la publicación." className="mt-2 inline-flex text-sm font-semibold text-accent-strong">
                   Abrir en catálogo
                 </Link>
               </li>

@@ -25,7 +25,7 @@ export default function GlobalError({ error, retry }: { error: unknown; retry: (
         <title>Algo falló · COMPRUKI</title>
       </head>
       <body className={`${jakarta.variable} font-sans antialiased`}>
-        <a className="skip-link" href="#contenido">
+        <a className="skip-link" href="#contenido" title="Saltar no cobra ni cambia el carrito.">
           Saltar al contenido
         </a>
         <main id="contenido" tabIndex={-1} className="min-h-dvh bg-canvas px-4 py-4 outline-none">

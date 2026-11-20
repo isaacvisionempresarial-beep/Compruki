@@ -23,7 +23,7 @@ export function ProductEditorPage({
     return (
       <div className="mx-auto max-w-[720px] pb-8">
         <p className="text-xs text-muted">
-          <Link href="/panel/catalogo" className="font-semibold text-accent-strong">
+          <Link href="/panel/catalogo" title="Volver no cobra ni cambia el precio ni la publicación." className="font-semibold text-accent-strong">
             Catálogo
           </Link>
         </p>

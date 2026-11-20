@@ -194,7 +194,7 @@ export function ProfitabilityScreen({
               <span className="mt-0.5 block text-muted">
                 Bajo «Ver pedidos».{" "}
                 {canManageOrderMoney ? "Precio actual en " : "El precio de la ficha lo cambia el propietario en "}
-                <Link href="/panel/catalogo" className="font-semibold text-accent-strong">
+                <Link href="/panel/catalogo" title="Abrirlo no cobra ni cambia el precio ni la publicación." className="font-semibold text-accent-strong">
                   Catálogo
                 </Link>
                 .

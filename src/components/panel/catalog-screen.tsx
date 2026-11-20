@@ -183,7 +183,7 @@ export function CatalogScreen({
               <span className="font-semibold text-sm">Pedidos</span>
               <span className="mt-0.5 block text-muted">
                 Lo vendido está en{" "}
-                <Link href="/panel/rentabilidad" className="font-semibold text-accent-strong">
+                <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="font-semibold text-accent-strong">
                   Rentabilidad
                 </Link>
                 .
@@ -473,7 +473,7 @@ function CampaignLink({
     return (
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
         <span className="font-semibold text-muted">Campaña</span>
-        <a href={path} target="_blank" rel="noreferrer" className="font-semibold text-accent-strong underline-offset-2 hover:underline">
+        <a href={path} target="_blank" rel="noreferrer" title="Abrirla no cobra ni cambia el precio ni la publicación." className="font-semibold text-accent-strong underline-offset-2 hover:underline">
           Abrir
         </a>
         <button

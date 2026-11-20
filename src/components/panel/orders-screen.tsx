@@ -351,7 +351,7 @@ export function OrdersScreen({
           </ul>
           <p className="mt-3 text-xs leading-5 text-muted">
             Dropi no está conectado. El número se anota en{" "}
-            <Link href="/panel/sincronizacion" className="font-semibold text-accent-strong">
+            <Link href="/panel/sincronizacion" title="Abrirla no cobra. El total guardado no cambia." className="font-semibold text-accent-strong">
               Sincronización
             </Link>
             .
@@ -409,12 +409,13 @@ export function OrderEditor({
           {order.collected ? <CollectedPill /> : null}
           <Link
             href="/panel/pedidos"
+            title="Volver no cobra ni cambia el total guardado."
             className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
           >
             Volver
           </Link>
           {canNoteDropiNumber(order) ? (
-            <Link href={syncFocusHref(order.number)} className="text-sm font-semibold text-accent-strong">
+            <Link href={syncFocusHref(order.number)} title="Abrirla no cobra. El total guardado no cambia." className="text-sm font-semibold text-accent-strong">
               Sincronización
             </Link>
           ) : null}
@@ -542,7 +543,7 @@ export function OrderEditor({
               ? `Número: ${order.providerRef}. `
               : "Falta el número de Dropi. "}
             No se envía desde aquí.{" "}
-            <Link href={syncFocusHref(order.number)} className="font-semibold text-accent-strong">
+            <Link href={syncFocusHref(order.number)} title="Abrirla no cobra. El total guardado no cambia." className="font-semibold text-accent-strong">
               Abrir
             </Link>
           </p>

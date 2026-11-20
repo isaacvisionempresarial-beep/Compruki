@@ -233,7 +233,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                   Acepto las condiciones: el pedido queda pendiente, el envío se acuerda antes de despachar y pago el precio
                   publicado al recibir.
                 </label>{" "}
-                <Link href="/tienda/condiciones" className="scroll-mb-24 font-semibold text-accent-strong">
+                <Link href="/tienda/condiciones" title="Leerlas no confirma el pedido ni cobra." className="scroll-mb-24 font-semibold text-accent-strong">
                   Leerlas
                 </Link>
                 <span className="mt-1 block text-xs leading-5 text-muted">Leerlas no confirma el pedido ni cobra.</span>
@@ -309,7 +309,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
             Confirmar registra en la tienda y no cobra. Dropi no está conectado: no crea el pedido ahí.
           </p>
           <p className="mt-2 text-sm leading-5 text-muted">
-            <Link href="/tienda/carrito" className="font-semibold text-accent-strong">
+            <Link href="/tienda/carrito" title="Volver no confirma el pedido ni cobra." className="font-semibold text-accent-strong">
               Volver al carrito
             </Link>
             <span className="mt-1 block text-xs">Volver no confirma el pedido ni cobra.</span>

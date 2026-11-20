@@ -80,7 +80,7 @@ export function CentralRouterPanel({
                 {route.pending.map((item) => (
                   <li key={item.id}>
                     {item.href ? (
-                      <Link href={item.href} className="font-semibold text-accent-strong">
+                      <Link href={item.href} title="Abrirlo no cobra ni cambia pedidos." className="font-semibold text-accent-strong">
                         {item.label}
                       </Link>
                     ) : (

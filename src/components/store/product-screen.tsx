@@ -227,7 +227,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               {descriptionIsLong ? (
                 <>
                   {" "}
-                  <a href="#descripcion" className="font-semibold text-accent-strong">
+                  <a href="#descripcion" title="Leerla no cambia el precio publicado ni crea un pedido." className="font-semibold text-accent-strong">
                     Leer la descripción completa
                   </a>
                 </>
@@ -414,7 +414,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               <p key={`${index}-${paragraph.slice(0, 16)}`}>{paragraph}</p>
             ))}
           </div>
-          <a href="#detalles" className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-accent-strong hover:underline">
+          <a href="#detalles" title="Ir ahí no cambia el precio publicado ni crea un pedido." className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-accent-strong hover:underline">
             Ver antes de pedir <span aria-hidden="true">→</span>
           </a>
         </section>
@@ -450,7 +450,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
         </div>
       </div>
 
-      <a href="#contenido" className="mt-3 inline-flex text-sm font-semibold text-accent-strong hover:underline">
+      <a href="#contenido" title="Volver no registra pedido ni cobra." className="mt-3 inline-flex text-sm font-semibold text-accent-strong hover:underline">
         Volver al producto <span className="ml-1" aria-hidden="true">↑</span>
       </a>
       <p className="mt-1 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>

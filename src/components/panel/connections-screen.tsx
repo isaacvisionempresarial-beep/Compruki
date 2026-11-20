@@ -51,7 +51,7 @@ export function ConnectionsScreen({
               <li className="rounded-[10px] border border-line px-3 py-2">
                 <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">Agentes P0-IA</p>
                 <p className="mt-0.5 font-semibold">Modo determinista</p>
-                <Link href="/panel/agentes" className="mt-1 inline-flex text-sm font-semibold text-accent-strong">
+                <Link href="/panel/agentes" title="Abrirlo no cobra ni cambia pedidos." className="mt-1 inline-flex text-sm font-semibold text-accent-strong">
                   Abrir centro de agentes
                 </Link>
               </li>

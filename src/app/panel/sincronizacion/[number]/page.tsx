@@ -34,10 +34,10 @@ export default async function SyncOrderPage({ params }: { params: Promise<{ numb
         <StatusPill status={order.status} />
       </div>
       <div className="mt-3 flex flex-wrap gap-3 text-sm font-semibold">
-        <Link href="/panel/sincronizacion" className="text-accent-strong">
+        <Link href="/panel/sincronizacion" title="Volver no cobra. El total guardado no cambia." className="text-accent-strong">
           Volver a sincronización
         </Link>
-        <Link href={orderFocusHref(order.number)} className="text-accent-strong">
+        <Link href={orderFocusHref(order.number)} title="Abrirlo no cobra ni cambia el total guardado." className="text-accent-strong">
           Abrir el pedido
         </Link>
       </div>

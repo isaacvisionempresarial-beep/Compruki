@@ -124,7 +124,7 @@ export function ConfirmationScreen({
               <p className="mt-1">{order.buyerNote}</p>
             </section>
           ) : null}
-          <Link href="/tienda/condiciones" className="inline-flex text-sm font-semibold text-accent-strong">
+          <Link href="/tienda/condiciones" title="Leerlas no cobra. El total guardado no cambia." className="inline-flex text-sm font-semibold text-accent-strong">
             Condiciones de la compra
           </Link>
           <p className="text-xs leading-5 text-muted">Leerlas no cobra. El total guardado no cambia.</p>
