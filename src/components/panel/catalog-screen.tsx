@@ -87,17 +87,18 @@ export function CatalogScreen({
           {canManageCommerce ? (
             <Link
               href="/panel/catalogo/nuevo"
+              title="Crearlo no cobra ni confirma un pedido."
               className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold hover:bg-subtle"
             >
               Nuevo producto
             </Link>
           ) : (
-            <p className="inline-flex h-10 items-center text-sm text-muted">Solo el propietario crea productos.</p>
+            <p className="inline-flex h-10 items-center text-sm text-muted">Solo el propietario crea productos. No cobra.</p>
           )}
           <button
             type="button"
             disabled
-            title="Disponible cuando Dropi esté autorizado"
+            title="Disponible cuando Dropi esté autorizado. No cobra."
             className="inline-flex h-10 cursor-not-allowed items-center justify-center rounded-[10px] bg-subtle px-4 text-sm font-semibold text-muted"
           >
             Importar desde Dropi
@@ -130,6 +131,7 @@ export function CatalogScreen({
               );
             })}
           </div>
+          <p className="mt-2 text-xs leading-5 text-muted">Filtrar no cobra ni cambia el precio ni la publicación.</p>
 
           {visible.length === 0 ? (
             <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
@@ -403,14 +405,14 @@ function CatalogRowLifecycle({
 function catalogEmptyMessage(total: number, searched: number, filter: FilterId, query: string, canManageCommerce: boolean) {
   if (total === 0) {
     return canManageCommerce
-      ? "Todavía no hay productos en el catálogo. Crea uno a mano. Importar desde Dropi sigue pendiente de autorización."
-      : "Todavía no hay productos en el catálogo. Solo el propietario puede crear uno. Importar desde Dropi sigue pendiente de autorización.";
+      ? "Todavía no hay productos en el catálogo. Crea uno a mano. No cobra. Importar desde Dropi sigue pendiente de autorización."
+      : "Todavía no hay productos en el catálogo. Solo el propietario puede crear uno. No cobra. Importar desde Dropi sigue pendiente de autorización.";
   }
-  if (query && searched === 0) return "Ningún producto coincide con la búsqueda.";
-  if (filter === "tienda") return "No hay productos en tienda.";
-  if (filter === "ocultos") return "No hay borradores.";
-  if (filter === "agotados") return "No hay publicados no pedibles.";
-  return "No hay productos en este grupo.";
+  if (query && searched === 0) return "Ningún producto coincide con la búsqueda. Filtrar no cobra ni cambia el precio ni la publicación.";
+  if (filter === "tienda") return "No hay productos en tienda. Filtrar no cobra ni cambia el precio ni la publicación.";
+  if (filter === "ocultos") return "No hay borradores. Filtrar no cobra ni cambia el precio ni la publicación.";
+  if (filter === "agotados") return "No hay publicados no pedibles. Filtrar no cobra ni cambia el precio ni la publicación.";
+  return "No hay productos en este grupo. Filtrar no cobra ni cambia el precio ni la publicación.";
 }
 
 function matches(product: CatalogProduct, filter: FilterId) {

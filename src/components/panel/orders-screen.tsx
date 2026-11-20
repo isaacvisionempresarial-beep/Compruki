@@ -586,7 +586,7 @@ export function OrderEditor({
             )}
           </div>
           <p className="mt-2 text-xs leading-5 text-muted">
-            Estas acciones no cambian el total guardado ni el precio de las líneas.
+            Estas acciones no cambian el total guardado ni el precio de las líneas. No cobran en esta pantalla.
             {actions.some((item) => item.id === "entregar")
               ? " Marcar entregado no anota el cobro ni la utilidad realizada."
               : ""}

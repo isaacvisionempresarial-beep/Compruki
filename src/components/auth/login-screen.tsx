@@ -36,7 +36,7 @@ export function LoginScreen({
         <div className="mt-8 max-w-md">
           <p className="text-3xl font-semibold tracking-tight text-balance">«Tu negocio, en modo venta.»</p>
           <p className="mt-2 text-sm leading-5 text-on-dark-muted">
-            Pedidos, sincronización, catálogo y rentabilidad, cada uno en su sitio. Dropi no está conectado.
+            Pedidos, sincronización, catálogo y rentabilidad, cada uno en su sitio. Leer esto no cobra ni cambia pedidos. Dropi no está conectado.
           </p>
           <ul className="mt-4 space-y-2">
             {[
@@ -62,7 +62,7 @@ export function LoginScreen({
             <Wordmark />
             <p className="mt-2 text-lg font-semibold tracking-tight">«Tu negocio, en modo venta.»</p>
             <p className="mt-1 text-sm leading-5 text-muted">
-              Pedidos, sincronización, catálogo y rentabilidad. Dropi no está conectado.
+              Pedidos, sincronización, catálogo y rentabilidad. Leer esto no cobra ni cambia pedidos. Dropi no está conectado.
             </p>
           </div>
 
@@ -95,7 +95,7 @@ function LoginForm({ onRecover, accessDenied }: { onRecover: () => void; accessD
       {accessDenied ? (
         <div className="mt-3 space-y-2">
           <p role="alert" className="rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
-            Tu cuenta entró, pero no tiene membresía en la tienda piloto. Pide que te enlacen en Supabase
+            Tu cuenta entró, pero no tiene membresía en la tienda piloto. No cobra ni cambia pedidos. Pide que te enlacen en Supabase
             (tabla memberships) o cierra sesión.
           </p>
           <form action={signOut}>
@@ -105,6 +105,7 @@ function LoginForm({ onRecover, accessDenied }: { onRecover: () => void; accessD
             >
               Cerrar sesión
             </button>
+            <p className="text-xs leading-5 text-muted">Cerrarla no cobra ni cambia pedidos.</p>
           </form>
         </div>
       ) : null}

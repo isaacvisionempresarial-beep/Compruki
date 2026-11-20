@@ -103,9 +103,11 @@ export default function ConditionsPage() {
           >
             Volver a la tienda
           </Link>
+          <p className="mt-2 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>
           <Link href="/tienda/consultar" className="mt-2 inline-flex w-full justify-center text-xs font-semibold text-accent-strong">
             Consultar pedido
           </Link>
+          <p className="mt-2 text-xs leading-5 text-muted">Consultar no cobra ni cambia el total guardado.</p>
         </aside>
       </div>
     </div>
