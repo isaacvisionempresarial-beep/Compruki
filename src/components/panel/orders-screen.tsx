@@ -1228,7 +1228,7 @@ function AddProductForm({ order, products }: { order: StoreOrder; products: Orde
         <span className="mt-1 block font-normal leading-5 text-muted">
           De 1 a 5. Se copia el precio de la ficha de hoy a este pedido. No cambia el catálogo. Si ya está en el pedido, cambia la cantidad, la talla o el tamaño
           de arriba. Sin producto, talla o cantidad válida el botón queda bloqueado. Guardar aquí no cambia nada en
-          Dropi.
+          Dropi. No es dinero cobrado.
           {quantityReady ? "" : " Vacío, cero o más de 5 no se agrega: el botón queda bloqueado."}
           {alreadyOnOrder ? " Ese producto ya está en el pedido: el botón queda bloqueado." : ""}
           {preview !== null ? ` Al agregar, el total de productos queda en ${formatCop(preview)}.` : ""}
@@ -1436,6 +1436,9 @@ function LinesForm({
       >
         Guardar productos
       </button>
+      <p className="text-xs leading-5 text-muted">
+        Guardar no es dinero cobrado. Si cambia la cantidad o quitas un producto, el total guardado sí puede cambiar.
+      </p>
     </form>
   );
 }

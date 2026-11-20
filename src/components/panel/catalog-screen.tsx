@@ -238,7 +238,7 @@ function CatalogProductRow({
               className="h-full w-full object-contain"
             />
           ) : (
-            <span className="px-1 text-center text-[10px] font-semibold text-muted">Sin foto</span>
+            <span className="px-1 text-center text-[10px] font-semibold text-muted" title="El precio de la ficha no cambia.">Sin foto</span>
           )}
         </div>
 
@@ -360,6 +360,7 @@ function CatalogRowLifecycle({
           >
             No
           </button>
+          <p className="w-full text-xs leading-5 text-muted">Quita el producto del catálogo. No cobra ni confirma un pedido.</p>
           {deleteState.error ? <span className="text-xs font-semibold text-danger">{deleteState.error}</span> : null}
         </form>
       );

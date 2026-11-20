@@ -358,6 +358,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                     : "Elige la talla"
                   : "Pedir · pagas al recibir"}
               </button>
+              <p className="text-xs leading-5 text-muted">Pedirlo lleva al pago. No confirma el pedido ni cobra.</p>
               <button
                 type="submit"
                 disabled={!canBuy}
