@@ -190,7 +190,7 @@ export function CatalogScreen({
               </span>
             </li>
           </ul>
-          <p className="mt-3 text-xs leading-5 text-muted">Dropi no está conectado.</p>
+          <p className="mt-3 text-xs leading-5 text-muted">Leer esto no cobra ni cambia el precio ni la publicación. Dropi no está conectado.</p>
         </aside>
       </div>
     </div>
@@ -1214,7 +1214,7 @@ export function ProductEditor({
               {margin === null ? "—" : formatCop(margin)}
             </p>
           </div>
-          <p className="mt-1.5 text-xs leading-5 text-muted">Precio − costo − envío − comisiones.</p>
+          <p className="mt-1.5 text-xs leading-5 text-muted">Precio − costo − envío − comisiones. Es el margen de la ficha, no dinero cobrado.</p>
           <dl className="mt-2 space-y-1.5 border-t border-line pt-2 text-xs">
             <div className="flex justify-between gap-2">
               <dt className="text-muted">Precio</dt>
@@ -1247,7 +1247,7 @@ export function ProductEditor({
               </span>
             </li>
           </ul>
-          <p className="mt-3 text-xs leading-5 text-muted">Dropi no está conectado. Las fotos se suben aquí.</p>
+          <p className="mt-3 text-xs leading-5 text-muted">Dropi no está conectado. Las fotos se suben aquí. Subirlas no cobra ni cambia el precio ni la publicación.</p>
         </aside>
       </div>
     </div>

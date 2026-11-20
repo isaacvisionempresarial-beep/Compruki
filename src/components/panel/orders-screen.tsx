@@ -246,12 +246,12 @@ export function OrdersScreen({
       </section>
       {orders.length === 0 ? (
         <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-          Todavía no entra ningún pedido de la tienda.
+          Todavía no entra ningún pedido de la tienda. No cobra.
         </p>
       ) : (
         <>
           <h2 className="mt-3 text-sm font-semibold">Todos los pedidos</h2>
-          <p className="mt-0.5 text-xs text-muted">Buscar o filtrar solo cambia esta lista.</p>
+          <p className="mt-0.5 text-xs text-muted">Buscar o filtrar solo cambia esta lista. No cobra ni cambia el total guardado.</p>
           <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Filtrar por estado">
             <StatusFilter
               label="Todos"
@@ -431,7 +431,7 @@ export function OrderEditor({
             {canManageOrderMoney ? (
               <AddProductForm order={order} products={products} />
             ) : (
-              <p className="mt-3 text-sm text-muted">Solo el propietario agrega productos a este pedido.</p>
+              <p className="mt-3 text-sm text-muted">Solo el propietario agrega productos a este pedido. No cobra. No es dinero cobrado.</p>
             )}
           </>
         ) : (
@@ -684,7 +684,7 @@ export function OrderEditor({
           ) : null}
           </>
         ) : (
-          <p className="mt-2 text-sm text-muted">No hay una acción disponible en este estado.</p>
+          <p className="mt-2 text-sm text-muted">No hay una acción disponible en este estado. No cobra. El total guardado no cambia.</p>
         )}
       </section>
       </aside>
@@ -732,7 +732,7 @@ export function OrderEditor({
             </ol>
           </div>
         ) : (
-          <p className="mt-2 text-sm text-muted">Todavía no hay movimientos anotados.</p>
+          <p className="mt-2 text-sm text-muted">Todavía no hay movimientos anotados. Verlos no cobra ni cambia el total guardado.</p>
         )}
       </section>
     </div>
@@ -1144,7 +1144,7 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
         {showCollection ? "Guardar flete y recaudo" : "Guardar flete"}
       </button>
       ) : (
-        <p className="text-sm leading-5 text-muted">Solo el propietario guarda el flete y el recaudo.</p>
+        <p className="text-sm leading-5 text-muted">Solo el propietario guarda el flete y el recaudo. No cobra.</p>
       )}
     </form>
   );
@@ -1167,7 +1167,7 @@ function AddProductForm({ order, products }: { order: StoreOrder; products: Orde
   const preview = canAdd && chosen ? order.total + chosen.price * qty : null;
 
   if (products.length === 0) {
-    return <p className="mt-3 text-sm text-muted">No hay productos publicados y disponibles para agregar.</p>;
+    return <p className="mt-3 text-sm text-muted">No hay productos publicados y disponibles para agregar. No cobra. El total guardado no cambia.</p>;
   }
 
   return (

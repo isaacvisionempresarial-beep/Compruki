@@ -221,6 +221,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
           <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">{product.title}</h1>
           <p className="mt-1 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">SKU {product.sku}</p>
           {descriptionParagraphs.length > 0 ? (
+            <>
             <p className="mt-2 text-sm leading-5 text-muted">
               {descriptionIsLong ? descriptionParagraphs[0] : product.description.trim()}
               {descriptionIsLong ? (
@@ -232,6 +233,10 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                 </>
               ) : null}
             </p>
+            {descriptionIsLong ? null : (
+              <p className="mt-1 text-xs leading-5 text-muted">Leerla no cambia el precio publicado ni crea un pedido.</p>
+            )}
+            </>
           ) : null}
 
           <div className="mt-2 border-y border-line py-2">
