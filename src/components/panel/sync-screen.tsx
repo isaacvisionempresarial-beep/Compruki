@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
+import { useActionState } from "react";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 import { StatusPill } from "@/components/panel/status-pill";
 import { cx } from "@/lib/cx";
@@ -15,11 +16,30 @@ import {
   syncFocusHref,
   type StoreOrder,
 } from "@/lib/store-order";
+import type { DropiEnqueueState, DropiQueuedJob } from "@/lib/dropi-provider";
+import { enqueueDropiSend } from "@/server/dropi-connection";
 
 const syncGrid = "md:grid-cols-[6.75rem_minmax(0,1.4fr)_12.5rem_9rem_4.25rem]";
 
-export function SyncScreen({ orders }: { orders: StoreOrder[] }) {
+const queueInitial: DropiEnqueueState = { error: null, message: null };
+
+export function SyncScreen({
+  orders,
+  jobs,
+  tableReady,
+  tableDetail,
+  canEnqueue,
+}: {
+  orders: StoreOrder[];
+  jobs: DropiQueuedJob[];
+  tableReady: boolean;
+  tableDetail: string;
+  canEnqueue: boolean;
+}) {
   const query = usePanelQuery().trim().toLocaleLowerCase("es");
+  const [queueState, queueAction, queuePending] = useActionState(enqueueDropiSend, queueInitial);
+  const queuedIds = new Set(jobs.map((job) => job.orderId));
+  const waiting = orders.filter((order) => awaitsDropiNumber(order) && !queuedIds.has(order.id));
   const noted = useMemo(
     () => orders.filter((order) => canNoteDropiNumber(order) && Boolean(normalizeProviderRef(order.providerRef ?? ""))),
     [orders],
@@ -65,6 +85,56 @@ export function SyncScreen({ orders }: { orders: StoreOrder[] }) {
 
       <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
         <div className="order-2 min-w-0 xl:order-1">
+      <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="cola-dropi">
+        <h2 id="cola-dropi" className="text-sm font-semibold">
+          Cola de envío ({jobs.length})
+        </h2>
+        <p className="mt-0.5 text-xs leading-5 text-muted">
+          {tableReady
+            ? "Dejar un pedido aquí no lo envía a Dropi. La cola queda bloqueada hasta que esta aplicación tenga autorización. El total guardado no cambia."
+            : tableDetail}
+        </p>
+        {queueState.error ? <p className="mt-2 text-sm leading-5 text-warning">{queueState.error}</p> : null}
+        {queueState.message ? <p className="mt-2 text-sm leading-5 text-ink">{queueState.message}</p> : null}
+        {jobs.length === 0 ? (
+          <p className="mt-2 text-sm text-muted">Todavía no hay pedidos en la cola.</p>
+        ) : (
+          <ul className="mt-2 divide-y divide-line text-sm">
+            {jobs.map((job) => (
+              <li key={job.orderId} className="py-2">
+                <span className="font-semibold">{job.orderNumber}</span>
+                <span className="mt-0.5 block text-xs leading-5 text-muted">{job.detail}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {waiting.length > 0 && tableReady ? (
+          <ul className="mt-2 space-y-2">
+            {waiting.map((order) => (
+              <li key={order.id} className="flex items-center justify-between gap-3 text-sm">
+                <span className="font-semibold">{order.number}</span>
+                {canEnqueue ? (
+                  <form action={queueAction}>
+                    <input type="hidden" name="orderId" value={order.id} />
+                    <button
+                      type="submit"
+                      title="Dejarlo en cola no lo envía a Dropi ni cobra. El total guardado no cambia."
+                      disabled={queuePending}
+                      className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-canvas ${
+                        queuePending ? "cursor-wait opacity-70" : ""
+                      }`}
+                    >
+                      {queuePending ? "Dejando…" : "Dejar en cola"}
+                    </button>
+                  </form>
+                ) : (
+                  <span className="text-xs text-muted">Lo deja el propietario.</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </section>
       {groups.map((group) => {
         const visible = group.rows.filter((order) => matchesSync(order, query));
         return (

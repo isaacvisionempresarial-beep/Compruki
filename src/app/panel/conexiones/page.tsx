@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ConnectionsScreen } from "@/components/panel/connections-screen";
+import { readDropiQueue } from "@/server/dropi-connection";
 import { getHealthSnapshot } from "@/server/health";
 
 export const metadata: Metadata = {
@@ -10,6 +11,13 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function ConnectionsPage() {
-  const health = await getHealthSnapshot();
-  return <ConnectionsScreen healthOk={health.ok} tenantPilotOk={health.checks.tenantPilot} />;
+  const [health, queue] = await Promise.all([getHealthSnapshot(), readDropiQueue()]);
+  return (
+    <ConnectionsScreen
+      healthOk={health.ok}
+      tenantPilotOk={health.checks.tenantPilot}
+      connection={queue.connection}
+      jobs={queue.jobs}
+    />
+  );
 }

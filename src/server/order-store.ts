@@ -61,6 +61,27 @@ export async function getOrder(id: string) {
   return (await readOrders()).find((order) => order.id === id) ?? null;
 }
 
+/** Anota el historial del pedido. No toca el total, el estado ni el número de Dropi. */
+export async function appendOrderHistory(id: string, summary: string, actorName: string) {
+  const orders = await readOrders();
+  const current = orders.find((order) => order.id === id);
+  if (!current) return { error: "No encontré ese pedido.", order: null };
+  const order: StoreOrder = {
+    ...current,
+    history: [
+      {
+        id: `evt_${randomUUID().slice(0, 8)}`,
+        at: bogotaNow(),
+        actorName,
+        summary,
+      },
+      ...current.history,
+    ],
+  };
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  return { error: null, order };
+}
+
 export async function findOrderForCustomer(number: string, phone: string) {
   const normalizedNumber = normalizeOrderNumber(number);
   const normalizedPhone = normalizePhone(phone);

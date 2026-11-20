@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { SyncScreen } from "@/components/panel/sync-screen";
+import { readDropiQueue } from "@/server/dropi-connection";
 import { listOrders } from "@/server/order-store";
+import { requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
   title: "Sincronización",
@@ -10,5 +12,15 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function SyncPage() {
-  return <SyncScreen orders={await listOrders()} />;
+  const access = await requirePanelAccess();
+  const [orders, queue] = await Promise.all([listOrders(), readDropiQueue()]);
+  return (
+    <SyncScreen
+      orders={orders}
+      jobs={queue.jobs}
+      tableReady={queue.connection.tableReady}
+      tableDetail={queue.connection.detail}
+      canEnqueue={access.role === "owner" && queue.connection.tableReady}
+    />
+  );
 }
