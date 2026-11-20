@@ -239,6 +239,7 @@ function CatalogProductRow({
             <img
               src={cover ? `/panel/imagen/${product.sku}?m=${cover.id}` : `/panel/imagen/${product.sku}`}
               alt=""
+              title="Verla no cambia el precio de la ficha."
               className="h-full w-full object-contain"
             />
           ) : (
@@ -377,6 +378,7 @@ function CatalogRowLifecycle({
     return (
       <button
         type="button"
+        title="Todavía no elimina. No cobra."
         className="inline-flex h-8 items-center justify-center rounded-[10px] border border-danger bg-card px-3 text-sm font-semibold text-danger hover:bg-danger-tint"
         onClick={() => setConfirmDelete(true)}
       >
@@ -829,6 +831,9 @@ export function ProductEditor({
                       })),
                     ]}
                     label="Fotos del producto"
+                    photoTitle="Verla no cambia el precio ni la publicación."
+                    moveTitle="Pasarla no cambia el precio ni la publicación."
+                    brokenNote="El precio de la ficha no cambia."
                     frameClassName="h-[min(28rem,56vh)] w-full"
                     singleClassName="max-h-[28rem] w-full object-contain"
                     roundedClassName="rounded-[10px]"

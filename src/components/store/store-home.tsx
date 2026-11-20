@@ -139,6 +139,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
                       roundedClassName="rounded-none"
                       compact
                       openLabel={`Ver ${product.title}`}
+                      openTitle="Abrirla no cambia el precio publicado ni crea un pedido."
                       onOpen={() => router.push(`/tienda/producto/${product.sku}`)}
                     />
                   ) : null}

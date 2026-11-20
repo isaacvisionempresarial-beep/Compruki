@@ -213,6 +213,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
               <>
                 <Link
                   href="/tienda/pagar"
+                  title="Continuar no confirma el pedido ni cobra."
                   className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark"
                 >
                   Continuar · pagas al recibir
@@ -224,6 +225,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                 <p
                   className="inline-flex h-10 w-full cursor-not-allowed items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark opacity-55"
                   aria-disabled="true"
+                  title="Continuar no confirma el pedido ni cobra."
                 >
                   Continuar · pagas al recibir
                 </p>

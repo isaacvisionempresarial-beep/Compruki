@@ -18,6 +18,10 @@ export function PhotoCarousel({
   onIndexChange,
   onOpen,
   openLabel = "Ampliar foto",
+  openTitle = "Ampliarla no cambia el precio publicado ni crea un pedido.",
+  photoTitle = "Verla no cambia el precio publicado ni crea un pedido.",
+  moveTitle = "Pasarla no cambia el precio publicado ni crea un pedido.",
+  brokenNote = "El precio publicado no cambia.",
   corner,
   priority = false,
   compact = false,
@@ -32,6 +36,10 @@ export function PhotoCarousel({
   onIndexChange?: (index: number) => void;
   onOpen?: () => void;
   openLabel?: string;
+  openTitle?: string;
+  photoTitle?: string;
+  moveTitle?: string;
+  brokenNote?: string;
   corner?: ReactNode;
   priority?: boolean;
   compact?: boolean;
@@ -76,7 +84,7 @@ export function PhotoCarousel({
     <div className={multiple ? "grid h-full w-full place-items-center px-3 text-center" : "grid min-h-36 w-full place-items-center px-3 text-center"}>
       <span>
         <span className="block text-xs font-semibold text-muted">Sin foto</span>
-        <span className="mt-1 block text-[11px] leading-4 text-muted">El precio publicado no cambia.</span>
+        <span className="mt-1 block text-[11px] leading-4 text-muted">{brokenNote}</span>
       </span>
     </div>
   ) : (
@@ -88,6 +96,7 @@ export function PhotoCarousel({
       className={multiple ? "h-full w-full object-contain" : singleClassName}
       fetchPriority={priority && current === 0 ? "high" : "auto"}
       draggable={false}
+      title={onOpen ? undefined : photoTitle}
       onError={() => setFailed((prev) => (prev[slide.key] ? prev : { ...prev, [slide.key]: true }))}
     />
   );
@@ -117,7 +126,7 @@ export function PhotoCarousel({
           type="button"
           className={multiple ? "absolute inset-0 cursor-zoom-in border-0 bg-transparent p-0" : "block w-full cursor-zoom-in border-0 bg-transparent p-0"}
           aria-label={openLabel}
-          title="Ampliarla no cambia el precio publicado ni crea un pedido."
+          title={openTitle}
           onClick={() => {
             if (swiped.current) {
               swiped.current = false;
@@ -142,7 +151,7 @@ export function PhotoCarousel({
             data-carousel-control="prev"
             className={`absolute top-1/2 z-10 grid -translate-y-1/2 place-items-center rounded-full border-0 bg-card/90 text-ink shadow-md backdrop-blur-sm hover:bg-card ${dense ? "left-1.5 h-7 w-7" : compact ? "left-3 h-8 w-8" : "left-3 h-10 w-10"}`}
             aria-label="Foto anterior"
-            title="Pasarla no cambia el precio publicado ni crea un pedido."
+            title={moveTitle}
             onClick={() => go(-1)}
           >
             <Chevron direction="left" small={dense} />
@@ -152,7 +161,7 @@ export function PhotoCarousel({
             data-carousel-control="next"
             className={`absolute top-1/2 z-10 grid -translate-y-1/2 place-items-center rounded-full border-0 bg-card/90 text-ink shadow-md backdrop-blur-sm hover:bg-card ${dense ? "right-1.5 h-7 w-7" : compact ? "right-3 h-8 w-8" : "right-3 h-10 w-10"}`}
             aria-label="Foto siguiente"
-            title="Pasarla no cambia el precio publicado ni crea un pedido."
+            title={moveTitle}
             onClick={() => go(1)}
           >
             <Chevron direction="right" small={dense} />
@@ -164,7 +173,7 @@ export function PhotoCarousel({
                 type="button"
                 data-carousel-control="dot"
                 aria-label={`Ver foto ${itemIndex + 1}`}
-                title="Pasarla no cambia el precio publicado ni crea un pedido."
+                title={moveTitle}
                 aria-current={itemIndex === current ? "true" : undefined}
                 className={`h-1.5 rounded-full border-0 shadow-[0_0_0_1px_rgba(34,38,56,0.35)] ${itemIndex === current ? "w-4 bg-card" : "w-1.5 bg-card/70"}`}
                 onClick={() => {

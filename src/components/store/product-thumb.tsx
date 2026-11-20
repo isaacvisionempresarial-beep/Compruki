@@ -12,6 +12,7 @@ export function CatalogPhoto({
   frameClassName,
   query,
   note,
+  title,
 }: {
   sku: string;
   alt: string;
@@ -19,12 +20,13 @@ export function CatalogPhoto({
   frameClassName?: string;
   query?: string;
   note?: string;
+  title?: string;
 }) {
   const [failed, setFailed] = useState(false);
   if (failed) {
     return (
       <div className={cx("grid place-items-center bg-subtle px-2 text-center", frameClassName)}>
-        <span>
+        <span title={title}>
           <span className="block text-xs font-semibold text-muted">Sin foto</span>
           {note ? <span className="mt-1 block text-[11px] leading-4 text-muted">{note}</span> : null}
         </span>
@@ -36,7 +38,7 @@ export function CatalogPhoto({
     <div className={cx("overflow-hidden bg-subtle", frameClassName)}>
       {/* Ruta local dinámica + Sin foto en onError; next/image no aporta aquí. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt={alt} className={imgClassName} onError={() => setFailed(true)} />
+      <img src={src} alt={alt} title={title} className={imgClassName} onError={() => setFailed(true)} />
     </div>
   );
 }
@@ -47,6 +49,7 @@ export function ProductThumb({ sku, show }: { sku: string; show: boolean }) {
     <CatalogPhoto
       sku={sku}
       alt=""
+      title="Verla no cambia el precio publicado ni crea un pedido."
       frameClassName="h-12 w-12 shrink-0 rounded-[10px]"
       imgClassName="h-12 w-12 rounded-[10px] bg-canvas object-contain"
     />
