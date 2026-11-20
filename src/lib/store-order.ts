@@ -979,15 +979,15 @@ export function payableTotalLabel(status: OrderStatus) {
 
 export function customerPayLine(status: OrderStatus, collected = false) {
   if (status === "cancelado" || status === "devuelto") {
-    return "Este pedido ya no se cobra. El total guardado no cambió. ";
+    return "Ya no se paga al recibir. Nadie cobra en la tienda. El total guardado no cambió. ";
   }
   if (status === "entregado") {
     return collected
-      ? "La tienda anotó el cobro. El total guardado no cambió. "
-      : "El cobro contra entrega todavía no está anotado. El total guardado no cambió. ";
+      ? "La tienda anotó el cobro contra entrega. Nadie lo cobró en esta tienda. El total guardado no cambió. "
+      : "El cobro contra entrega todavía no está anotado. Nadie cobra en la tienda. El total guardado no cambió. ";
   }
   if (status === "incidencia") {
-    return "Mientras dure la incidencia no se cobra. Si continúa, pagas al recibir. El total guardado no cambió. ";
+    return "Mientras dure, no se paga al recibir. Si continúa, pagas al recibir. Nadie cobra en la tienda. El total guardado no cambió. ";
   }
   if (
     status === "pendiente_confirmacion" ||
@@ -1273,8 +1273,8 @@ export function customerProgressNote(status: OrderStatus, collected = false) {
       return "Dropi no está conectado. Sin guía ni una fecha exacta de llegada. El total guardado no cambió. Pagas al recibir.";
     case "entregado":
       return collected
-        ? "La tienda anotó el cobro contra entrega. El total guardado no cambió. Dropi no está conectado: sin guía."
-        : "El cobro contra entrega todavía no está anotado. El total guardado no cambió. Dropi no está conectado: sin guía.";
+        ? "La tienda anotó el cobro contra entrega. Nadie lo cobró en esta tienda. El total guardado no cambió. Dropi no está conectado: sin guía."
+        : "El cobro contra entrega todavía no está anotado. Nadie cobra en la tienda. El total guardado no cambió. Dropi no está conectado: sin guía.";
     default:
       return "";
   }
@@ -1294,25 +1294,25 @@ export function customerStatusNote(status: OrderStatus, reason = "", byCustomer 
       return "La tienda anotó el despacho. Dropi no está conectado. Sin guía ni una fecha exacta de llegada. El total guardado no cambió. Pagas al recibir.";
     case "entregado":
       return collected
-        ? "La tienda marcó el pedido como entregado y anotó el cobro contra entrega. El total guardado no cambió. Dropi no está conectado: sin guía."
-        : "La tienda marcó el pedido como entregado. El cobro contra entrega todavía no está anotado. El total guardado no cambió. Dropi no está conectado: sin guía.";
+        ? "La tienda marcó el pedido como entregado y anotó el cobro contra entrega. Nadie lo cobró en esta tienda. El total guardado no cambió. Dropi no está conectado: sin guía."
+        : "La tienda marcó el pedido como entregado. El cobro contra entrega todavía no está anotado. Nadie cobra en la tienda. El total guardado no cambió. Dropi no está conectado: sin guía.";
     case "incidencia":
       return detail
-        ? `La tienda marcó una incidencia: ${detail} El pedido no sigue su curso hasta que lo resuelva. Mientras dure, no se cobra. El total guardado no cambió.`
-        : "La tienda marcó una incidencia. El pedido no sigue su curso hasta que lo resuelva. Mientras dure, no se cobra. El total guardado no cambió.";
+        ? `La tienda marcó una incidencia: ${detail} El pedido no sigue su curso hasta que lo resuelva. Mientras dure, no se paga al recibir. Nadie cobra en la tienda. El total guardado no cambió.`
+        : "La tienda marcó una incidencia. El pedido no sigue su curso hasta que lo resuelva. Mientras dure, no se paga al recibir. Nadie cobra en la tienda. El total guardado no cambió.";
     case "cancelado":
       if (byCustomer) {
         return detail
-          ? `Cancelaste este pedido: ${detail} No se va a despachar. Ya no se cobra. El total guardado no cambió.`
-          : "Cancelaste este pedido. No se va a despachar. Ya no se cobra. El total guardado no cambió.";
+          ? `Cancelaste este pedido: ${detail} No se va a despachar. Ya no se paga al recibir. Nadie cobra en la tienda. El total guardado no cambió.`
+          : "Cancelaste este pedido. No se va a despachar. Ya no se paga al recibir. Nadie cobra en la tienda. El total guardado no cambió.";
       }
       return detail
-        ? `La tienda canceló este pedido: ${detail} No se va a despachar. Ya no se cobra. El total guardado no cambió.`
-        : "La tienda canceló este pedido. No se va a despachar. Ya no se cobra. El total guardado no cambió.";
+        ? `La tienda canceló este pedido: ${detail} No se va a despachar. Ya no se paga al recibir. Nadie cobra en la tienda. El total guardado no cambió.`
+        : "La tienda canceló este pedido. No se va a despachar. Ya no se paga al recibir. Nadie cobra en la tienda. El total guardado no cambió.";
     case "devuelto":
       return detail
-        ? `La tienda registró la devolución de este pedido: ${detail} Ya no se cobra. El total guardado no cambió.`
-        : "La tienda registró la devolución de este pedido. Ya no se cobra. El total guardado no cambió.";
+        ? `La tienda registró la devolución de este pedido: ${detail} Ya no se paga al recibir. Nadie cobra en la tienda. El total guardado no cambió.`
+        : "La tienda registró la devolución de este pedido. Ya no se paga al recibir. Nadie cobra en la tienda. El total guardado no cambió.";
     default:
       return "La tienda está revisando este pedido. Dropi no está conectado. No hay guía ni fecha de entrega.";
   }

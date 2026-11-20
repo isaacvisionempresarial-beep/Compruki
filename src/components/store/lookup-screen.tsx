@@ -99,7 +99,7 @@ export function LookupScreen() {
             </li>
           </ul>
           <p className="mt-3 text-xs leading-5 text-muted">
-            Solo estado en la tienda. Consultar no cobra ni cambia el total guardado. Dropi no está conectado. Sin guía ni fecha exacta.
+            Solo estado en la tienda. Si está cancelado, devuelto o en incidencia, ya no se paga al recibir. Anotar el cobro tampoco cobra aquí. Consultar no cambia el total guardado. Dropi no está conectado. Sin guía ni fecha exacta.
           </p>
           <Link
             href="/tienda/condiciones"

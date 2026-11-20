@@ -188,17 +188,17 @@ function nextStepCopy(order: CustomerOrder) {
   }
   if (order.status === "entregado") {
     return order.collected
-      ? "Pedido entregado. La tienda anotó el cobro. El total guardado no cambió."
-      : "Pedido entregado. El cobro contra entrega todavía no está anotado. El total guardado no cambió.";
+      ? "Pedido entregado. La tienda anotó el cobro contra entrega. Nadie lo cobró en esta tienda. El total guardado no cambió."
+      : "Pedido entregado. El cobro contra entrega todavía no está anotado. Nadie cobra en la tienda. El total guardado no cambió.";
   }
   if (order.status === "incidencia") {
-    return "La tienda está resolviendo una incidencia. Mientras dure, no se cobra. El total guardado no cambió.";
+    return "La tienda está resolviendo una incidencia. Mientras dure, no se paga al recibir. Nadie cobra en la tienda. El total guardado no cambió.";
   }
   if (order.status === "devuelto") {
-    return "El pedido fue marcado como devuelto. Ya no se cobra. El total guardado no cambió.";
+    return "El pedido fue marcado como devuelto. Ya no se paga al recibir. Nadie cobra en la tienda. El total guardado no cambió.";
   }
   if (order.status === "cancelado") {
-    return "Este pedido quedó cancelado. Ya no se cobra. El total guardado no cambió.";
+    return "Este pedido quedó cancelado. Ya no se paga al recibir. Nadie cobra en la tienda. El total guardado no cambió.";
   }
   return "Consulta el avance abajo.";
 }
