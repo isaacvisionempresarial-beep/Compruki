@@ -53,7 +53,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
           Pagas al recibir
         </h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Elige, deja el pedido y confirma el envío aparte. Los precios son los publicados. Nadie cobra aquí. Dropi no está conectado.
+          Elige y deja el pedido. El envío se acuerda aparte. Los precios son los publicados. Nadie cobra aquí. Dropi no está conectado.
         </p>
       </section>
 
@@ -178,7 +178,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
                           Ver
                         </span>
                       </div>
-                      <p className="mt-1 text-[11px] leading-4 text-muted">Pagas al recibir. Envío aparte.</p>
+                      <p className="mt-1 text-[11px] leading-4 text-muted">Pagas al recibir. Envío aparte. No se cobra aquí.</p>
                     </div>
                   </Link>
                 </li>
@@ -188,11 +188,11 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
         </div>
 
         <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3rem] xl:order-2">
-          <h2 className="text-sm font-semibold">Cómo comprar</h2>
+          <h2 className="text-sm font-semibold">Cómo pedir</h2>
           <ul className="mt-2 space-y-2 text-xs leading-5">
             <li>
               <span className="font-semibold text-sm">Elige</span>
-              <span className="mt-0.5 block text-muted">Entra a la ficha, elige talla o tamaño y agrega al carrito.</span>
+              <span className="mt-0.5 block text-muted">Entra a la ficha, elige talla o tamaño y agrega al carrito. No registra pedido ni cobra.</span>
             </li>
             <li>
               <span className="font-semibold text-sm">Pagas al recibir</span>
