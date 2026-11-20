@@ -365,6 +365,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               >
                 Agregar al carrito
               </button>
+              <p className="text-xs leading-5 text-muted">Agregarlo no registra pedido ni cobra.</p>
               {added ? (
                 <p className="text-sm text-accent-strong" role="status">
                   Quedó en el carrito. No registra pedido ni es dinero cobrado.
@@ -477,6 +478,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
             onIndexChange={setPhoto}
           />
         ) : null}
+        <p className="mt-2 text-xs leading-5 text-muted">Verla así no cambia el precio publicado ni crea un pedido.</p>
       </dialog>
     </article>
   );

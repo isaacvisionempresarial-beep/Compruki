@@ -144,6 +144,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
                         alt={product.title}
                         frameClassName="h-32 sm:h-36"
                         imgClassName="h-32 w-full object-contain transition-transform duration-500 group-hover:scale-[1.04] sm:h-36"
+                        note="El precio publicado no cambia."
                       />
                     ) : null}
                     {!product.hasImage && product.images.length === 0 ? (

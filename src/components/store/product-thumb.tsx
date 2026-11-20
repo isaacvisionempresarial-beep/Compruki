@@ -11,18 +11,23 @@ export function CatalogPhoto({
   imgClassName,
   frameClassName,
   query,
+  note,
 }: {
   sku: string;
   alt: string;
   imgClassName: string;
   frameClassName?: string;
   query?: string;
+  note?: string;
 }) {
   const [failed, setFailed] = useState(false);
   if (failed) {
     return (
-      <div className={cx("grid place-items-center bg-subtle", frameClassName)}>
-        <span className="text-xs font-semibold text-muted">Sin foto</span>
+      <div className={cx("grid place-items-center bg-subtle px-2 text-center", frameClassName)}>
+        <span>
+          <span className="block text-xs font-semibold text-muted">Sin foto</span>
+          {note ? <span className="mt-1 block text-[11px] leading-4 text-muted">{note}</span> : null}
+        </span>
       </div>
     );
   }
