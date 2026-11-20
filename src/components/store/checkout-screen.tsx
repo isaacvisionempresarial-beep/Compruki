@@ -71,7 +71,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
       })
     : null;
 
-  if (!cart.ready) return <p className="text-sm text-muted">Cargando el carrito…</p>;
+  if (!cart.ready) return <p className="text-sm text-muted">Cargando el carrito… No registra pedido ni cobra.</p>;
 
   if (blocked || payload.length === 0) {
     return (

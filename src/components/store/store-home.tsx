@@ -217,12 +217,14 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
           >
             Consultar pedido
           </Link>
+          <p className="mt-2 text-xs leading-5 text-muted">Consultar no cobra ni cambia el total guardado.</p>
           <Link
             href="/tienda/condiciones"
             className="mt-2 inline-flex w-full justify-center text-xs font-semibold text-accent-strong"
           >
             Condiciones
           </Link>
+          <p className="mt-2 text-xs leading-5 text-muted">Leerlas no registra pedido ni cobra.</p>
         </aside>
       </div>
     </div>

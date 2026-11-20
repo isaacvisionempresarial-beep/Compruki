@@ -38,7 +38,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
       : "Quita lo que ya no se puede pedir para continuar. No entra en el total al recibir ni registra pedido.";
 
   if (!cart.ready) {
-    return <p className="text-sm text-muted">Cargando el carrito…</p>;
+    return <p className="text-sm text-muted">Cargando el carrito… No registra pedido ni cobra.</p>;
   }
 
   return (

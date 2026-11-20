@@ -52,7 +52,7 @@ export default function StoreError({ error, retry }: { error: unknown; retry: ()
             </li>
             <li>
               <span className="font-semibold text-sm">Catálogo</span>
-              <span className="mt-0.5 block text-muted">Los publicados siguen en Inicio.</span>
+              <span className="mt-0.5 block text-muted">Los publicados siguen en Inicio. El precio publicado no cambia.</span>
             </li>
             <li>
               <span className="font-semibold text-sm">Dropi</span>

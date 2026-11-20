@@ -447,6 +447,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
       <a href="#contenido" className="mt-3 inline-flex text-sm font-semibold text-accent-strong hover:underline">
         Volver al producto <span className="ml-1" aria-hidden="true">↑</span>
       </a>
+      <p className="mt-1 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>
 
       <dialog
         ref={dialogRef}
