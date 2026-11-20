@@ -297,14 +297,14 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
       <h2 className="text-sm font-semibold">Entrega</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <Field label="Nombre de quien recibe" htmlFor="customerName">
+          <Field label="Nombre de quien recibe" htmlFor="customerName" hint="Guardarlo no cobra. El total guardado no cambia.">
             <input id="customerName" name="customerName" required autoComplete="name" value={customerName} onChange={(event) => setCustomerName(event.target.value)} className={fieldClass} />
           </Field>
         </div>
-        <Field label="Celular" htmlFor="phone" hint="10 dígitos, empieza por 3.">
+        <Field label="Celular" htmlFor="phone" hint="10 dígitos, empieza por 3. El total guardado no cambia.">
           <input id="phone" name="phone" required inputMode="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} className={fieldClass} />
         </Field>
-        <Field label="Cédula de quien recibe" htmlFor="document" hint="Opcional. De 6 a 10 dígitos, sin puntos. Vacío: se quita.">
+        <Field label="Cédula de quien recibe" htmlFor="document" hint="Opcional. De 6 a 10 dígitos, sin puntos. Vacío: se quita. El total guardado no cambia.">
           <input id="document" name="document" inputMode="numeric" autoComplete="off" value={documentId} onChange={(event) => setDocumentId(event.target.value)} className={fieldClass} />
         </Field>
         <Field
@@ -312,17 +312,17 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
           htmlFor="department"
           hint={
             department.trim()
-              ? "No es la ciudad."
-              : "Opcional. No es la ciudad. La tienda puede confirmar sin él."
+              ? "No es la ciudad. El total guardado no cambia."
+              : "Opcional. No es la ciudad. La tienda puede confirmar sin él. El total guardado no cambia."
           }
         >
           <input id="department" name="department" autoComplete="address-level1" value={department} onChange={(event) => setDepartment(event.target.value)} className={fieldClass} />
         </Field>
-        <Field label="Ciudad" htmlFor="city">
+        <Field label="Ciudad" htmlFor="city" hint="Guardarla no cobra. El total guardado no cambia.">
           <input id="city" name="city" required autoComplete="address-level2" value={city} onChange={(event) => setCity(event.target.value)} className={fieldClass} />
         </Field>
         <div className="sm:col-span-2">
-          <Field label="Dirección" htmlFor="address">
+          <Field label="Dirección" htmlFor="address" hint="Guardarla no cobra. El total guardado no cambia.">
             <input id="address" name="address" required autoComplete="street-address" value={address} onChange={(event) => setAddress(event.target.value)} className={fieldClass} />
           </Field>
         </div>
@@ -356,7 +356,7 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
           pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
         }`}
       >
-        {pending ? "Guardando…" : "Guardar entrega"}
+        {pending ? "Guardando…" : "Guardar entrega · no cobra"}
       </button>
     </form>
   );
