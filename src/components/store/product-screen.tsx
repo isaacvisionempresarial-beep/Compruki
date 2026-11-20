@@ -398,6 +398,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
       {descriptionIsLong ? (
         <section id="descripcion" className="scroll-mt-16 border-t border-line pt-3 pb-2" aria-label="Descripción">
           <h2 className="text-base font-extrabold tracking-tight">Descripción</h2>
+          <p className="mt-1 max-w-xl text-xs leading-5 text-muted">Leerla no cambia el precio publicado ni crea un pedido.</p>
           <div className="mt-2 max-w-2xl space-y-2 text-sm leading-5 text-muted">
             {descriptionParagraphs.map((paragraph, index) => (
               <p key={`${index}-${paragraph.slice(0, 16)}`}>{paragraph}</p>
