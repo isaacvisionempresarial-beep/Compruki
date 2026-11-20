@@ -123,7 +123,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                   />
                 </Field>
               </div>
-              <Field label="Celular" htmlFor="phone" hint="10 dígitos, empieza por 3. Sirve para coordinar la entrega.">
+              <Field label="Celular" htmlFor="phone" hint="10 dígitos, empieza por 3. Sirve para coordinar la entrega. No es un pago.">
                 <input
                   id="phone"
                   name="phone"
@@ -138,7 +138,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
               <Field
                 label="Cédula de quien recibe"
                 htmlFor="document"
-                hint="Opcional. De 6 a 10 dígitos, sin puntos. La pide la transportadora."
+                hint="Opcional. De 6 a 10 dígitos, sin puntos. La pide la transportadora. No es un pago."
               >
                 <input
                   id="document"
@@ -186,7 +186,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                 </Field>
               </div>
               <div className="sm:col-span-2">
-                <Field label="Barrio o referencia" htmlFor="reference" hint="Opcional.">
+                <Field label="Barrio o referencia" htmlFor="reference" hint="Opcional. No es un pago.">
                   <input
                     id="reference"
                     name="reference"
