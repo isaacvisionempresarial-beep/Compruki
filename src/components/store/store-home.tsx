@@ -105,6 +105,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
                 <>
                 <button
                   type="button"
+                  title="Verlos no cambia los precios publicados ni crea un pedido."
                   className="mt-3 inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-4 text-sm font-semibold"
                   onClick={() => {
                     setCategory("todas");
@@ -259,6 +260,7 @@ function CategoryChip({
       type="button"
       role="radio"
       aria-checked={selected}
+      title="Filtrar no cambia los precios publicados ni crea un pedido."
       className={cx(
         "min-h-9 rounded-[10px] px-2.5 text-sm font-semibold transition-colors",
         selected ? "bg-primary text-on-dark" : "border border-line bg-card text-muted hover:bg-subtle",

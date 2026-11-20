@@ -74,6 +74,7 @@ export function LookupScreen() {
           ) : null}
           <button
             type="submit"
+            title="Consultar no cobra ni cambia el total guardado."
             disabled={pending || !canSearch}
             className={`inline-flex h-10 w-full scroll-mb-24 items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark ${
               pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"

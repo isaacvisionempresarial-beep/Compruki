@@ -119,6 +119,7 @@ export function CatalogScreen({
                   type="button"
                   role="radio"
                   aria-checked={selectedFilter}
+                  title="Filtrar no cobra ni cambia el precio ni la publicación."
                   className={cx(
                     "min-h-9 rounded-[10px] px-2.5 text-sm font-semibold",
                     selectedFilter ? "bg-primary text-on-dark" : "border border-line bg-card text-muted",
@@ -481,6 +482,7 @@ function CampaignLink({
           type="button"
           className="font-semibold text-accent-strong underline-offset-2 hover:underline"
           aria-label={`Copiar enlace de ${product.title}`}
+          title="Copiarlo no cobra ni cambia el precio ni la publicación."
           onClick={copy}
         >
           {copied === "ok" ? "Copiado" : "Copiar enlace"}
@@ -510,6 +512,7 @@ function CampaignLink({
           href={path}
           target="_blank"
           rel="noreferrer"
+          title="Abrirla no cobra ni cambia el precio ni la publicación."
           className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas"
         >
           Abrir página
@@ -518,6 +521,7 @@ function CampaignLink({
           type="button"
           className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas"
           aria-label={`Copiar enlace de ${product.title}`}
+          title="Copiarlo no cobra ni cambia el precio ni la publicación."
           onClick={copy}
         >
           {copied === "ok" ? "Enlace copiado" : "Copiar enlace"}

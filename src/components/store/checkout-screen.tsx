@@ -265,6 +265,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
 
             <button
               type="submit"
+              title="Confirmar deja el pedido pendiente. Nadie cobra aquí."
               disabled={pending || !canConfirm}
               className={`mt-3 inline-flex h-10 w-full scroll-mb-24 items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark ${
                 pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"

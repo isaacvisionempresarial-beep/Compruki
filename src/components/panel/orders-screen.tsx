@@ -211,6 +211,7 @@ export function OrdersScreen({
                       <li key={row.order.id}>
                         <a
                           href={orderFocusHref(row.order.number)}
+                          title="Abrirlo no cobra ni cambia el total guardado."
                           className={cx("grid items-start gap-3 px-3 py-2 text-sm hover:bg-canvas md:gap-4", queueGrid)}
                         >
                           <span>
@@ -1851,6 +1852,7 @@ function CustomerNote({ order }: { order: StoreOrder }) {
           type="button"
           className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
           aria-label={`Copiar mensaje de ${order.number}`}
+          title="Copiarlo no cobra. El total guardado no cambia."
           onClick={copy}
         >
           {copied === "ok" ? "Mensaje copiado" : "Copiar mensaje"}
@@ -1860,6 +1862,7 @@ function CustomerNote({ order }: { order: StoreOrder }) {
             href={href}
             target="_blank"
             rel="noreferrer"
+            title="Abrirlo no envía el mensaje ni cobra. El total guardado no cambia."
             className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
           >
             Abrir en WhatsApp

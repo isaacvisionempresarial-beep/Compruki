@@ -173,6 +173,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                         </span>
                         <button
                           type="button"
+                          title="Quitarla no registra pedido ni cobra."
                           className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
                           onClick={() => cart.remove(line.sku, line.variant)}
                         >

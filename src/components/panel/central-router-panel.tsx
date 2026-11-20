@@ -47,6 +47,7 @@ export function CentralRouterPanel({
         <div className="flex items-end">
           <button
             type="submit"
+            title="Enrutar no cobra ni cambia pedidos."
             disabled={!enabled}
             className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55 sm:w-auto"
           >

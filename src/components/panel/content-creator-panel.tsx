@@ -73,6 +73,7 @@ export function ContentCreatorPanel({
         <div className="flex items-end gap-2">
           <button
             type="submit"
+            title="Generar no cobra ni publica."
             disabled={!enabled}
             className="inline-flex h-10 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
           >
@@ -201,6 +202,7 @@ function DraftCard({ sku, draft, enabled }: { sku: string; draft: ContentDraft; 
         <input type="hidden" name="cta" value={draft.cta} />
         <button
           type="submit"
+          title="Guardarlo no publica ni cobra."
           disabled={pending || !enabled}
           className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-55"
         >

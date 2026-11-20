@@ -101,6 +101,7 @@ function LoginForm({ onRecover, accessDenied }: { onRecover: () => void; accessD
           <form action={signOut}>
             <button
               type="submit"
+              title="Cerrarla no cobra ni cambia pedidos."
               className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle"
             >
               Cerrar sesión
@@ -176,6 +177,7 @@ function LoginForm({ onRecover, accessDenied }: { onRecover: () => void; accessD
 
         <button
           type="submit"
+          title="Entrar no cobra ni cambia pedidos."
           className={`inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark ${
             pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
           }`}
@@ -239,6 +241,7 @@ function RecoveryForm({ onBack, linkError }: { onBack: () => void; linkError?: b
 
         <button
           type="submit"
+          title="Enviarlo no cobra ni cambia pedidos."
           disabled={!canSend || pending}
           className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
         >
@@ -357,6 +360,7 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
 
         <button
           type="submit"
+          title="Guardarla no cobra ni cambia pedidos."
           disabled={!canSave || pending}
           className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
         >
@@ -364,7 +368,7 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
         </button>
       </form>
 
-      <button type="button" className="mt-3 text-sm font-semibold text-accent-strong" onClick={onBack}>
+      <button type="button" title="Volver no guarda la contraseña ni cobra." className="mt-3 text-sm font-semibold text-accent-strong" onClick={onBack}>
         Volver a iniciar sesión
       </button>
       <p className="mt-1 text-xs leading-5 text-muted">Volver no guarda la contraseña ni cobra.</p>

@@ -159,6 +159,7 @@ export function AgentsScreen({
           <div className="flex items-end">
             <button
               type="submit"
+              title="Buscar no cobra ni cambia el catálogo."
               disabled={!ag02}
               className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
             >
@@ -258,6 +259,7 @@ export function AgentsScreen({
           <div className="flex items-end">
             <button
               type="submit"
+              title="Calcular no cobra ni cambia pedidos."
               disabled={!ag04}
               className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55 sm:w-auto"
             >
@@ -373,6 +375,7 @@ export function AgentsScreen({
           </div>
           <a
             href="/panel/agentes/export"
+            title="Bajarlo no cobra ni cambia pedidos."
             className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle"
           >
             Descargar CSV

@@ -355,6 +355,7 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
       ) : null}
       <button
         type="submit"
+        title="Guardar la entrega no cobra. El total guardado no cambia."
         disabled={pending || !canSave}
         className={`inline-flex h-10 scroll-mb-24 items-center justify-center rounded-[10px] bg-accent px-3 text-sm font-extrabold text-primary-dark ${
           pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
@@ -536,6 +537,7 @@ function CustomerSizeForm({
       ) : null}
       <button
         type="submit"
+        title="Guardarla no cambia el total guardado ni cobra."
         disabled={pending || !canSave}
         className={`mt-3 inline-flex h-10 scroll-mb-24 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
@@ -585,6 +587,7 @@ function CustomerBuyerNote({ orderId, token, note }: { orderId: string; token: s
       ) : null}
       <button
         type="submit"
+        title="Guardarlo no cobra. El total guardado no cambia."
         disabled={pending || !canSave}
         className={`mt-3 inline-flex h-10 scroll-mb-24 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
@@ -635,6 +638,7 @@ function CustomerCancel({ order, token }: { order: CustomerOrder; token: string 
       ) : null}
       <button
         type="submit"
+        title="Cancelarlo no cobra. El total guardado no cambia."
         disabled={pending || !canSave}
         className={`mt-3 inline-flex h-10 scroll-mb-24 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-danger ${
           pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"

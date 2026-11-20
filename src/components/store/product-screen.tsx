@@ -316,6 +316,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                       type="button"
                       className="h-full w-10 border-0 bg-card text-xl text-muted hover:bg-accent-tint focus-visible:bg-accent-tint"
                       aria-label="Disminuir cantidad"
+                      title="Cambiarla no registra pedido ni cobra."
                       onClick={() => setQuantity((current) => Math.max(1, current - 1))}
                     >
                       −
@@ -333,6 +334,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                       type="button"
                       className="h-full w-10 border-0 bg-card text-xl text-muted hover:bg-accent-tint focus-visible:bg-accent-tint"
                       aria-label="Aumentar cantidad"
+                      title="Cambiarla no registra pedido ni cobra."
                       onClick={() => setQuantity((current) => Math.min(5, current + 1))}
                     >
                       +
@@ -354,6 +356,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               <button
                 type="button"
                 disabled={!canBuy}
+                title="Pedirlo lleva al pago. No confirma el pedido ni cobra."
                 className="flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-extrabold text-on-dark transition-colors enabled:hover:bg-primary-soft disabled:cursor-not-allowed disabled:opacity-55"
                 onClick={goCheckout}
               >
@@ -367,6 +370,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               <button
                 type="submit"
                 disabled={!canBuy}
+                title="Agregarlo no registra pedido ni cobra."
                 className="flex h-10 w-full items-center justify-center rounded-[10px] border border-line bg-canvas text-sm font-semibold text-ink transition-colors enabled:hover:border-accent enabled:hover:bg-accent-tint disabled:cursor-not-allowed disabled:opacity-55"
               >
                 Agregar al carrito
@@ -469,6 +473,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
             type="button"
             className="grid h-9 w-9 place-items-center rounded-[10px] border-0 bg-subtle text-2xl"
             aria-label="Cerrar"
+            title="Cerrarla no cambia el precio publicado ni crea un pedido."
             onClick={() => setLightboxOpen(false)}
           >
             ×
@@ -522,6 +527,7 @@ function ProductQuestion({ product }: { product: PublicProduct }) {
         <button
           type="submit"
           disabled={!canAsk}
+          title="Preguntar no se envía a la tienda ni cobra."
           className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold hover:bg-subtle disabled:cursor-not-allowed disabled:opacity-55"
         >
           Preguntar
