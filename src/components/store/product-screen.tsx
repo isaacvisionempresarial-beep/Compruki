@@ -287,7 +287,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                   </div>
                   <p className="mt-2 text-xs leading-5 text-muted" role="status">
                     {needsSizeChoice
-                      ? `Elige ${product.sizeKind === "tamano" ? "el tamaño" : "la talla"} para poder pedir.`
+                      ? `Elige ${product.sizeKind === "tamano" ? "el tamaño" : "la talla"} para poder pedir. El precio no cambia. Todavía no es un pedido.`
                       : sizeChoiceSentence(product.sizeKind, variant)}
                   </p>
                   {variantError ? (

@@ -246,7 +246,9 @@ export function sizeChoiceSentence(kind: SizeKind, name: string) {
       ? "Elige el tamaño para identificar cuál vas a pedir."
       : "Elige la talla para identificar cuál vas a pedir.";
   }
-  return kind === "tamano" ? `Vas a pedir el tamaño ${value}.` : `Vas a pedir la talla ${value}.`;
+  return kind === "tamano"
+    ? `Vas a pedir el tamaño ${value}. El precio no cambia. Todavía no es un pedido.`
+    : `Vas a pedir la talla ${value}. El precio no cambia. Todavía no es un pedido.`;
 }
 
 function sizeListSummary(kind: SizeKind | "", names: string[]) {
