@@ -62,7 +62,7 @@ export default function ConditionsPage() {
         <p className="text-[10px] font-bold tracking-[0.08em] text-accent-strong uppercase">Tienda piloto · Colombia</p>
         <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">Condiciones de la compra</h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Lo que aceptas al dejar el pedido. Dropi no está conectado. La identidad de la tienda sigue en prueba.
+          Lo que aceptas al dejar el pedido. Leerlas no registra pedido ni cobra. Dropi no está conectado. La identidad de la tienda sigue en prueba.
         </p>
       </section>
 
