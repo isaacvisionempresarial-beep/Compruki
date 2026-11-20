@@ -995,9 +995,9 @@ export function customerPayLine(status: OrderStatus, collected = false) {
     status === "en_preparacion" ||
     status === "en_transporte"
   ) {
-    return "Pagas al recibir. El total guardado no cambió. ";
+    return "Pagas al recibir. Nadie cobra en la tienda. El total guardado no cambió. ";
   }
-  return "Pagas al recibir. ";
+  return "Pagas al recibir. Nadie cobra en la tienda. ";
 }
 
 export type LineEdit = {
@@ -1265,12 +1265,12 @@ export function customerSizeHoldNote(
 export function customerProgressNote(status: OrderStatus, collected = false) {
   switch (status) {
     case "pendiente_confirmacion":
-      return "No hay guía ni fecha. Pagas al recibir. El total guardado no cambió. Dropi no está conectado.";
+      return "No hay guía ni fecha. Pagas al recibir. Nadie cobra en la tienda. El total guardado no cambió. Dropi no está conectado.";
     case "confirmado":
     case "en_preparacion":
-      return "Dropi no está conectado. Todavía no hay guía ni fecha. El despacho se anota a mano. El total guardado no cambió. Pagas al recibir.";
+      return "Dropi no está conectado. Todavía no hay guía ni fecha. El despacho se anota a mano. El total guardado no cambió. Pagas al recibir. Nadie cobra en la tienda.";
     case "en_transporte":
-      return "Dropi no está conectado. Sin guía ni una fecha exacta de llegada. El total guardado no cambió. Pagas al recibir.";
+      return "Dropi no está conectado. Sin guía ni una fecha exacta de llegada. El total guardado no cambió. Pagas al recibir. Nadie cobra en la tienda.";
     case "entregado":
       return collected
         ? "La tienda anotó el cobro contra entrega. Nadie lo cobró en esta tienda. El total guardado no cambió. Dropi no está conectado: sin guía."
@@ -1285,13 +1285,13 @@ export function customerStatusNote(status: OrderStatus, reason = "", byCustomer 
   const detail = spoken ? ( /[.!?]$/.test(spoken) ? spoken : `${spoken}.`) : "";
   switch (status) {
     case "pendiente_confirmacion":
-      return "Quedó pendiente de confirmación. La tienda revisará la dirección antes de despachar. No hay guía ni fecha de entrega: Dropi no está conectado. El total guardado no cambió. Pagas al recibir. Si ya no lo quieres, cancélalo al consultar el pedido.";
+      return "Quedó pendiente de confirmación. La tienda revisará la dirección antes de despachar. No hay guía ni fecha de entrega: Dropi no está conectado. El total guardado no cambió. Pagas al recibir. Nadie cobra en la tienda. Si ya no lo quieres, cancélalo al consultar el pedido.";
     case "confirmado":
-      return "La tienda confirmó el pedido. Dropi no está conectado. Todavía no hay guía ni fecha de entrega. El despacho se anota a mano. El total guardado no cambió. Pagas al recibir.";
+      return "La tienda confirmó el pedido. Dropi no está conectado. Todavía no hay guía ni fecha de entrega. El despacho se anota a mano. El total guardado no cambió. Pagas al recibir. Nadie cobra en la tienda.";
     case "en_preparacion":
-      return "La tienda está preparando el pedido. Dropi no está conectado. Todavía no hay guía ni fecha de entrega. El total guardado no cambió. Pagas al recibir.";
+      return "La tienda está preparando el pedido. Dropi no está conectado. Todavía no hay guía ni fecha de entrega. El total guardado no cambió. Pagas al recibir. Nadie cobra en la tienda.";
     case "en_transporte":
-      return "La tienda anotó el despacho. Dropi no está conectado. Sin guía ni una fecha exacta de llegada. El total guardado no cambió. Pagas al recibir.";
+      return "La tienda anotó el despacho. Dropi no está conectado. Sin guía ni una fecha exacta de llegada. El total guardado no cambió. Pagas al recibir. Nadie cobra en la tienda.";
     case "entregado":
       return collected
         ? "La tienda marcó el pedido como entregado y anotó el cobro contra entrega. Nadie lo cobró en esta tienda. El total guardado no cambió. Dropi no está conectado: sin guía."
@@ -1314,7 +1314,7 @@ export function customerStatusNote(status: OrderStatus, reason = "", byCustomer 
         ? `La tienda registró la devolución de este pedido: ${detail} Ya no se paga al recibir. Nadie cobra en la tienda. El total guardado no cambió.`
         : "La tienda registró la devolución de este pedido. Ya no se paga al recibir. Nadie cobra en la tienda. El total guardado no cambió.";
     default:
-      return "La tienda está revisando este pedido. Dropi no está conectado. No hay guía ni fecha de entrega.";
+      return "La tienda está revisando este pedido. Dropi no está conectado. No hay guía ni fecha de entrega. Nadie cobra en la tienda.";
   }
 }
 

@@ -178,13 +178,13 @@ const STEP_WORD = { hecho: "Listo", ahora: "Ahora", despues: "Después" } as con
 
 function nextStepCopy(order: CustomerOrder) {
   if (order.status === "pendiente_confirmacion") {
-    return "Espera la confirmación de la tienda. Pagas al recibir. El total guardado no cambió. Mientras tanto puedes corregir la entrega o la talla si falta.";
+    return "Espera la confirmación de la tienda. Pagas al recibir. Nadie cobra en la tienda. El total guardado no cambió. Mientras tanto puedes corregir la entrega o la talla si falta.";
   }
   if (order.status === "confirmado" || order.status === "en_preparacion") {
-    return "La tienda prepara el envío. Pagas al recibir. El total guardado no cambió. Te escriben a este celular si hace falta algo.";
+    return "La tienda prepara el envío. Pagas al recibir. Nadie cobra en la tienda. El total guardado no cambió. Te escriben a este celular si hace falta algo.";
   }
   if (order.status === "en_transporte") {
-    return "El pedido va en camino. Pagas al recibirlo. El total guardado no cambió.";
+    return "El pedido va en camino. Pagas al recibirlo. Nadie cobra en la tienda. El total guardado no cambió.";
   }
   if (order.status === "entregado") {
     return order.collected
