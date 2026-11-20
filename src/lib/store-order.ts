@@ -200,29 +200,29 @@ export function storedUtilityCaveat(order: {
 export function collectionMarkSummary(order: Pick<StoreOrder, "lines">, collected: boolean) {
   if (collected) {
     return needsCatalogCost(order)
-      ? "Marcó el recaudo contra entrega. Sin el costo del producto no entra en la utilidad realizada. El total guardado no cambió."
-      : "Marcó el recaudo contra entrega. Entra en la utilidad realizada. El total guardado no cambió.";
+      ? "Marcó el recaudo contra entrega. Sin el costo del producto no entra en la utilidad realizada. El total guardado no cambió. No es dinero cobrado."
+      : "Marcó el recaudo contra entrega. Entra en la utilidad realizada. El total guardado no cambió. No es dinero cobrado.";
   }
   return needsCatalogCost(order)
-    ? "Quitó el recaudo contra entrega. El pedido sigue fuera de la utilidad realizada. El total guardado no cambió."
-    : "Quitó el recaudo. Deja de contar como utilidad realizada. El total guardado no cambió.";
+    ? "Quitó el recaudo contra entrega. El pedido sigue fuera de la utilidad realizada. El total guardado no cambió. No es dinero cobrado."
+    : "Quitó el recaudo. Deja de contar como utilidad realizada. El total guardado no cambió. No es dinero cobrado.";
 }
 
 export function collectionAmountSummary(order: Pick<StoreOrder, "lines">, amount: number | null) {
   if (amount === null) {
     return needsCatalogCost(order)
-      ? "Quitó el recaudo real. El pedido sigue fuera de la utilidad realizada."
-      : "Quitó el recaudo real. La utilidad vuelve a usar las comisiones estimadas.";
+      ? "Quitó el recaudo real. El pedido sigue fuera de la utilidad realizada. No es dinero cobrado."
+      : "Quitó el recaudo real. La utilidad vuelve a usar las comisiones estimadas. No es dinero cobrado.";
   }
   return needsCatalogCost(order)
-    ? `Anotó el recaudo real en ${formatCop(amount)}. Sin el costo del producto no entra en la utilidad realizada.`
-    : `Anotó el recaudo real en ${formatCop(amount)}. Reemplaza las comisiones estimadas en la utilidad realizada.`;
+    ? `Anotó el recaudo real en ${formatCop(amount)}. Sin el costo del producto no entra en la utilidad realizada. No es dinero cobrado.`
+    : `Anotó el recaudo real en ${formatCop(amount)}. Reemplaza las comisiones estimadas en la utilidad realizada. No es dinero cobrado.`;
 }
 
 export function shippingClearedSummary(order: Pick<StoreOrder, "lines">) {
   return needsCatalogCost(order)
-    ? "Quitó el flete real. Sin el costo del producto no entra en la utilidad realizada."
-    : "Quitó el flete real. La utilidad vuelve a usar el flete estimado.";
+    ? "Quitó el flete real. Sin el costo del producto no entra en la utilidad realizada. No es dinero cobrado."
+    : "Quitó el flete real. La utilidad vuelve a usar el flete estimado. No es dinero cobrado.";
 }
 
 function readyCostGuide(guide: CostGuide | undefined): guide is CostGuide {
@@ -796,14 +796,14 @@ const ACTIONS: ActionSpec[] = [
     id: "cobrar",
     label: "Marcar cobrado",
     tone: "primary",
-    summary: "Marcó el recaudo contra entrega.",
+    summary: "Marcó el recaudo contra entrega. El total guardado no cambió. No es dinero cobrado.",
     collected: true,
   },
   {
     id: "quitar_cobro",
     label: "Quitar el cobro",
     tone: "quiet",
-    summary: "Quitó el recaudo contra entrega.",
+    summary: "Quitó el recaudo contra entrega. El total guardado no cambió. No es dinero cobrado.",
     collected: false,
   },
   {

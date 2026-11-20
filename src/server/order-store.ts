@@ -201,7 +201,7 @@ export async function updateOrder(id: string, action: OrderAction, actorName: st
 
 function saleStopSummary(action: OrderAction, summary: string, wasCollected: boolean) {
   if (action !== "incidencia" && action !== "cancelar" && action !== "devolver") return summary;
-  const note = `${summary} El total guardado no cambió.`;
+  const note = `${summary} El total guardado no cambió. Nadie cobra en el sitio.`;
   if (action === "devolver" && wasCollected) return `${note} Se quitó la marca de cobro.`;
   return note;
 }
@@ -239,7 +239,7 @@ export async function cancelOrderByCustomer(id: string, token: string, rawReason
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName: current.customerName,
-        summary: "Canceló su pedido antes de la confirmación. Deja de sumar en las ventas. El total guardado no cambió.",
+        summary: "Canceló su pedido antes de la confirmación. Deja de sumar en las ventas. El total guardado no cambió. Nadie cobra en la tienda.",
       },
       ...current.history,
     ],
@@ -505,7 +505,7 @@ export async function applyCatalogCosts(id: string, actorName: string) {
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName,
-        summary: "Anotó el costo, el envío y las comisiones de la ficha. El precio del pedido no cambió. El total guardado no cambió.",
+        summary: "Anotó el costo, el envío y las comisiones de la ficha. El precio del pedido no cambió. El total guardado no cambió. No es dinero cobrado.",
       },
       ...current.history,
     ],
@@ -574,7 +574,7 @@ export async function saveFreight(
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName,
-        summary: `${notes.join(" ")} El total guardado no cambió.`,
+        summary: `${notes.join(" ")} El total guardado no cambió. No es dinero cobrado.`,
       },
       ...current.history,
     ],
