@@ -417,7 +417,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
             {[
               ["Envío", "No incluido. Se acuerda con la dirección. Sin fecha prometida. No se cobra aquí."],
               ["Pago", "Pagas al recibir el precio publicado. Nadie cobra aquí. El pedido queda pendiente de confirmación."],
-              ["Cambios", "Se acuerdan con la tienda. No se inventa una política aquí."],
+              ["Cambios", "Se acuerdan con la tienda. No se inventa una política aquí. No cambia el precio publicado ni crea un pedido."],
               ["Dropi", "No está conectado. Esta ficha no crea pedido en Dropi."],
             ].map(([label, value]) => (
               <div key={label} className="px-3 py-2">
