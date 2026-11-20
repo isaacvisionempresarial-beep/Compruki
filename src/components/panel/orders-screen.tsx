@@ -599,7 +599,7 @@ export function OrderEditor({
           ) : null}
           {confirmBlocked || prepareDropiError(order) || resolveBlocked ? (
             <details className="mt-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
-              <summary className="cursor-pointer text-sm font-semibold text-muted">
+              <summary className="cursor-pointer text-sm font-semibold text-muted" title="Abrirlo no cobra ni cambia el total guardado.">
                 Acciones bloqueadas y mensaje al cliente
               </summary>
               <div className="mt-2 flex flex-wrap gap-2">
@@ -670,7 +670,7 @@ export function OrderEditor({
           ) : null}
           {actions.filter((item) => !needsCustomerReason(item.id)).length > 0 ? (
             <details className="mt-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
-              <summary className="cursor-pointer text-sm font-semibold text-muted">
+              <summary className="cursor-pointer text-sm font-semibold text-muted" title="Abrirlo no cobra ni cambia el total guardado.">
                 Si más adelante… mensaje al cliente
               </summary>
               {actions
@@ -985,6 +985,7 @@ function CatalogCostForm({
       {canManageOrderMoney ? (
       <button
         type="submit"
+        title="El total guardado no cambia. No es dinero cobrado."
         disabled={costPending || !canSave}
         className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           costPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
@@ -1144,6 +1145,7 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
       {canManageOrderMoney ? (
       <button
         type="submit"
+        title="El total guardado no cambia. No es dinero cobrado."
         disabled={freightPending || !canSave}
         className={`inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           freightPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
@@ -1489,6 +1491,7 @@ function ClosedDepartmentForm({ order }: { order: StoreOrder }) {
       ) : null}
       <button
         type="submit"
+        title="Anotarlo no cobra. El total guardado no cambia."
         disabled={departmentPending || !canSave}
         className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           departmentPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
@@ -1617,6 +1620,7 @@ function DeliveryForm({ order }: { order: StoreOrder }) {
       ) : null}
       <button
         type="submit"
+        title="Guardarla no cobra. El total guardado no cambia."
         disabled={deliveryPending || !canSave}
         className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           deliveryPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
@@ -1692,6 +1696,7 @@ function ReturnReasonForm({ order }: { order: StoreOrder }) {
       ) : null}
       <button
         type="submit"
+        title="Guardarlo no cobra. El total guardado no cambia."
         disabled={reasonPending || !canSave}
         className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           reasonPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
@@ -1733,7 +1738,7 @@ function IncidenceReasonForm({ order }: { order: StoreOrder }) {
         />
         <span className="mt-1 block font-normal leading-5 text-muted">
           Lo ve en su pedido y en el mensaje. Vacío o sin un cambio: el botón queda bloqueado. Sin este motivo no se
-          resuelve. Anotarlo no la resuelve ni sale en el texto para Dropi. El total guardado no cambia.
+          resuelve. Anotarlo no la           resuelve ni sale en el texto para Dropi. El total guardado no cambia.
         </span>
       </label>
       <MotivoMessagePreview order={order} next={next} canSave={canSave} />
@@ -1744,6 +1749,7 @@ function IncidenceReasonForm({ order }: { order: StoreOrder }) {
       ) : null}
       <button
         type="submit"
+        title="Anotarlo no cobra. El total guardado no cambia."
         disabled={reasonPending || !canSave}
         className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           reasonPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
@@ -1801,6 +1807,7 @@ function InternalNoteForm({ order }: { order: StoreOrder }) {
       ) : null}
       <button
         type="submit"
+        title="Guardarla no cobra. El total guardado no cambia."
         disabled={notePending || !canSave}
         className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           notePending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"

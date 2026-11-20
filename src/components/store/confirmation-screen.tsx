@@ -343,7 +343,7 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
       <p className="text-xs leading-5 text-muted">Guardar la entrega no cobra. El total guardado no cambia. Pagas al recibir.</p>
       {previewText ? (
         <details>
-          <summary className="cursor-pointer text-sm font-semibold text-muted">Vista previa al guardar</summary>
+          <summary className="cursor-pointer text-sm font-semibold text-muted" title="Abrirla no cobra. El total guardado no cambia.">Vista previa al guardar</summary>
           <p className="mt-1 text-xs leading-5 text-muted">Abrirla no cobra. El total guardado no cambia.</p>
           <p className="mt-2 text-sm leading-5 whitespace-pre-line text-muted">{previewText}</p>
         </details>

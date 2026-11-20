@@ -109,6 +109,11 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                             {product.sizeKind === "tamano" ? "Tamaño" : "Talla"}
                             <select
                               value={product.variants.includes(line.variant) ? line.variant : ""}
+                              title={
+                                product.sizeKind === "tamano"
+                                  ? "Elegirlo no cambia el precio ni registra pedido."
+                                  : "Elegirla no cambia el precio ni registra pedido."
+                              }
                               onChange={(event) =>
                                 cart.setVariant(line.sku, line.variant, event.target.value, product.sizeKind ?? undefined)
                               }

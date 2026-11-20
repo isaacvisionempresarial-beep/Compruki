@@ -207,7 +207,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
             <fieldset className="mt-3 space-y-2">
               <legend className="sr-only">Cómo se paga</legend>
               <label className="flex items-start gap-3 rounded-[10px] border border-accent bg-accent-tint px-3 py-2 text-sm">
-                <input type="radio" name="payment" value="contra_entrega" defaultChecked className="mt-1" />
+                <input type="radio" name="payment" value="contra_entrega" defaultChecked title="Marcarlo no cobra." className="mt-1" />
                 <span>
                   <span className="block font-semibold">Efectivo contra entrega</span>
                   <span className="text-muted">Pagas el precio publicado cuando los recibes. Marcarlo no cobra.</span>
@@ -226,6 +226,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                 checked={accepted}
                 className="mt-1 h-4 w-4"
                 required
+                title="Marcarla no confirma el pedido ni cobra."
                 onChange={(event) => setAccepted(event.target.checked)}
               />
               <p>
@@ -248,7 +249,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
 
             {handoff ? (
               <details className="mt-3">
-                <summary className="cursor-pointer text-sm font-semibold text-muted">
+                <summary className="cursor-pointer text-sm font-semibold text-muted" title="Abrirla no confirma el pedido ni cobra.">
                   Vista previa del texto de entrega
                 </summary>
                 <p className="mt-1 text-xs leading-5 text-muted">Abrirla no confirma el pedido ni cobra.</p>

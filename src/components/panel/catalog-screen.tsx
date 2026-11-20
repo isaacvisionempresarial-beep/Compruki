@@ -1114,11 +1114,11 @@ export function ProductEditor({
                   <legend className="text-sm font-semibold">Qué va a elegir el comprador</legend>
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
                     <label className="flex items-center gap-3 rounded-[10px] border border-line bg-card px-3 py-2 text-sm">
-                      <input type="radio" name="sizeKind" value="talla" checked={sizeKind === "talla"} onChange={() => setSizeKind("talla")} />
+                      <input type="radio" name="sizeKind" value="talla" title="Elegirlas no es el precio ni la publicación." checked={sizeKind === "talla"} onChange={() => setSizeKind("talla")} />
                       Tallas, como S, M o 38
                     </label>
                     <label className="flex items-center gap-3 rounded-[10px] border border-line bg-card px-3 py-2 text-sm">
-                      <input type="radio" name="sizeKind" value="tamano" checked={sizeKind === "tamano"} onChange={() => setSizeKind("tamano")} />
+                      <input type="radio" name="sizeKind" value="tamano" title="Elegirlos no es el precio ni la publicación." checked={sizeKind === "tamano"} onChange={() => setSizeKind("tamano")} />
                       Tamaños, como 50 cm o 1.5 m
                     </label>
                   </div>

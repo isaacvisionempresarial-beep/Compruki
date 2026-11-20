@@ -126,7 +126,7 @@ export function ProfitabilityScreen({
                         ) : null}
                         {row.sources.length > 0 ? (
                           <details className="mt-3">
-                            <summary className="cursor-pointer text-sm font-semibold text-accent-strong">
+                            <summary className="cursor-pointer text-sm font-semibold text-accent-strong" title="Verlos no cobra ni cambia el total guardado.">
                               Ver pedidos ({row.sources.length})
                             </summary>
                             <ul className="mt-2 space-y-1 text-sm leading-5">

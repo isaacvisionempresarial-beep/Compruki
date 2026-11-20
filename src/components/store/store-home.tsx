@@ -68,6 +68,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Buscar por nombre o SKU"
+              title="Buscar no cambia los precios publicados ni crea un pedido."
               className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm shadow-[0_1px_0_rgb(34_38_56/0.02)] transition-[border-color,box-shadow] focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
             />
             <span className="mt-1 block text-xs leading-5 text-muted">Buscar no cambia los precios publicados ni crea un pedido.</span>

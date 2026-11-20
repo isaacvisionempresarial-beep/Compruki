@@ -24,6 +24,7 @@ export function PeriodControl({
               name={name}
               value={item.id}
               checked={period === item.id}
+              title="Cambiar el período no cobra ni cambia pedidos."
               onChange={() => onChange(item.id)}
               className="peer sr-only"
             />

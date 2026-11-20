@@ -282,6 +282,11 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                             name="variant"
                             value={name}
                             checked={selected}
+                            title={
+                              product.sizeKind === "tamano"
+                                ? "Elegirlo no cambia el precio publicado ni crea un pedido."
+                                : "Elegirla no cambia el precio publicado ni crea un pedido."
+                            }
                             className="sr-only"
                             onChange={() => {
                               setVariant(name);

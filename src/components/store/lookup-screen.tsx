@@ -38,6 +38,7 @@ export function LookupScreen() {
               autoComplete="off"
               inputMode="text"
               placeholder="P-2001"
+              title="Escribirlo no cobra ni cambia el total guardado."
               value={number}
               onChange={(event) => setNumber(event.target.value)}
               className={inputClass}
@@ -54,6 +55,7 @@ export function LookupScreen() {
               required
               inputMode="tel"
               autoComplete="tel"
+              title="Escribirlo no cobra ni cambia el total guardado."
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
               className={inputClass}
