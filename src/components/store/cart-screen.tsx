@@ -55,7 +55,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
         <div className="order-2 min-w-0 xl:order-1">
         {rows.length === 0 ? (
           <p className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 text-sm leading-5 text-muted">
-            El carrito está vacío.{" "}
+            El carrito está vacío. Vacío no registra pedido ni cobra.{" "}
             <Link href="/tienda" className="font-semibold text-accent-strong">
               Ver productos
             </Link>

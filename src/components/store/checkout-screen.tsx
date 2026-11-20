@@ -76,7 +76,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
   if (blocked || payload.length === 0) {
     return (
       <p className="text-sm text-muted">
-        No hay productos que se puedan pedir.{" "}
+        No hay productos que se puedan pedir. No registra pedido ni cobra.{" "}
         <Link href="/tienda/carrito" className="font-semibold text-accent-strong">
           Volver al carrito
         </Link>
@@ -210,11 +210,11 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                 <input type="radio" name="payment" value="contra_entrega" defaultChecked className="mt-1" />
                 <span>
                   <span className="block font-semibold">Efectivo contra entrega</span>
-                  <span className="text-muted">Pagas el precio publicado cuando los recibes.</span>
+                  <span className="text-muted">Pagas el precio publicado cuando los recibes. Marcarlo no cobra.</span>
                 </span>
               </label>
               <p className="rounded-[10px] border border-line bg-subtle px-3 py-2 text-sm text-muted">
-                Transferencia y tarjeta todavía no están conectadas.
+                Transferencia y tarjeta todavía no están conectadas. No es un pago.
               </p>
             </fieldset>
 
@@ -236,6 +236,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                 <Link href="/tienda/condiciones" className="scroll-mb-24 font-semibold text-accent-strong">
                   Leerlas
                 </Link>
+                <span className="mt-1 block text-xs leading-5 text-muted">Leerlas no confirma el pedido ni cobra.</span>
               </p>
             </div>
 
@@ -310,6 +311,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
             <Link href="/tienda/carrito" className="font-semibold text-accent-strong">
               Volver al carrito
             </Link>
+            <span className="mt-1 block text-xs">Volver no confirma el pedido ni cobra.</span>
           </p>
         </aside>
       </form>

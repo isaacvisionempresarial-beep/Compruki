@@ -195,9 +195,12 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               />
             )}
             {product.hasVideo ? (
-              <video controls preload="metadata" className="max-h-[70vh] w-full rounded-[14px] bg-subtle" src={`/tienda/video/${product.sku}`}>
-                Tu navegador no reproduce este video.
-              </video>
+              <>
+                <video controls preload="metadata" className="max-h-[70vh] w-full rounded-[14px] bg-subtle" src={`/tienda/video/${product.sku}`}>
+                  Tu navegador no reproduce este video.
+                </video>
+                <p className="text-xs leading-5 text-muted">Verlo no cambia el precio publicado ni crea un pedido.</p>
+              </>
             ) : null}
           </div>
           <p className="mt-3 flex items-center gap-2 text-[11px] text-muted">
@@ -429,6 +432,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               <div className="px-3 py-2">
                 <dt className="text-sm font-bold text-ink">Lo que puedes saber</dt>
                 <dd className="mt-0.5 text-xs leading-5 whitespace-pre-line text-muted">{product.answers}</dd>
+                <p className="mt-1 text-xs leading-5 text-muted">Leerlas no cambia el precio publicado ni crea un pedido.</p>
               </div>
             ) : null}
           </dl>
