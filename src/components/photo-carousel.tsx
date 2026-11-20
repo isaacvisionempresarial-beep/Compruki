@@ -117,6 +117,7 @@ export function PhotoCarousel({
           type="button"
           className={multiple ? "absolute inset-0 cursor-zoom-in border-0 bg-transparent p-0" : "block w-full cursor-zoom-in border-0 bg-transparent p-0"}
           aria-label={openLabel}
+          title="Ampliarla no cambia el precio publicado ni crea un pedido."
           onClick={() => {
             if (swiped.current) {
               swiped.current = false;

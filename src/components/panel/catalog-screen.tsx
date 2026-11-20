@@ -265,6 +265,7 @@ function CatalogProductRow({
               {product.published ? (
                 <a
                   href={campaignPath(product.sku)}
+                  title="Visitarla no cobra ni cambia el precio ni la publicación."
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex h-8 items-center justify-center rounded-[10px] border border-line bg-card px-2.5 text-xs font-semibold hover:bg-canvas"

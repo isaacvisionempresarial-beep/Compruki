@@ -156,10 +156,10 @@ function LoginForm({ onRecover, accessDenied }: { onRecover: () => void; accessD
         </Field>
 
         <div className="flex flex-wrap justify-end gap-x-3 gap-y-1">
-          <a href="/ingresar?modo=nueva-clave" className="text-sm font-semibold text-accent-strong">
+          <a href="/ingresar?modo=nueva-clave" title="Abrirla no cobra ni cambia pedidos." className="text-sm font-semibold text-accent-strong">
             Cambiar contraseña
           </a>
-          <button type="button" className="text-sm font-semibold text-accent-strong" onClick={onRecover}>
+          <button type="button" title="Abrirlo no envía el enlace ni cobra." className="text-sm font-semibold text-accent-strong" onClick={onRecover}>
             Olvidé mi acceso
           </button>
         </div>

@@ -1341,7 +1341,7 @@ function LinesForm({
             <li key={`${line.sku}:${line.sourceVariant}:${index}`} className="grid gap-2">
               <p className="text-sm">
                 {lineName(line)}
-                <span className="mt-1 block text-muted">Precio guardado {formatCop(line.unitPrice)} cada uno</span>
+                <span className="mt-1 block text-muted">Precio guardado {formatCop(line.unitPrice)} cada uno. No es dinero cobrado.</span>
               </p>
               {sized && product?.sizeKind ? (
                 <label className="text-sm font-semibold" htmlFor={`talla-${order.id}-${index}`}>

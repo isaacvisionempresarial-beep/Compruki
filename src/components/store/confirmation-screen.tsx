@@ -569,7 +569,7 @@ function CustomerBuyerNote({ orderId, token, note }: { orderId: string; token: s
           className="mt-1 min-h-20 w-full rounded-[10px] border border-line bg-card px-3 py-2 text-sm font-normal leading-5 focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
         />
       </label>
-      <p className="mt-1 text-xs leading-5 text-muted">Opcional. Hasta 160 caracteres. Vacío: se quita. El total guardado no cambia.</p>
+      <p className="mt-1 text-xs leading-5 text-muted">Opcional. Hasta 160 caracteres. Vacío: se quita. Dejarlo no cobra. El total guardado no cambia.</p>
       {canSave ? (
         <p className="mt-2 text-sm leading-5 text-ink">
           {next ? "Si guardas, la tienda ve este aviso. El total guardado no cambia." : "Si guardas, se quita el aviso. El total guardado no cambia."}

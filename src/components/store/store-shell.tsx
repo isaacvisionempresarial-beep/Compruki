@@ -44,14 +44,14 @@ export function StoreShell({ children }: { children: ReactNode }) {
             {productPage ? (
               <nav className="hidden items-center gap-3 text-sm font-semibold md:flex" aria-label="En esta ficha">
                 {showBenefits ? (
-                  <a href="#lo-especial" className="text-muted hover:text-accent-strong">
+                  <a href="#lo-especial" title="Ir ahí no cambia el precio publicado ni crea un pedido." className="text-muted hover:text-accent-strong">
                     Beneficios
                   </a>
                 ) : null}
-                <a href="#detalles" className="text-muted hover:text-accent-strong">
+                <a href="#detalles" title="Ir ahí no cambia el precio publicado ni crea un pedido." className="text-muted hover:text-accent-strong">
                   Detalles
                 </a>
-                <a href="#preguntas" className="text-muted hover:text-accent-strong">
+                <a href="#preguntas" title="Ir ahí no cambia el precio publicado ni crea un pedido." className="text-muted hover:text-accent-strong">
                   Preguntas
                 </a>
               </nav>
