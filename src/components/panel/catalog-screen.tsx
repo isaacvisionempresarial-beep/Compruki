@@ -865,6 +865,7 @@ export function ProductEditor({
               <input
                 ref={imagePickerRef}
                 type="file"
+                title="Elegirlas no las publica solas. El precio no cambia."
                 accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
                 multiple
                 className="sr-only"
@@ -883,15 +884,15 @@ export function ProductEditor({
               <div className="mt-3 border-t border-line pt-2.5">
                 <p className="text-sm font-semibold">Video</p>
                 {videoPreview ? (
-                  <video src={videoPreview} controls className="mt-3 max-h-[32rem] w-full rounded-[10px] bg-card" />
+                  <video src={videoPreview} controls title="Verlo no cambia el precio ni la publicación." className="mt-3 max-h-[32rem] w-full rounded-[10px] bg-card" />
                 ) : savedVideo && !clearVideo ? (
-                  <video src={`/panel/video/${product?.sku}`} controls className="mt-3 max-h-[32rem] w-full rounded-[10px] bg-card" />
+                  <video src={`/panel/video/${product?.sku}`} controls title="Verlo no cambia el precio ni la publicación." className="mt-3 max-h-[32rem] w-full rounded-[10px] bg-card" />
                 ) : (
                   <p className="mt-2 text-sm leading-5">
                     Todavía no hay video. Agregarlo no cambia el precio ni la publicación.
                   </p>
                 )}
-                <input ref={videoPickerRef} type="file" accept="video/mp4,.mp4" className="sr-only" onChange={onPickVideo} />
+                <input ref={videoPickerRef} type="file" accept="video/mp4,.mp4" title="Elegirlo no lo publica solo. El precio no cambia." className="sr-only" onChange={onPickVideo} />
                 <input ref={videoRef} name="video" type="file" accept="video/mp4,.mp4" className="hidden" tabIndex={-1} aria-hidden="true" />
                 <button
                   type="button"
@@ -907,6 +908,7 @@ export function ProductEditor({
                     <input
                       type="checkbox"
                       name="clearVideo"
+                      title="Marcarla no quita el video hasta guardar. No es el precio ni la publicación."
                       checked={clearVideo}
                       className="mt-1 h-4 w-4"
                       onChange={(event) => setClearVideo(event.target.checked)}
@@ -981,6 +983,7 @@ export function ProductEditor({
                   <input
                     type="checkbox"
                     name="unavailable"
+                    title="Marcarla no cambia el precio ni la publicación. No cobra."
                     checked={unavailable}
                     className="mt-1 h-4 w-4"
                     onChange={(event) => setUnavailable(event.target.checked)}

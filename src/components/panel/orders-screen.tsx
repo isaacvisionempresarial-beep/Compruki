@@ -1258,6 +1258,7 @@ function AddProductForm({ order, products }: { order: StoreOrder; products: Orde
       ) : null}
       <button
         type="submit"
+        title="Agregarlo puede cambiar el total guardado. No es dinero cobrado."
         disabled={addPending || !canAdd}
         className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           addPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
@@ -1412,6 +1413,7 @@ function LinesForm({
                 {canManageOrderMoney && lines.length > 1 ? (
                   <button
                     type="button"
+                    title="Quitarla de esta lista no guarda sola. No es dinero cobrado."
                     className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
                     onClick={() => setLines((current) => current.filter((_, position) => position !== index))}
                   >
@@ -1448,6 +1450,7 @@ function LinesForm({
       ) : null}
       <button
         type="submit"
+        title="Guardarlas puede cambiar el total guardado. No es dinero cobrado."
         disabled={linesPending || !canSave}
         className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
           linesPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"

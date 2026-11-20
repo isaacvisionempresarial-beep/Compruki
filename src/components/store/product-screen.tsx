@@ -196,7 +196,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
             )}
             {product.hasVideo ? (
               <>
-                <video controls preload="metadata" className="max-h-[70vh] w-full rounded-[14px] bg-subtle" src={`/tienda/video/${product.sku}`}>
+                <video controls preload="metadata" title="Verlo no cambia el precio publicado ni crea un pedido." className="max-h-[70vh] w-full rounded-[14px] bg-subtle" src={`/tienda/video/${product.sku}`}>
                   Tu navegador no reproduce este video.
                 </video>
                 <p className="text-xs leading-5 text-muted">Verlo no cambia el precio publicado ni crea un pedido.</p>
