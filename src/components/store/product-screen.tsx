@@ -330,6 +330,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                       +
                     </button>
                   </div>
+                  <p className="mt-1 text-xs leading-5 text-muted">Cambiarla no registra pedido ni cobra.</p>
                 </div>
                 <div className="pb-1 text-xs leading-5 text-muted">
                   <p className="font-extrabold text-ink">Envío aparte</p>
