@@ -523,6 +523,7 @@ function ProductQuestion({ product }: { product: PublicProduct }) {
           Tu pregunta
           <input
             id="pregunta"
+            title="Escribirla no se envía a la tienda ni cobra."
             value={question}
             maxLength={200}
             onChange={(event) => setQuestion(event.target.value)}

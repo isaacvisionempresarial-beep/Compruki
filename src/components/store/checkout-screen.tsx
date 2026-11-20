@@ -114,6 +114,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                 <Field label="Nombre de quien recibe" htmlFor="customerName" hint="No es un pago. Al confirmar, el pedido queda pendiente.">
                   <input
                     id="customerName"
+                    title="Escribirlo no confirma el pedido ni cobra."
                     name="customerName"
                     required
                     autoComplete="name"
@@ -126,6 +127,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
               <Field label="Celular" htmlFor="phone" hint="10 dígitos, empieza por 3. Sirve para coordinar la entrega. No es un pago.">
                 <input
                   id="phone"
+                  title="Escribirlo no confirma el pedido ni cobra."
                   name="phone"
                   required
                   inputMode="tel"
@@ -142,6 +144,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
               >
                 <input
                   id="document"
+                  title="Escribirlo no confirma el pedido ni cobra."
                   name="document"
                   inputMode="numeric"
                   autoComplete="off"
@@ -153,6 +156,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
               <Field label="Departamento" htmlFor="department" hint="Por ejemplo, Sucre o Antioquia. No es la ciudad. No es un pago.">
                 <input
                   id="department"
+                  title="Escribirlo no confirma el pedido ni cobra."
                   name="department"
                   required
                   autoComplete="address-level1"
@@ -164,6 +168,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
               <Field label="Ciudad" htmlFor="city" hint="No es un pago.">
                 <input
                   id="city"
+                  title="Escribirlo no confirma el pedido ni cobra."
                   name="city"
                   required
                   autoComplete="address-level2"
@@ -176,6 +181,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                 <Field label="Dirección" htmlFor="address" hint="No es un pago. Al confirmar, el pedido queda pendiente.">
                   <input
                     id="address"
+                    title="Escribirlo no confirma el pedido ni cobra."
                     name="address"
                     required
                     autoComplete="street-address"
@@ -189,6 +195,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                 <Field label="Barrio o referencia" htmlFor="reference" hint="Opcional. No es un pago.">
                   <input
                     id="reference"
+                    title="Escribirlo no confirma el pedido ni cobra."
                     name="reference"
                     autoComplete="off"
                     value={reference}

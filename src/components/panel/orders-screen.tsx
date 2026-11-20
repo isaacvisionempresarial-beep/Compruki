@@ -778,6 +778,7 @@ function ReasonAction({
         <textarea
           id={`motivo-${order.id}-${item.id}`}
           name="customerReason"
+          title="Escribirlo no cobra. El total guardado no cambia."
           rows={3}
           maxLength={160}
           value={reason}
@@ -1070,6 +1071,7 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
           Flete real del envío
           <input
             id={`flete-${order.id}`}
+            title="Escribirlo no cobra. El total guardado no cambia."
             name="actualShipping"
             inputMode="numeric"
             value={shipping}
@@ -1093,6 +1095,7 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
           Recaudo real
           <input
             id={`recaudo-${order.id}`}
+            title="Escribirlo no cobra. El total guardado no cambia."
             name="collectionCost"
             inputMode="numeric"
             value={collection}
@@ -1114,6 +1117,7 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
           Flete de la devolución
           <input
             id={`devolucion-${order.id}`}
+            title="Escribirlo no cobra. El total guardado no cambia."
             name="returnFreight"
             inputMode="numeric"
             value={returning}
@@ -1229,6 +1233,7 @@ function AddProductForm({ order, products }: { order: StoreOrder; products: Orde
         Cantidad
         <input
           id={`agregar-cantidad-${order.id}`}
+          title="Escribirla no agrega el producto ni cobra."
           name="quantity"
           inputMode="numeric"
           value={quantity}
@@ -1358,6 +1363,7 @@ function LinesForm({
                   {product.sizeKind === "tamano" ? "Tamaño" : "Talla"}
                   <select
                     id={`talla-${order.id}-${index}`}
+                    title={product.sizeKind === "tamano" ? "Elegirlo no cambia el precio guardado de la línea." : "Elegirla no cambia el precio guardado de la línea."}
                     key={`${choiceEpoch}:${line.sourceVariant}:${line.variant ?? ""}`}
                     value={line.variant ?? ""}
                     onChange={(event) =>
@@ -1391,6 +1397,7 @@ function LinesForm({
                   Cantidad
                   <input
                     id={`cantidad-${order.id}-${index}`}
+                    title="Escribirla no guarda sola. No es dinero cobrado."
                     inputMode="numeric"
                     value={line.quantity}
                     readOnly={!canManageOrderMoney}
@@ -1467,6 +1474,7 @@ function ClosedDepartmentForm({ order }: { order: StoreOrder }) {
         Departamento
         <input
           id={`departamento-cerrado-${order.id}`}
+          title="Escribirlo no cobra. El total guardado no cambia."
           name="department"
           autoComplete="address-level1"
           value={department}
@@ -1565,41 +1573,41 @@ function DeliveryForm({ order }: { order: StoreOrder }) {
       <p className="text-sm font-semibold">Corregir entrega</p>
       <label className="text-sm font-semibold" htmlFor={`entrega-nombre-${order.id}`}>
         Nombre de quien recibe
-        <input id={`entrega-nombre-${order.id}`} name="customerName" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" className={freightInput} />
+        <input id={`entrega-nombre-${order.id}`} name="customerName" title="Escribirlo no cobra. El total guardado no cambia." value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" className={freightInput} />
         <span className="mt-1 block font-normal leading-5 text-muted">Guardarlo no cobra. El total guardado no cambia.</span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-celular-${order.id}`}>
         Celular
-        <input id={`entrega-celular-${order.id}`} name="phone" inputMode="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} className={freightInput} />
+        <input id={`entrega-celular-${order.id}`} name="phone" title="Escribirlo no cobra. El total guardado no cambia." inputMode="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} className={freightInput} />
         <span className="mt-1 block font-normal leading-5 text-muted">Guardarlo no cobra. El total guardado no cambia.</span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-cedula-${order.id}`}>
         Cédula de quien recibe
-        <input id={`entrega-cedula-${order.id}`} name="document" inputMode="numeric" autoComplete="off" value={documentId} onChange={(event) => setDocumentId(event.target.value)} className={freightInput} />
+        <input id={`entrega-cedula-${order.id}`} name="document" title="Escribirlo no cobra. El total guardado no cambia." inputMode="numeric" autoComplete="off" value={documentId} onChange={(event) => setDocumentId(event.target.value)} className={freightInput} />
         <span className="mt-1 block font-normal leading-5 text-muted">
           Opcional. De 6 a 10 dígitos, sin puntos. Vacío: se quita. Sale en el texto para Dropi y en la confirmación. No va en el mensaje de estado. El total guardado no cambia.
         </span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-departamento-${order.id}`}>
         Departamento
-        <input id={`entrega-departamento-${order.id}`} name="department" autoComplete="address-level1" value={department} onChange={(event) => setDepartment(event.target.value)} className={freightInput} />
+        <input id={`entrega-departamento-${order.id}`} name="department" title="Escribirlo no cobra. El total guardado no cambia." autoComplete="address-level1" value={department} onChange={(event) => setDepartment(event.target.value)} className={freightInput} />
         <span className="mt-1 block font-normal leading-5 text-muted">
           Opcional si el pedido entró sin él. Vacío: no se agrega. En un pedido nuevo la tienda lo pide. El total guardado no cambia.
         </span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-ciudad-${order.id}`}>
         Ciudad
-        <input id={`entrega-ciudad-${order.id}`} name="city" autoComplete="address-level2" value={city} onChange={(event) => setCity(event.target.value)} className={freightInput} />
+        <input id={`entrega-ciudad-${order.id}`} name="city" title="Escribirlo no cobra. El total guardado no cambia." autoComplete="address-level2" value={city} onChange={(event) => setCity(event.target.value)} className={freightInput} />
         <span className="mt-1 block font-normal leading-5 text-muted">Guardarla no cobra. El total guardado no cambia.</span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-direccion-${order.id}`}>
         Dirección
-        <input id={`entrega-direccion-${order.id}`} name="address" autoComplete="street-address" value={address} onChange={(event) => setAddress(event.target.value)} className={freightInput} />
+        <input id={`entrega-direccion-${order.id}`} name="address" title="Escribirlo no cobra. El total guardado no cambia." autoComplete="street-address" value={address} onChange={(event) => setAddress(event.target.value)} className={freightInput} />
         <span className="mt-1 block font-normal leading-5 text-muted">Guardarla no cobra. El total guardado no cambia.</span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-referencia-${order.id}`}>
         Barrio o referencia
-        <input id={`entrega-referencia-${order.id}`} name="reference" autoComplete="off" value={reference} onChange={(event) => setReference(event.target.value)} className={freightInput} />
+        <input id={`entrega-referencia-${order.id}`} name="reference" title="Escribirlo no cobra. El total guardado no cambia." autoComplete="off" value={reference} onChange={(event) => setReference(event.target.value)} className={freightInput} />
         <span className="mt-1 block font-normal leading-5 text-muted">
           Opcional. Vacío: se quita. El cliente ve estos datos en su confirmación. Guardar aquí no cambia nada en Dropi.
           El total guardado no cambia.
@@ -1677,6 +1685,7 @@ function ReturnReasonForm({ order }: { order: StoreOrder }) {
         <textarea
           id={`motivo-devolucion-${order.id}`}
           name="customerReason"
+          title="Escribirlo no cobra. El total guardado no cambia."
           rows={3}
           maxLength={160}
           value={reason}
@@ -1730,6 +1739,7 @@ function IncidenceReasonForm({ order }: { order: StoreOrder }) {
         <textarea
           id={`motivo-incidencia-${order.id}`}
           name="customerReason"
+          title="Escribirlo no cobra. El total guardado no cambia."
           rows={3}
           maxLength={160}
           value={reason}
@@ -1780,6 +1790,7 @@ function InternalNoteForm({ order }: { order: StoreOrder }) {
         Nota interna
         <textarea
           id={`nota-${order.id}`}
+          title="Escribirla no cobra. El total guardado no cambia."
           name="internalNote"
           rows={3}
           maxLength={280}

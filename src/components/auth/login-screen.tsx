@@ -115,6 +115,7 @@ function LoginForm({ onRecover, accessDenied }: { onRecover: () => void; accessD
         <Field label="Correo" htmlFor="email">
           <input
             id="email"
+            title="Escribirlo no cobra ni cambia pedidos."
             name="email"
             type="email"
             autoComplete="username"
@@ -134,6 +135,7 @@ function LoginForm({ onRecover, accessDenied }: { onRecover: () => void; accessD
           <div className="relative">
             <input
               id="password"
+              title="Escribirla no cobra ni cambia pedidos."
               name="password"
               type={visible ? "text" : "password"}
               autoComplete="current-password"
@@ -216,6 +218,7 @@ function RecoveryForm({ onBack, linkError }: { onBack: () => void; linkError?: b
         <Field label="Correo" htmlFor="recovery-email">
           <input
             id="recovery-email"
+            title="Escribirlo no envía el enlace ni cobra."
             name="email"
             type="email"
             autoComplete="username"
@@ -287,6 +290,7 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
         <Field label="Correo" htmlFor="new-email">
           <input
             id="new-email"
+            title="Escribirlo no guarda la contraseña ni cobra."
             name="email"
             type="email"
             autoComplete="username"
@@ -300,6 +304,7 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
         <Field label="Contraseña actual (si no usaste el enlace)" htmlFor="current-password">
           <input
             id="current-password"
+            title="Escribirla no guarda la contraseña ni cobra."
             name="currentPassword"
             type={visible ? "text" : "password"}
             autoComplete="current-password"
@@ -313,6 +318,7 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
           <div className="relative">
             <input
               id="new-password"
+              title="Escribirla no guarda la contraseña ni cobra."
               name="password"
               type={visible ? "text" : "password"}
               autoComplete="new-password"
@@ -337,6 +343,7 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
         <Field label="Confirmar nueva contraseña" htmlFor="confirm-password">
           <input
             id="confirm-password"
+            title="Escribirla no guarda la contraseña ni cobra."
             name="confirm"
             type={visible ? "text" : "password"}
             autoComplete="new-password"
