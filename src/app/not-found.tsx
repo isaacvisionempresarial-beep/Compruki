@@ -14,7 +14,7 @@ export default function NotFound() {
         showBrand
         eyebrow="COMPRUKI"
         title="Esta página no está"
-        body="La dirección no corresponde a una pantalla de la tienda ni del panel. No se creó ni se borró nada. Dropi no está conectado."
+        body="La dirección no corresponde a una pantalla de la tienda ni del panel. No se creó ni se borró nada. El carrito de este navegador no cambia. No cobra. Dropi no está conectado."
         actions={[
           { href: "/tienda", label: "Ir a la tienda", primary: true },
           { href: "/ingresar", label: "Entrar al panel" },

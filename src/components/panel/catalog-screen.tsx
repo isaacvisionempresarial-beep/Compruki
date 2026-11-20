@@ -1330,16 +1330,16 @@ export function ProductDangerZone({
       </h2>
       {canDelete && canManageCommerce ? (
         <p className="mt-1.5 max-w-2xl text-xs leading-5 text-muted">
-          No hay pedidos con este SKU. Puedes eliminarlo del catálogo. Esta acción no se puede deshacer.
+          No hay pedidos con este SKU. Puedes eliminarlo del catálogo. Esta acción no se puede deshacer. No cobra ni confirma un pedido.
         </p>
       ) : canDelete ? (
         <p className="mt-1.5 max-w-2xl text-xs leading-5 text-muted">
-          No hay pedidos con este SKU. Solo el propietario puede eliminarlo. Puedes marcarlo como no disponible.
+          No hay pedidos con este SKU. Solo el propietario puede eliminarlo. Puedes marcarlo como no disponible. No cobra ni confirma un pedido.
         </p>
       ) : (
         <p className="mt-1.5 max-w-2xl text-xs leading-5 text-muted">
           Hay {relatedOrderCount === 1 ? "1 pedido" : `${relatedOrderCount} pedidos`} con este producto. No se puede
-          eliminar; solo puedes marcarlo como no disponible para que no se pida.
+          eliminar; solo puedes marcarlo como no disponible para que no se pida. No cobra ni confirma un pedido.
         </p>
       )}
 
@@ -1389,7 +1389,7 @@ export function ProductDangerZone({
         ) : product.available ? (
           <>
             <p className="mt-2 max-w-2xl text-xs leading-5 text-muted">
-              Marcarlo como no disponible no cambia el precio ni la publicación.
+              Marcarlo como no disponible no cambia el precio ni la publicación. No cobra.
               {product.published ? " Sigue publicado, pero no se puede pedir." : " Sigue sin publicar."}
             </p>
             <form action={deactivateAction}>

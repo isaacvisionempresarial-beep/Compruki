@@ -169,7 +169,7 @@ function LoginForm({ onRecover, accessDenied }: { onRecover: () => void; accessD
         ) : null}
 
         <p className="text-xs leading-5 text-muted">
-          {canEnter ? "Entras al panel de la tienda piloto." : "Sin correo y contraseña el botón queda bloqueado."}
+          {canEnter ? "Entras al panel de la tienda piloto." : "Sin correo y contraseña el botón queda bloqueado."} Entrar no cobra ni cambia pedidos.
         </p>
 
         <button
@@ -199,7 +199,7 @@ function RecoveryForm({ onBack, linkError }: { onBack: () => void; linkError?: b
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Recuperar acceso</h1>
       <p className="mt-1 text-sm text-muted">
-        Te enviamos un enlace. Al abrirlo volverás aquí para elegir la nueva contraseña. Dropi no está conectado.
+        Te enviamos un enlace. Al abrirlo volverás aquí para elegir la nueva contraseña. Pedir el enlace no cobra ni cambia pedidos. Dropi no está conectado.
       </p>
 
       {linkError ? (
@@ -274,7 +274,7 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Nueva contraseña</h1>
       <p className="mt-1 text-sm text-muted">
         Si viniste del correo de recuperación, basta la clave nueva. Si no, escribe también la actual (por ejemplo{" "}
-        <span className="font-semibold">ComprukiTemp2026!</span>).
+        <span className="font-semibold">ComprukiTemp2026!</span>). Cambiarla no cobra ni cambia pedidos.
       </p>
 
       <form action={formAction} className="mt-3 space-y-2">
