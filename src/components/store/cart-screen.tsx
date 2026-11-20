@@ -172,6 +172,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                         >
                           Quitar
                         </button>
+                        <p className="mt-1 text-xs leading-5 text-muted">No registra pedido ni cobra.</p>
                       </div>
                     </div>
                   </li>
@@ -270,6 +271,7 @@ function CartQuantity({
           className="h-10 w-20 rounded-[10px] border border-line bg-card px-2 tabular-nums focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
         />
       </label>
+      <p className="mt-1 text-xs leading-5 text-muted">Cambiarla no registra pedido ni cobra.</p>
       {valid ? null : (
         <p className="mt-2 text-sm leading-5 text-ink">De 1 a 5. Vacío o cero no quita el producto: usa Quitar.</p>
       )}
