@@ -203,9 +203,9 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
           <p className="mt-3 flex items-center gap-2 text-[11px] text-muted">
             <span aria-hidden="true">▣</span>
             {slides.length > 1
-              ? "Fotos del catálogo, completas. Las flechas las pasan en el mismo espacio."
+              ? "Fotos del catálogo, completas. Las flechas las pasan en el mismo espacio. Verlas no cambia el precio publicado ni crea un pedido."
               : slides.length === 1
-                ? "Foto del catálogo, completa. Amplía para verla mejor."
+                ? "Foto del catálogo, completa. Amplía para verla mejor. Verla no cambia el precio publicado ni crea un pedido."
                 : "Cuando haya foto revisada, aparece aquí."}
           </p>
         </div>
