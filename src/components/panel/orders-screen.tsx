@@ -287,7 +287,7 @@ export function OrdersScreen({
             const notes = rowWarnings(order, sizeGuides, canManageOrderMoney);
             return (
               <li key={order.id}>
-                <a href={orderFocusHref(order.number)} className={cx("grid items-start gap-3 px-3 py-2 hover:bg-canvas md:gap-4", orderGrid)}>
+                <a href={orderFocusHref(order.number)} title="Abrirlo no cobra ni cambia el total guardado." className={cx("grid items-start gap-3 px-3 py-2 hover:bg-canvas md:gap-4", orderGrid)}>
                   <span>
                     <span className="text-sm font-bold">{order.number}</span>
                     <span className="mt-1 block text-xs text-muted">{formatDay(order.createdAt.slice(0, 10))}</span>

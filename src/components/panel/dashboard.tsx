@@ -442,11 +442,11 @@ export function Dashboard({
           Dónde se trabaja
         </h3>
         <p className="mt-0.5 text-xs text-muted">
-          Todos los pedidos de la tienda · buscar no cambia estas cifras
+          Todos los pedidos de la tienda · buscar no cambia estas cifras. Abrirlas no cobra ni cambia pedidos.
         </p>
         <ul className="mt-2 grid gap-3 sm:grid-cols-2">
           <li>
-            <Link href="/panel/pedidos" className="elevate-1 block rounded-[14px] border border-line bg-card px-3 py-2 hover:bg-canvas">
+            <Link href="/panel/pedidos" title="Abrirlos no cobra ni cambia el total guardado." className="elevate-1 block rounded-[14px] border border-line bg-card px-3 py-2 hover:bg-canvas">
               <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedidos</span>
               <span className="mt-1 block text-sm font-bold">
                 {orderWork.yours} {orderWork.yours === 1 ? "pedido por atender" : "pedidos por atender"}
@@ -461,7 +461,7 @@ export function Dashboard({
             </Link>
           </li>
           <li>
-            <Link href="/panel/sincronizacion" className="elevate-1 block rounded-[14px] border border-line bg-card px-3 py-2 hover:bg-canvas">
+            <Link href="/panel/sincronizacion" title="Abrirla no cobra. El total guardado no cambia." className="elevate-1 block rounded-[14px] border border-line bg-card px-3 py-2 hover:bg-canvas">
               <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sincronización</span>
               <span className="mt-1 block text-sm font-bold">
                 {syncWorkCount} {syncWorkCount === 1 ? "pedido sin número de Dropi" : "pedidos sin número de Dropi"}

@@ -96,13 +96,13 @@ export function AgentsScreen({
           <Stat label="Pendiente confirmación" value={view.storeSummary.pendingConfirmation} />
         </dl>
         <div className="mt-3 flex flex-wrap gap-3 text-sm font-semibold">
-          <Link href="/panel/catalogo" className="text-accent-strong">
+          <Link href="/panel/catalogo" title="Abrirlo no cobra ni cambia pedidos." className="text-accent-strong">
             Ir al catálogo
           </Link>
-          <Link href="/panel/pedidos" className="text-accent-strong">
+          <Link href="/panel/pedidos" title="Abrirlos no cobra ni cambia el total guardado." className="text-accent-strong">
             Ir a pedidos
           </Link>
-          <Link href="/panel/conexiones" className="text-accent-strong">
+          <Link href="/panel/conexiones" title="Verlas no cobra ni cambia pedidos." className="text-accent-strong">
             Ver conexiones
           </Link>
         </div>

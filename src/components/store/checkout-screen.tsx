@@ -77,7 +77,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
     return (
       <p className="text-sm text-muted">
         No hay productos que se puedan pedir. No registra pedido ni cobra.{" "}
-        <Link href="/tienda/carrito" className="font-semibold text-accent-strong">
+        <Link href="/tienda/carrito" title="Volver no confirma el pedido ni cobra." className="font-semibold text-accent-strong">
           Volver al carrito
         </Link>
       </p>

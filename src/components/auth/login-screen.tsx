@@ -247,10 +247,10 @@ function RecoveryForm({ onBack, linkError }: { onBack: () => void; linkError?: b
       </form>
 
       <div className="mt-3 flex flex-col gap-2">
-        <a href="/ingresar?modo=nueva-clave" className="text-sm font-semibold text-accent-strong">
+        <a href="/ingresar?modo=nueva-clave" title="Abrirla no guarda la contraseña ni cobra." className="text-sm font-semibold text-accent-strong">
           Ya puedo cambiar la contraseña aquí
         </a>
-        <button type="button" className="text-sm font-semibold text-accent-strong" onClick={onBack}>
+        <button type="button" title="Volver no envía el enlace ni cobra." className="text-sm font-semibold text-accent-strong" onClick={onBack}>
           Volver a iniciar sesión
         </button>
         <p className="text-xs leading-5 text-muted">Volver no envía el enlace ni cobra.</p>

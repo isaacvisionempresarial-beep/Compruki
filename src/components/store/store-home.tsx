@@ -140,7 +140,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
                       onOpen={() => router.push(`/tienda/producto/${product.sku}`)}
                     />
                   ) : null}
-                  <Link href={`/tienda/producto/${product.sku}`} className="block">
+                  <Link href={`/tienda/producto/${product.sku}`} title="Abrirla no cambia el precio publicado ni crea un pedido." className="block">
                     {product.images.length <= 1 && product.hasImage ? (
                       <CatalogPhoto
                         sku={product.sku}

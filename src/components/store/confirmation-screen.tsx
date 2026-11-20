@@ -112,7 +112,7 @@ export function ConfirmationScreen({
           )}
           {order.status === "pendiente_confirmacion" && token ? (
             <details className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
-              <summary className="cursor-pointer text-sm font-semibold">Aviso para la tienda y cancelar</summary>
+              <summary className="cursor-pointer text-sm font-semibold" title="Abrirlo no cobra. El total guardado no cambia.">Aviso para la tienda y cancelar</summary>
               <div className="mt-2 space-y-2">
                 <CustomerBuyerNote orderId={order.id} token={token} note={order.buyerNote} />
                 <CustomerCancel order={order} token={token} />

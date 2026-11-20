@@ -757,7 +757,7 @@ export function ProductEditor({
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div className="min-w-0">
           <p className="text-xs text-muted">
-            <Link href="/panel/catalogo" className="font-semibold text-accent-strong">
+            <Link href="/panel/catalogo" title="Volver no cobra ni cambia el precio ni la publicación." className="font-semibold text-accent-strong">
               Catálogo
             </Link>
             <span aria-hidden="true"> / </span>
@@ -772,6 +772,7 @@ export function ProductEditor({
         </div>
         <Link
           href="/panel/catalogo"
+          title="Volver no cobra ni cambia el precio ni la publicación."
           className="inline-flex h-10 shrink-0 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
         >
           Volver al catálogo
