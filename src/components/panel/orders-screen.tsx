@@ -120,7 +120,7 @@ export function OrdersScreen({
     <div className="mx-auto max-w-[1600px] pb-8">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda pública</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Pedidos recibidos</h1>
-      <p className="mt-0.5 text-sm text-muted">Cada pedido se abre en su página. Dropi no está conectado.</p>
+      <p className="mt-0.5 text-sm text-muted">Cada pedido se abre en su página. Abrirlos no cobra ni cambia el total guardado. Dropi no está conectado.</p>
 
       <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
         <div className="order-2 min-w-0 xl:order-1">
@@ -401,7 +401,7 @@ export function OrderEditor({
           <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">{order.number}</h1>
           <p className="mt-1 text-xs text-muted">
             {formatDay(order.createdAt.slice(0, 10))} · {order.customerName} · {order.city}
-            {order.department ? ` · ${order.department}` : ""}
+            {order.department ? ` · ${order.department}` : ""}. Abrirlo no cobra. El total guardado no cambia.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">

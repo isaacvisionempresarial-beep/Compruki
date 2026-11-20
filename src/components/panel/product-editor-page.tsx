@@ -29,7 +29,7 @@ export function ProductEditorPage({
         </p>
         <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Nuevo producto</h1>
         <p className="mt-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-          Solo el propietario puede crear productos. Puedes editar textos, fotos y disponibilidad de los que ya están.
+          Solo el propietario puede crear productos. Puedes editar textos, fotos y disponibilidad de los que ya están. No cobra ni cambia pedidos.
         </p>
       </div>
     );

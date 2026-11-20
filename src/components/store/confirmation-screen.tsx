@@ -73,7 +73,7 @@ export function ConfirmationScreen({
         </p>
         <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">{order.number}</h1>
         <p className="mt-1 text-sm font-semibold">{STATUS_LABEL[order.status]}</p>
-        <p className="mt-1 text-sm text-muted">Lo dejaste el {formatDay(order.createdAt.slice(0, 10))}.</p>
+        <p className="mt-1 text-sm text-muted">Lo dejaste el {formatDay(order.createdAt.slice(0, 10))}. Abrirlo no cobra. El total guardado no cambia.</p>
       </section>
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="siguiente-paso">
         <h2 id="siguiente-paso" className="text-sm font-semibold">

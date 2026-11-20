@@ -45,7 +45,7 @@ export default async function SyncOrderPage({ params }: { params: Promise<{ numb
         <>
           <p className="mt-3 max-w-2xl text-sm leading-5 text-muted">
             Dropi no está conectado. Copia los datos, créalo ahí a mano y escribe aquí el número que te
-            devuelve. Esta página no lo envía.
+            devuelve. Esta página no lo envía. No cobra. El total guardado no cambia.
           </p>
           <DropiHandoff order={order} />
         </>

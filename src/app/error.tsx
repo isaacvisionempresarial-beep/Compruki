@@ -19,7 +19,7 @@ export default function AppError({ error, retry }: { error: unknown; retry: () =
         <p className="mt-4 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">COMPRUKI</p>
         <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">Algo falló en esta pantalla</h1>
         <p className="mt-1.5 max-w-2xl text-sm leading-5 text-muted">
-          No se guardó un cambio por este error. Puedes intentar de nuevo o salir a una pantalla estable.
+          No se guardó un cambio por este error. No cobra. El carrito de este navegador no cambia. Puedes intentar de nuevo o salir a una pantalla estable.
         </p>
 
         <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">

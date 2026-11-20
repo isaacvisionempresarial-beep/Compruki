@@ -88,7 +88,7 @@ export function AgentsScreen({
         <h2 id="resumen-tienda" className="text-sm font-semibold">
           Resumen determinista de la tienda
         </h2>
-        <p className="mt-1 text-sm text-muted">Cifras del catálogo y pedidos locales. No pasan por un modelo.</p>
+        <p className="mt-1 text-sm text-muted">Cifras del catálogo y pedidos locales. No pasan por un modelo. Verlas no cobra ni cambia pedidos.</p>
         <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Stat label="Publicados" value={view.storeSummary.publishedProducts} />
           <Stat label="Disponibles" value={view.storeSummary.availableProducts} />

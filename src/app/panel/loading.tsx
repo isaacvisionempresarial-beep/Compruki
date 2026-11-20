@@ -6,7 +6,7 @@ export default function PanelLoading() {
       wide
       eyebrow="Panel"
       title="Cargando el panel"
-      hint="Estamos preparando esta pantalla. No se anota ni se confirma nada. Dropi no está conectado."
+      hint="Estamos preparando esta pantalla. No se anota ni se confirma nada. No cobra. Dropi no está conectado."
     />
   );
 }

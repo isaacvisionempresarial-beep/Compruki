@@ -26,7 +26,7 @@ export default async function SettingsPage() {
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Configuración</h1>
       <p className="mt-1 text-sm text-muted">
-        Datos de tu cuenta y del tenant activo. Dropi no está conectado.
+        Datos de tu cuenta y del tenant activo. Verlos no cobra ni cambia pedidos. Dropi no está conectado.
       </p>
 
       <dl className="elevate-1 mt-4 space-y-3 rounded-[14px] border border-line bg-card px-4 py-3">
