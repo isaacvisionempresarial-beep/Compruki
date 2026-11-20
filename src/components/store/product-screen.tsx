@@ -390,7 +390,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
       {pieces.length > 0 ? (
         <section id="lo-especial" className="scroll-mt-16 border-t border-line pt-3 pb-2" aria-label="Características y beneficios">
           <h2 className="text-base font-extrabold tracking-tight">Características y beneficios</h2>
-          <p className="mt-1 max-w-xl text-xs leading-5 text-muted">Sale del catálogo. Si falta un dato, no se inventa.</p>
+          <p className="mt-1 max-w-xl text-xs leading-5 text-muted">Sale del catálogo. Si falta un dato, no se inventa. Leerlas no cambia el precio publicado ni crea un pedido.</p>
           <div className="mt-2 max-w-3xl space-y-2">{renderHighlightPieces(pieces)}</div>
         </section>
       ) : null}
