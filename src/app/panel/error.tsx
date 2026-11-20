@@ -23,6 +23,7 @@ export default function PanelError({ error, retry }: { error: unknown; retry: ()
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
+              title="Reintentar no cobra ni cambia pedidos."
               onClick={() => retry()}
               className="inline-flex h-10 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark"
             >
@@ -30,12 +31,14 @@ export default function PanelError({ error, retry }: { error: unknown; retry: ()
             </button>
             <Link
               href="/panel/pedidos"
+              title="Abrirlos no cobra ni cambia el total guardado."
               className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-4 text-sm font-semibold"
             >
               Ir a pedidos
             </Link>
             <Link
               href="/panel"
+              title="Abrirlo no cobra ni cambia pedidos."
               className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-4 text-sm font-semibold"
             >
               Panel principal

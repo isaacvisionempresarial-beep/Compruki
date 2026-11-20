@@ -165,6 +165,7 @@ export function ConnectionsScreen({
             </p>
             <Link
               href="/panel/sincronizacion"
+              title="Abrirla no cobra. El total guardado no cambia."
               className="mt-2 inline-flex text-sm font-semibold text-accent-strong"
             >
               Abrir sincronización

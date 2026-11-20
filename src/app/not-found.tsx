@@ -16,8 +16,8 @@ export default function NotFound() {
         title="Esta página no está"
         body="La dirección no corresponde a una pantalla de la tienda ni del panel. No se creó ni se borró nada. El carrito de este navegador no cambia. No cobra. Dropi no está conectado."
         actions={[
-          { href: "/tienda", label: "Ir a la tienda", primary: true },
-          { href: "/ingresar", label: "Entrar al panel" },
+          { href: "/tienda", label: "Ir a la tienda", title: "Abrirla no registra pedido ni cobra.", primary: true },
+          { href: "/ingresar", label: "Entrar al panel", title: "Abrirlo no cobra ni cambia pedidos." },
         ]}
         asideItems={[
           {

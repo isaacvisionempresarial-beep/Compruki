@@ -4,6 +4,7 @@ import { Wordmark } from "@/components/brand/wordmark";
 type Action = {
   href?: string;
   label: string;
+  title?: string;
   primary?: boolean;
   onClick?: () => void;
 };
@@ -69,14 +70,14 @@ function ActionControl({ action }: { action: Action }) {
 
   if (action.href) {
     return (
-      <Link href={action.href} className={className}>
+      <Link href={action.href} title={action.title} className={className}>
         {action.label}
       </Link>
     );
   }
 
   return (
-    <button type="button" className={className} onClick={action.onClick}>
+    <button type="button" title={action.title} className={className} onClick={action.onClick}>
       {action.label}
     </button>
   );

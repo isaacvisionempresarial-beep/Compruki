@@ -96,7 +96,7 @@ export function CentralRouterPanel({
           {route.suggestedLinks.length > 0 ? (
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               {route.suggestedLinks.map((link) => (
-                <Link key={link.href + link.label} href={link.href} className="text-accent-strong">
+                <Link key={link.href + link.label} href={link.href} title="Abrirlo no cobra ni cambia pedidos." className="text-accent-strong">
                   {link.label}
                 </Link>
               ))}

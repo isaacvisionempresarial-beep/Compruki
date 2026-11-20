@@ -162,6 +162,7 @@ export function ConfirmationScreen({
           </p>
           <Link
             href="/tienda"
+            title="Volver no cobra. El total guardado no cambia."
             className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary text-sm font-semibold text-on-dark"
           >
             Volver a la tienda

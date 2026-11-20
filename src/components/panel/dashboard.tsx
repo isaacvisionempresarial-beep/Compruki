@@ -131,6 +131,7 @@ export function Dashboard({
         <div className="flex flex-wrap items-center gap-2">
           <Link
             href={agentPendingCount > 0 ? "/panel/agentes#pendientes-humanos" : "/panel/agentes"}
+            title="Abrirlo no cobra ni cambia pedidos."
             className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle"
           >
             Centro de agentes
@@ -142,6 +143,7 @@ export function Dashboard({
           </Link>
           <Link
             href="/panel/agentes?intent=margen%20LAM-MES-01"
+            title="Abrirlo no cobra ni cambia pedidos."
             className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-accent-strong hover:bg-subtle"
           >
             Probar Central
@@ -168,7 +170,7 @@ export function Dashboard({
                 {canApproveCatalog ? "" : ". Puedes rechazar. Aprobar un borrador o una corrida lo guarda el propietario."}
               </p>
             </div>
-            <Link href="/panel/agentes#pendientes-humanos" className="text-sm font-semibold text-accent-strong">
+            <Link href="/panel/agentes#pendientes-humanos" title="Abrirla no cobra ni cambia pedidos." className="text-sm font-semibold text-accent-strong">
               Abrir bandeja
             </Link>
           </div>
@@ -178,7 +180,7 @@ export function Dashboard({
                 <span className="mr-2 rounded-[8px] border border-line px-1.5 py-0.5 text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
                   {item.kind}
                 </span>
-                <Link href={item.href} className="font-semibold text-accent-strong">
+                <Link href={item.href} title="Abrirlo no cobra ni cambia el total guardado." className="font-semibold text-accent-strong">
                   {item.label}
                 </Link>
                 <span className="text-muted"> · {item.detail}</span>
@@ -208,6 +210,7 @@ export function Dashboard({
             />
             <Link
               href="/panel/pedidos"
+              title="Abrirlos no cobra ni cambia el total guardado."
               className="inline-flex h-10 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft"
             >
               Atender pedidos
@@ -226,7 +229,7 @@ export function Dashboard({
                 <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm leading-5">
                   {card.numbers.map((number) => (
                     <li key={number}>
-                      <Link href={orderFocusHref(number)} className="font-semibold text-accent-strong">
+                      <Link href={orderFocusHref(number)} title="Abrirlo no cobra ni cambia el total guardado." className="font-semibold text-accent-strong">
                         {number}
                       </Link>
                     </li>
@@ -323,7 +326,7 @@ export function Dashboard({
                       <ul className="mt-2 space-y-1 text-sm leading-5">
                         {row.sources.map((source) => (
                           <li key={source.number}>
-                            <Link href={orderFocusHref(source.number)} className="font-semibold text-accent-strong">
+                            <Link href={orderFocusHref(source.number)} title="Abrirlo no cobra ni cambia el total guardado." className="font-semibold text-accent-strong">
                               {source.number}
                             </Link>
                             <span className="text-muted"> · {STATUS_LABEL[source.status]}</span>
@@ -402,6 +405,7 @@ export function Dashboard({
                 <li key={order.id}>
                   <Link
                     href={orderFocusHref(order.number)}
+                    title="Abrirlo no cobra ni cambia el total guardado."
                     className="flex flex-col gap-2 px-3 py-2 hover:bg-canvas sm:flex-row sm:items-center sm:gap-3"
                   >
                     <span className="w-[4.75rem] shrink-0">
@@ -557,7 +561,7 @@ function OrderListPhrase({ numbers, lead }: { numbers: string[]; lead: "de" | ":
       {numbers.map((number, index) => (
         <span key={number}>
           {index === 0 ? "" : index === numbers.length - 1 ? " y " : ", "}
-          <Link href={orderFocusHref(number)} className="font-semibold text-accent-strong">
+          <Link href={orderFocusHref(number)} title="Abrirlo no cobra ni cambia el total guardado." className="font-semibold text-accent-strong">
             {number}
           </Link>
         </span>

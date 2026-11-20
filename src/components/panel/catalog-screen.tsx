@@ -141,6 +141,7 @@ export function CatalogScreen({
               {products.length === 0 && canManageCommerce ? (
                 <Link
                   href="/panel/catalogo/nuevo"
+                  title="Crearlo no cobra ni confirma un pedido."
                   className="mt-3 inline-flex h-10 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark"
                 >
                   Nuevo producto

@@ -100,6 +100,7 @@ export function LookupScreen() {
           </p>
           <Link
             href="/tienda/condiciones"
+            title="Leerlas no registra pedido ni cobra."
             className="mt-3 inline-flex w-full justify-center text-xs font-semibold text-accent-strong"
           >
             Condiciones

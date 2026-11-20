@@ -15,6 +15,14 @@ export function usePanelQuery() {
   return useContext(PanelQueryContext);
 }
 
+function navTitle(href: string) {
+  if (href === "/panel/pedidos") return "Abrirlos no cobra ni cambia el total guardado.";
+  if (href === "/panel/sincronizacion") return "Abrirla no cobra. El total guardado no cambia.";
+  if (href === "/panel/catalogo") return "Abrirlo no cobra ni cambia el precio ni la publicación.";
+  if (href === "/panel/rentabilidad") return "Verla no cobra ni cambia los pedidos.";
+  return "Abrirlo no cobra ni cambia pedidos.";
+}
+
 const items: Array<{ id: string; label: string; icon: IconName; href?: string }> = [
   { id: "panel", label: "Panel principal", icon: "panel", href: "/panel" },
   { id: "agentes", label: "Centro de agentes", icon: "spark", href: "/panel/agentes" },
@@ -95,7 +103,7 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
 
         {open ? (
           <div className="fixed inset-0 z-40 lg:hidden">
-            <button type="button" className="absolute inset-0 bg-primary-dark/50" aria-label="Cerrar menú" onClick={() => setOpen(false)} />
+            <button type="button" className="absolute inset-0 bg-primary-dark/50" aria-label="Cerrar menú" title="Cerrarlo no cobra ni cambia pedidos." onClick={() => setOpen(false)} />
             <div
               ref={menuRef}
               id="panel-menu-movil"
@@ -118,6 +126,7 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
                 className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] border border-line bg-card lg:hidden"
                 aria-expanded={open}
                 aria-controls="panel-menu-movil"
+                title="Abrirlo no cobra ni cambia pedidos."
                 onClick={() => setOpen(true)}
               >
                 <Icon name="menu" className="h-5 w-5" />
@@ -204,6 +213,7 @@ function Sidebar({
             data-close
             className="grid h-10 w-10 place-items-center rounded-[10px] hover:bg-white/10"
             aria-label="Cerrar menú"
+            title="Cerrarlo no cobra ni cambia pedidos."
             onClick={onNavigate}
           >
             <Icon name="close" className="h-5 w-5" />
@@ -222,6 +232,7 @@ function Sidebar({
                 {item.href ? (
                   <Link
                     href={item.href}
+                    title={navTitle(item.href)}
                     aria-current={active ? "page" : undefined}
                     onClick={onNavigate}
                     className={

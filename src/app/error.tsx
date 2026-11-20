@@ -27,6 +27,7 @@ export default function AppError({ error, retry }: { error: unknown; retry: () =
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
+                title="Reintentar no cobra ni cambia el carrito."
                 onClick={() => retry()}
                 className="inline-flex h-10 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark"
               >
@@ -34,12 +35,14 @@ export default function AppError({ error, retry }: { error: unknown; retry: () =
               </button>
               <Link
                 href="/tienda"
+                title="Abrirla no registra pedido ni cobra."
                 className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-4 text-sm font-semibold"
               >
                 Ir a la tienda
               </Link>
               <Link
                 href="/panel"
+                title="Abrirlo no cobra ni cambia pedidos."
                 className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-4 text-sm font-semibold"
               >
                 Ir al panel

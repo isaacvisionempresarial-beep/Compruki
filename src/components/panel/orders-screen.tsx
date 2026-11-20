@@ -471,7 +471,7 @@ export function OrderEditor({
             <ul className="mt-1 space-y-1">
               {phoneMatches.map((item) => (
                 <li key={item.id}>
-                  <a href={orderFocusHref(item.number)} className="text-sm font-semibold underline-offset-2 hover:underline">
+                  <a href={orderFocusHref(item.number)} title="Abrirlo no cobra ni cambia el total guardado." className="text-sm font-semibold underline-offset-2 hover:underline">
                     {item.number}
                   </a>
                   <span className="text-sm text-muted"> · {STATUS_LABEL[item.status]}</span>
@@ -2133,7 +2133,7 @@ function SummaryCard({
           <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
             {numbers.map((number) => (
               <li key={number}>
-                <Link href={orderFocusHref(number)} className="text-sm font-semibold text-accent-strong">
+                <Link href={orderFocusHref(number)} title="Abrirlo no cobra ni cambia el total guardado." className="text-sm font-semibold text-accent-strong">
                   {number}
                 </Link>
               </li>
@@ -2154,7 +2154,7 @@ function OrderLinks({ numbers, lead }: { numbers: string[]; lead: "de" | ":" }) 
       {numbers.map((number, index) => (
         <span key={number}>
           {index === 0 ? "" : index === numbers.length - 1 ? " y " : ", "}
-          <Link href={orderFocusHref(number)} className="font-semibold text-accent-strong">
+          <Link href={orderFocusHref(number)} title="Abrirlo no cobra ni cambia el total guardado." className="font-semibold text-accent-strong">
             {number}
           </Link>
         </span>

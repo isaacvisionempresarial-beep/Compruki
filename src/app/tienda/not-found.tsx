@@ -14,9 +14,9 @@ export default function StoreNotFound() {
       title="No encontramos eso"
       body="El producto o el pedido no está publicado aquí, o el enlace ya no sirve. El carrito de este navegador no cambia. No cobra. Dropi no está conectado."
       actions={[
-        { href: "/tienda", label: "Ver productos", primary: true },
-        { href: "/tienda/consultar", label: "Consultar un pedido" },
-        { href: "/tienda/carrito", label: "Ver carrito" },
+        { href: "/tienda", label: "Ver productos", title: "Verlos no cambia los precios publicados ni crea un pedido.", primary: true },
+        { href: "/tienda/consultar", label: "Consultar un pedido", title: "Consultar no cobra ni cambia el total guardado." },
+        { href: "/tienda/carrito", label: "Ver carrito", title: "Abrirlo no cobra ni registra un pedido." },
       ]}
       asideItems={[
         {

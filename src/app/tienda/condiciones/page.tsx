@@ -99,6 +99,7 @@ export default function ConditionsPage() {
           </ul>
           <Link
             href="/tienda"
+            title="Volver no registra pedido ni cobra."
             className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary text-sm font-semibold text-on-dark"
           >
             Volver a la tienda

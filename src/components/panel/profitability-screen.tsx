@@ -132,7 +132,7 @@ export function ProfitabilityScreen({
                             <ul className="mt-2 space-y-1 text-sm leading-5">
                               {row.sources.map((source) => (
                                 <li key={source.number}>
-                                  <a href={orderFocusHref(source.number)} className="font-semibold text-accent-strong">
+                                  <a href={orderFocusHref(source.number)} title="Abrirlo no cobra ni cambia el total guardado." className="font-semibold text-accent-strong">
                                     {source.number}
                                   </a>
                                   <span className="text-muted">

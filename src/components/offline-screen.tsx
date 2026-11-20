@@ -11,8 +11,8 @@ export function OfflineScreen() {
         title="No hay conexión"
         body="Sin internet no cargan pantallas nuevas. No cobra. Dropi no está conectado ni se sincroniza. El carrito de este navegador puede seguir aquí; no se confirma ni se envía un pedido."
         actions={[
-          { label: "Intentar de nuevo", primary: true, onClick: () => window.location.reload() },
-          { href: "/tienda", label: "Ir a la tienda" },
+          { label: "Intentar de nuevo", title: "Reintentar no cobra ni registra un pedido.", primary: true, onClick: () => window.location.reload() },
+          { href: "/tienda", label: "Ir a la tienda", title: "Abrirla no registra pedido ni cobra." },
         ]}
         asideTitle="Qué significa"
         asideItems={[
