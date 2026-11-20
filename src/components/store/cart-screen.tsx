@@ -203,12 +203,15 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
               El pedido se crea al confirmar en el pago y no cobra. Dropi no está conectado.
             </p>
             {canContinue ? (
-              <Link
-                href="/tienda/pagar"
-                className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark"
-              >
-                Continuar · pagas al recibir
-              </Link>
+              <>
+                <Link
+                  href="/tienda/pagar"
+                  className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark"
+                >
+                  Continuar · pagas al recibir
+                </Link>
+                <p className="mt-2 text-xs leading-5 text-muted">Continuar no confirma el pedido ni cobra.</p>
+              </>
             ) : rows.length > 0 ? (
               <div className="mt-3">
                 <p
@@ -218,14 +221,18 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                   Continuar · pagas al recibir
                 </p>
                 <p className="mt-2 text-sm leading-5 text-coral-strong">{blockedHint}</p>
+                <p className="mt-2 text-xs leading-5 text-muted">Continuar no confirma el pedido ni cobra.</p>
               </div>
             ) : (
-              <Link
-                href="/tienda"
-                className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary text-sm font-semibold text-on-dark"
-              >
-                Ver productos
-              </Link>
+              <>
+                <Link
+                  href="/tienda"
+                  className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary text-sm font-semibold text-on-dark"
+                >
+                  Ver productos
+                </Link>
+                <p className="mt-2 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>
+              </>
             )}
           </aside>
         </div>

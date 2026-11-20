@@ -30,7 +30,7 @@ export function OfflineNotice() {
       role="status"
       className="border-b border-line bg-warning-tint px-4 py-1.5 text-center text-xs leading-5 text-warning"
     >
-      Sin conexión. Dropi no está conectado ni se sincroniza. El carrito de este navegador puede seguir aquí.
+      Sin conexión. No cobra. Dropi no está conectado ni se sincroniza. El carrito de este navegador puede seguir aquí.
     </div>
   );
 }

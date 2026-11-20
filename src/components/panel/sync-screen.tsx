@@ -60,7 +60,7 @@ export function SyncScreen({ orders }: { orders: StoreOrder[] }) {
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Dropi, a mano</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Sincronización</h1>
       <p className="mt-0.5 text-sm text-muted">
-        Copia la entrega y anota el número. Dropi no está conectado: no se envía desde aquí y el total guardado no cambia.
+        Copia la entrega y anota el número. Ver esta lista no cobra. Dropi no está conectado: no se envía desde aquí y el total guardado no cambia.
       </p>
 
       <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">

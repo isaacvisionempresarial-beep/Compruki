@@ -38,7 +38,7 @@ export function AgentBudgetPanel({
       <p className="mt-1 text-sm text-muted">
         Activación y tope mensual por rol (HU-AG05). Solo el propietario los cambia. Si un rol está
         apagado o sin presupuesto, Enrutar / Buscar / Generar / Calcular se cancelan. OpenAI no está
-        conectado: el costo estimado sigue en cero.
+        conectado: el costo estimado sigue en cero. Verlo o guardarlo no cobra ni cambia pedidos. El costo estimado no es dinero cobrado.
       </p>
 
       <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
@@ -150,7 +150,7 @@ function AgentConfigForm({
         </label>
         {!canEdit ? (
           <p role="status" className="text-sm font-medium text-coral">
-            Solo el propietario puede cambiar esta configuración.
+            Solo el propietario puede cambiar esta configuración. No cobra ni cambia pedidos.
           </p>
         ) : null}
         <button

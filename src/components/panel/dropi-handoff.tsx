@@ -19,7 +19,7 @@ export function DropiHandoff({ order }: { order: StoreOrder }) {
           Datos para Dropi
         </h2>
         <p className="mt-1 text-xs leading-5 text-muted">
-          Dropi no está conectado. Se copian a mano; desde aquí no se crea el pedido ni cambia el total guardado.
+          Dropi no está conectado. Se copian a mano; desde aquí no se crea el pedido ni cobra. El total guardado no cambia.
         </p>
         <DropiCopy order={order} />
       </section>
@@ -99,12 +99,12 @@ function DropiCopy({ order }: { order: StoreOrder }) {
       </button>
       {copied === "ok" ? (
         <p role="status" className="text-sm text-accent-strong">
-          Listo para pegarlo en Dropi. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
+          Listo para pegarlo en Dropi. Copiar no cobra. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
         </p>
       ) : null}
       {copied === "fail" ? (
         <p role="alert" className="text-sm font-semibold text-danger">
-          No se pudo copiar. El texto queda seleccionado para copiarlo a mano.
+          No se pudo copiar. El texto queda seleccionado para copiarlo a mano. No cobra. El total guardado no cambia.
         </p>
       ) : null}
     </div>

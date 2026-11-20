@@ -35,7 +35,7 @@ export function ContentCreatorPanel({
       </h2>
       <p className="mt-1 text-sm text-muted">
         AG-03 sin OpenAI: arma borradores con hechos del catálogo. Generar o guardar deja corrida en el
-        historial. Guardar no publica ni cambia el precio de la ficha.{" "}
+        historial. Generar no cobra ni cambia pedidos. Guardar no publica ni cambia el precio de la ficha.{" "}
         {canTurnOn
           ? "El borrador espera tu aprobación para escribirse en el catálogo."
           : "No escribe el catálogo. Lo aprueba el propietario."}
