@@ -207,7 +207,7 @@ function saleStopSummary(action: OrderAction, summary: string, wasCollected: boo
 }
 
 function keptTotalNote(summary: string) {
-  return `${summary} El total guardado no cambió.`;
+  return `${summary} El total guardado no cambió. Nadie cobra en el sitio.`;
 }
 
 export async function cancelOrderByCustomer(id: string, token: string, rawReason: string) {
@@ -349,7 +349,7 @@ export async function chooseSizeByCustomer(
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName: current.customerName,
-        summary: `${lead} El total guardado no cambió. El precio de la línea tampoco. El catálogo no cambió. Dropi no está conectado: no se entera desde aquí.`,
+        summary: `${lead} El total guardado no cambió. El precio de la línea tampoco. Nadie cobra en la tienda. El catálogo no cambió. Dropi no está conectado: no se entera desde aquí.`,
       },
       ...current.history,
     ],
@@ -770,7 +770,7 @@ export async function saveOrderLines(
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName,
-        summary: `${lead} ${total === current.total ? "El total guardado no cambió." : `El total guardado quedó en ${formatCop(total)}.`} El precio guardado de cada línea que sigue no cambió. El catálogo no cambió. Dropi no está conectado: no se entera desde aquí.`,
+        summary: `${lead} ${total === current.total ? "El total guardado no cambió." : `El total guardado quedó en ${formatCop(total)}.`} No es dinero cobrado. El precio guardado de cada línea que sigue no cambió. El catálogo no cambió. Dropi no está conectado: no se entera desde aquí.`,
       },
       ...current.history,
     ],
@@ -838,7 +838,7 @@ export async function addOrderLine(
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName,
-        summary: `Agregó ${lineName(line)}. Copió el precio de la ficha de hoy. El catálogo no cambió. El total guardado quedó en ${formatCop(total)}. Dropi no está conectado: no se entera desde aquí.`,
+        summary: `Agregó ${lineName(line)}. Copió el precio de la ficha de hoy. El catálogo no cambió. El total guardado quedó en ${formatCop(total)}. No es dinero cobrado. Dropi no está conectado: no se entera desde aquí.`,
       },
       ...current.history,
     ],

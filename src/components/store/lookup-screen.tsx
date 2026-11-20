@@ -101,6 +101,9 @@ export function LookupScreen() {
           <p className="mt-3 text-xs leading-5 text-muted">
             Solo estado en la tienda. Si sigue en curso, pagas al recibir y nadie cobra aquí. Si está cancelado, devuelto o en incidencia, ya no se paga al recibir. Anotar el cobro, el flete o el recaudo no es dinero cobrado aquí. Consultar no cambia el total guardado. Dropi no está conectado. Sin guía ni fecha exacta.
           </p>
+          <p className="mt-2 text-xs leading-5 text-muted">
+            Corregir la entrega, la talla o un aviso no cobra aquí. El total guardado no cambia. Agregar o quitar un producto sí puede cambiar ese total, y tampoco es dinero cobrado.
+          </p>
           <Link
             href="/tienda/condiciones"
             title="Leerlas no registra pedido ni cobra."
