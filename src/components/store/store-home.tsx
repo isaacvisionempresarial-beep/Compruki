@@ -73,6 +73,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
             <span className="mt-1 block text-xs leading-5 text-muted">Buscar no cambia los precios publicados ni crea un pedido.</span>
           </label>
           {categories.length > 0 ? (
+            <>
             <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Filtrar por categoría">
               <CategoryChip label="Todas" count={products.length} selected={category === "todas"} onSelect={() => setCategory("todas")} />
               {categories.map(([key, label]) => (
@@ -93,6 +94,8 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
                 />
               ) : null}
             </div>
+            <p className="mt-2 text-xs leading-5 text-muted">Filtrar no cambia los precios publicados ni crea un pedido.</p>
+            </>
           ) : null}
 
           {visible.length === 0 ? (
