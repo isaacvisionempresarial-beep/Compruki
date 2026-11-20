@@ -143,8 +143,11 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
                       />
                     ) : null}
                     {!product.hasImage && product.images.length === 0 ? (
-                      <div className="grid h-32 place-items-center bg-subtle sm:h-36">
-                        <span className="text-xs font-semibold text-muted">Sin foto</span>
+                      <div className="grid h-32 place-items-center bg-subtle px-2 text-center sm:h-36">
+                        <span>
+                          <span className="block text-xs font-semibold text-muted">Sin foto</span>
+                          <span className="mt-1 block text-[11px] leading-4 text-muted">El precio publicado no cambia.</span>
+                        </span>
                       </div>
                     ) : null}
                     <div className="p-2">

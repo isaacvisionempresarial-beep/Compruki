@@ -174,8 +174,8 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
             {slides.length === 0 ? (
               <div className="grid min-h-36 place-items-center rounded-[14px] border border-line bg-subtle px-4 text-center">
                 <div>
-                  <p className="text-sm font-semibold text-muted">Sin foto publicada</p>
-                  <p className="mt-1 text-xs text-muted">La ficha muestra solo lo revisado en el catálogo.</p>
+                  <p className="text-sm font-semibold text-muted">Sin foto en la ficha</p>
+                  <p className="mt-1 text-xs text-muted">El precio publicado no cambia. La ficha muestra solo lo revisado en el catálogo.</p>
                 </div>
               </div>
             ) : (

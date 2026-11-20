@@ -93,7 +93,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                                 {product.title}
                               </Link>
                             ) : (
-                              <p className="font-semibold">Producto no publicado</p>
+                              <p className="font-semibold">Ya no está en la tienda</p>
                             )}
                             {line.variant ? (
                               <p className="text-sm font-semibold">
