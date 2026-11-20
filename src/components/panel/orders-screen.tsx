@@ -1552,32 +1552,36 @@ function DeliveryForm({ order }: { order: StoreOrder }) {
       <label className="text-sm font-semibold" htmlFor={`entrega-nombre-${order.id}`}>
         Nombre de quien recibe
         <input id={`entrega-nombre-${order.id}`} name="customerName" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" className={freightInput} />
+        <span className="mt-1 block font-normal leading-5 text-muted">Guardarlo no cobra. El total guardado no cambia.</span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-celular-${order.id}`}>
         Celular
         <input id={`entrega-celular-${order.id}`} name="phone" inputMode="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} className={freightInput} />
+        <span className="mt-1 block font-normal leading-5 text-muted">Guardarlo no cobra. El total guardado no cambia.</span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-cedula-${order.id}`}>
         Cédula de quien recibe
         <input id={`entrega-cedula-${order.id}`} name="document" inputMode="numeric" autoComplete="off" value={documentId} onChange={(event) => setDocumentId(event.target.value)} className={freightInput} />
         <span className="mt-1 block font-normal leading-5 text-muted">
-          Opcional. De 6 a 10 dígitos, sin puntos. Vacío: se quita. Sale en el texto para Dropi y en la confirmación. No va en el mensaje de estado.
+          Opcional. De 6 a 10 dígitos, sin puntos. Vacío: se quita. Sale en el texto para Dropi y en la confirmación. No va en el mensaje de estado. El total guardado no cambia.
         </span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-departamento-${order.id}`}>
         Departamento
         <input id={`entrega-departamento-${order.id}`} name="department" autoComplete="address-level1" value={department} onChange={(event) => setDepartment(event.target.value)} className={freightInput} />
         <span className="mt-1 block font-normal leading-5 text-muted">
-          Opcional si el pedido entró sin él. Vacío: no se agrega. En un pedido nuevo la tienda lo pide.
+          Opcional si el pedido entró sin él. Vacío: no se agrega. En un pedido nuevo la tienda lo pide. El total guardado no cambia.
         </span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-ciudad-${order.id}`}>
         Ciudad
         <input id={`entrega-ciudad-${order.id}`} name="city" autoComplete="address-level2" value={city} onChange={(event) => setCity(event.target.value)} className={freightInput} />
+        <span className="mt-1 block font-normal leading-5 text-muted">Guardarla no cobra. El total guardado no cambia.</span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-direccion-${order.id}`}>
         Dirección
         <input id={`entrega-direccion-${order.id}`} name="address" autoComplete="street-address" value={address} onChange={(event) => setAddress(event.target.value)} className={freightInput} />
+        <span className="mt-1 block font-normal leading-5 text-muted">Guardarla no cobra. El total guardado no cambia.</span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-referencia-${order.id}`}>
         Barrio o referencia
@@ -1607,7 +1611,7 @@ function DeliveryForm({ order }: { order: StoreOrder }) {
           deliveryPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
         }`}
       >
-        Guardar entrega
+        {deliveryPending ? "Guardando…" : "Guardar entrega · no cobra"}
       </button>
     </form>
   );
