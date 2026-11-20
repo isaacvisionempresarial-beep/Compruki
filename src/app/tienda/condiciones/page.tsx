@@ -35,19 +35,19 @@ const points = [
   },
   {
     label: "El envío",
-    text: "No está incluido y se acuerda antes de despachar. No hay guía ni fecha prometida. Dropi no está conectado.",
+    text: "No está incluido y se acuerda antes de despachar. No hay guía ni fecha prometida. Acordarlo no cobra y el total guardado no cambia. Dropi no está conectado.",
   },
   {
     label: "Tus datos",
-    text: "Nombre, celular, cédula si la escribes, departamento, ciudad, dirección y referencia. Sirven para preparar este pedido. Sin departamento, el texto para Dropi no lo lleva y la tienda puede confirmar igual. Mientras sigue pendiente, puedes corregirlos.",
+    text: "Nombre, celular, cédula si la escribes, departamento, ciudad, dirección y referencia. Sirven para preparar este pedido. Sin departamento, el texto para Dropi no lo lleva y la tienda puede confirmar igual. Mientras sigue pendiente, puedes corregirlos. Corregirlos no cobra y el total guardado no cambia.",
   },
   {
     label: "El estado",
-    text: "Se consulta con el número del pedido y el celular de la entrega.",
+    text: "Se consulta con el número del pedido y el celular de la entrega. Consultar no cobra ni cambia el total guardado.",
   },
   {
     label: "Un aviso",
-    text: "Mientras sigue pendiente, puedes dejarle uno a la tienda desde el pedido. No es un chat ni WhatsApp.",
+    text: "Mientras sigue pendiente, puedes dejarle uno a la tienda desde el pedido. No es un chat ni WhatsApp. Dejarlo no cobra y el total guardado no cambia.",
   },
   {
     label: "Devolución",
@@ -90,7 +90,7 @@ export default function ConditionsPage() {
             </li>
             <li>
               <span className="font-semibold text-sm">Envío aparte</span>
-              <span className="mt-0.5 block text-muted">Se acuerda antes de despachar.</span>
+              <span className="mt-0.5 block text-muted">Se acuerda antes de despachar. No se cobra aquí.</span>
             </li>
             <li>
               <span className="font-semibold text-sm">Dropi</span>
