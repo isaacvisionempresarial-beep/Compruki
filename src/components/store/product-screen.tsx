@@ -468,6 +468,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
       <dialog
         ref={dialogRef}
         className="m-auto max-h-[90vh] w-[min(860px,90vw)] rounded-[14px] border-0 bg-card p-3 shadow-2xl backdrop:bg-primary-dark/70 backdrop:backdrop-blur-sm open:flex open:flex-col"
+        title="Verla así no cambia el precio publicado ni crea un pedido."
         onClose={() => setLightboxOpen(false)}
         onClick={(event) => {
           if (event.target === dialogRef.current) setLightboxOpen(false);

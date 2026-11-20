@@ -630,7 +630,7 @@ function CustomerCancel({ order, token }: { order: CustomerOrder; token: string 
       </p>
       {preview ? (
         <p className="mt-2 text-sm leading-5 text-ink">
-          Si cancelas, ya no se cobra y el total guardado no cambia. En tu pedido queda así.
+          Si cancelas, ya no se paga al recibir. Nadie cobra aquí y el total guardado no cambia. En tu pedido queda así.
           <span className="mt-1 block font-normal text-muted">{preview}</span>
         </p>
       ) : null}

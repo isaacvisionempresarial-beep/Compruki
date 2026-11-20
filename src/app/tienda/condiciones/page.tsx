@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 const points = [
   {
     label: "El pedido",
-    text: "Queda pendiente hasta que la tienda lo confirme. Confirmar no cobra. Mientras sigue pendiente, puedes cancelarlo desde el pedido: deja de cobrarse y el total guardado no cambia.",
+    text: "Queda pendiente hasta que la tienda lo confirme. Confirmar no cobra. Mientras sigue pendiente, puedes cancelarlo desde el pedido. Cancelarlo no cobra aquí: ya no se paga al recibir y el total guardado no cambia.",
   },
   {
     label: "La talla",
@@ -51,7 +51,7 @@ const points = [
   },
   {
     label: "Devolución",
-    text: "Si la tienda la anota, el motivo queda en el pedido y ya no se cobra. El total guardado no cambia. Esta página no fija un plazo de retracto.",
+    text: "Si la tienda la anota, el motivo queda en el pedido. Ya no se paga al recibir. Nadie cobra aquí y el total guardado no cambia. Esta página no fija un plazo de retracto.",
   },
 ];
 

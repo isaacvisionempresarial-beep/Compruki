@@ -106,7 +106,8 @@ export function PhotoCarousel({
       className={`relative overflow-hidden bg-subtle ${roundedClassName} ${multiple ? `${frameClassName} touch-pan-y` : ""}`}
       role="region"
       aria-roledescription="carrusel"
-      aria-label={label}
+      aria-label={multiple ? `${label}. ${moveTitle}` : label}
+      title={multiple ? moveTitle : onOpen ? openTitle : photoTitle}
       tabIndex={multiple ? 0 : undefined}
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
@@ -184,7 +185,7 @@ export function PhotoCarousel({
             ))}
           </div>
           <p className="sr-only" aria-live="polite">
-            Foto {current + 1} de {count}
+            Foto {current + 1} de {count}. {moveTitle}
           </p>
         </>
       ) : null}

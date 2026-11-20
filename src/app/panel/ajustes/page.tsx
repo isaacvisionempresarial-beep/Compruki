@@ -54,8 +54,8 @@ export default async function SettingsPage() {
           <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Qué puede esta sesión</dt>
           <dd className="mt-0.5 text-sm text-muted">
             {access.role === "owner"
-              ? "Puedes cambiar precios, publicación, alta y eliminación del catálogo; el flete, el costo y el cobro de los pedidos; y aprobar borradores y presupuestos de agentes."
-              : "Puedes editar textos, fotos y disponibilidad, y seguir pedidos: estado, entrega, talla o tamaño y aviso. Precio, flete, costo, cobro, alta, eliminación, aprobar borradores y presupuestos los guarda el propietario."}
+              ? "Puedes cambiar precios, publicación, alta y eliminación del catálogo; anotar el flete, el costo y la marca de cobro; y aprobar borradores y presupuestos. Nada de eso cobra en el sitio."
+              : "Puedes editar textos, fotos y disponibilidad, y seguir pedidos: estado, entrega, talla o tamaño y aviso. Precio, flete, costo, marca de cobro, alta, eliminación, aprobar borradores y presupuestos los guarda el propietario. Nada de eso cobra en el sitio."}
           </dd>
         </div>
       </dl>
