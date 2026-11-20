@@ -369,7 +369,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
             </form>
           ) : (
             <p className="mt-3 rounded-[10px] bg-coral-tint px-3 py-2 text-sm font-semibold text-coral-strong">
-              Este producto está publicado, pero ahora no se puede pedir.
+              Este producto está publicado, pero ahora no se puede pedir. El precio publicado no cambia.
             </p>
           )}
 
@@ -403,14 +403,14 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
             ))}
           </div>
           <a href="#detalles" className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-accent-strong hover:underline">
-            Ver antes de comprar <span aria-hidden="true">→</span>
+            Ver antes de pedir <span aria-hidden="true">→</span>
           </a>
         </section>
       ) : null}
 
       <div className="scroll-mt-16 grid items-start gap-3 border-t border-line pt-3 pb-2 xl:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)]">
-        <section id="detalles" className="min-w-0" aria-label="Antes de comprar">
-          <h2 className="text-base font-extrabold tracking-tight">Antes de comprar</h2>
+        <section id="detalles" className="min-w-0" aria-label="Antes de pedir">
+          <h2 className="text-base font-extrabold tracking-tight">Antes de pedir</h2>
           <dl className="mt-2 divide-y divide-line overflow-hidden rounded-[14px] border border-line bg-card">
             {[
               ["Envío", "No incluido. Se acuerda con la dirección. Sin fecha prometida. No se cobra aquí."],
