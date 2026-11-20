@@ -37,7 +37,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
     <div className="min-h-dvh bg-canvas">
       <header className="sticky top-0 z-20 border-b border-line bg-card/95 backdrop-blur">
         <div className={cx("mx-auto flex h-11 items-center justify-between gap-3 px-4", shellWidth)}>
-          <Link href="/tienda" className="rounded-[10px]" aria-label="COMPRUKI, inicio de la tienda">
+          <Link href="/tienda" title="Ir al inicio no registra pedido ni cobra." className="rounded-[10px]" aria-label="COMPRUKI, inicio de la tienda">
             <Wordmark />
           </Link>
           <div className="flex items-center gap-2">

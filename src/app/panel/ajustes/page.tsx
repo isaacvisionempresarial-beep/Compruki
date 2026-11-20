@@ -95,16 +95,16 @@ export default async function SettingsPage() {
       </section>
 
       <div className="mt-4 flex flex-wrap gap-3 text-sm font-semibold">
-        <Link href="/ingresar?modo=nueva-clave" className="text-accent-strong">
+        <Link href="/ingresar?modo=nueva-clave" title="Abrirla no cobra ni cambia pedidos." className="text-accent-strong">
           Cambiar contraseña
         </Link>
-        <Link href="/tienda" className="text-accent-strong">
+        <Link href="/tienda" title="Abrirla no cobra ni cambia pedidos." className="text-accent-strong">
           Abrir tienda
         </Link>
-        <Link href="/panel/agentes" className="text-accent-strong">
+        <Link href="/panel/agentes" title="Abrirlo no cobra ni cambia pedidos." className="text-accent-strong">
           Centro de agentes
         </Link>
-        <a href="/api/health" className="text-accent-strong">
+        <a href="/api/health" title="Verla no cobra ni cambia pedidos." className="text-accent-strong">
           Ver /api/health
         </a>
       </div>

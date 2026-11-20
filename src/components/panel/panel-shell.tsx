@@ -195,7 +195,7 @@ function Sidebar({
   return (
     <div className="flex h-dvh flex-col bg-primary-dark text-on-dark">
       <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3">
-        <Link href="/panel" className="rounded-[10px]" onClick={onNavigate}>
+        <Link href="/panel" title="Ir al panel no cobra ni cambia pedidos." className="rounded-[10px]" onClick={onNavigate}>
           <Wordmark onDark badge />
         </Link>
         {showClose ? (
@@ -259,7 +259,7 @@ function Sidebar({
         <p className="mt-1 text-xs leading-4 text-on-dark-muted">Navegar no cobra ni cambia pedidos.</p>
         <p className="mt-1.5 text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Tenant activo</p>
         <p className="mt-0.5 text-sm font-semibold">{storeName}</p>
-        <Link href="/tienda" className="mt-2 inline-flex text-sm font-semibold text-accent" onClick={onNavigate}>
+        <Link href="/tienda" title="Abrirla no cobra ni cambia pedidos." className="mt-2 inline-flex text-sm font-semibold text-accent" onClick={onNavigate}>
           Abrir tienda
         </Link>
       </div>

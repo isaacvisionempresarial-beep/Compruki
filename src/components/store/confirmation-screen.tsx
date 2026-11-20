@@ -166,6 +166,7 @@ export function ConfirmationScreen({
           >
             Volver a la tienda
           </Link>
+          <p className="mt-2 text-xs leading-5 text-muted">Volver no cobra. El total guardado no cambia.</p>
         </aside>
       </div>
     </div>

@@ -46,7 +46,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="es-CO">
       <body className={`${jakarta.variable} font-sans antialiased`}>
-        <a className="skip-link" href="#contenido">
+        <a className="skip-link" href="#contenido" title="Saltar no cobra ni cambia el carrito.">
           Saltar al contenido
         </a>
         <OfflineNotice />
