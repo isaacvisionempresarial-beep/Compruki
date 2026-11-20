@@ -150,7 +150,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                   className={inputClass}
                 />
               </Field>
-              <Field label="Departamento" htmlFor="department" hint="Por ejemplo, Sucre o Antioquia. No es la ciudad.">
+              <Field label="Departamento" htmlFor="department" hint="Por ejemplo, Sucre o Antioquia. No es la ciudad. No es un pago.">
                 <input
                   id="department"
                   name="department"
@@ -161,7 +161,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                   className={inputClass}
                 />
               </Field>
-              <Field label="Ciudad" htmlFor="city">
+              <Field label="Ciudad" htmlFor="city" hint="No es un pago.">
                 <input
                   id="city"
                   name="city"
@@ -173,7 +173,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                 />
               </Field>
               <div className="sm:col-span-2">
-                <Field label="Dirección" htmlFor="address">
+                <Field label="Dirección" htmlFor="address" hint="No es un pago. Al confirmar, el pedido queda pendiente.">
                   <input
                     id="address"
                     name="address"
