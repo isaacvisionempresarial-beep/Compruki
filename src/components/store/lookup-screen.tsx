@@ -42,6 +42,7 @@ export function LookupScreen() {
               onChange={(event) => setNumber(event.target.value)}
               className={inputClass}
             />
+            <p className="mt-1 text-xs text-muted">Consultar no cobra ni cambia el total guardado.</p>
           </div>
           <div>
             <label htmlFor="phone" className="mb-1 block text-sm font-semibold">
@@ -58,12 +59,12 @@ export function LookupScreen() {
               className={inputClass}
             />
             <p className="mt-1 text-xs text-muted">
-              El mismo de 10 dígitos que dejaste al pedir. Sin número y celular válidos el botón queda bloqueado.
+              El mismo de 10 dígitos que dejaste al pedir. Sin número y celular válidos el botón queda bloqueado. Consultar no cobra ni cambia el total guardado.
             </p>
           </div>
           {canSearch ? (
             <p className="text-sm leading-5 text-ink">
-              Se abre {orderNumber} solo si el celular {phoneNumber} coincide.
+              Se abre {orderNumber} solo si el celular {phoneNumber} coincide. No cobra ni cambia el total guardado.
             </p>
           ) : null}
           {state.error ? (
@@ -78,7 +79,7 @@ export function LookupScreen() {
               pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
             }`}
           >
-            {pending ? "Buscando…" : "Ver el pedido"}
+            {pending ? "Buscando…" : "Ver el pedido · no cobra"}
           </button>
         </form>
 
