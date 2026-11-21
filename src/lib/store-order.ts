@@ -493,6 +493,36 @@ export function validateCheckout(input: CheckoutInput) {
   return null;
 }
 
+const REPEAT_WINDOW_MS = 30 * 60 * 1000;
+
+function samePlace(value: string) {
+  return value.trim().replace(/\s+/g, " ").toLocaleLowerCase("es");
+}
+
+function lineKey(lines: Array<{ sku: string; quantity: number; variant?: string }>) {
+  return lines
+    .map((line) => `${line.sku.trim().toUpperCase()}|${(line.variant ?? "").trim().toLocaleLowerCase("es")}|${line.quantity}`)
+    .sort()
+    .join(";");
+}
+
+/** Mismo celular, dirección y productos, todavía pendiente y dejado en la última media hora. */
+export function pendingCheckoutMatch(
+  order: Pick<StoreOrder, "status" | "phone" | "city" | "address" | "department" | "lines" | "createdAt">,
+  input: CheckoutInput,
+  nowIso: string,
+) {
+  if (order.status !== "pendiente_confirmacion") return false;
+  if (order.phone !== normalizePhone(input.phone)) return false;
+  if (samePlace(order.city) !== samePlace(input.city)) return false;
+  if (samePlace(order.department ?? "") !== samePlace(input.department)) return false;
+  if (samePlace(order.address) !== samePlace(input.address)) return false;
+  const incoming = lineKey(input.lines.map((line) => ({ sku: line.sku, quantity: line.quantity, variant: line.variant })));
+  if (lineKey(order.lines) !== incoming) return false;
+  const age = Date.parse(nowIso) - Date.parse(order.createdAt);
+  return Number.isFinite(age) && age >= 0 && age <= REPEAT_WINDOW_MS;
+}
+
 function validVariantName(variant: string) {
   const name = variant.trim();
   if (!name) return true;

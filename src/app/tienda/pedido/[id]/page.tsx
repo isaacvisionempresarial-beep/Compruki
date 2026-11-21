@@ -22,10 +22,10 @@ export default async function OrderPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ t?: string; nuevo?: string }>;
+  searchParams: Promise<{ t?: string; nuevo?: string; ya?: string }>;
 }) {
   const { id } = await params;
-  const { t, nuevo } = await searchParams;
+  const { t, nuevo, ya } = await searchParams;
   const order = await getOrder(id);
   if (!order || !t || order.viewToken !== t) notFound();
   const published = await listPublicProducts();
@@ -37,5 +37,14 @@ export default async function OrderPage({
       ? [{ sku: product.sku, sizeKind: product.sizeKind, variants: product.variants }]
       : [],
   );
-  return <ConfirmationScreen order={toCustomerOrder(order)} justPlaced={nuevo === "1"} images={images} sizes={sizes} token={t} />;
+  return (
+    <ConfirmationScreen
+      order={toCustomerOrder(order)}
+      justPlaced={nuevo === "1"}
+      repeated={ya === "1"}
+      images={images}
+      sizes={sizes}
+      token={t}
+    />
+  );
 }

@@ -49,12 +49,14 @@ const fieldClass =
 export function ConfirmationScreen({
   order,
   justPlaced,
+  repeated = false,
   images = [],
   sizes = [],
   token = "",
 }: {
   order: CustomerOrder;
   justPlaced: boolean;
+  repeated?: boolean;
   images?: CustomerImages[];
   sizes?: CustomerSizeChoice[];
   token?: string;
@@ -62,18 +64,22 @@ export function ConfirmationScreen({
   const { clear } = useCart();
 
   useEffect(() => {
-    if (justPlaced) clear();
-  }, [clear, justPlaced]);
+    if (justPlaced || repeated) clear();
+  }, [clear, justPlaced, repeated]);
 
   return (
     <div>
       <section className="store-hero relative overflow-hidden rounded-[14px] border border-line px-3 py-2 sm:px-4">
         <p className="text-[10px] font-bold tracking-[0.08em] text-accent-strong uppercase">
-          {justPlaced ? "Pedido registrado" : "Tu pedido"}
+          {repeated ? "Pedido ya pendiente" : justPlaced ? "Pedido registrado" : "Tu pedido"}
         </p>
         <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">{order.number}</h1>
         <p className="mt-1 text-sm font-semibold">{STATUS_LABEL[order.status]}</p>
-        <p className="mt-1 text-sm text-muted">Lo dejaste el {formatDay(order.createdAt.slice(0, 10))}. Abrirlo no cobra. El total guardado no cambia.</p>
+        <p className="mt-1 text-sm text-muted">
+          {repeated
+            ? "Ya estaba pendiente con estos productos y esta dirección. No se creó otro. El total guardado no cambió. Nadie cobra en la tienda."
+            : `Lo dejaste el ${formatDay(order.createdAt.slice(0, 10))}. Abrirlo no cobra. El total guardado no cambia.`}
+        </p>
       </section>
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="siguiente-paso">
         <h2 id="siguiente-paso" className="text-sm font-semibold">

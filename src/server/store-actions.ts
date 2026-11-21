@@ -76,7 +76,8 @@ export async function placeOrderAction(_state: PlaceOrderState, formData: FormDa
   }
 
   refreshOrderScreens();
-  redirect(`/tienda/pedido/${result.order.id}?t=${result.order.viewToken}&nuevo=1`);
+  const flag = result.repeated ? "ya=1" : "nuevo=1";
+  redirect(`/tienda/pedido/${result.order.id}?t=${result.order.viewToken}&${flag}`);
 }
 
 export type UpdateOrderState = { error: string | null; orderId: string | null };

@@ -21,6 +21,7 @@ import {
   orderTotal,
   prepareDropiError,
   resolveIncidenceError,
+  pendingCheckoutMatch,
   validateCheckout,
   validateBuyerNote,
   validateCustomerReason,
@@ -92,10 +93,14 @@ export async function findOrderForCustomer(number: string, phone: string) {
 export async function placeOrder(input: CheckoutInput) {
   const orders = await readOrders();
   const existing = orders.find((order) => order.idempotencyKey === input.idempotencyKey);
-  if (existing) return { error: null, order: existing };
+  if (existing) return { error: null, order: existing, repeated: false };
 
   const error = validateCheckout(input);
   if (error) return { error, order: null };
+
+  const now = bogotaNow();
+  const repeated = orders.find((order) => pendingCheckoutMatch(order, input, now));
+  if (repeated) return { error: null, order: repeated, repeated: true };
 
   const catalog = await listProducts();
   const lines = [];
@@ -157,7 +162,7 @@ export async function placeOrder(input: CheckoutInput) {
   };
 
   await writeOrders([order, ...orders]);
-  return { error: null, order };
+  return { error: null, order, repeated: false };
 }
 
 export async function updateOrder(id: string, action: OrderAction, actorName: string, rawReason = "") {
