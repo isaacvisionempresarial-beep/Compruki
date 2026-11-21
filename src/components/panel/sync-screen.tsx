@@ -40,6 +40,8 @@ export function SyncScreen({
   const [queueState, queueAction, queuePending] = useActionState(enqueueDropiSend, queueInitial);
   const queuedIds = new Set(jobs.map((job) => job.orderId));
   const waiting = orders.filter((order) => awaitsDropiNumber(order) && !queuedIds.has(order.id));
+  const blockedJobs = jobs.filter((job) => job.status === "bloqueado");
+  const reconciledJobs = jobs.filter((job) => job.status === "conciliado");
   const noted = useMemo(
     () => orders.filter((order) => canNoteDropiNumber(order) && Boolean(normalizeProviderRef(order.providerRef ?? ""))),
     [orders],
@@ -87,11 +89,11 @@ export function SyncScreen({
         <div className="order-2 min-w-0 xl:order-1">
       <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="cola-dropi">
         <h2 id="cola-dropi" className="text-sm font-semibold">
-          Cola de envío ({jobs.length})
+          Cola de envío ({blockedJobs.length} bloqueados · {reconciledJobs.length} conciliados)
         </h2>
         <p className="mt-0.5 text-xs leading-5 text-muted">
           {tableReady
-            ? "Dejar un pedido aquí no lo envía a Dropi. La cola queda bloqueada hasta que esta aplicación tenga autorización. El total guardado no cambia."
+            ? "Dejar un pedido aquí no lo envía a Dropi. Si anotas el número a mano, queda conciliado y no se reintenta cuando haya autorización. El total guardado no cambia."
             : tableDetail}
         </p>
         {queueState.error ? <p className="mt-2 text-sm leading-5 text-warning">{queueState.error}</p> : null}
@@ -100,7 +102,13 @@ export function SyncScreen({
           <p className="mt-2 text-sm text-muted">Todavía no hay pedidos en la cola.</p>
         ) : (
           <ul className="mt-2 divide-y divide-line text-sm">
-            {jobs.map((job) => (
+            {blockedJobs.map((job) => (
+              <li key={job.orderId} className="py-2">
+                <span className="font-semibold">{job.orderNumber}</span>
+                <span className="mt-0.5 block text-xs leading-5 text-muted">{job.detail}</span>
+              </li>
+            ))}
+            {reconciledJobs.map((job) => (
               <li key={job.orderId} className="py-2">
                 <span className="font-semibold">{job.orderNumber}</span>
                 <span className="mt-0.5 block text-xs leading-5 text-muted">{job.detail}</span>

@@ -471,7 +471,7 @@ export function Dashboard({
                 {syncWorkCount} {syncWorkCount === 1 ? "pedido sin número de Dropi" : "pedidos sin número de Dropi"}
               </span>
               <span className="mt-0.5 block text-xs leading-5 text-muted">
-                Copiar entrega y anotar el número a mano. El total guardado no cambia.
+                Anotar el número lo concilia a mano. No se envía a Dropi y el total guardado no cambia.
               </span>
             </Link>
           </li>

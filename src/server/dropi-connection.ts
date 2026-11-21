@@ -2,9 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { dropiAdapter, emptyDropiQueue, type DropiEnqueueState, type DropiQueueSnapshot, type DropiQueuedJob } from "@/lib/dropi-provider";
-import { awaitsDropiNumber } from "@/lib/store-order";
+import { awaitsDropiNumber, validateProviderRef } from "@/lib/store-order";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import { appendOrderHistory, getOrder } from "@/server/order-store";
+import { appendOrderHistory, getOrder, listOrders } from "@/server/order-store";
 import { assertPanelAccess } from "@/server/panel-auth";
 import { getPilotTenantId } from "@/server/tenant";
 
@@ -12,6 +12,7 @@ const QUEUE_NOTE =
   "Quedó en la cola para Dropi. Sigue bloqueada: esta aplicación no tiene autorización. No se creó una orden allá. El total guardado no cambió. Nadie cobra en el sitio.";
 
 type LinkRow = {
+  id: string;
   order_id: string;
   order_number: string;
   sync_status: string;
@@ -23,22 +24,131 @@ function missingTable(message: string) {
   return message.includes("schema cache") || message.includes("does not exist") || message.includes("Could not find");
 }
 
-function blockedJob(row: LinkRow): DropiQueuedJob {
-  const extra = row.external_order_id?.trim()
-    ? " Hay un número en la fila, pero esta aplicación no lo envió."
-    : row.sync_status === "bloqueado"
-      ? ""
-      : " La fila no puede darse por enviada: no hay autorización.";
+const RECONCILED_DETAIL = "Anotado a mano. Esta aplicación no lo envió y no lo reintentará.";
+
+function presentJob(row: LinkRow): DropiQueuedJob {
+  const noted = row.external_order_id?.trim();
+  if (noted) {
+    return {
+      orderId: row.order_id,
+      orderNumber: row.order_number,
+      status: "conciliado",
+      detail: `${RECONCILED_DETAIL} Número ${noted}. El total guardado no cambió.`,
+    };
+  }
   return {
     orderId: row.order_id,
     orderNumber: row.order_number,
     status: "bloqueado",
-    detail: `Bloqueado: no hay autorización.${extra} No se creó una orden en Dropi.`,
+    detail:
+      row.sync_status === "bloqueado"
+        ? "Bloqueado: no hay autorización. No se creó una orden en Dropi."
+        : "La fila no puede darse por enviada: no hay autorización. No se creó una orden en Dropi.",
   };
+}
+
+async function reconcileNotedDropiNumbers() {
+  const access = await assertPanelAccess();
+  if (!access) return;
+  const tenantId = await getPilotTenantId();
+  const supabase = createAdminSupabase();
+  const [orders, links] = await Promise.all([
+    listOrders(),
+    supabase
+      .from("provider_order_links")
+      .select("id, order_id, order_number, sync_status, external_order_id, idempotency_key")
+      .eq("tenant_id", tenantId)
+      .eq("provider", "dropi")
+      .limit(200),
+  ]);
+  if (links.error) return;
+
+  const linkByOrder = new Map((links.data as LinkRow[]).map((row) => [row.order_id, row]));
+  for (const order of orders) {
+    const noted = validateProviderRef(order.providerRef ?? "").value;
+    const link = linkByOrder.get(order.id);
+    const stableKey = /^[0-9a-f-]{36}$/i.test(order.idempotencyKey);
+    const idempotencyKey = link?.idempotency_key || (stableKey ? `dropi:${order.idempotencyKey}` : "");
+    if (noted) {
+      if (!idempotencyKey) continue;
+      if (link?.external_order_id === noted) {
+        await supabase
+          .from("integration_jobs")
+          .update({ status: "bloqueado", next_run_at: null, last_detail: RECONCILED_DETAIL })
+          .eq("tenant_id", tenantId)
+          .eq("idempotency_key", idempotencyKey)
+          .neq("last_detail", RECONCILED_DETAIL);
+        continue;
+      }
+      if (!link) {
+        const inserted = await supabase.from("provider_order_links").insert({
+          tenant_id: tenantId,
+          order_id: order.id,
+          order_number: order.number,
+          provider: "dropi",
+          external_order_id: noted,
+          idempotency_key: idempotencyKey,
+          sync_status: "bloqueado",
+        });
+        if (inserted.error && inserted.error.code !== "23505") continue;
+      } else {
+        await supabase
+          .from("provider_order_links")
+          .update({ external_order_id: noted, sync_status: "bloqueado", order_number: order.number })
+          .eq("id", link.id);
+      }
+      await writeBlockedJob(supabase, tenantId, order.id, order.number, idempotencyKey, RECONCILED_DETAIL);
+      continue;
+    }
+    if (link?.external_order_id) {
+      await supabase.from("provider_order_links").update({ external_order_id: null, sync_status: "bloqueado" }).eq("id", link.id);
+      await writeBlockedJob(supabase, tenantId, order.id, order.number, idempotencyKey, dropiAdapter.createOrder().detail);
+    }
+  }
+}
+
+async function writeBlockedJob(
+  supabase: ReturnType<typeof createAdminSupabase>,
+  tenantId: string,
+  orderId: string,
+  orderNumber: string,
+  idempotencyKey: string,
+  detail: string,
+) {
+  const existing = await supabase
+    .from("integration_jobs")
+    .select("id")
+    .eq("tenant_id", tenantId)
+    .eq("idempotency_key", idempotencyKey)
+    .maybeSingle();
+  if (existing.error) return;
+  if (!existing.data) {
+    await supabase.from("integration_jobs").insert({
+      tenant_id: tenantId,
+      job_type: "enviar_pedido",
+      status: "bloqueado",
+      attempts: 0,
+      next_run_at: null,
+      correlation_id: orderId,
+      order_number: orderNumber,
+      idempotency_key: idempotencyKey,
+      last_detail: detail,
+    });
+    return;
+  }
+  await supabase
+    .from("integration_jobs")
+    .update({ status: "bloqueado", next_run_at: null, last_detail: detail, order_number: orderNumber })
+    .eq("id", existing.data.id);
 }
 
 export async function readDropiQueue(): Promise<DropiQueueSnapshot> {
   try {
+    try {
+      await reconcileNotedDropiNumbers();
+    } catch {
+      // La lectura sigue. Un fallo al conciliar no marca la tienda como conectada.
+    }
     const tenantId = await getPilotTenantId();
     const supabase = createAdminSupabase();
     const connection = await supabase
@@ -82,7 +192,7 @@ export async function readDropiQueue(): Promise<DropiQueueSnapshot> {
           ? `${detail} La referencia guardada no es un token usable. Sigue sin estar conectado.`
           : detail,
       },
-      jobs: ((links.data ?? []) as LinkRow[]).map(blockedJob),
+      jobs: ((links.data ?? []) as LinkRow[]).map(presentJob),
     };
   } catch {
     return emptyDropiQueue("No se pudo leer la cola. Dropi sigue sin estar conectado.");
@@ -145,7 +255,7 @@ export async function enqueueDropiSend(_state: DropiEnqueueState, formData: Form
     const supabase = createAdminSupabase();
     const existing = await supabase
       .from("provider_order_links")
-      .select("id")
+      .select("id, external_order_id")
       .eq("tenant_id", tenantId)
       .eq("provider", "dropi")
       .eq("order_id", order.id)
@@ -156,6 +266,13 @@ export async function enqueueDropiSend(_state: DropiEnqueueState, formData: Form
           ? "Falta la tabla de la cola. Corre 011_dropi_connection.sql en Supabase. El pedido no cambió."
           : "No se pudo leer la cola. El pedido no cambió.",
         message: null,
+      };
+    }
+
+    if (existing.data?.external_order_id) {
+      return {
+        error: null,
+        message: "Ya está conciliado a mano. No se crea otro envío. El total guardado no cambió.",
       };
     }
 
