@@ -47,6 +47,11 @@ import {
   prepareQueueNote,
   resolveIncidenceError,
   orderFocusHref,
+  ordersInSpan,
+  spanPhrase,
+  dispatchSheetOrders,
+  dispatchSheetText,
+  type OrderSpan,
   payableTotalLabel,
   syncFocusHref,
   readyToConfirm,
@@ -86,21 +91,32 @@ const orderGrid = "md:grid-cols-[6.75rem_minmax(0,1.5fr)_8.75rem_12.5rem_4.25rem
 const historyGrid = "md:grid-cols-[7rem_9rem_minmax(0,1fr)]";
 const queueGrid = "md:grid-cols-[6.75rem_minmax(0,1.2fr)_minmax(0,1.4fr)_4.25rem]";
 
+const ORDER_SPANS: Array<{ id: OrderSpan; label: string }> = [
+  { id: "todo", label: "Todo" },
+  { id: "hoy", label: "Hoy" },
+  { id: "7d", label: "7 días" },
+  { id: "30d", label: "30 días" },
+];
+
 export function OrdersScreen({
   orders,
   sizeGuides,
   canManageOrderMoney = false,
+  today,
 }: {
   orders: StoreOrder[];
   sizeGuides: SizeGuide[];
   canManageOrderMoney?: boolean;
+  today: string;
 }) {
   const router = useRouter();
   const [status, setStatus] = useState<OrderStatus | "todos">("todos");
+  const [span, setSpan] = useState<OrderSpan>("todo");
   const query = usePanelQuery().trim().toLocaleLowerCase("es");
-  const summary = summarizeStoreOrders(orders);
-  const searched = useMemo(() => orders.filter((order) => matchesOrder(order, query, sizeGuides)), [orders, query, sizeGuides]);
-  const present = STATUS_SEQUENCE.filter((item) => orders.some((order) => order.status === item));
+  const spanOrders = useMemo(() => ordersInSpan(orders, span, today), [orders, span, today]);
+  const summary = useMemo(() => summarizeStoreOrders(spanOrders), [spanOrders]);
+  const searched = useMemo(() => spanOrders.filter((order) => matchesOrder(order, query, sizeGuides)), [spanOrders, query, sizeGuides]);
+  const present = STATUS_SEQUENCE.filter((item) => spanOrders.some((order) => order.status === item));
   const visible = searched.filter((order) => status === "todos" || order.status === status);
   const work = workQueues(orders, sizeGuides, canManageOrderMoney);
 
@@ -121,7 +137,23 @@ export function OrdersScreen({
     <div className="mx-auto max-w-[1600px] pb-8">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda pública</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Pedidos recibidos</h1>
-      <p className="mt-0.5 text-sm text-muted">Cada pedido se abre en su página. Abrirlos no cobra ni cambia el total guardado. Dropi no está conectado.</p>
+      <p className="mt-0.5 text-sm text-muted">
+        {span === "todo"
+          ? "Las cifras y la lista son de todos los pedidos. La cola Por atender tampoco se recorta. Abrirlos no cobra ni cambia el total guardado. Dropi no está conectado."
+          : `Las cifras y la lista son de ${spanPhrase(span)}. La cola Por atender sigue con los que esperan, aunque sean de otro día. Cambiar el período no cobra ni cambia el total guardado. Dropi no está conectado.`}
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Período de las cifras y la lista">
+        {ORDER_SPANS.map((item) => (
+          <StatusFilter
+            key={item.id}
+            label={item.label}
+            count={ordersInSpan(orders, item.id, today).length}
+            selected={span === item.id}
+            onSelect={() => setSpan(item.id)}
+          />
+        ))}
+      </div>
+      <p className="mt-2 text-xs leading-5 text-muted">Elegir un período no cobra ni cambia el total guardado.</p>
 
       <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
         <div className="order-2 min-w-0 xl:order-1">
@@ -252,7 +284,8 @@ export function OrdersScreen({
         </p>
       ) : (
         <>
-          <h2 className="mt-3 text-sm font-semibold">Todos los pedidos</h2>
+          <DispatchSheet orders={spanOrders} />
+          <h2 className="mt-3 text-sm font-semibold">{span === "todo" ? "Todos los pedidos" : `Pedidos de ${spanPhrase(span)}`}</h2>
           <p className="mt-0.5 text-xs text-muted">Buscar o filtrar solo cambia esta lista. No cobra ni cambia el total guardado.</p>
           <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Filtrar por estado">
             <StatusFilter
@@ -273,7 +306,7 @@ export function OrdersScreen({
           </div>
           {visible.length === 0 ? (
             <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-              {emptyListMessage(query, status)}
+              {emptyListMessage(query, status, span)}
             </p>
           ) : (
         <div className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">
@@ -853,10 +886,86 @@ function matchesOrder(order: StoreOrder, query: string, guides: SizeGuide[]) {
   );
 }
 
-function emptyListMessage(query: string, status: OrderStatus | "todos") {
+function emptyListMessage(query: string, status: OrderStatus | "todos", span: OrderSpan) {
   if (query && status !== "todos") return "Ningún pedido de ese estado coincide con la búsqueda.";
   if (query) return "Ningún pedido coincide con la búsqueda.";
+  if (span !== "todo" && status === "todos") return "No hay pedidos en este período. La cola Por atender no cambia.";
   return "No hay pedidos en este estado.";
+}
+
+function DispatchSheet({ orders }: { orders: StoreOrder[] }) {
+  const rows = dispatchSheetOrders(orders);
+  const text = dispatchSheetText(rows);
+  const [copied, setCopied] = useState<"ok" | "fail" | null>(null);
+
+  function copy() {
+    const node = document.getElementById("hoja-despacho");
+    if (!(node instanceof HTMLTextAreaElement)) return;
+    node.focus();
+    node.select();
+    let copiedByCommand = false;
+    try {
+      copiedByCommand = document.execCommand("copy");
+    } catch {
+      copiedByCommand = false;
+    }
+    if (copiedByCommand) {
+      setCopied("ok");
+      return;
+    }
+    void navigator.clipboard.writeText(text).then(
+      () => setCopied("ok"),
+      () => setCopied("fail"),
+    );
+  }
+
+  return (
+    <section className="mt-5" aria-labelledby="hoja-despacho-titulo">
+      <h2 id="hoja-despacho-titulo" className="text-sm font-semibold">
+        Hoja para copiar ({rows.length})
+      </h2>
+      <p className="mt-0.5 text-xs leading-5 text-muted">
+        Confirmados, en preparación o en despacho de este período. Copiarla no crea el pedido en Dropi ni cambia el total guardado.
+      </p>
+      {rows.length === 0 ? (
+        <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
+          En este período no hay pedidos en curso para copiar. Los pendientes siguen en Por atender.
+        </p>
+      ) : (
+        <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
+          <label className="text-sm font-semibold" htmlFor="hoja-despacho">
+            Texto de {rows.length === 1 ? "1 pedido" : `${rows.length} pedidos`}
+            <textarea
+              id="hoja-despacho"
+              title="Leerlo no envía el pedido ni cobra. El total guardado no cambia."
+              readOnly
+              rows={8}
+              value={text}
+              className="mt-1 min-h-32 w-full rounded-[10px] border border-line bg-canvas px-3 py-2 text-sm leading-5 font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
+            />
+          </label>
+          <button
+            type="button"
+            title="Copiar no crea el pedido en Dropi ni cambia el total guardado."
+            className="mt-2 inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
+            onClick={copy}
+          >
+            {copied === "ok" ? "Hoja copiada" : "Copiar hoja"}
+          </button>
+          {copied === "ok" ? (
+            <p role="status" className="mt-2 text-sm text-accent-strong">
+              Lista para pegarla a mano. Copiar no cobra. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
+            </p>
+          ) : null}
+          {copied === "fail" ? (
+            <p role="alert" className="mt-2 text-sm font-semibold text-danger">
+              No se pudo copiar. El texto queda seleccionado. No cobra. El total guardado no cambia.
+            </p>
+          ) : null}
+        </div>
+      )}
+    </section>
+  );
 }
 
 function moneyNote(order: StoreOrder, margin: number | null) {

@@ -8,6 +8,9 @@ import {
   orderMargin,
   orderRealizedMargin,
   orderTotal,
+  ordersInSpan,
+  dispatchSheetOrders,
+  dispatchSheetText,
   ownerOnlyOrderIntent,
   pendingCheckoutMatch,
   pendingPhoneIsFull,
@@ -211,5 +214,30 @@ describe("aislamiento y respaldo", () => {
     expect(csv).toContain("precio_publicado,costo,envio_estimado,comisiones,margen_estimado");
     expect(csv).toContain("80000,40000,8000,2000,30000");
     expect(csv).toContain("Publicado");
+  });
+});
+
+describe("cierre de pedidos", () => {
+  it("recorta las cifras por fecha y deja fuera de la hoja lo que no está en curso", () => {
+    const pending = order({
+      status: "pendiente_confirmacion",
+      number: "P-2001",
+      createdAt: "2026-11-18T15:00:00.000Z",
+    });
+    const moving = order({
+      status: "en_preparacion",
+      number: "P-2002",
+      createdAt: "2026-11-20T15:00:00.000Z",
+      providerRef: "DP-10",
+    });
+    expect(ordersInSpan([pending, moving], "hoy", "2026-11-20").map((item) => item.number)).toEqual(["P-2002"]);
+    expect(ordersInSpan([pending, moving], "todo", "2026-11-20")).toHaveLength(2);
+    expect(dispatchSheetOrders([pending, moving]).map((item) => item.number)).toEqual(["P-2002"]);
+    const sheet = dispatchSheetText([pending, moving]);
+    expect(sheet).toContain("Pedido P-2002");
+    expect(sheet).toContain("Total guardado");
+    expect(sheet).not.toContain("P-2001");
+    expect(sheet).not.toContain("secreto-del-cliente");
+    expect(sheet).toContain("no crea el pedido en Dropi");
   });
 });

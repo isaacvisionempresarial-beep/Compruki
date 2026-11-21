@@ -644,6 +644,32 @@ export function periodPhrase(period: Period) {
   return "los últimos 30 días";
 }
 
+export type OrderSpan = Period | "todo";
+
+export function ordersInSpan(orders: StoreOrder[], span: OrderSpan, today = bogotaNow().slice(0, 10)) {
+  if (span === "todo") return orders;
+  return storeOrdersInPeriod(orders, span, today);
+}
+
+export function spanPhrase(span: OrderSpan) {
+  if (span === "todo") return "todos los pedidos";
+  return periodPhrase(span);
+}
+
+const DISPATCH_SHEET: OrderStatus[] = ["confirmado", "en_preparacion", "en_transporte"];
+
+export function dispatchSheetOrders(orders: StoreOrder[]) {
+  return orders
+    .filter((order) => DISPATCH_SHEET.includes(order.status))
+    .sort((left, right) => right.number.localeCompare(left.number, "es"));
+}
+
+export function dispatchSheetText(orders: StoreOrder[]) {
+  const rows = dispatchSheetOrders(orders);
+  if (rows.length === 0) return "";
+  return rows.map((order) => dropiHandoffText(order)).join("\n\n---\n\n");
+}
+
 export function summarizeStoreOrders(orders: StoreOrder[]) {
   const active = orders.filter((order) => order.status !== "cancelado" && order.status !== "devuelto");
   const confirmed = active.filter((order) => CONFIRMED.includes(order.status));
