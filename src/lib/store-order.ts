@@ -1,5 +1,5 @@
 import { bogotaNow, sizeChoiceLabel, validSizeName, variantFits, type SizeKind } from "@/lib/catalog";
-import { type OrderStatus, type Period } from "@/lib/demo-data";
+import { STATUS_LABEL, type OrderStatus, type Period } from "@/lib/demo-data";
 import { formatCop } from "@/lib/format";
 
 export type OrderLine = {
@@ -850,6 +850,89 @@ export function resultsByProduct(orders: StoreOrder[], guides: SizeGuide[] = [])
   }
 
   return [...rows.values()].sort((a, b) => a.title.localeCompare(b.title, "es"));
+}
+
+function orderCountPhrase(count: number) {
+  return count === 1 ? "1 pedido" : `${count} pedidos`;
+}
+
+function listedNumbers(numbers: string[]) {
+  return numbers.length > 0 ? ` ${numbers.join(", ")}.` : "";
+}
+
+export function closeSheetText(
+  orders: StoreOrder[],
+  period: Period,
+  basis: CloseBasis = "creados",
+  guides: SizeGuide[] = [],
+) {
+  const summary = summarizeStoreOrders(orders);
+  const products = resultsByProduct(orders, guides);
+  const lines = [
+    `Cierre · ${closePhrase(period, basis)}`,
+    "Copiar este texto no cobra ni cambia pedidos. Dropi no está conectado: desde aquí no se crea el pedido.",
+  ];
+  if (basis === "movidos") lines.push("El total guardado es el del pedido, no lo cobrado en ese día.");
+  lines.push(
+    "",
+    `Registrados: ${formatCop(summary.registered.amount)} · ${orderCountPhrase(summary.registered.count)}.${listedNumbers(summary.registered.numbers)} Total guardado. Sin cancelados ni devueltos. No es dinero cobrado.`,
+    `Confirmados: ${formatCop(summary.confirmed.amount)} · ${orderCountPhrase(summary.confirmed.count)}.${listedNumbers(summary.confirmed.numbers)} Total guardado. Ya confirmados. No es dinero cobrado.`,
+    `Entregados: ${formatCop(summary.delivered.amount)} · ${orderCountPhrase(summary.delivered.count)}.${listedNumbers(summary.delivered.numbers)} Total guardado. Estado entregado. No es dinero cobrado.`,
+    `Cobrados: ${formatCop(summary.collected.amount)} · ${orderCountPhrase(summary.collected.count)}.${listedNumbers(summary.collected.numbers)} Total guardado de los marcados como cobrados. No es un cobro de este sitio ni la utilidad.`,
+    "",
+    `Margen estimado: ${formatCop(summary.estimatedMargin.amount)}.${listedNumbers(summary.estimatedMargin.numbers)} Margen de confirmados. No es dinero cobrado ni el total guardado.`,
+  );
+  if (summary.estimatedMargin.missingNumbers.length > 0) {
+    lines.push(`Sin costo, no entra al margen estimado:${listedNumbers(summary.estimatedMargin.missingNumbers)}`);
+  }
+  lines.push(
+    `Utilidad realizada: ${formatCop(summary.realized.amount)}.${listedNumbers(summary.realized.numbers)} Utilidad de pedidos entregados y marcados como cobrados. No es un cobro de este sitio ni el total guardado.`,
+  );
+  if (summary.realized.missingNumbers.length > 0) {
+    lines.push(`Cobrado sin costo, no entra a la utilidad:${listedNumbers(summary.realized.missingNumbers)}`);
+  }
+  if (summary.returnFreight > 0) {
+    lines.push(`Flete de devolución: ${formatCop(summary.returnFreight)}.${listedNumbers(summary.returnFreightNumbers)} Resta de la utilidad.`);
+  }
+  if (summary.collectionCost > 0) {
+    lines.push(`Recaudo real: ${formatCop(summary.collectionCost)}.${listedNumbers(summary.collectionCostNumbers)} No es el total guardado.`);
+  }
+  lines.push(
+    `Devueltos: ${formatCop(summary.returned.amount)} · ${orderCountPhrase(summary.returned.count)}.${listedNumbers(summary.returned.numbers)} Total guardado. No entra a la utilidad.`,
+    "",
+    "Por producto",
+  );
+  if (products.length === 0) {
+    lines.push("En este período no hay pedidos confirmados ni devueltos.");
+  } else {
+    for (const row of products) {
+      const sources = row.sources.map((source) => `${source.number} ${STATUS_LABEL[source.status]}`).join(", ");
+      const estimated =
+        row.confirmedUnits > 0
+          ? `${formatCop(row.estimatedMargin)} · ${row.confirmedUnits === 1 ? "1 unidad confirmada" : `${row.confirmedUnits} unidades confirmadas`} · total guardado ${formatCop(row.confirmedAmount)}`
+          : "sin unidades confirmadas";
+      const realized =
+        row.realizedUnits > 0 && row.realizedMissingUnits === row.realizedUnits
+          ? "sin costo, no entra"
+          : row.realizedUnits > 0
+            ? `${formatCop(row.realizedMargin)} · ${row.realizedUnits === 1 ? "1 unidad entregada y cobrada" : `${row.realizedUnits} unidades entregadas y cobradas`}`
+            : "todavía no entra";
+      const returned =
+        row.returnFreight > 0
+          ? `${formatCop(row.returnedAmount)} · total guardado · flete de devolución ${formatCop(row.returnFreight)} resta de la utilidad`
+          : `${formatCop(row.returnedAmount)} · total guardado · no entra a la utilidad`;
+      lines.push(
+        `${row.title} (${row.sku})`,
+        sources ? `Pedidos: ${sources}.` : "Sin pedidos en la cuenta.",
+        `Margen estimado: ${estimated}. No es dinero cobrado.`,
+        `Utilidad realizada: ${realized}. No es el total guardado.`,
+        `Devuelto: ${returned}.`,
+        "",
+      );
+    }
+  }
+  lines.push("Copiar no cobra. El total guardado no cambia.");
+  return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
 const RESULT_PERIODS: Period[] = ["hoy", "7d", "30d"];

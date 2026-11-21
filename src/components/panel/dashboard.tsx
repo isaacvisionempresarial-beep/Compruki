@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { CloseSheet } from "@/components/panel/close-sheet";
 import { CloseBasisControl, PeriodControl } from "@/components/panel/period-control";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
@@ -376,6 +377,7 @@ export function Dashboard({
             </ul>
           </div>
         )}
+        <CloseSheet orders={storeInPeriod} period={storePeriod} basis={basis} guides={sizeGuides} fieldId="cierre-tienda" />
         <div className="mt-3">
           <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="text-sm font-semibold text-accent-strong">
             Ver el detalle en Rentabilidad

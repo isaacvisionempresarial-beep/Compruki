@@ -9,6 +9,7 @@ import {
   orderRealizedMargin,
   orderTotal,
   closePhrase,
+  closeSheetText,
   ordersInSpan,
   dispatchSheetOrders,
   dispatchSheetText,
@@ -267,5 +268,28 @@ describe("cierre de pedidos", () => {
     expect(closePhrase("7d")).toBe("pedidos creados en los últimos 7 días");
     expect(resultsByProduct(ordersInSpan([moved], "hoy", "2026-11-20", "movidos"))).toHaveLength(1);
     expect(widerPeriodWithResults([moved], "hoy", [], "2026-11-20", "creados")).toBe("30d");
+  });
+
+  it("el cierre para copiar usa el total guardado y deja fuera el dato del cliente", () => {
+    const pending = order({ status: "pendiente_confirmacion", number: "P-2001" });
+    const moving = order({
+      status: "en_preparacion",
+      number: "P-2002",
+      id: "44444444-4444-4444-8444-444444444444",
+    });
+    const sheet = closeSheetText([pending, moving], "hoy", "creados");
+    expect(sheet).toContain("Cierre · pedidos creados hoy");
+    expect(sheet).toContain("Registrados: $160.000 · 2 pedidos. P-2002, P-2001.");
+    expect(sheet).toContain("Confirmados: $80.000 · 1 pedido. P-2002.");
+    expect(sheet).toContain("Cobrados: $0 · 0 pedidos.");
+    expect(sheet).toContain("Margen estimado: $30.000. P-2002.");
+    expect(sheet).toContain("Faja (SKU-1)");
+    expect(sheet).toContain("no se crea el pedido");
+    expect(sheet).not.toContain("3001234567");
+    expect(sheet).not.toContain("secreto-del-cliente");
+    expect(sheet).not.toContain("Calle 10");
+    const movedSheet = closeSheetText([moving], "hoy", "movidos");
+    expect(movedSheet).toContain("movimientos de hoy");
+    expect(movedSheet).toContain("no lo cobrado en ese día");
   });
 });

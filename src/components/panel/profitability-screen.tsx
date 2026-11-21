@@ -18,6 +18,7 @@ import {
   type ProductSource,
   type StoreOrder,
 } from "@/lib/store-order";
+import { CloseSheet } from "@/components/panel/close-sheet";
 import { CloseBasisControl, PeriodControl } from "@/components/panel/period-control";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 
@@ -179,6 +180,13 @@ export function ProfitabilityScreen({
                 </ul>
               </div>
             )}
+            <CloseSheet
+              orders={ordersInSpan(orders, storePeriod, today, basis)}
+              period={storePeriod}
+              basis={basis}
+              guides={guides}
+              fieldId="cierre-resultados"
+            />
           </section>
         </div>
 
