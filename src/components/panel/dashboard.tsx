@@ -10,7 +10,7 @@ import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
 import { STATUS_LABEL, type Period } from "@/lib/demo-data";
 import { cx } from "@/lib/cx";
 import { formatCop, formatDay } from "@/lib/format";
-import { attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, ordersInSpan, priceDrift, resultsByProduct, samePhoneMatches, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import { attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, ordersInSpan, priceDrift, priceDriftNote, resultsByProduct, samePhoneMatches, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
 
 const homeProductGrid = "md:grid-cols-[minmax(0,1.5fr)_8.75rem_8.75rem_8.75rem]";
 
@@ -400,13 +400,13 @@ export function Dashboard({
               const phoneCount = samePhoneMatches(order, storeOrders).length;
               const place = [order.city, order.department].filter(Boolean).join(" · ");
               const products = order.lines.map((line) => `${line.quantity} × ${lineName(line)}`).join(", ");
+              const driftNote = priceDriftNote(priceDrift(order, priceGuides));
               const meta = [
                 place,
                 products,
                 order.campaignEntry ? "Campaña" : "",
                 phoneCount === 1 ? "mismo celular en otro" : phoneCount > 1 ? `mismo celular en ${phoneCount} más` : "",
                 row.also.length > 0 ? `También: ${row.also.join(", ")}` : "",
-                priceDrift(order, priceGuides).length > 0 ? "La ficha cambió. El total guardado no se reescribe." : "",
               ]
                 .filter(Boolean)
                 .join(" · ");
@@ -430,6 +430,11 @@ export function Dashboard({
                       <span className="block truncate text-sm font-semibold text-warning" title={row.note}>
                         {row.note}
                       </span>
+                      {driftNote ? (
+                        <span className="mt-0.5 block text-xs leading-5 text-warning" title={driftNote}>
+                          {driftNote}
+                        </span>
+                      ) : null}
                     </span>
                     <span className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
                       <span className="text-right">
@@ -448,7 +453,7 @@ export function Dashboard({
             })}
           </ul>
         )}
-        <AttentionSheet orders={storeOrders} guides={sizeGuides} canManageOrderMoney={canManageOrderMoney} />
+        <AttentionSheet orders={storeOrders} guides={sizeGuides} priceGuides={priceGuides} canManageOrderMoney={canManageOrderMoney} />
       </section>
 
 

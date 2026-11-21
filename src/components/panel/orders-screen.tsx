@@ -304,7 +304,7 @@ export function OrdersScreen({
             ))}
           </div>
         )}
-        <AttentionSheet orders={orders} guides={sizeGuides} canManageOrderMoney={canManageOrderMoney} />
+        <AttentionSheet orders={orders} guides={sizeGuides} priceGuides={priceGuides} canManageOrderMoney={canManageOrderMoney} />
       </section>
       {orders.length === 0 ? (
         <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">

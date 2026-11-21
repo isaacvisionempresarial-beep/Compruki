@@ -467,5 +467,16 @@ describe("precio de la ficha", () => {
     expect(priceDriftNote(moved)).toContain("guardó $80.000");
     expect(priceDriftNote(moved)).toContain("no reescribe el total guardado");
     expect(priceDrift(current, [])).toHaveLength(0);
+    const pending = order({ status: "pendiente_confirmacion", number: "P-2031" });
+    const sameSheet = attentionSheetText([pending], [], true, [{ sku: "SKU-1", price: 80_000 }]);
+    expect(sameSheet).not.toContain("hoy está en");
+    expect(sameSheet).not.toContain("3001234567");
+    const movedSheet = attentionSheetText([pending], [], true, [{ sku: "SKU-1", price: 90_000 }]);
+    expect(movedSheet).toContain("hoy está en $90.000");
+    expect(movedSheet).toContain("guardó $80.000");
+    expect(movedSheet).toContain("no reescribe el total guardado");
+    expect(movedSheet).toContain("Copiarlos no reescribe el total.");
+    expect(movedSheet).not.toContain("3001234567");
+    expect(movedSheet).not.toContain("Calle 10");
   });
 });

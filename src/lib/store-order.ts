@@ -1167,7 +1167,12 @@ export function attentionQueues(orders: StoreOrder[], guides: SizeGuide[] = [], 
     .filter((queue) => queue.rows.length > 0);
 }
 
-export function attentionSheetText(orders: StoreOrder[], guides: SizeGuide[] = [], canManageOrderMoney = true) {
+export function attentionSheetText(
+  orders: StoreOrder[],
+  guides: SizeGuide[] = [],
+  canManageOrderMoney = true,
+  priceGuides: PriceGuide[] = [],
+) {
   const queues = attentionQueues(orders, guides, canManageOrderMoney);
   const lines = [
     "Por atender · un pedido, un siguiente paso",
@@ -1178,6 +1183,9 @@ export function attentionSheetText(orders: StoreOrder[], guides: SizeGuide[] = [
   }
   if (queues.some((queue) => queue.rows.some((row) => row.cta === "Anotar número" || row.cta === "Anotar despacho"))) {
     lines.push("Si el paso es anotar el número o el despacho, va el texto para Dropi, con celular y dirección. Copiarlo no crea el pedido.");
+  }
+  if (queues.some((queue) => queue.rows.some((row) => priceDrift(row.order, priceGuides).length > 0))) {
+    lines.push("Si la ficha de hoy no es el precio guardado, van los dos montos en ese pedido. Copiarlos no reescribe el total.");
   }
   lines.push("");
   if (queues.length === 0) {
@@ -1199,6 +1207,8 @@ export function attentionSheetText(orders: StoreOrder[], guides: SizeGuide[] = [
           lines.push("Texto para Dropi. Copiarlo no crea el pedido:");
           lines.push(dropiHandoffText(row.order));
         }
+        const drift = priceDriftNote(priceDrift(row.order, priceGuides));
+        if (drift) lines.push(drift);
       }
       lines.push("");
     }
