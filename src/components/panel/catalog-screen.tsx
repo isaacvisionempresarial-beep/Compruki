@@ -15,6 +15,7 @@ import {
   deleteProductAction,
   type ProductLifecycleState,
 } from "@/server/catalog-actions";
+import { applySkuCatalogCostAction, type SkuCostState } from "@/server/store-actions";
 
 const filters = [
   { id: "todos", label: "Todos" },
@@ -27,6 +28,7 @@ const filters = [
 type FilterId = (typeof filters)[number]["id"];
 
 const lifecycleInitial: ProductLifecycleState = { error: null, message: null };
+const skuCostInitial: SkuCostState = { error: null, saved: 0 };
 
 export function CatalogScreen({
   products,
@@ -711,6 +713,87 @@ function CatalogDriftSheet({ text }: { text: string }) {
   );
 }
 
+function SkuCostApply({
+  product,
+  lines,
+  amounts,
+  canManageCommerce,
+}: {
+  product: CatalogProduct;
+  lines: StoredSkuLine[];
+  amounts: { cost: string; shipping: string; commissions: string };
+  canManageCommerce: boolean;
+}) {
+  const [state, action, pending] = useActionState(applySkuCatalogCostAction, skuCostInitial);
+  const saved = fichaDrift(lines, {
+    price: product.price,
+    cost: product.cost,
+    shipping: product.shipping,
+    commissions: product.commissions,
+  });
+  if (saved.costNumbers.length === 0 && state.saved === 0) return null;
+  const dirty =
+    parsePesos(amounts.cost) !== product.cost ||
+    parsePesos(amounts.shipping) !== product.shipping ||
+    parsePesos(amounts.commissions) !== product.commissions;
+  const count = saved.costNumbers.length;
+  const label = count === 1 ? "1 pedido" : `${count} pedidos`;
+  return (
+    <div className="mt-3 rounded-[10px] border border-line bg-card px-3 py-2">
+      <p className="text-sm font-semibold">Costo de hoy en los pedidos</p>
+      <p className="mt-1 text-sm leading-5 text-muted">
+        {canManageCommerce
+          ? `Copia el costo, el envío y las comisiones ya guardados en esta ficha a ${label}. No usa lo que está escrito y todavía no guardaste. El precio de cada pedido no cambia. El total guardado no cambia. No es dinero cobrado.`
+          : "Solo el propietario copia estas cifras a los pedidos. El precio y el total guardado no cambian."}
+      </p>
+      {dirty ? (
+        <p className="mt-1 text-sm leading-5 text-warning">Guarda la ficha primero. Este botón usa lo ya guardado, no lo que está escrito.</p>
+      ) : null}
+      {count > 0 ? (
+        <p className="mt-1 text-sm leading-5">
+          {saved.costNumbers.map((number) => (
+            <Link
+              key={number}
+              href={orderFocusHref(number)}
+              title="Abrirlo no cobra ni cambia el total guardado."
+              className="mr-2 font-semibold text-accent-strong"
+            >
+              {number}
+            </Link>
+          ))}
+        </p>
+      ) : null}
+      {state.error ? (
+        <p role="alert" className="mt-1 text-sm font-semibold text-danger">
+          {state.error}
+        </p>
+      ) : null}
+      {state.saved > 0 ? (
+        <p role="status" className="mt-1 text-sm text-accent-strong">
+          Quedó anotado en {state.saved === 1 ? "1 pedido" : `${state.saved} pedidos`}. El precio y el total guardado no cambiaron. No es dinero cobrado.
+        </p>
+      ) : null}
+      {canManageCommerce ? (
+        <button
+          type="button"
+          title="El precio y el total guardado no cambian. No es dinero cobrado."
+          disabled={pending || dirty || count === 0}
+          className={`mt-2 inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold ${
+            pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+          }`}
+          onClick={() => {
+            const data = new FormData();
+            data.set("sku", product.sku);
+            action(data);
+          }}
+        >
+          {pending ? "…" : "Usar las cifras de hoy"}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 function FichaDriftNotice({
   lines,
   amounts,
@@ -1129,6 +1212,14 @@ export function ProductEditor({
                   commissions: parsePesos(amounts.commissions),
                 }}
               />
+              {product ? (
+                <SkuCostApply
+                  product={product}
+                  lines={storedLines}
+                  amounts={amounts}
+                  canManageCommerce={canManageCommerce}
+                />
+              ) : null}
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 <MoneyField label="Precio de venta" name="price" title="Es el precio de la ficha. No es dinero cobrado." value={amounts.price} readOnly={!canManageCommerce} onValue={(price) => setAmounts((current) => ({ ...current, price }))} />
                 <MoneyField label="Costo del producto" name="cost" title="Es el costo de la ficha. No es dinero cobrado." value={amounts.cost} readOnly={!canManageCommerce} onValue={(cost) => setAmounts((current) => ({ ...current, cost }))} />

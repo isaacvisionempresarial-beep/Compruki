@@ -7,7 +7,7 @@ import { parsePesos } from "@/lib/catalog";
 import { assertPanelAccess } from "@/server/panel-auth";
 import { normalizePhone, ownerOnlyOrderIntent, type OrderAction } from "@/lib/store-order";
 import { syncQueueWithOrderIncident } from "@/server/dropi-connection";
-import { addOrderLine, applyCatalogCosts, markCustomerNotice, placeOrder, saveClosedDepartment, saveDelivery, saveFreight, saveIncidenceReason, saveInternalNote, saveOrderLines, saveProviderRef, saveReturnReason, updateOrder } from "@/server/order-store";
+import { addOrderLine, applyCatalogCosts, applySkuCatalogCosts, markCustomerNotice, placeOrder, saveClosedDepartment, saveDelivery, saveFreight, saveIncidenceReason, saveInternalNote, saveOrderLines, saveProviderRef, saveReturnReason, updateOrder } from "@/server/order-store";
 
 function refreshOrderScreens() {
   revalidatePath("/panel/pedidos");
@@ -175,6 +175,24 @@ export async function applyCatalogCostAction(_state: UpdateOrderState, formData:
   revalidatePath("/panel/rentabilidad");
   revalidatePath("/panel");
   return { error: null, orderId };
+}
+
+export type SkuCostState = { error: string | null; saved: number };
+
+export async function applySkuCatalogCostAction(_state: SkuCostState, formData: FormData): Promise<SkuCostState> {
+  const sku = String(formData.get("sku") ?? "");
+  const access = await assertPanelAccess();
+  if (!access) return { error: "Tu sesión no permite copiar el costo.", saved: 0 };
+  if (access.role !== "owner") return { error: "Solo el propietario puede copiar el costo de la ficha a los pedidos.", saved: 0 };
+  const result = await applySkuCatalogCosts(sku, access.actorName);
+  if (result.error) return { error: result.error, saved: 0 };
+  if (result.saved === 0) return { error: null, saved: 0 };
+  refreshOrderScreens();
+  revalidatePath("/panel/catalogo");
+  revalidatePath(`/panel/catalogo/${encodeURIComponent(sku.trim().toUpperCase())}`);
+  revalidatePath("/panel/rentabilidad");
+  revalidatePath("/panel");
+  return { error: null, saved: result.saved };
 }
 
 export async function saveProviderRefAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {

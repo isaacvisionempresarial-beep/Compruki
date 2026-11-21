@@ -9,6 +9,7 @@ import {
   orderRealizedMargin,
   orderTotal,
   adoptCatalogCosts,
+  adoptSkuCosts,
   costDrift,
   costDriftNote,
   accountHoldNote,
@@ -594,6 +595,34 @@ describe("precio de la ficha", () => {
     expect(filled.lines[0]?.unitPrice).toBe(80_000);
     expect(adoptCatalogCosts(bare, []).error).toContain("ya no tiene");
     expect(adoptCatalogCosts(current, []).mode).toBe("igual");
+    const skuGuide = { sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 };
+    const skuReplaced = adoptSkuCosts(current, "sku-1", skuGuide);
+    expect(skuReplaced.mode).toBe("reemplazar");
+    expect(skuReplaced.total).toBe(80_000);
+    expect(skuReplaced.lines[0].unitPrice).toBe(80_000);
+    expect(skuReplaced.lines[0].unitCost).toBe(50_000);
+    expect(adoptSkuCosts(current, "SKU-1", { sku: "SKU-1", cost: 40_000, shipping: 8_000, commissions: 2_000 }).mode).toBe("igual");
+    expect(adoptSkuCosts(bare, "SKU-1", skuGuide).mode).toBe("igual");
+    const otherLine = order({
+      status: "confirmado",
+      lines: [
+        { sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 },
+        { sku: "OTRO", title: "Otra", unitPrice: 10_000, quantity: 1, unitCost: 1_000, unitShipping: 1_000, unitCommissions: 1_000 },
+      ],
+    });
+    const onlySku = adoptSkuCosts(otherLine, "SKU-1", { sku: "SKU-1", cost: 50_000, shipping: 9_000, commissions: 2_000 });
+    expect(onlySku.lines[0].unitShipping).toBe(9_000);
+    expect(onlySku.lines[0].unitPrice).toBe(80_000);
+    expect(onlySku.lines[1].unitCost).toBe(1_000);
+    expect(onlySku.total).toBe(80_000);
+    const priceOnly = order({
+      status: "confirmado",
+      lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 90_000, quantity: 1, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 }],
+    });
+    const priceKept = adoptSkuCosts(priceOnly, "SKU-1", { sku: "SKU-1", cost: 40_000, shipping: 8_000, commissions: 2_000 });
+    expect(priceKept.mode).toBe("igual");
+    expect(priceKept.lines[0].unitPrice).toBe(90_000);
+    expect(adoptSkuCosts(current, "SKU-1", undefined).error).toContain("ya no tiene");
     const quiet = order({
       status: "entregado",
       collected: true,

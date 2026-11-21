@@ -4,6 +4,7 @@ import { bogotaNow, sizeChoiceLabel, variantFits } from "@/lib/catalog";
 import { formatCop } from "@/lib/format";
 import {
   adoptCatalogCosts,
+  adoptSkuCosts,
   applyOrderAction,
   catalogCostSummary,
   nextOrderNumber,
@@ -549,6 +550,41 @@ export async function applyCatalogCosts(id: string, actorName: string) {
   };
   await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order, saved: true };
+}
+
+export async function applySkuCatalogCosts(sku: string, actorName: string) {
+  const needle = sku.trim().toUpperCase();
+  if (!needle) return { error: "Falta el SKU.", saved: 0 };
+  const product = (await listProducts()).find((item) => item.sku === needle);
+  if (!product) return { error: "No encontré esa ficha.", saved: 0 };
+  const guide = { sku: product.sku, cost: product.cost, shipping: product.shipping, commissions: product.commissions };
+  const orders = await readOrders();
+  const plans = orders.map((current) => ({ current, adopted: adoptSkuCosts(current, needle, guide) }));
+  const blocked = plans.find((plan) => plan.adopted.error);
+  if (blocked?.adopted.error) return { error: blocked.adopted.error, saved: 0 };
+  let saved = 0;
+  const next = plans.map(({ current, adopted }) => {
+    if (adopted.mode !== "reemplazar") return current;
+    saved += 1;
+    return {
+      ...current,
+      lines: adopted.lines,
+      total: current.total,
+      history: [
+        {
+          id: `evt_${randomUUID().slice(0, 8)}`,
+          at: bogotaNow(),
+          actorName,
+          summary:
+            "Desde la ficha, reemplazó el costo guardado con las cifras de hoy. El precio del pedido no cambió. El total guardado no cambió. No es dinero cobrado.",
+        },
+        ...current.history,
+      ],
+    };
+  });
+  if (saved === 0) return { error: null, saved: 0 };
+  await writeOrders(next);
+  return { error: null, saved };
 }
 
 export async function saveFreight(

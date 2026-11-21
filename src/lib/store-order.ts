@@ -313,6 +313,49 @@ export function adoptCatalogCosts(order: Pick<StoreOrder, "lines">, guides: Cost
   return { lines, mode, error: null as string | null };
 }
 
+export function adoptSkuCosts(order: Pick<StoreOrder, "lines" | "total">, sku: string, guide: CostGuide | undefined) {
+  const needle = sku.trim().toUpperCase();
+  let replaced = false;
+  const lines: OrderLine[] = [];
+  for (const line of order.lines) {
+    if (line.sku !== needle) {
+      lines.push(line);
+      continue;
+    }
+    if (!readyCostGuide(guide)) {
+      const hasStored =
+        typeof line.unitCost === "number" || typeof line.unitShipping === "number" || typeof line.unitCommissions === "number";
+      if (!hasStored) {
+        lines.push(line);
+        continue;
+      }
+      return {
+        lines: order.lines,
+        total: order.total,
+        mode: "igual" as const,
+        error: `La ficha de ${line.title} ya no tiene el costo, el envío y las comisiones.`,
+      };
+    }
+    const differs =
+      (typeof line.unitCost === "number" && line.unitCost !== guide.cost) ||
+      (typeof line.unitShipping === "number" && line.unitShipping !== guide.shipping) ||
+      (typeof line.unitCommissions === "number" && line.unitCommissions !== guide.commissions);
+    if (!differs) {
+      lines.push(line);
+      continue;
+    }
+    replaced = true;
+    lines.push({
+      ...line,
+      unitCost: guide.cost,
+      unitShipping: guide.shipping,
+      unitCommissions: guide.commissions,
+    });
+  }
+  if (!replaced) return { lines: order.lines, total: order.total, mode: "igual" as const, error: null as string | null };
+  return { lines, total: order.total, mode: "reemplazar" as const, error: null as string | null };
+}
+
 export function catalogCostSummary(mode: "anotar" | "reemplazar") {
   if (mode === "reemplazar") {
     return "Reemplazó el costo guardado con las cifras de la ficha de hoy. El precio del pedido no cambió. El total guardado no cambió. No es dinero cobrado.";
