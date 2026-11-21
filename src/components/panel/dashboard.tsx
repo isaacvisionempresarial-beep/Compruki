@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { AttentionSheet } from "@/components/panel/attention-sheet";
 import { CloseSheet } from "@/components/panel/close-sheet";
 import { CloseBasisControl, PeriodControl } from "@/components/panel/period-control";
 import { usePanelQuery } from "@/components/panel/panel-shell";
@@ -9,7 +10,7 @@ import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
 import { STATUS_LABEL, type Period } from "@/lib/demo-data";
 import { cx } from "@/lib/cx";
 import { formatCop, formatDay } from "@/lib/format";
-import { awaitsDropiNumber, closePhrase, confirmQueueNote, lineName, missingSizeNote, needsCatalogCost, needsClosedDropiNumber, needsCustomerNotice, needsDepartment, needsClosedDepartment, needsIncidenceDropiNumber, needsIncidenceReason, needsReturnReason, needsReturnFreight, needsSize, orderFocusHref, ordersInSpan, readyToConfirm, readyToDispatch, readyToPrepare, resultsByProduct, samePhoneMatches, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import { attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, ordersInSpan, resultsByProduct, samePhoneMatches, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type SizeGuide, type StoreOrder } from "@/lib/store-order";
 
 const homeProductGrid = "md:grid-cols-[minmax(0,1.5fr)_8.75rem_8.75rem_8.75rem]";
 
@@ -64,43 +65,39 @@ export function Dashboard({
       [row.title, row.sku, ...row.sizes.map((size) => size.label), ...row.sources.map((source) => source.number)].some((value) => value.toLocaleLowerCase("es").includes(query)),
     );
   }, [productRows, query]);
+  const attention = useMemo(
+    () => attentionQueues(storeOrders, sizeGuides, canManageOrderMoney),
+    [storeOrders, sizeGuides, canManageOrderMoney],
+  );
   const waiting = useMemo(() => {
-    const pending = storeOrders.filter(
-      (order) => order.status === "pendiente_confirmacion" || order.status === "incidencia",
+    const rows = attention.flatMap((queue) => queue.rows.map((row) => ({ ...row, queueTitle: queue.title })));
+    if (!query) return rows;
+    return rows.filter((row) =>
+      [
+        row.queueTitle,
+        row.note,
+        row.cta,
+        ...row.also,
+        row.order.number,
+        row.order.customerName,
+        row.order.city,
+        row.order.department ?? "",
+        row.order.campaignEntry ? "campaña" : "",
+        ...row.order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""]),
+      ].some((value) => value.toLocaleLowerCase("es").includes(query)),
     );
-    if (!query) return pending;
-    return pending.filter((order) =>
-      [order.number, order.customerName, order.city, order.campaignEntry ? "campaña" : "", missingSizeNote(order, sizeGuides), ...order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""])].some(
-        (value) => value.toLocaleLowerCase("es").includes(query),
-      ),
-    );
-  }, [storeOrders, sizeGuides, query]);
+  }, [attention, query]);
 
   const orderWork = useMemo(() => {
     let yours = 0;
     let ownerMoney = 0;
-    for (const order of storeOrders) {
-      const yoursMatch =
-        readyToConfirm(order, sizeGuides) ||
-        needsSize(order, sizeGuides) ||
-        needsDepartment(order) ||
-        needsClosedDepartment(order) ||
-        readyToPrepare(order) ||
-        readyToDispatch(order) ||
-        needsIncidenceReason(order) ||
-        needsReturnReason(order) ||
-        needsCustomerNotice(order);
-      const moneyMatch = needsReturnFreight(order) || needsCatalogCost(order);
-      if (canManageOrderMoney) {
-        if (yoursMatch || moneyMatch) yours += 1;
-      } else if (yoursMatch) {
-        yours += 1;
-      } else if (moneyMatch) {
-        ownerMoney += 1;
-      }
+    for (const queue of attention) {
+      const money = queue.id === "cola-flete-devolucion" || queue.id === "cola-costo";
+      if (!canManageOrderMoney && money) ownerMoney += queue.rows.length;
+      else yours += queue.rows.length;
     }
     return { yours, ownerMoney };
-  }, [storeOrders, sizeGuides, canManageOrderMoney]);
+  }, [attention, canManageOrderMoney]);
   const syncWorkCount = useMemo(
     () =>
       storeOrders.filter(
@@ -383,20 +380,20 @@ export function Dashboard({
             Ver el detalle en Rentabilidad
           </Link>
         </div>
-        <h3 className="mt-3 text-sm font-semibold">Pendientes e incidencias ({waiting.length})</h3>
+        <h3 className="mt-3 text-sm font-semibold">Por atender ({waiting.length})</h3>
         <p className="mt-0.5 text-xs text-muted">
-          Siguiente paso aquí · cola completa en Pedidos → Por atender
+          La misma cola que Pedidos. No se recorta por período. Buscar solo cambia esta lista.
         </p>
         {waiting.length === 0 ? (
           <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-            {storeOrders.some((order) => order.status === "pendiente_confirmacion" || order.status === "incidencia")
-              ? "Ningún pedido de la tienda coincide con la búsqueda."
-              : "No hay pedidos pendientes ni con incidencia."}
+            {attention.length === 0
+              ? "No hay pedidos esperando un dato o una acción."
+              : "Ningún pedido de la cola coincide con la búsqueda."}
           </p>
         ) : (
           <ul className="elevate-1 mt-3 divide-y divide-line overflow-hidden rounded-[14px] border border-line bg-card">
-            {waiting.map((order) => {
-              const step = waitingNextStep(order, sizeGuides);
+            {waiting.map((row) => {
+              const order = row.order;
               const phoneCount = samePhoneMatches(order, storeOrders).length;
               const place = [order.city, order.department].filter(Boolean).join(" · ");
               const products = order.lines.map((line) => `${line.quantity} × ${lineName(line)}`).join(", ");
@@ -405,6 +402,7 @@ export function Dashboard({
                 products,
                 order.campaignEntry ? "Campaña" : "",
                 phoneCount === 1 ? "mismo celular en otro" : phoneCount > 1 ? `mismo celular en ${phoneCount} más` : "",
+                row.also.length > 0 ? `También: ${row.also.join(", ")}` : "",
               ]
                 .filter(Boolean)
                 .join(" · ");
@@ -424,8 +422,9 @@ export function Dashboard({
                       <span className="mt-0.5 block truncate text-xs text-muted" title={meta}>
                         {meta}
                       </span>
-                      <span className="mt-0.5 block truncate text-sm font-semibold text-warning" title={step.note}>
-                        {step.note}
+                      <span className="mt-0.5 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase">{row.queueTitle}</span>
+                      <span className="block truncate text-sm font-semibold text-warning" title={row.note}>
+                        {row.note}
                       </span>
                     </span>
                     <span className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
@@ -437,7 +436,7 @@ export function Dashboard({
                         <StatusPill status={order.status} />
                         {order.collected ? <CollectedPill /> : null}
                       </span>
-                      <span className="text-sm font-semibold whitespace-nowrap text-primary">{step.cta}</span>
+                      <span className="text-sm font-semibold whitespace-nowrap text-primary">{row.cta}</span>
                     </span>
                   </Link>
                 </li>
@@ -445,6 +444,7 @@ export function Dashboard({
             })}
           </ul>
         )}
+        <AttentionSheet orders={storeOrders} guides={sizeGuides} canManageOrderMoney={canManageOrderMoney} />
       </section>
 
 
@@ -500,8 +500,8 @@ export function Dashboard({
               <span className="font-semibold text-sm">Siguiente paso</span>
               <span className="mt-0.5 block text-muted">
                 {canManageOrderMoney
-                  ? "Pendientes aquí; la cola completa en Pedidos → Por atender."
-                  : "Pendientes aquí. Flete, costo y marca de cobro los guarda el propietario. Nada de eso cobra en el sitio."}
+                  ? "La misma cola que Pedidos. No se recorta por período. Copiarla no cobra ni envía el mensaje."
+                  : "La misma cola que Pedidos. El flete y el costo los guarda el propietario. Copiarla no cobra ni envía el mensaje."}
               </span>
             </li>
             <li>
@@ -522,26 +522,6 @@ export function Dashboard({
       </div>
     </div>
   );
-}
-
-function waitingNextStep(order: StoreOrder, guides: SizeGuide[]) {
-  if (order.status === "incidencia") {
-    if (needsIncidenceReason(order)) {
-      return { note: "Falta el motivo de la incidencia. El total guardado no cambia.", cta: "Anotar motivo" };
-    }
-    return { note: "Incidencia abierta. El total guardado no cambia.", cta: "Ver pedido" };
-  }
-  if (needsSize(order, guides)) {
-    return { note: "Falta la talla o el tamaño. El total guardado no cambia.", cta: "Anotar talla" };
-  }
-  if (readyToConfirm(order, guides)) {
-    const confirm = confirmQueueNote(order, guides);
-    return { note: confirm && confirm.length < 90 ? confirm : "Listo para confirmar. El total guardado no cambia.", cta: "Confirmar" };
-  }
-  if (needsDepartment(order)) {
-    return { note: "Falta el departamento. El total guardado no cambia.", cta: "Anotar departamento" };
-  }
-  return { note: "Pendiente de confirmación. El total guardado no cambia.", cta: "Ver pedido" };
 }
 
 function HomeProductFigure({ label, value, detail }: { label: string; value: string; detail: string }) {

@@ -330,5 +330,15 @@ describe("cierre de pedidos", () => {
     expect(heldSheet).toContain("Falta la talla o el tamaño (1)");
     expect(heldSheet).toContain("Falta la talla de Faja.");
     expect(heldSheet).not.toContain("Se pueden confirmar");
+    const preparing = order({
+      status: "en_preparacion",
+      number: "P-2010",
+      id: "66666666-6666-4666-8666-666666666666",
+      providerRef: "DP-10",
+    });
+    const preparingSheet = attentionSheetText([preparing], [], true);
+    expect(preparingSheet).toContain("Por anotar despacho (1)");
+    expect(preparingSheet).toContain("P-2010");
+    expect(preparingSheet).not.toContain("Se pueden confirmar");
   });
 });
