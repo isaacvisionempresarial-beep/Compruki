@@ -550,6 +550,22 @@ describe("precio de la ficha", () => {
     expect(costNote).toContain("guardaron el costo en $40.000");
     expect(costNote).toContain("El total guardado no cambia.");
     expect(resultDriftNote([bare], "SKU-1", [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }])).toBe("");
+    const otherCost = order({
+      status: "confirmado",
+      number: "P-2038",
+      id: "77777777-7777-4777-8777-777777777777",
+      lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1, unitCost: 30_000, unitShipping: 8_000, unitCommissions: 2_000 }],
+    });
+    const resultMixed = resultDriftNote([confirmed, otherCost], "SKU-1", [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
+    expect(resultMixed).toContain("hoy tiene el costo en $50.000");
+    expect(resultMixed).toContain("el costo en cifras distintas");
+    expect(resultMixed).toContain("siguen con lo guardado");
+    expect(resultMixed).not.toContain("3001234567");
+    const mixedClose = closeSheetText([confirmed, otherCost], "hoy", "creados", [], [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
+    expect(mixedClose).toContain("el costo en cifras distintas");
+    expect(mixedClose).toContain("El margen y la utilidad siguen con lo guardado.");
+    expect(mixedClose).not.toContain("3001234567");
+    expect(mixedClose).not.toContain("Calle 10");
     const productClose = closeSheetText([confirmed], "hoy", "creados", [], [{ sku: "SKU-1", price: 90_000 }]);
     expect(productClose).toContain("Faja (SKU-1)");
     expect(productClose).toContain("va bajo ese producto");

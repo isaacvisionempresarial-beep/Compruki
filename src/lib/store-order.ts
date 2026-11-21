@@ -693,15 +693,13 @@ export function resultDriftNote(
       { label: "el envío estimado", current: cost.shipping, stored: storedAmounts(lines, (line) => line.unitShipping, cost.shipping) },
       { label: "las comisiones estimadas", current: cost.commissions, stored: storedAmounts(lines, (line) => line.unitCommissions, cost.commissions) },
     ].filter((field) => field.stored.length > 0);
-    if (fields.length > 0 && fields.every((field) => field.stored.length === 1)) {
+    if (fields.length > 0) {
       const today = fields.map((field) => `${field.label} en ${formatCop(field.current)}`).join(", ");
-      const stored = fields.map((field) => `${field.label} en ${formatCop(field.stored[0])}`).join(", ");
+      const stored = fields
+        .map((field) => `${field.label} en ${field.stored.length === 1 ? formatCop(field.stored[0]) : "cifras distintas"}`)
+        .join(", ");
       parts.push(
         `La ficha hoy tiene ${today}. Estos pedidos guardaron ${stored}. El margen estimado y la utilidad siguen con lo guardado. Cambiar la ficha no los reescribe. No es dinero cobrado. El total guardado no cambia.`,
-      );
-    } else if (fields.length > 0) {
-      parts.push(
-        "La ficha de hoy no coincide con el costo guardado en estos pedidos. El margen estimado y la utilidad siguen con lo guardado. Cambiar la ficha no los reescribe. No es dinero cobrado. El total guardado no cambia.",
       );
     }
   }
