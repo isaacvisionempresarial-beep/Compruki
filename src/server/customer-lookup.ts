@@ -2,16 +2,33 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { CUSTOMER_BURST_ERROR, CUSTOMER_WRITE_RULE, LOOKUP_BURST_ERROR, LOOKUP_IP_RULE, LOOKUP_PHONE_RULE } from "@/lib/public-limits";
 import { normalizeOrderNumber, normalizePhone } from "@/lib/store-order";
 import { cancelOrderByCustomer, chooseSizeByCustomer, correctDeliveryByCustomer, findOrderForCustomer, saveBuyerNoteByCustomer } from "@/server/order-store";
+import { clientAddress, takePublicAttempt } from "@/server/public-guard";
+
+async function customerChangePaused() {
+  const address = await clientAddress();
+  return takePublicAttempt("customer-write", address, CUSTOMER_WRITE_RULE) ? null : CUSTOMER_BURST_ERROR;
+}
 
 export type LookupOrderState = { error: string | null };
 
 export async function lookupOrderAction(_state: LookupOrderState, formData: FormData): Promise<LookupOrderState> {
   const number = normalizeOrderNumber(String(formData.get("number") ?? ""));
   const phone = normalizePhone(String(formData.get("phone") ?? ""));
-  if (!/^P-\d{4,6}$/.test(number)) return { error: "Escribe el número del pedido, por ejemplo P-2001." };
-  if (!/^3\d{9}$/.test(phone)) return { error: "Escribe el celular de 10 dígitos que dejaste en el pedido." };
+  const address = await clientAddress();
+  if (!/^P-\d{4,6}$/.test(number)) {
+    if (!takePublicAttempt("lookup-ip", address, LOOKUP_IP_RULE)) return { error: LOOKUP_BURST_ERROR };
+    return { error: "Escribe el número del pedido, por ejemplo P-2001." };
+  }
+  if (!/^3\d{9}$/.test(phone)) {
+    if (!takePublicAttempt("lookup-ip", address, LOOKUP_IP_RULE)) return { error: LOOKUP_BURST_ERROR };
+    return { error: "Escribe el celular de 10 dígitos que dejaste en el pedido." };
+  }
+  if (!takePublicAttempt("lookup-ip", address, LOOKUP_IP_RULE) || !takePublicAttempt("lookup-phone", phone, LOOKUP_PHONE_RULE)) {
+    return { error: LOOKUP_BURST_ERROR };
+  }
 
   const order = await findOrderForCustomer(number, phone);
   if (!order) return { error: "No encontramos un pedido con ese número y ese celular." };
@@ -25,6 +42,8 @@ export async function cancelCustomerOrderAction(
   _state: CancelCustomerOrderState,
   formData: FormData,
 ): Promise<CancelCustomerOrderState> {
+  const paused = await customerChangePaused();
+  if (paused) return { error: paused };
   const id = String(formData.get("orderId") ?? "");
   const token = String(formData.get("token") ?? "");
   const result = await cancelOrderByCustomer(id, token, String(formData.get("reason") ?? ""));
@@ -47,6 +66,8 @@ export async function correctCustomerDeliveryAction(
   _state: CorrectDeliveryState,
   formData: FormData,
 ): Promise<CorrectDeliveryState> {
+  const paused = await customerChangePaused();
+  if (paused) return { error: paused };
   const id = String(formData.get("orderId") ?? "");
   const token = String(formData.get("token") ?? "");
   const result = await correctDeliveryByCustomer(id, token, {
@@ -74,6 +95,8 @@ export async function correctCustomerDeliveryAction(
 export type ChooseSizeState = { error: string | null };
 
 export async function chooseCustomerSizeAction(_state: ChooseSizeState, formData: FormData): Promise<ChooseSizeState> {
+  const paused = await customerChangePaused();
+  if (paused) return { error: paused };
   const id = String(formData.get("orderId") ?? "");
   const token = String(formData.get("token") ?? "");
   const skus = formData.getAll("sku").map(String);
@@ -104,6 +127,8 @@ export async function chooseCustomerSizeAction(_state: ChooseSizeState, formData
 export type BuyerNoteState = { error: string | null };
 
 export async function saveBuyerNoteAction(_state: BuyerNoteState, formData: FormData): Promise<BuyerNoteState> {
+  const paused = await customerChangePaused();
+  if (paused) return { error: paused };
   const id = String(formData.get("orderId") ?? "");
   const token = String(formData.get("token") ?? "");
   const result = await saveBuyerNoteByCustomer(id, token, String(formData.get("buyerNote") ?? ""));

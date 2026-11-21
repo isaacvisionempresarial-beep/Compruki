@@ -272,7 +272,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
             )}
 
             <p className="mt-3 text-xs leading-5 text-muted">
-              Si este mismo pedido ya está pendiente, no se crea otro. Un celular puede dejar hasta 3 pendientes a la vez. El total guardado no cambia.
+              Si este mismo pedido ya está pendiente, no se crea otro. Un celular puede dejar hasta 3 pendientes a la vez. Muchos intentos seguidos desde el mismo lugar se detienen un rato y no crean otro. El total guardado no cambia.
             </p>
             <button
               type="submit"

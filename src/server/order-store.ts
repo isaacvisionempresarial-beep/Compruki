@@ -39,8 +39,10 @@ import {
   type OrderLine,
   type StoreOrder,
 } from "@/lib/store-order";
+import { CHECKOUT_BURST_ERROR, CHECKOUT_CREATE_RULE, CHECKOUT_TRY_RULE } from "@/lib/public-limits";
 import { listProducts } from "@/server/catalog-store";
 import { loadOrders, saveOrders } from "@/server/pg-persistence";
+import { clientAddress, takePublicAttempt } from "@/server/public-guard";
 
 export async function listOrders() {
   return (await readOrders()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -96,6 +98,11 @@ export async function placeOrder(input: CheckoutInput) {
   const orders = await readOrders();
   const existing = orders.find((order) => order.idempotencyKey === input.idempotencyKey);
   if (existing) return { error: null, order: existing, repeated: false };
+
+  const address = await clientAddress();
+  if (!takePublicAttempt("checkout-try", address, CHECKOUT_TRY_RULE)) {
+    return { error: CHECKOUT_BURST_ERROR, order: null };
+  }
 
   const error = validateCheckout(input);
   if (error) return { error, order: null };
@@ -172,6 +179,10 @@ export async function placeOrder(input: CheckoutInput) {
       },
     ],
   };
+
+  if (!takePublicAttempt("checkout-create", address, CHECKOUT_CREATE_RULE)) {
+    return { error: CHECKOUT_BURST_ERROR, order: null };
+  }
 
   await writeOrders([order, ...orders]);
   return { error: null, order, repeated: false };

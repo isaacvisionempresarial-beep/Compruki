@@ -53,7 +53,7 @@ export default async function SettingsPage() {
         <div>
           <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Aislamiento</dt>
           <dd className="mt-0.5 text-sm text-muted">
-            Esta sesión solo abre {access.tenantName}. Pedidos, catálogo y agentes salen de esa tienda. Un identificador de otra tienda no se lee ni se escribe. Verlo no cobra ni cambia pedidos.
+            Esta sesión solo abre {access.tenantName}. Pedidos, catálogo y agentes salen de esa tienda. Un identificador de otra tienda no se lee ni se escribe. En la tienda pública, consultas, cambios del cliente y pedidos seguidos se detienen un rato: no abren ni crean otro. Verlo no cobra ni cambia pedidos.
           </dd>
         </div>
         <div>
