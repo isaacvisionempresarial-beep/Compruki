@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/brand/wordmark";
+import { safeFailureCode } from "@/lib/failure-copy";
 
 type Action = {
   href?: string;
@@ -84,6 +85,7 @@ function ActionControl({ action }: { action: Action }) {
 }
 
 export function ErrorDigest({ digest }: { digest?: string }) {
-  if (!digest) return null;
-  return <p className="mt-3 text-xs leading-5 text-muted">Código de referencia: {digest}</p>;
+  const code = safeFailureCode(digest);
+  if (!code) return null;
+  return <p className="mt-3 text-xs leading-5 text-muted">Código de referencia: {code}</p>;
 }
