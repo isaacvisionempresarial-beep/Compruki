@@ -11,6 +11,7 @@ import {
   adoptCatalogCosts,
   costDrift,
   costDriftNote,
+  accountHoldNote,
   catalogDriftText,
   fichaDrift,
   fichaDriftNote,
@@ -522,12 +523,14 @@ describe("precio de la ficha", () => {
     expect(sameSheet).not.toContain("hoy tiene el costo");
     expect(sameSheet).not.toContain("3001234567");
     const movedSheet = attentionSheetText([pending], [], true, [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
+    expect(movedSheet).toContain("Sigue pendiente: no entra al margen ni a la utilidad.");
     expect(movedSheet).toContain("hoy tiene el costo en $50.000");
     expect(movedSheet).toContain("guardó el costo en $40.000");
     expect(movedSheet).toContain("Copiarlas no reescribe lo guardado");
     expect(movedSheet).not.toContain("3001234567");
     expect(movedSheet).not.toContain("Calle 10");
     const closeMoved = closeSheetText([pending], "hoy", "creados", [], [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
+    expect(closeMoved).toContain("Sigue pendiente: no entra al margen ni a la utilidad.");
     expect(closeMoved).toContain("El cierre sigue con el costo guardado");
     expect(closeMoved).toContain("P-2033. La ficha de Faja hoy tiene el costo en $50.000");
     expect(closeMoved).toContain("guardó el costo en $40.000");
@@ -652,6 +655,16 @@ describe("precio de la ficha", () => {
     expect(fichaDriftNote(pendingDrift, 90_000)).toContain("P-2045 sigue pendiente y no entra al margen ni a la utilidad.");
     expect(fichaDriftNote(pendingDrift, 90_000)).not.toContain("3001234567");
     expect(fichaDrift([{ number: "P-2046", status: "confirmado", unitPrice: 80_000, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 }], { price: 90_000, cost: 40_000, shipping: 8_000, commissions: 2_000 }).pendingNumbers).toEqual([]);
+    expect(accountHoldNote("confirmado")).toBe("");
+    expect(accountHoldNote("entregado")).toBe("");
+    const aside = { price: 90_000, cost: 40_000, shipping: 8_000, commissions: 2_000 };
+    const money = { unitPrice: 80_000, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 };
+    expect(fichaDriftNote(fichaDrift([{ number: "P-2048", status: "cancelado", ...money }], aside), 90_000)).toContain("P-2048 está cancelado y no entra al margen ni a la utilidad.");
+    expect(fichaDriftNote(fichaDrift([{ number: "P-2049", status: "incidencia", ...money }], aside), 90_000)).toContain("P-2049 está en incidencia y no suma como venta confirmada mientras dure.");
+    expect(fichaDriftNote(fichaDrift([{ number: "P-2050", status: "devuelto", ...money }], aside), 90_000)).toContain("P-2050 está devuelto y el total guardado no entra a la utilidad.");
+    expect(accountHoldNote("cancelado")).toContain("Está cancelado");
+    expect(accountHoldNote("incidencia")).toContain("no suma como venta confirmada");
+    expect(accountHoldNote("devuelto")).toContain("no entra a la utilidad");
     const driftSource = [
       {
         number: "P-2045",

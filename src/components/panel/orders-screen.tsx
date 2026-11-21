@@ -57,6 +57,7 @@ import {
   dispatchSheetText,
   type CloseBasis,
   type OrderSpan,
+  accountHoldNote,
   costDrift,
   costDriftNote,
   priceDrift,
@@ -357,6 +358,7 @@ export function OrdersScreen({
             const notes = rowWarnings(order, sizeGuides, canManageOrderMoney);
             const drift = priceDriftNote(priceDrift(order, priceGuides));
             const costNote = costDriftNote(costDrift(order, costGuides));
+            const hold = drift || costNote ? accountHoldNote(order.status) : "";
             return (
               <li key={order.id}>
                 <a href={orderFocusHref(order.number)} title="Abrirlo no cobra ni cambia el total guardado." className={cx("grid items-start gap-3 px-3 py-2 hover:bg-canvas md:gap-4", orderGrid)}>
@@ -375,6 +377,7 @@ export function OrdersScreen({
                     ))}
                     {drift ? <span className="mt-2 block text-sm leading-5 text-warning">{drift}</span> : null}
                     {costNote ? <span className="mt-2 block text-sm leading-5 text-warning">{costNote}</span> : null}
+                    {hold ? <span className="mt-2 block text-sm leading-5 text-warning">{hold}</span> : null}
                   </span>
                   <span className="text-sm font-semibold tabular-nums md:pt-0.5 md:text-right">
                     <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">Total guardado</span>
@@ -581,6 +584,9 @@ export function OrderEditor({
           {moneyNote(order, margin)}
         </p>
         {costNote ? <p className="mt-2 text-sm leading-5 text-warning">{costNote}</p> : null}
+        {priceDrift(order, priceGuides).length > 0 || costNote ? (
+          accountHoldNote(order.status) ? <p className="mt-2 text-sm leading-5 text-warning">{accountHoldNote(order.status)}</p> : null
+        ) : null}
         {readyToConfirm(order, sizeGuides) ? (
           <p className="mt-2 text-xs leading-5 text-warning">{confirmQueueNote(order, sizeGuides)}</p>
         ) : departmentNote ? (
@@ -929,7 +935,7 @@ function StatusFilter({
 
 function matchesOrder(order: StoreOrder, query: string, guides: SizeGuide[], priceGuides: PriceGuide[] = [], costGuides: CostGuide[] = []) {
   if (!query) return true;
-  return [priceDriftNote(priceDrift(order, priceGuides)), costDriftNote(costDrift(order, costGuides)), order.number, order.customerName, order.city, order.department ?? "", order.phone, order.document ?? "", order.address, order.reference, order.providerRef ?? "", order.internalNote ?? "", order.customerReason ?? "", order.buyerNote ?? "", order.customerNotifiedAt ? "avisé" : "", order.campaignEntry ? "campaña" : "", awaitsDropiNumber(order) || needsClosedDropiNumber(order) || needsIncidenceDropiNumber(order) ? "dropi" : "", needsDepartment(order) || needsClosedDepartment(order) ? "departamento" : "", missingSizeNote(order, guides), catalogCostQueueNote(order), collectedWithoutCost(order) ? "utilidad" : "", needsCustomerNotice(order) ? "avisar aviso" : "", needsIncidenceReason(order) ? "motivo incidencia" : "", needsReturnReason(order) ? "motivo devolución" : "", needsReturnFreight(order) ? "flete devolución" : "", readyToConfirm(order, guides) ? "confirmar" : "", readyToPrepare(order) ? "preparación preparar" : "", readyToDispatch(order) ? "despacho preparación" : "", ...order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""])].some(
+  return [priceDriftNote(priceDrift(order, priceGuides)), costDriftNote(costDrift(order, costGuides)), priceDrift(order, priceGuides).length > 0 || costDrift(order, costGuides).length > 0 ? accountHoldNote(order.status) : "", order.number, order.customerName, order.city, order.department ?? "", order.phone, order.document ?? "", order.address, order.reference, order.providerRef ?? "", order.internalNote ?? "", order.customerReason ?? "", order.buyerNote ?? "", order.customerNotifiedAt ? "avisé" : "", order.campaignEntry ? "campaña" : "", awaitsDropiNumber(order) || needsClosedDropiNumber(order) || needsIncidenceDropiNumber(order) ? "dropi" : "", needsDepartment(order) || needsClosedDepartment(order) ? "departamento" : "", missingSizeNote(order, guides), catalogCostQueueNote(order), collectedWithoutCost(order) ? "utilidad" : "", needsCustomerNotice(order) ? "avisar aviso" : "", needsIncidenceReason(order) ? "motivo incidencia" : "", needsReturnReason(order) ? "motivo devolución" : "", needsReturnFreight(order) ? "flete devolución" : "", readyToConfirm(order, guides) ? "confirmar" : "", readyToPrepare(order) ? "preparación preparar" : "", readyToDispatch(order) ? "despacho preparación" : "", ...order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""])].some(
     (value) => value.toLocaleLowerCase("es").includes(query),
   );
 }

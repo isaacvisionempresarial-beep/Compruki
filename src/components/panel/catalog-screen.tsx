@@ -18,6 +18,7 @@ import {
 
 const filters = [
   { id: "todos", label: "Todos" },
+  { id: "diferencia", label: "Otra cifra" },
   { id: "tienda", label: "En tienda" },
   { id: "agotados", label: "Publicado no pedible" },
   { id: "ocultos", label: "Borrador" },
@@ -54,7 +55,7 @@ export function CatalogScreen({
     [orders, products],
   );
   const rowDrift = useMemo(() => {
-    const notes = new Map<string, { note: string; numbers: string[]; pending: string[] }>();
+    const notes = new Map<string, { note: string; numbers: string[]; pending: string[]; cancel: string[]; incidence: string[]; returned: string[] }>();
     for (const product of products) {
       const drift = fichaDrift(storedSkuLines(orders, product.sku), {
         price: product.price,
@@ -68,6 +69,9 @@ export function CatalogScreen({
         note,
         numbers: [...new Set([...drift.priceNumbers, ...drift.costNumbers])],
         pending: drift.pendingNumbers,
+        cancel: drift.cancelNumbers,
+        incidence: drift.incidenceNumbers,
+        returned: drift.returnedNumbers,
       });
     }
     return notes;
@@ -93,7 +97,10 @@ export function CatalogScreen({
       ),
     [products, query, holds, rowDrift],
   );
-  const visible = useMemo(() => searched.filter((product) => matches(product, filter)), [searched, filter]);
+  const visible = useMemo(
+    () => searched.filter((product) => matches(product, filter, rowDrift.has(product.sku))),
+    [searched, filter, rowDrift],
+  );
 
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
@@ -106,7 +113,7 @@ export function CatalogScreen({
           </p>
           {rowDrift.size > 0 ? (
             <p className="mt-1 text-xs leading-5 text-warning">
-              Si la ficha de hoy no es el precio o el costo guardado, va en esa fila. Si el pedido sigue pendiente, no entra al margen ni a la utilidad. Abrir el pedido no reescribe el total ni cobra.
+              Si la ficha de hoy no es el precio o el costo guardado, va en esa fila. Pendiente o cancelado no entra al margen ni a la utilidad. En incidencia no suma como venta confirmada. Devuelto, el total no entra a la utilidad. Abrir el pedido no reescribe el total ni cobra.
             </p>
           ) : null}
         </div>
@@ -138,7 +145,7 @@ export function CatalogScreen({
         <div className="order-2 min-w-0 xl:order-1">
           <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Filtrar productos">
             {filters.map((item) => {
-              const count = searched.filter((product) => matches(product, item.id)).length;
+              const count = searched.filter((product) => matches(product, item.id, rowDrift.has(product.sku))).length;
               const selectedFilter = filter === item.id;
               return (
                 <button
@@ -238,7 +245,7 @@ function CatalogProductRow({
   product: CatalogProduct;
   hasOrders: boolean;
   hold: { orders: number; kind: "talla" | "tamano" } | null;
-  drift: { note: string; numbers: string[]; pending: string[] } | null;
+  drift: { note: string; numbers: string[]; pending: string[]; cancel: string[]; incidence: string[]; returned: string[] } | null;
   canManageCommerce: boolean;
 }) {
   const margin = productMargin(product);
@@ -343,11 +350,7 @@ function CatalogProductRow({
                     <Link
                       key={number}
                       href={orderFocusHref(number)}
-                      title={
-                        drift.pending.includes(number)
-                          ? "Sigue pendiente. Abrirlo no cobra ni entra a la utilidad."
-                          : "Abrirlo no cobra ni cambia el total guardado."
-                      }
+                      title={driftLinkTitle(number, drift)}
                       className="mr-2 font-semibold text-accent-strong"
                     >
                       {number}
@@ -472,17 +475,35 @@ function catalogEmptyMessage(total: number, searched: number, filter: FilterId, 
       : "Todavía no hay productos en el catálogo. Solo el propietario puede crear uno. No cobra. Importar desde Dropi sigue pendiente de autorización.";
   }
   if (query && searched === 0) return "Ningún producto coincide con la búsqueda. Filtrar no cobra ni cambia el precio ni la publicación.";
+  if (filter === "diferencia") return "Ninguna ficha tiene otro precio o costo guardado. Filtrar no cobra ni cambia el precio ni la publicación.";
   if (filter === "tienda") return "No hay productos en tienda. Filtrar no cobra ni cambia el precio ni la publicación.";
   if (filter === "ocultos") return "No hay borradores. Filtrar no cobra ni cambia el precio ni la publicación.";
   if (filter === "agotados") return "No hay publicados no pedibles. Filtrar no cobra ni cambia el precio ni la publicación.";
   return "No hay productos en este grupo. Filtrar no cobra ni cambia el precio ni la publicación.";
 }
 
-function matches(product: CatalogProduct, filter: FilterId) {
+function matches(product: CatalogProduct, filter: FilterId, drifted: boolean) {
+  if (filter === "diferencia") return drifted;
   if (filter === "tienda") return product.published && product.available;
   if (filter === "ocultos") return !product.published;
   if (filter === "agotados") return product.published && !product.available;
   return true;
+}
+
+function driftLinkTitle(
+  number: string,
+  hold: { pending: string[]; cancel: string[]; incidence: string[]; returned: string[] },
+) {
+  if (hold.pending.includes(number) || hold.cancel.includes(number)) {
+    return "No entra al margen ni a la utilidad. Abrirlo no cobra ni cambia el total guardado.";
+  }
+  if (hold.incidence.includes(number)) {
+    return "No suma como venta confirmada mientras dure. Abrirlo no cobra ni cambia el total guardado.";
+  }
+  if (hold.returned.includes(number)) {
+    return "El total guardado no entra a la utilidad. Abrirlo no cobra ni cambia el total guardado.";
+  }
+  return "Abrirlo no cobra ni cambia el total guardado.";
 }
 
 function CampaignLink({
@@ -653,7 +674,7 @@ function CatalogDriftSheet({ text }: { text: string }) {
         Fichas para copiar
       </h2>
       <p className="mt-0.5 text-xs leading-5 text-muted">
-        El catálogo completo, no el filtro de la pantalla. Van el precio, el costo, el envío y las comisiones de hoy junto a lo guardado, y el número del pedido. Si sigue pendiente, no entra al margen ni a la utilidad. Copiar no cobra, no reescribe los pedidos y no cambia el total guardado.
+        El catálogo completo, no el filtro de la pantalla. Van el precio, el costo, el envío y las comisiones de hoy junto a lo guardado, y el número del pedido. Si sigue pendiente o está cancelado, no entra al margen ni a la utilidad. En incidencia no suma como venta confirmada. Devuelto, el total guardado no entra a la utilidad. Copiar no cobra, no reescribe los pedidos y no cambia el total guardado.
       </p>
       <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
         <label className="text-sm font-semibold" htmlFor="catalogo-fichas-distintas">
@@ -701,7 +722,12 @@ function FichaDriftNotice({
   const note = fichaDriftNote(drift, amounts.price);
   if (!note) return null;
   const numbers = [...new Set([...drift.priceNumbers, ...drift.costNumbers])];
-  const pending = new Set(drift.pendingNumbers);
+  const hold = {
+    pending: drift.pendingNumbers,
+    cancel: drift.cancelNumbers,
+    incidence: drift.incidenceNumbers,
+    returned: drift.returnedNumbers,
+  };
   return (
     <div className="mt-2 text-sm leading-5 text-warning">
       <p>{note}</p>
@@ -711,11 +737,7 @@ function FichaDriftNotice({
             <Link
               key={number}
               href={orderFocusHref(number)}
-              title={
-                pending.has(number)
-                  ? "Sigue pendiente. Abrirlo no cobra ni entra a la utilidad."
-                  : "Abrirlo no cobra ni cambia el total guardado."
-              }
+              title={driftLinkTitle(number, hold)}
               className="mr-2 font-semibold text-accent-strong"
             >
               {number}

@@ -553,6 +553,15 @@ export function fichaDrift(
   const storedPrices = new Set<number>();
   const costNumbers: string[] = [];
   const pendingNumbers: string[] = [];
+  const cancelNumbers: string[] = [];
+  const incidenceNumbers: string[] = [];
+  const returnedNumbers: string[] = [];
+  const holdLists: Partial<Record<OrderStatus, string[]>> = {
+    pendiente_confirmacion: pendingNumbers,
+    cancelado: cancelNumbers,
+    incidencia: incidenceNumbers,
+    devuelto: returnedNumbers,
+  };
   const costBuckets = new Map<string, { label: string; current: number; stored: number[] }>();
   const remember = (key: string, label: string, currentValue: number | null, stored: number | undefined) => {
     if (currentValue === null || typeof stored !== "number" || stored === currentValue) return false;
@@ -572,15 +581,17 @@ export function fichaDrift(
       remember("commissions", "las comisiones estimadas", current.commissions, line.unitCommissions);
     if (costDiffers && !costNumbers.includes(line.number)) costNumbers.push(line.number);
     const drifted = priceNumbers.includes(line.number) || costNumbers.includes(line.number);
-    if (drifted && line.status === "pendiente_confirmacion" && !pendingNumbers.includes(line.number)) {
-      pendingNumbers.push(line.number);
-    }
+    const hold = line.status ? holdLists[line.status] : undefined;
+    if (drifted && hold && !hold.includes(line.number)) hold.push(line.number);
   }
   return {
     priceNumbers,
     storedPrices: [...storedPrices],
     costNumbers,
     pendingNumbers,
+    cancelNumbers,
+    incidenceNumbers,
+    returnedNumbers,
     costFields: ["cost", "shipping", "commissions"].flatMap((key) => {
       const field = costBuckets.get(key);
       return field ? [field] : [];
@@ -594,6 +605,9 @@ export function fichaDriftNote(
     storedPrices: number[];
     costNumbers: string[];
     pendingNumbers: string[];
+    cancelNumbers: string[];
+    incidenceNumbers: string[];
+    returnedNumbers: string[];
     costFields: Array<{ label: string; current: number; stored: number[] }>;
   },
   price: number | null,
@@ -619,7 +633,30 @@ export function fichaDriftNote(
   } else if (drift.pendingNumbers.length > 1) {
     parts.push(`${drift.pendingNumbers.join(", ")} siguen pendientes y no entran al margen ni a la utilidad.`);
   }
+  if (drift.cancelNumbers.length === 1) {
+    parts.push(`${drift.cancelNumbers[0]} está cancelado y no entra al margen ni a la utilidad.`);
+  } else if (drift.cancelNumbers.length > 1) {
+    parts.push(`${drift.cancelNumbers.join(", ")} están cancelados y no entran al margen ni a la utilidad.`);
+  }
+  if (drift.incidenceNumbers.length === 1) {
+    parts.push(`${drift.incidenceNumbers[0]} está en incidencia y no suma como venta confirmada mientras dure.`);
+  } else if (drift.incidenceNumbers.length > 1) {
+    parts.push(`${drift.incidenceNumbers.join(", ")} están en incidencia y no suman como venta confirmada mientras dure.`);
+  }
+  if (drift.returnedNumbers.length === 1) {
+    parts.push(`${drift.returnedNumbers[0]} está devuelto y el total guardado no entra a la utilidad.`);
+  } else if (drift.returnedNumbers.length > 1) {
+    parts.push(`${drift.returnedNumbers.join(", ")} están devueltos y el total guardado no entra a la utilidad.`);
+  }
   return parts.join(" ");
+}
+
+export function accountHoldNote(status: OrderStatus) {
+  if (status === "pendiente_confirmacion") return "Sigue pendiente: no entra al margen ni a la utilidad.";
+  if (status === "cancelado") return "Está cancelado: no entra al margen ni a la utilidad.";
+  if (status === "incidencia") return "Está en incidencia: no suma como venta confirmada mientras dure.";
+  if (status === "devuelto") return "Está devuelto: el total guardado no entra a la utilidad.";
+  return "";
 }
 
 export function catalogDriftText(
@@ -647,7 +684,7 @@ export function catalogDriftText(
   return [
     "Fichas con otro precio o costo guardado",
     "Copiar este texto no cobra, no reescribe los pedidos y no cambia el total guardado.",
-    "Un pedido pendiente no entra al margen ni a la utilidad.",
+    "Un pedido pendiente o cancelado no entra al margen ni a la utilidad. En incidencia no suma como venta confirmada. Devuelto, el total guardado no entra a la utilidad.",
     "",
     ...blocks,
     "",
@@ -1213,9 +1250,16 @@ export function closeSheetText(
     "Copiar este texto no cobra ni cambia pedidos. Dropi no está conectado: desde aquí no se crea el pedido.",
   ];
   if (span !== "todo" && basis === "movidos") lines.push("El total guardado es el del pedido, no lo cobrado en ese día.");
+  const holdSeen = new Set<string>();
+  const driftLine = (order: StoreOrder, note: string) => {
+    const hold = accountHoldNote(order.status);
+    const extra = hold && !holdSeen.has(order.number) ? ` ${hold}` : "";
+    if (extra) holdSeen.add(order.number);
+    return `${order.number}. ${note}${extra}`;
+  };
   const drifted = orders.flatMap((order) => {
     const note = priceDriftNote(priceDrift(order, priceGuides));
-    return note ? [`${order.number}. ${note}`] : [];
+    return note ? [driftLine(order, note)] : [];
   });
   if (drifted.length > 0) {
     lines.push(
@@ -1225,7 +1269,7 @@ export function closeSheetText(
   }
   const costDrifted = orders.flatMap((order) => {
     const note = costDriftNote(costDrift(order, costGuides));
-    return note ? [`${order.number}. ${note}`] : [];
+    return note ? [driftLine(order, note)] : [];
   });
   if (costDrifted.length > 0) {
     lines.push(
@@ -1578,6 +1622,7 @@ export function attentionSheetText(
         if (drift) lines.push(drift);
         const costNote = costDriftNote(costDrift(row.order, costGuides));
         if (costNote) lines.push(costNote);
+        if ((drift || costNote) && accountHoldNote(row.order.status)) lines.push(accountHoldNote(row.order.status));
       }
       lines.push("");
     }
