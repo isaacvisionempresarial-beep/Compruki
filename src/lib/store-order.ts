@@ -675,6 +675,12 @@ export function spanPhrase(span: OrderSpan) {
   return periodPhrase(span);
 }
 
+export function closePhrase(period: Period, basis: CloseBasis = "creados") {
+  const when = periodPhrase(period);
+  if (basis === "movidos") return `movimientos de ${when}`;
+  return when === "hoy" ? "pedidos creados hoy" : `pedidos creados en ${when}`;
+}
+
 const DISPATCH_SHEET: OrderStatus[] = ["confirmado", "en_preparacion", "en_transporte"];
 
 export function dispatchSheetOrders(orders: StoreOrder[]) {
@@ -853,10 +859,11 @@ export function widerPeriodWithResults(
   period: Period,
   guides: SizeGuide[] = [],
   today = bogotaNow().slice(0, 10),
+  basis: CloseBasis = "creados",
 ) {
   const start = RESULT_PERIODS.indexOf(period);
   for (const candidate of RESULT_PERIODS.slice(start + 1)) {
-    if (resultsByProduct(storeOrdersInPeriod(orders, candidate, today), guides).length > 0) return candidate;
+    if (resultsByProduct(ordersInSpan(orders, candidate, today, basis), guides).length > 0) return candidate;
   }
   return null;
 }

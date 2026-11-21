@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { PeriodControl } from "@/components/panel/period-control";
+import { CloseBasisControl, PeriodControl } from "@/components/panel/period-control";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
 import { STATUS_LABEL, type Period } from "@/lib/demo-data";
 import { cx } from "@/lib/cx";
 import { formatCop, formatDay } from "@/lib/format";
-import { awaitsDropiNumber, confirmQueueNote, lineName, missingSizeNote, needsCatalogCost, needsClosedDropiNumber, needsCustomerNotice, needsDepartment, needsClosedDepartment, needsIncidenceDropiNumber, needsIncidenceReason, needsReturnReason, needsReturnFreight, needsSize, orderFocusHref, readyToConfirm, readyToDispatch, readyToPrepare, periodPhrase, resultsByProduct, samePhoneMatches, storeOrdersInPeriod, summarizeStoreOrders, widerPeriodWithResults, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import { awaitsDropiNumber, closePhrase, confirmQueueNote, lineName, missingSizeNote, needsCatalogCost, needsClosedDropiNumber, needsCustomerNotice, needsDepartment, needsClosedDepartment, needsIncidenceDropiNumber, needsIncidenceReason, needsReturnReason, needsReturnFreight, needsSize, orderFocusHref, ordersInSpan, readyToConfirm, readyToDispatch, readyToPrepare, resultsByProduct, samePhoneMatches, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type SizeGuide, type StoreOrder } from "@/lib/store-order";
 
 const homeProductGrid = "md:grid-cols-[minmax(0,1.5fr)_8.75rem_8.75rem_8.75rem]";
 
@@ -46,16 +46,17 @@ export function Dashboard({
   agentPendingSummary?: AgentPendingSummary | null;
 }) {
   const [storePeriod, setStorePeriod] = useState<Period>("7d");
+  const [basis, setBasis] = useState<CloseBasis>("creados");
   const query = usePanelQuery().trim().toLocaleLowerCase("es");
 
   const storeInPeriod = useMemo(
-    () => storeOrdersInPeriod(storeOrders, storePeriod, today),
-    [storeOrders, storePeriod, today],
+    () => ordersInSpan(storeOrders, storePeriod, today, basis),
+    [storeOrders, storePeriod, today, basis],
   );
   const storeSummary = useMemo(() => summarizeStoreOrders(storeInPeriod), [storeInPeriod]);
   const productRows = useMemo(() => resultsByProduct(storeInPeriod, sizeGuides), [storeInPeriod, sizeGuides]);
   const widerStorePeriod =
-    productRows.length === 0 ? widerPeriodWithResults(storeOrders, storePeriod, sizeGuides, today) : null;
+    productRows.length === 0 ? widerPeriodWithResults(storeOrders, storePeriod, sizeGuides, today, basis) : null;
   const productResults = useMemo(() => {
     if (!query) return productRows;
     return productRows.filter((row) =>
@@ -199,9 +200,13 @@ export function Dashboard({
             <h2 id="tienda-titulo" className="mt-0.5 text-base font-bold leading-7">
               Pedidos de la tienda
             </h2>
-            <p className="mt-0.5 text-xs text-muted">Cifras de {periodPhrase(storePeriod)}. Verlas no cobra ni cambia pedidos.</p>
+            <p className="mt-0.5 text-xs text-muted">
+              Cifras de {closePhrase(storePeriod, basis)}. Verlas no cobra ni cambia pedidos.
+              {basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+            <CloseBasisControl basis={basis} onChange={setBasis} name="base-tienda" />
             <PeriodControl
               period={storePeriod}
               onChange={setStorePeriod}
@@ -295,13 +300,13 @@ export function Dashboard({
         </dl>
         <h3 className="mt-3 text-sm font-semibold">Por producto ({productResults.length})</h3>
         <p className="mt-0.5 text-xs text-muted">
-          Mismo período · detalle en Rentabilidad
+          Mismo período y la misma fecha · detalle en Rentabilidad
         </p>
         {productResults.length === 0 ? (
           <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
             {productRows.length > 0
               ? "Ningún producto coincide con la búsqueda."
-              : `En este período no hay pedidos confirmados ni devueltos.${widerStorePeriod ? ` En ${periodPhrase(widerStorePeriod)} sí hay.` : ""}`}
+              : `En este período no hay pedidos confirmados ni devueltos.${widerStorePeriod ? ` En ${closePhrase(widerStorePeriod, basis)} sí hay.` : ""}`}
           </p>
         ) : (
           <div className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">

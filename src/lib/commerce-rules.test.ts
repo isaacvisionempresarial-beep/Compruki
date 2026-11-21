@@ -8,12 +8,15 @@ import {
   orderMargin,
   orderRealizedMargin,
   orderTotal,
+  closePhrase,
   ordersInSpan,
   dispatchSheetOrders,
   dispatchSheetText,
+  widerPeriodWithResults,
   ownerOnlyOrderIntent,
   pendingCheckoutMatch,
   pendingPhoneIsFull,
+  resultsByProduct,
   summarizeStoreOrders,
   validateCheckout,
   validateLineEdits,
@@ -260,5 +263,9 @@ describe("cierre de pedidos", () => {
     const summary = summarizeStoreOrders(ordersInSpan([moved], "hoy", "2026-11-20", "movidos"));
     expect(summary.confirmed.amount).toBe(moved.total);
     expect(dispatchSheetText(ordersInSpan([moved], "hoy", "2026-11-20", "movidos"))).toContain("Pedido P-2002");
+    expect(closePhrase("hoy", "movidos")).toBe("movimientos de hoy");
+    expect(closePhrase("7d")).toBe("pedidos creados en los últimos 7 días");
+    expect(resultsByProduct(ordersInSpan([moved], "hoy", "2026-11-20", "movidos"))).toHaveLength(1);
+    expect(widerPeriodWithResults([moved], "hoy", [], "2026-11-20", "creados")).toBe("30d");
   });
 });

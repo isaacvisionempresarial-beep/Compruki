@@ -7,17 +7,18 @@ import { STATUS_LABEL, type Period } from "@/lib/demo-data";
 import { cx } from "@/lib/cx";
 import { formatCop } from "@/lib/format";
 import {
+  closePhrase,
   orderFocusHref,
+  ordersInSpan,
   pendingSizeHoldPhrase,
   pendingSizeHolds,
-  periodPhrase,
   resultsByProduct,
-  storeOrdersInPeriod,
   widerPeriodWithResults,
+  type CloseBasis,
   type ProductSource,
   type StoreOrder,
 } from "@/lib/store-order";
-import { PeriodControl } from "@/components/panel/period-control";
+import { CloseBasisControl, PeriodControl } from "@/components/panel/period-control";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 
 const resultGrid = "md:grid-cols-[minmax(0,1.5fr)_8.75rem_8.75rem_8.75rem]";
@@ -34,6 +35,7 @@ export function ProfitabilityScreen({
   canManageOrderMoney?: boolean;
 }) {
   const [storePeriod, setStorePeriod] = useState<Period>("7d");
+  const [basis, setBasis] = useState<CloseBasis>("creados");
   const query = usePanelQuery().trim().toLocaleLowerCase("es");
   const guides = useMemo(
     () => products.map((product) => ({ sku: product.sku, variants: product.variants, sizeKind: product.sizeKind ?? null })),
@@ -41,10 +43,10 @@ export function ProfitabilityScreen({
   );
   const holds = useMemo(() => pendingSizeHolds(orders, guides), [orders, guides]);
   const results = useMemo(
-    () => resultsByProduct(storeOrdersInPeriod(orders, storePeriod, today), guides),
-    [orders, guides, storePeriod, today],
+    () => resultsByProduct(ordersInSpan(orders, storePeriod, today, basis), guides),
+    [orders, guides, storePeriod, today, basis],
   );
-  const wider = results.length === 0 ? widerPeriodWithResults(orders, storePeriod, guides, today) : null;
+  const wider = results.length === 0 ? widerPeriodWithResults(orders, storePeriod, guides, today, basis) : null;
   const visible = results.filter(
     (row) =>
       !query ||
@@ -72,20 +74,24 @@ export function ProfitabilityScreen({
                   Qué dejaron los pedidos
                 </h2>
                 <p className="mt-0.5 text-xs text-muted">
-                  Cifras de {periodPhrase(storePeriod)}
+                  Cifras de {closePhrase(storePeriod, basis)}. Verlas no cobra ni cambia pedidos.
+                  {basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
                 </p>
               </div>
-              <PeriodControl
-                period={storePeriod}
-                onChange={setStorePeriod}
-                name="periodo-resultados"
-                legend="Período de los resultados por producto"
-              />
+              <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                <CloseBasisControl basis={basis} onChange={setBasis} name="base-resultados" />
+                <PeriodControl
+                  period={storePeriod}
+                  onChange={setStorePeriod}
+                  name="periodo-resultados"
+                  legend="Período de los resultados por producto"
+                />
+              </div>
             </div>
             {results.length === 0 ? (
               <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
                 En este período no hay pedidos confirmados ni devueltos.
-                {wider ? ` En ${periodPhrase(wider)} sí hay.` : ""}
+                {wider ? ` En ${closePhrase(wider, basis)} sí hay.` : ""}
               </p>
             ) : visible.length === 0 ? (
               <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
