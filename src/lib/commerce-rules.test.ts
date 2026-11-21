@@ -616,7 +616,19 @@ describe("precio de la ficha", () => {
     const fichaCost = fichaDrift(stored, { price: 80_000, cost: 50_000, shipping: 8_000, commissions: 2_000 });
     expect(fichaCost.priceNumbers).toEqual([]);
     expect(fichaCost.costNumbers).toEqual(["P-2040"]);
-    expect(fichaDriftNote(fichaCost, 80_000)).toContain("El total guardado no cambia.");
+    const fichaCostNote = fichaDriftNote(fichaCost, 80_000);
+    expect(fichaCostNote).toContain("el costo en $50.000");
+    expect(fichaCostNote).toContain("Ese pedido guardó el costo en $40.000");
+    expect(fichaCostNote).toContain("El total guardado no cambia.");
+    expect(fichaCostNote).not.toContain("3001234567");
+    const shipping = fichaDrift(stored, { price: 80_000, cost: 40_000, shipping: 9_000, commissions: 2_000 });
+    expect(fichaDriftNote(shipping, 80_000)).toContain("el envío estimado en $9.000");
+    expect(fichaDriftNote(shipping, 80_000)).toContain("el envío estimado en $8.000");
+    const mixedCosts = fichaDrift(
+      [...stored, { number: "P-2044", unitPrice: 80_000, unitCost: 30_000, unitShipping: 8_000, unitCommissions: 2_000 }],
+      { price: 80_000, cost: 50_000, shipping: 8_000, commissions: 2_000 },
+    );
+    expect(fichaDriftNote(mixedCosts, 80_000)).toContain("el costo en cifras distintas");
     expect(fichaDrift([{ number: "P-2041", unitPrice: 80_000 }], { price: 80_000, cost: 50_000, shipping: 8_000, commissions: 2_000 }).costNumbers).toEqual([]);
     const listed = storedSkuLines(
       [

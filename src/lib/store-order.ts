@@ -549,22 +549,43 @@ export function fichaDrift(
   const priceNumbers: string[] = [];
   const storedPrices = new Set<number>();
   const costNumbers: string[] = [];
+  const costBuckets = new Map<string, { label: string; current: number; stored: number[] }>();
+  const remember = (key: string, label: string, currentValue: number | null, stored: number | undefined) => {
+    if (currentValue === null || typeof stored !== "number" || stored === currentValue) return false;
+    const field = costBuckets.get(key) ?? { label, current: currentValue, stored: [] };
+    if (!field.stored.includes(stored)) field.stored.push(stored);
+    costBuckets.set(key, field);
+    return true;
+  };
   for (const line of lines) {
     if (current.price !== null && line.unitPrice !== current.price) {
       if (!priceNumbers.includes(line.number)) priceNumbers.push(line.number);
       storedPrices.add(line.unitPrice);
     }
     const costDiffers =
-      (current.cost !== null && typeof line.unitCost === "number" && line.unitCost !== current.cost) ||
-      (current.shipping !== null && typeof line.unitShipping === "number" && line.unitShipping !== current.shipping) ||
-      (current.commissions !== null && typeof line.unitCommissions === "number" && line.unitCommissions !== current.commissions);
+      remember("cost", "el costo", current.cost, line.unitCost) ||
+      remember("shipping", "el envío estimado", current.shipping, line.unitShipping) ||
+      remember("commissions", "las comisiones estimadas", current.commissions, line.unitCommissions);
     if (costDiffers && !costNumbers.includes(line.number)) costNumbers.push(line.number);
   }
-  return { priceNumbers, storedPrices: [...storedPrices], costNumbers };
+  return {
+    priceNumbers,
+    storedPrices: [...storedPrices],
+    costNumbers,
+    costFields: ["cost", "shipping", "commissions"].flatMap((key) => {
+      const field = costBuckets.get(key);
+      return field ? [field] : [];
+    }),
+  };
 }
 
 export function fichaDriftNote(
-  drift: { priceNumbers: string[]; storedPrices: number[]; costNumbers: string[] },
+  drift: {
+    priceNumbers: string[];
+    storedPrices: number[];
+    costNumbers: string[];
+    costFields: Array<{ label: string; current: number; stored: number[] }>;
+  },
   price: number | null,
 ) {
   const parts: string[] = [];
@@ -575,10 +596,13 @@ export function fichaDriftNote(
       `La ficha está en ${formatCop(price)}. ${count} ${stored}. Guardar la ficha no reescribe el total. No es dinero cobrado.`,
     );
   }
-  if (drift.costNumbers.length > 0) {
-    parts.push(
-      "El costo de la ficha no es el guardado en esos pedidos. Guardar la ficha no lo reescribe. El total guardado no cambia.",
-    );
+  if (drift.costFields.length > 0) {
+    const today = drift.costFields.map((field) => `${field.label} en ${formatCop(field.current)}`).join(", ");
+    const stored = drift.costFields
+      .map((field) => `${field.label} en ${field.stored.length === 1 ? formatCop(field.stored[0]) : "cifras distintas"}`)
+      .join(", ");
+    const who = drift.costNumbers.length === 1 ? "Ese pedido guardó" : "Esos pedidos guardaron";
+    parts.push(`La ficha hoy tiene ${today}. ${who} ${stored}. Guardar la ficha no lo reescribe. El total guardado no cambia.`);
   }
   return parts.join(" ");
 }
