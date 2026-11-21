@@ -1151,8 +1151,11 @@ export function attentionSheetText(orders: StoreOrder[], guides: SizeGuide[] = [
   const lines = [
     "Por atender · un pedido, un siguiente paso",
     "Esta lista no se recorta por fecha. Copiarla no cobra, no envía el mensaje y no cambia pedidos. Dropi no está conectado: desde aquí no se crea el pedido.",
-    "",
   ];
+  if (queues.some((queue) => queue.rows.some((row) => row.cta === "Marcar aviso"))) {
+    lines.push("Si el paso es avisar, el mensaje va en ese pedido. Copiarlo no lo envía.");
+  }
+  lines.push("");
   if (queues.length === 0) {
     lines.push("No hay pedidos esperando un dato o una acción.");
   } else {
@@ -1164,6 +1167,10 @@ export function attentionSheetText(orders: StoreOrder[], guides: SizeGuide[] = [
         lines.push(row.note);
         if (row.also.length > 0) lines.push(`También: ${row.also.join(", ")}.`);
         lines.push(`Siguiente paso: ${row.cta}.`);
+        if (row.cta === "Marcar aviso") {
+          lines.push("Mensaje para copiar. Copiarlo no lo envía:");
+          lines.push(customerMessage(row.order));
+        }
       }
       lines.push("");
     }

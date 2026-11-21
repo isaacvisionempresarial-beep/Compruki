@@ -421,4 +421,29 @@ describe("cierre de pedidos", () => {
     expect(closedSheet).toContain("no crea otro pedido");
     expect(closedSheet).not.toContain("Falta anotar el recaudo");
   });
+
+  it("el aviso para copiar trae el mensaje y no el celular", () => {
+    const delivered = order({
+      status: "entregado",
+      number: "P-2020",
+      id: "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      collected: true,
+      providerRef: "DP-20",
+    });
+    const sheet = attentionSheetText([delivered], [], true);
+    expect(sheet).toContain("Falta avisarle al cliente (1)");
+    expect(sheet).toContain("Siguiente paso: Marcar aviso.");
+    expect(sheet).toContain("Mensaje para copiar. Copiarlo no lo envía:");
+    expect(sheet).toContain("Hola Ana. Tu pedido P-2020:");
+    expect(sheet).toContain("Nadie lo cobró en esta tienda.");
+    expect(sheet).not.toContain("3001234567");
+    expect(sheet).not.toContain("Calle 10");
+    const blocked = order({
+      status: "confirmado",
+      number: "P-2021",
+      id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      providerRef: "",
+    });
+    expect(attentionSheetText([blocked], [], true)).not.toContain("Hola Ana.");
+  });
 });
