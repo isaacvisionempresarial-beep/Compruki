@@ -11,6 +11,7 @@ import {
   adoptCatalogCosts,
   costDrift,
   costDriftNote,
+  catalogDriftText,
   fichaDrift,
   fichaDriftNote,
   storedSkuLines,
@@ -538,7 +539,7 @@ describe("precio de la ficha", () => {
     const confirmed = order({ status: "confirmado", number: "P-2034" });
     const priceNote = resultDriftNote([confirmed], "SKU-1", [{ sku: "SKU-1", price: 90_000 }]);
     expect(priceNote).toContain("hoy está en $90.000");
-    expect(priceNote).toContain("guardaron $80.000");
+    expect(priceNote).toContain("P-2034 guardó $80.000");
     expect(priceNote).toContain("siguen con el precio guardado");
     expect(priceNote).toContain("No es dinero cobrado.");
     expect(priceNote).not.toContain("3001234567");
@@ -547,7 +548,7 @@ describe("precio de la ficha", () => {
     expect(resultDriftNote([confirmed], "SKU-1", [])).toBe("");
     const costNote = resultDriftNote([confirmed], "SKU-1", [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
     expect(costNote).toContain("hoy tiene el costo en $50.000");
-    expect(costNote).toContain("guardaron el costo en $40.000");
+    expect(costNote).toContain("P-2034 guardó el costo en $40.000");
     expect(costNote).toContain("El total guardado no cambia.");
     expect(resultDriftNote([bare], "SKU-1", [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }])).toBe("");
     const otherCost = order({
@@ -558,7 +559,7 @@ describe("precio de la ficha", () => {
     });
     const resultMixed = resultDriftNote([confirmed, otherCost], "SKU-1", [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
     expect(resultMixed).toContain("hoy tiene el costo en $50.000");
-    expect(resultMixed).toContain("el costo en cifras distintas");
+    expect(resultMixed).toContain("P-2034 y P-2038 guardaron el costo en cifras distintas");
     expect(resultMixed).toContain("siguen con lo guardado");
     expect(resultMixed).not.toContain("3001234567");
     const mixedClose = closeSheetText([confirmed, otherCost], "hoy", "creados", [], [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
@@ -569,13 +570,13 @@ describe("precio de la ficha", () => {
     const productClose = closeSheetText([confirmed], "hoy", "creados", [], [{ sku: "SKU-1", price: 90_000 }]);
     expect(productClose).toContain("Faja (SKU-1)");
     expect(productClose).toContain("va bajo ese producto");
-    expect(productClose).toContain("Estos pedidos guardaron $80.000");
+    expect(productClose).toContain("P-2034 guardó $80.000");
     expect(productClose).toContain("siguen con el precio guardado");
     expect(productClose).not.toContain("3001234567");
     expect(productClose).not.toContain("Calle 10");
     expect(closeSheetText([confirmed], "hoy", "creados", [], [{ sku: "SKU-1", price: 80_000 }])).not.toContain("va bajo ese producto");
     const productCost = closeSheetText([confirmed], "hoy", "creados", [], [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
-    expect(productCost).toContain("guardaron el costo en $40.000");
+    expect(productCost).toContain("P-2034 guardó el costo en $40.000");
     expect(productCost).toContain("El margen y la utilidad siguen con lo guardado.");
     const sameCosts = [{ sku: "SKU-1", cost: 40_000, shipping: 8_000, commissions: 2_000 }];
     expect(adoptCatalogCosts(current, sameCosts).mode).toBe("igual");
@@ -645,6 +646,29 @@ describe("precio de la ficha", () => {
       { price: 80_000, cost: 50_000, shipping: 8_000, commissions: 2_000 },
     );
     expect(fichaDriftNote(mixedCosts, 80_000)).toContain("el costo en cifras distintas");
+    const pendingLine = [{ number: "P-2045", status: "pendiente_confirmacion" as const, unitPrice: 80_000, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 }];
+    const pendingDrift = fichaDrift(pendingLine, { price: 90_000, cost: 40_000, shipping: 8_000, commissions: 2_000 });
+    expect(pendingDrift.pendingNumbers).toEqual(["P-2045"]);
+    expect(fichaDriftNote(pendingDrift, 90_000)).toContain("P-2045 sigue pendiente y no entra al margen ni a la utilidad.");
+    expect(fichaDriftNote(pendingDrift, 90_000)).not.toContain("3001234567");
+    expect(fichaDrift([{ number: "P-2046", status: "confirmado", unitPrice: 80_000, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 }], { price: 90_000, cost: 40_000, shipping: 8_000, commissions: 2_000 }).pendingNumbers).toEqual([]);
+    const driftSource = [
+      {
+        number: "P-2045",
+        status: "pendiente_confirmacion" as const,
+        phone: "3001234567",
+        address: "Calle 10",
+        lines: [{ sku: "SKU-1", unitPrice: 80_000, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 }],
+      },
+    ];
+    const copied = catalogDriftText([{ sku: "SKU-1", title: "Faja", price: 90_000, cost: 40_000, shipping: 8_000, commissions: 2_000 }], driftSource);
+    expect(copied).toContain("Faja (SKU-1)");
+    expect(copied).toContain("1 pedido guardó $80.000");
+    expect(copied).toContain("P-2045 sigue pendiente");
+    expect(copied).toContain("no reescribe los pedidos");
+    expect(copied).not.toContain("3001234567");
+    expect(copied).not.toContain("Calle 10");
+    expect(catalogDriftText([{ sku: "SKU-1", title: "Faja", price: 80_000, cost: 40_000, shipping: 8_000, commissions: 2_000 }], driftSource)).toBe("");
     expect(fichaDrift([{ number: "P-2041", unitPrice: 80_000 }], { price: 80_000, cost: 50_000, shipping: 8_000, commissions: 2_000 }).costNumbers).toEqual([]);
     const listed = storedSkuLines(
       [

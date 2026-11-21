@@ -6,7 +6,7 @@ import { MAX_PRODUCT_IMAGES, parsePesos, parseVariants, productMargin, type Cata
 import { prepareProductImage } from "@/lib/prepare-image";
 import { formatCop, formatDay } from "@/lib/format";
 import { campaignPath } from "@/lib/campaign";
-import { fichaDrift, fichaDriftNote, orderFocusHref, pendingSizeHoldPhrase, pendingSizeHolds, storedSkuLines, type StoredSkuLine, type StoreOrder } from "@/lib/store-order";
+import { catalogDriftText, fichaDrift, fichaDriftNote, orderFocusHref, pendingSizeHoldPhrase, pendingSizeHolds, storedSkuLines, type StoredSkuLine, type StoreOrder } from "@/lib/store-order";
 import { cx } from "@/lib/cx";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 import { PhotoCarousel } from "@/components/photo-carousel";
@@ -54,7 +54,7 @@ export function CatalogScreen({
     [orders, products],
   );
   const rowDrift = useMemo(() => {
-    const notes = new Map<string, { note: string; numbers: string[] }>();
+    const notes = new Map<string, { note: string; numbers: string[]; pending: string[] }>();
     for (const product of products) {
       const drift = fichaDrift(storedSkuLines(orders, product.sku), {
         price: product.price,
@@ -67,10 +67,12 @@ export function CatalogScreen({
       notes.set(product.sku, {
         note,
         numbers: [...new Set([...drift.priceNumbers, ...drift.costNumbers])],
+        pending: drift.pendingNumbers,
       });
     }
     return notes;
   }, [orders, products]);
+  const driftText = useMemo(() => catalogDriftText(products, orders), [orders, products]);
 
   const searched = useMemo(
     () =>
@@ -104,7 +106,7 @@ export function CatalogScreen({
           </p>
           {rowDrift.size > 0 ? (
             <p className="mt-1 text-xs leading-5 text-warning">
-              Si la ficha de hoy no es el precio o el costo guardado, va en esa fila. Abrir el pedido no reescribe el total ni cobra.
+              Si la ficha de hoy no es el precio o el costo guardado, va en esa fila. Si el pedido sigue pendiente, no entra al margen ni a la utilidad. Abrir el pedido no reescribe el total ni cobra.
             </p>
           ) : null}
         </div>
@@ -158,6 +160,7 @@ export function CatalogScreen({
             })}
           </div>
           <p className="mt-2 text-xs leading-5 text-muted">Filtrar no cobra ni cambia el precio ni la publicación.</p>
+          <CatalogDriftSheet text={driftText} />
 
           {visible.length === 0 ? (
             <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
@@ -235,7 +238,7 @@ function CatalogProductRow({
   product: CatalogProduct;
   hasOrders: boolean;
   hold: { orders: number; kind: "talla" | "tamano" } | null;
-  drift: { note: string; numbers: string[] } | null;
+  drift: { note: string; numbers: string[]; pending: string[] } | null;
   canManageCommerce: boolean;
 }) {
   const margin = productMargin(product);
@@ -340,7 +343,11 @@ function CatalogProductRow({
                     <Link
                       key={number}
                       href={orderFocusHref(number)}
-                      title="Abrirlo no cobra ni cambia el total guardado."
+                      title={
+                        drift.pending.includes(number)
+                          ? "Sigue pendiente. Abrirlo no cobra ni entra a la utilidad."
+                          : "Abrirlo no cobra ni cambia el total guardado."
+                      }
                       className="mr-2 font-semibold text-accent-strong"
                     >
                       {number}
@@ -615,6 +622,74 @@ function catalogMark(product: { published: boolean; available: boolean }) {
   return { label: "Borrador", tone: "off" as const };
 }
 
+function CatalogDriftSheet({ text }: { text: string }) {
+  const [copied, setCopied] = useState<"ok" | "fail" | null>(null);
+  if (!text) return null;
+
+  function copy() {
+    const node = document.getElementById("catalogo-fichas-distintas");
+    if (!(node instanceof HTMLTextAreaElement)) return;
+    node.focus();
+    node.select();
+    let copiedByCommand = false;
+    try {
+      copiedByCommand = document.execCommand("copy");
+    } catch {
+      copiedByCommand = false;
+    }
+    if (copiedByCommand) {
+      setCopied("ok");
+      return;
+    }
+    void navigator.clipboard.writeText(text).then(
+      () => setCopied("ok"),
+      () => setCopied("fail"),
+    );
+  }
+
+  return (
+    <section className="mt-3" aria-labelledby="catalogo-fichas-distintas-titulo">
+      <h2 id="catalogo-fichas-distintas-titulo" className="text-sm font-semibold">
+        Fichas para copiar
+      </h2>
+      <p className="mt-0.5 text-xs leading-5 text-muted">
+        El catálogo completo, no el filtro de la pantalla. Van el precio, el costo, el envío y las comisiones de hoy junto a lo guardado, y el número del pedido. Si sigue pendiente, no entra al margen ni a la utilidad. Copiar no cobra, no reescribe los pedidos y no cambia el total guardado.
+      </p>
+      <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
+        <label className="text-sm font-semibold" htmlFor="catalogo-fichas-distintas">
+          Texto de las fichas
+          <textarea
+            id="catalogo-fichas-distintas"
+            title="Leerlo no cobra ni cambia el total guardado."
+            readOnly
+            rows={8}
+            value={text}
+            className="mt-1 min-h-32 w-full rounded-[10px] border border-line bg-canvas px-3 py-2 text-sm leading-5 font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
+          />
+        </label>
+        <button
+          type="button"
+          title="Copiar no cobra ni cambia el total guardado."
+          className="mt-2 inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
+          onClick={copy}
+        >
+          {copied === "ok" ? "Fichas copiadas" : "Copiar fichas"}
+        </button>
+        {copied === "ok" ? (
+          <p role="status" className="mt-2 text-sm text-accent-strong">
+            Listo para pegarlo a mano. Copiar no cobra ni reescribe los pedidos. El total guardado no cambia.
+          </p>
+        ) : null}
+        {copied === "fail" ? (
+          <p role="alert" className="mt-2 text-sm font-semibold text-danger">
+            No se pudo copiar. El texto queda seleccionado. No cobra. El total guardado no cambia.
+          </p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 function FichaDriftNotice({
   lines,
   amounts,
@@ -626,6 +701,7 @@ function FichaDriftNotice({
   const note = fichaDriftNote(drift, amounts.price);
   if (!note) return null;
   const numbers = [...new Set([...drift.priceNumbers, ...drift.costNumbers])];
+  const pending = new Set(drift.pendingNumbers);
   return (
     <div className="mt-2 text-sm leading-5 text-warning">
       <p>{note}</p>
@@ -635,7 +711,11 @@ function FichaDriftNotice({
             <Link
               key={number}
               href={orderFocusHref(number)}
-              title="Abrirlo no cobra ni cambia el total guardado."
+              title={
+                pending.has(number)
+                  ? "Sigue pendiente. Abrirlo no cobra ni entra a la utilidad."
+                  : "Abrirlo no cobra ni cambia el total guardado."
+              }
               className="mr-2 font-semibold text-accent-strong"
             >
               {number}

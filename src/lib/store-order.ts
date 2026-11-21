@@ -511,6 +511,7 @@ export function priceDrift(order: Pick<StoreOrder, "lines">, guides: PriceGuide[
 
 export type StoredSkuLine = {
   number: string;
+  status?: OrderStatus;
   unitPrice: number;
   unitCost?: number;
   unitShipping?: number;
@@ -520,6 +521,7 @@ export type StoredSkuLine = {
 export function storedSkuLines(
   orders: Array<{
     number: string;
+    status?: OrderStatus;
     lines: Array<Pick<OrderLine, "sku" | "unitPrice" | "unitCost" | "unitShipping" | "unitCommissions">>;
   }>,
   sku: string,
@@ -532,6 +534,7 @@ export function storedSkuLines(
       if (line.sku !== needle) continue;
       lines.push({
         number: order.number,
+        ...(order.status ? { status: order.status } : {}),
         unitPrice: line.unitPrice,
         ...(typeof line.unitCost === "number" ? { unitCost: line.unitCost } : {}),
         ...(typeof line.unitShipping === "number" ? { unitShipping: line.unitShipping } : {}),
@@ -549,6 +552,7 @@ export function fichaDrift(
   const priceNumbers: string[] = [];
   const storedPrices = new Set<number>();
   const costNumbers: string[] = [];
+  const pendingNumbers: string[] = [];
   const costBuckets = new Map<string, { label: string; current: number; stored: number[] }>();
   const remember = (key: string, label: string, currentValue: number | null, stored: number | undefined) => {
     if (currentValue === null || typeof stored !== "number" || stored === currentValue) return false;
@@ -567,11 +571,16 @@ export function fichaDrift(
       remember("shipping", "el envío estimado", current.shipping, line.unitShipping) ||
       remember("commissions", "las comisiones estimadas", current.commissions, line.unitCommissions);
     if (costDiffers && !costNumbers.includes(line.number)) costNumbers.push(line.number);
+    const drifted = priceNumbers.includes(line.number) || costNumbers.includes(line.number);
+    if (drifted && line.status === "pendiente_confirmacion" && !pendingNumbers.includes(line.number)) {
+      pendingNumbers.push(line.number);
+    }
   }
   return {
     priceNumbers,
     storedPrices: [...storedPrices],
     costNumbers,
+    pendingNumbers,
     costFields: ["cost", "shipping", "commissions"].flatMap((key) => {
       const field = costBuckets.get(key);
       return field ? [field] : [];
@@ -584,6 +593,7 @@ export function fichaDriftNote(
     priceNumbers: string[];
     storedPrices: number[];
     costNumbers: string[];
+    pendingNumbers: string[];
     costFields: Array<{ label: string; current: number; stored: number[] }>;
   },
   price: number | null,
@@ -604,7 +614,48 @@ export function fichaDriftNote(
     const who = drift.costNumbers.length === 1 ? "Ese pedido guardó" : "Esos pedidos guardaron";
     parts.push(`La ficha hoy tiene ${today}. ${who} ${stored}. Guardar la ficha no lo reescribe. El total guardado no cambia.`);
   }
+  if (drift.pendingNumbers.length === 1) {
+    parts.push(`${drift.pendingNumbers[0]} sigue pendiente y no entra al margen ni a la utilidad.`);
+  } else if (drift.pendingNumbers.length > 1) {
+    parts.push(`${drift.pendingNumbers.join(", ")} siguen pendientes y no entran al margen ni a la utilidad.`);
+  }
   return parts.join(" ");
+}
+
+export function catalogDriftText(
+  products: Array<{ sku: string; title: string; price: number; cost: number; shipping: number; commissions: number }>,
+  orders: Array<{
+    number: string;
+    status?: OrderStatus;
+    lines: Array<Pick<OrderLine, "sku" | "unitPrice" | "unitCost" | "unitShipping" | "unitCommissions">>;
+  }>,
+) {
+  const blocks: string[] = [];
+  for (const product of products) {
+    const drift = fichaDrift(storedSkuLines(orders, product.sku), {
+      price: product.price,
+      cost: product.cost,
+      shipping: product.shipping,
+      commissions: product.commissions,
+    });
+    const note = fichaDriftNote(drift, product.price);
+    if (!note) continue;
+    const numbers = [...new Set([...drift.priceNumbers, ...drift.costNumbers])];
+    blocks.push(product.title + " (" + product.sku + ")", note, numbers.length > 0 ? "Pedidos: " + numbers.join(", ") + "." : "");
+  }
+  if (blocks.length === 0) return "";
+  return [
+    "Fichas con otro precio o costo guardado",
+    "Copiar este texto no cobra, no reescribe los pedidos y no cambia el total guardado.",
+    "Un pedido pendiente no entra al margen ni a la utilidad.",
+    "",
+    ...blocks,
+    "",
+    "Guardar la ficha no reescribe lo guardado. No es dinero cobrado.",
+  ]
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 export function priceDriftNote(drifts: Array<{ title: string; stored: number; current: number }>) {
@@ -649,10 +700,26 @@ export function costDriftNote(drifts: Array<{ title: string; fields: Array<{ lab
   return `La ficha cambió el costo guardado en ${drifts.map((drift) => drift.title).join(", ")}. Este pedido conserva esas cifras. ${tail}`;
 }
 
-function resultLines(orders: StoreOrder[], sku: string) {
+function resultEntries(orders: StoreOrder[], sku: string) {
   return orders
     .filter((order) => CONFIRMED.includes(order.status) || order.status === "devuelto")
-    .flatMap((order) => order.lines.filter((line) => line.sku === sku));
+    .flatMap((order) => order.lines.filter((line) => line.sku === sku).map((line) => ({ number: order.number, line })));
+}
+
+function driftingNumbers(entries: Array<{ number: string; line: OrderLine }>, differs: (line: OrderLine) => boolean) {
+  const numbers: string[] = [];
+  for (const entry of entries) {
+    if (!differs(entry.line) || numbers.includes(entry.number)) continue;
+    numbers.push(entry.number);
+  }
+  return numbers;
+}
+
+function orderPhrase(numbers: string[]) {
+  if (numbers.length === 0) return "Estos pedidos";
+  if (numbers.length === 1) return numbers[0];
+  if (numbers.length === 2) return `${numbers[0]} y ${numbers[1]}`;
+  return `${numbers.slice(0, -1).join(", ")} y ${numbers[numbers.length - 1]}`;
 }
 
 function storedAmounts(lines: OrderLine[], pick: (line: OrderLine) => number | undefined, current: number) {
@@ -670,19 +737,22 @@ export function resultDriftNote(
   priceGuides: PriceGuide[] = [],
   costGuides: CostGuide[] = [],
 ) {
-  const lines = resultLines(orders, sku);
+  const entries = resultEntries(orders, sku);
+  const lines = entries.map((entry) => entry.line);
   if (lines.length === 0) return "";
   const parts: string[] = [];
   const price = priceGuides.find((guide) => guide.sku === sku);
   if (price) {
     const stored = storedAmounts(lines, (line) => line.unitPrice, price.price);
+    const numbers = driftingNumbers(entries, (line) => line.unitPrice !== price.price);
+    const who = `${orderPhrase(numbers)} ${numbers.length === 1 ? "guardó" : "guardaron"}`;
     if (stored.length === 1) {
       parts.push(
-        `La ficha hoy está en ${formatCop(price.price)}. Estos pedidos guardaron ${formatCop(stored[0])}. El margen estimado y la utilidad siguen con el precio guardado. Cambiar la ficha no los reescribe. No es dinero cobrado.`,
+        `La ficha hoy está en ${formatCop(price.price)}. ${who} ${formatCop(stored[0])}. El margen estimado y la utilidad siguen con el precio guardado. Cambiar la ficha no los reescribe. No es dinero cobrado.`,
       );
     } else if (stored.length > 1) {
       parts.push(
-        `La ficha hoy está en ${formatCop(price.price)}. Estos pedidos guardaron precios distintos. El margen estimado y la utilidad siguen con el precio guardado. Cambiar la ficha no los reescribe. No es dinero cobrado.`,
+        `La ficha hoy está en ${formatCop(price.price)}. ${who} precios distintos. El margen estimado y la utilidad siguen con el precio guardado. Cambiar la ficha no los reescribe. No es dinero cobrado.`,
       );
     }
   }
@@ -698,8 +768,16 @@ export function resultDriftNote(
       const stored = fields
         .map((field) => `${field.label} en ${field.stored.length === 1 ? formatCop(field.stored[0]) : "cifras distintas"}`)
         .join(", ");
+      const numbers = driftingNumbers(
+        entries,
+        (line) =>
+          (typeof line.unitCost === "number" && line.unitCost !== cost.cost) ||
+          (typeof line.unitShipping === "number" && line.unitShipping !== cost.shipping) ||
+          (typeof line.unitCommissions === "number" && line.unitCommissions !== cost.commissions),
+      );
+      const who = `${orderPhrase(numbers)} ${numbers.length === 1 ? "guardó" : "guardaron"}`;
       parts.push(
-        `La ficha hoy tiene ${today}. Estos pedidos guardaron ${stored}. El margen estimado y la utilidad siguen con lo guardado. Cambiar la ficha no los reescribe. No es dinero cobrado. El total guardado no cambia.`,
+        `La ficha hoy tiene ${today}. ${who} ${stored}. El margen estimado y la utilidad siguen con lo guardado. Cambiar la ficha no los reescribe. No es dinero cobrado. El total guardado no cambia.`,
       );
     }
   }
