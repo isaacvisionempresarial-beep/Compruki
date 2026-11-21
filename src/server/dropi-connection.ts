@@ -25,6 +25,8 @@ function missingTable(message: string) {
 }
 
 const RECONCILED_DETAIL = "Anotado a mano. Esta aplicación no lo envió y no lo reintentará.";
+const NOTICE_DETAIL =
+  "Aviso operativo: no hay autorización para enviar. No se reintenta. La recuperación es anotar el número a mano. El cliente no recibe este aviso.";
 
 function presentJob(row: LinkRow): DropiQueuedJob {
   const noted = row.external_order_id?.trim();
@@ -34,6 +36,14 @@ function presentJob(row: LinkRow): DropiQueuedJob {
       orderNumber: row.order_number,
       status: "conciliado",
       detail: `${RECONCILED_DETAIL} Número ${noted}. El total guardado no cambió.`,
+    };
+  }
+  if (row.sync_status === "incidencia") {
+    return {
+      orderId: row.order_id,
+      orderNumber: row.order_number,
+      status: "aviso",
+      detail: `${NOTICE_DETAIL} El total guardado no cambió.`,
     };
   }
   return {
@@ -339,5 +349,107 @@ export async function enqueueDropiSend(_state: DropiEnqueueState, formData: Form
     message: alreadyQueued
       ? "Ya estaba en la cola. No se creó otra. No se envió a Dropi y el total guardado no cambió."
       : "Quedó en la cola, bloqueado. Dropi no está conectado: no se creó una orden allá y el total guardado no cambió.",
+  };
+}
+
+async function markQueueNotice(orderId: string, active: boolean) {
+  const tenantId = await getPilotTenantId();
+  const supabase = createAdminSupabase();
+  const link = await supabase
+    .from("provider_order_links")
+    .select("id, order_number, external_order_id, idempotency_key, sync_status")
+    .eq("tenant_id", tenantId)
+    .eq("provider", "dropi")
+    .eq("order_id", orderId)
+    .maybeSingle();
+  if (link.error) {
+    return {
+      error: missingTable(link.error.message)
+        ? "Falta la tabla de la cola. El pedido no se envió."
+        : "No se pudo leer la cola. El pedido no se envió.",
+    };
+  }
+  if (!link.data || link.data.external_order_id) return { error: null };
+  const nextStatus = active ? "incidencia" : "bloqueado";
+  if (!active && link.data.sync_status !== "incidencia") return { error: null };
+  if (active && link.data.sync_status === "incidencia") return { error: null };
+  const detail = active ? NOTICE_DETAIL : dropiAdapter.createOrder().detail;
+  const updated = await supabase.from("provider_order_links").update({ sync_status: nextStatus }).eq("id", link.data.id);
+  if (updated.error) return { error: "No se pudo registrar el aviso. No se envió a Dropi." };
+  await supabase
+    .from("integration_jobs")
+    .update({ status: nextStatus, next_run_at: null, last_detail: detail })
+    .eq("tenant_id", tenantId)
+    .eq("idempotency_key", link.data.idempotency_key);
+  return { error: null };
+}
+
+export async function syncQueueWithOrderIncident(orderId: string, active: boolean) {
+  try {
+    return await markQueueNotice(orderId, active);
+  } catch {
+    return { error: "No se pudo registrar el aviso. No se envió a Dropi." };
+  }
+}
+
+export async function recordOperationalNotice(_state: DropiEnqueueState, formData: FormData): Promise<DropiEnqueueState> {
+  const access = await assertPanelAccess();
+  if (!access) return { error: "Entra al panel para dejar el aviso.", message: null };
+  const orderId = String(formData.get("orderId") ?? "").trim();
+  if (!/^ord_[0-9a-f]{8}$/i.test(orderId)) {
+    return { error: "No encontré ese pedido. El total guardado no cambió.", message: null };
+  }
+  const order = await getOrder(orderId);
+  if (!order) return { error: "No encontré ese pedido. El total guardado no cambió.", message: null };
+  if (validateProviderRef(order.providerRef ?? "").value) {
+    return { error: null, message: "Ya tiene número anotado. No hace falta un aviso de envío. El total guardado no cambió." };
+  }
+
+  try {
+    const tenantId = await getPilotTenantId();
+    const supabase = createAdminSupabase();
+    const link = await supabase
+      .from("provider_order_links")
+      .select("id, sync_status, external_order_id")
+      .eq("tenant_id", tenantId)
+      .eq("provider", "dropi")
+      .eq("order_id", order.id)
+      .maybeSingle();
+    if (link.error) {
+      return {
+        error: missingTable(link.error.message)
+          ? "Falta la tabla de la cola. Corre 011_dropi_connection.sql en Supabase. El pedido no cambió."
+          : "No se pudo leer la cola. El pedido no cambió.",
+        message: null,
+      };
+    }
+    if (!link.data) {
+      return { error: "Primero déjalo en la cola. El aviso no envía el pedido y el total guardado no cambia.", message: null };
+    }
+    if (link.data.external_order_id) {
+      return { error: null, message: "Ya está conciliado a mano. No se crea un aviso de envío. El total guardado no cambió." };
+    }
+    if (link.data.sync_status === "incidencia") {
+      return { error: null, message: "El aviso ya estaba. No se creó otro y no se envió a Dropi." };
+    }
+  } catch {
+    return { error: "No se pudo registrar el aviso. No se envió a Dropi.", message: null };
+  }
+
+  const marked = await syncQueueWithOrderIncident(order.id, true);
+  if (marked.error) return { error: marked.error, message: null };
+  const noted = await appendOrderHistory(
+    order.id,
+    "Dejó un aviso operativo en la cola de Dropi. No se envió, no se reintenta y el cliente no recibe este aviso. El total guardado no cambió. Nadie cobra en el sitio.",
+    access.actorName,
+  );
+  if (noted.error) return { error: "El aviso quedó en la cola, pero el historial no se anotó. No se envió a Dropi.", message: null };
+
+  revalidatePath("/panel/sincronizacion");
+  revalidatePath("/panel/conexiones");
+  revalidatePath("/panel/pedidos", "layout");
+  return {
+    error: null,
+    message: "Quedó el aviso operativo. No se envió a Dropi, no se reintenta y el cliente no lo recibe. El total guardado no cambió.",
   };
 }

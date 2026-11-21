@@ -6,6 +6,7 @@ import { campaignSkusInOrder } from "@/lib/campaign";
 import { parsePesos } from "@/lib/catalog";
 import { assertPanelAccess } from "@/server/panel-auth";
 import { normalizePhone, type OrderAction } from "@/lib/store-order";
+import { syncQueueWithOrderIncident } from "@/server/dropi-connection";
 import { addOrderLine, applyCatalogCosts, markCustomerNotice, placeOrder, saveClosedDepartment, saveDelivery, saveFreight, saveIncidenceReason, saveInternalNote, saveOrderLines, saveProviderRef, saveReturnReason, updateOrder } from "@/server/order-store";
 
 function refreshOrderScreens() {
@@ -98,6 +99,9 @@ export async function updateOrderAction(_state: UpdateOrderState, formData: Form
   const result = await updateOrder(orderId, intent as OrderAction, access.actorName, String(formData.get("customerReason") ?? ""));
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudo actualizar el pedido.", orderId };
+  }
+  if (intent === "incidencia" || intent === "resolver") {
+    await syncQueueWithOrderIncident(orderId, intent === "incidencia");
   }
 
   refreshOrderScreens();

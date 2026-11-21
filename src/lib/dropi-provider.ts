@@ -48,7 +48,7 @@ export const dropiAdapter = {
 export type DropiQueuedJob = {
   orderId: string;
   orderNumber: string;
-  status: "bloqueado" | "conciliado";
+  status: "bloqueado" | "conciliado" | "aviso";
   detail: string;
 };
 

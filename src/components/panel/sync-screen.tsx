@@ -17,7 +17,7 @@ import {
   type StoreOrder,
 } from "@/lib/store-order";
 import type { DropiEnqueueState, DropiQueuedJob } from "@/lib/dropi-provider";
-import { enqueueDropiSend } from "@/server/dropi-connection";
+import { enqueueDropiSend, recordOperationalNotice } from "@/server/dropi-connection";
 
 const syncGrid = "md:grid-cols-[6.75rem_minmax(0,1.4fr)_12.5rem_9rem_4.25rem]";
 
@@ -38,9 +38,11 @@ export function SyncScreen({
 }) {
   const query = usePanelQuery().trim().toLocaleLowerCase("es");
   const [queueState, queueAction, queuePending] = useActionState(enqueueDropiSend, queueInitial);
+  const [noticeState, noticeAction, noticePending] = useActionState(recordOperationalNotice, queueInitial);
   const queuedIds = new Set(jobs.map((job) => job.orderId));
   const waiting = orders.filter((order) => awaitsDropiNumber(order) && !queuedIds.has(order.id));
   const blockedJobs = jobs.filter((job) => job.status === "bloqueado");
+  const noticeJobs = jobs.filter((job) => job.status === "aviso");
   const reconciledJobs = jobs.filter((job) => job.status === "conciliado");
   const noted = useMemo(
     () => orders.filter((order) => canNoteDropiNumber(order) && Boolean(normalizeProviderRef(order.providerRef ?? ""))),
@@ -89,20 +91,45 @@ export function SyncScreen({
         <div className="order-2 min-w-0 xl:order-1">
       <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="cola-dropi">
         <h2 id="cola-dropi" className="text-sm font-semibold">
-          Cola de envío ({blockedJobs.length} bloqueados · {reconciledJobs.length} conciliados)
+          Cola de envío ({blockedJobs.length} bloqueados · {noticeJobs.length} avisos · {reconciledJobs.length} conciliados)
         </h2>
         <p className="mt-0.5 text-xs leading-5 text-muted">
           {tableReady
-            ? "Dejar un pedido aquí no lo envía a Dropi. Si anotas el número a mano, queda conciliado y no se reintenta cuando haya autorización. El total guardado no cambia."
+            ? "Dejar un pedido aquí no lo envía a Dropi. Un aviso operativo no se reintenta ni le llega al cliente. Anotar el número lo concilia. El total guardado no cambia."
             : tableDetail}
         </p>
         {queueState.error ? <p className="mt-2 text-sm leading-5 text-warning">{queueState.error}</p> : null}
         {queueState.message ? <p className="mt-2 text-sm leading-5 text-ink">{queueState.message}</p> : null}
+        {noticeState.error ? <p className="mt-2 text-sm leading-5 text-warning">{noticeState.error}</p> : null}
+        {noticeState.message ? <p className="mt-2 text-sm leading-5 text-ink">{noticeState.message}</p> : null}
         {jobs.length === 0 ? (
           <p className="mt-2 text-sm text-muted">Todavía no hay pedidos en la cola.</p>
         ) : (
           <ul className="mt-2 divide-y divide-line text-sm">
             {blockedJobs.map((job) => (
+              <li key={job.orderId} className="flex items-start justify-between gap-3 py-2">
+                <span>
+                  <span className="font-semibold">{job.orderNumber}</span>
+                  <span className="mt-0.5 block text-xs leading-5 text-muted">{job.detail}</span>
+                </span>
+                {tableReady ? (
+                  <form action={noticeAction}>
+                    <input type="hidden" name="orderId" value={job.orderId} />
+                    <button
+                      type="submit"
+                      title="Registrar el aviso no lo envía a Dropi, no avisa al cliente y no cobra."
+                      disabled={noticePending}
+                      className={`inline-flex h-9 shrink-0 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-canvas ${
+                        noticePending ? "cursor-wait opacity-70" : ""
+                      }`}
+                    >
+                      {noticePending ? "Anotando…" : "Dejar aviso"}
+                    </button>
+                  </form>
+                ) : null}
+              </li>
+            ))}
+            {noticeJobs.map((job) => (
               <li key={job.orderId} className="py-2">
                 <span className="font-semibold">{job.orderNumber}</span>
                 <span className="mt-0.5 block text-xs leading-5 text-muted">{job.detail}</span>

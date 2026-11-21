@@ -54,7 +54,7 @@ export function ConnectionsScreen({
                 <p className="font-semibold">Cola de envío</p>
                 <p className="mt-0.5 text-xs leading-5 text-muted">
                   {connection.tableReady
-                    ? `${jobs.filter((job) => job.status === "bloqueado").length} bloqueados y ${jobs.filter((job) => job.status === "conciliado").length} conciliados a mano. Ninguno se envía a Dropi.`
+                    ? `${jobs.filter((job) => job.status === "bloqueado").length} bloqueados, ${jobs.filter((job) => job.status === "aviso").length} avisos y ${jobs.filter((job) => job.status === "conciliado").length} conciliados a mano. Ninguno se envía a Dropi.`
                     : connection.detail}
                 </p>
               </li>
