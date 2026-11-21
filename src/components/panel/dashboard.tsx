@@ -70,8 +70,8 @@ export function Dashboard({
     );
   }, [costGuides, priceGuides, productRows, query, storeInPeriod]);
   const attention = useMemo(
-    () => attentionQueues(storeOrders, sizeGuides, canManageOrderMoney),
-    [storeOrders, sizeGuides, canManageOrderMoney],
+    () => attentionQueues(storeOrders, sizeGuides, canManageOrderMoney, costGuides),
+    [storeOrders, sizeGuides, canManageOrderMoney, costGuides],
   );
   const waiting = useMemo(() => {
     const rows = attention.flatMap((queue) => queue.rows.map((row) => ({ ...row, queueTitle: queue.title })));

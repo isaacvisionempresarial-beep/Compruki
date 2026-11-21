@@ -14,6 +14,7 @@ import {
   priceDrift,
   priceDriftNote,
   resultDriftNote,
+  attentionQueues,
   attentionSheetText,
   closePhrase,
   closeSheetText,
@@ -570,5 +571,36 @@ describe("precio de la ficha", () => {
     expect(filled.lines[0]?.unitPrice).toBe(80_000);
     expect(adoptCatalogCosts(bare, []).error).toContain("ya no tiene");
     expect(adoptCatalogCosts(current, []).mode).toBe("igual");
+    const quiet = order({
+      status: "entregado",
+      collected: true,
+      number: "P-2035",
+      providerRef: "DP-35",
+      customerNotifiedAt: "2026-11-20T16:00:00.000Z",
+    });
+    const todayCost = [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }];
+    expect(attentionQueues([quiet], [], true, todayCost).map((queue) => queue.id)).toEqual(["cola-costo-hoy"]);
+    const quietSheet = attentionSheetText([quiet], [], true, [], todayCost);
+    expect(quietSheet).toContain("Siguiente paso: Usar las cifras de hoy.");
+    expect(quietSheet).toContain("hoy tiene el costo en $50.000");
+    expect(quietSheet).toContain("esta lista no las guarda");
+    expect(quietSheet).not.toContain("3001234567");
+    expect(quietSheet).not.toContain("Calle 10");
+    const operatorSheet = attentionSheetText([quiet], [], false, [], todayCost);
+    expect(operatorSheet).toContain("Siguiente paso: Ver pedido.");
+    expect(operatorSheet).toContain("Lo copia el propietario.");
+    expect(operatorSheet).not.toContain("Usar las cifras de hoy");
+    const ready = order({
+      status: "confirmado",
+      number: "P-2036",
+      providerRef: "DP-36",
+      customerNotifiedAt: "2026-11-20T16:00:00.000Z",
+      id: "66666666-6666-4666-8666-666666666666",
+    });
+    const mixed = attentionSheetText([ready], [], true, [], todayCost);
+    expect(mixed).toContain("Siguiente paso: Preparar.");
+    expect(mixed).toContain("También: costo de hoy.");
+    expect(mixed).not.toContain("3001234567");
+    expect(attentionQueues([quiet], [], true, sameCosts).some((queue) => queue.id === "cola-costo-hoy")).toBe(false);
   });
 });

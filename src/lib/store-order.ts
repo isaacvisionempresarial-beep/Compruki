@@ -1133,13 +1133,18 @@ export type AttentionRow = {
   cta: string;
 };
 
-const OWNER_MONEY_QUEUE = new Set(["cola-cobro", "cola-flete-devolucion", "cola-costo"]);
+const OWNER_MONEY_QUEUE = new Set(["cola-cobro", "cola-flete-devolucion", "cola-costo", "cola-costo-hoy"]);
 
 export function attentionQueueIsOwnerMoney(id: string) {
   return OWNER_MONEY_QUEUE.has(id);
 }
 
-export function attentionQueues(orders: StoreOrder[], guides: SizeGuide[] = [], canManageOrderMoney = true) {
+export function attentionQueues(
+  orders: StoreOrder[],
+  guides: SizeGuide[] = [],
+  canManageOrderMoney = true,
+  costGuides: CostGuide[] = [],
+) {
   const defs: Array<{
     id: string;
     title: string;
@@ -1292,6 +1297,22 @@ export function attentionQueues(orders: StoreOrder[], guides: SizeGuide[] = [], 
         canManageOrderMoney ? costQueueWarning(order) : "Falta el costo en el pedido. Lo copia el propietario. El total guardado no cambia.",
     },
     {
+      id: "cola-costo-hoy",
+      title: "La ficha de hoy tiene otro costo",
+      hint: canManageOrderMoney
+        ? "El pedido conserva el costo guardado. El botón del pedido copia las cifras de hoy. No cambia el precio ni el total guardado."
+        : "El pedido conserva el costo guardado. Lo copia el propietario. No cambia el precio ni el total guardado.",
+      short: "costo de hoy",
+      cta: canManageOrderMoney ? "Usar las cifras de hoy" : "Ver pedido",
+      match: (order) => costDrift(order, costGuides).length > 0,
+      note: (order) => {
+        const detail = costDriftNote(costDrift(order, costGuides));
+        return canManageOrderMoney
+          ? `${detail} El botón del pedido copia esas cifras. Esta lista no las guarda.`
+          : `${detail} Lo copia el propietario.`;
+      },
+    },
+    {
       id: "cola-aviso",
       title: "Falta avisarle al cliente",
       hint: "El estado ya cambió y todavía no marcaste que le avisaste. Esa marca no envía el mensaje. El total guardado no cambia.",
@@ -1339,7 +1360,7 @@ export function attentionSheetText(
   priceGuides: PriceGuide[] = [],
   costGuides: CostGuide[] = [],
 ) {
-  const queues = attentionQueues(orders, guides, canManageOrderMoney);
+  const queues = attentionQueues(orders, guides, canManageOrderMoney, costGuides);
   const lines = [
     "Por atender · un pedido, un siguiente paso",
     "Esta lista no se recorta por fecha. Copiarla no cobra, no envía el mensaje y no cambia pedidos. Dropi no está conectado: desde aquí no se crea el pedido.",
@@ -1355,6 +1376,9 @@ export function attentionSheetText(
   }
   if (queues.some((queue) => queue.rows.some((row) => costDrift(row.order, costGuides).length > 0))) {
     lines.push("Si la ficha de hoy no es el costo guardado, van las dos cifras en ese pedido. Copiarlas no reescribe lo guardado ni el total.");
+  }
+  if (queues.some((queue) => queue.rows.some((row) => row.cta === "Usar las cifras de hoy"))) {
+    lines.push("Si el paso es usar las cifras de hoy, esta lista no las guarda. El precio y el total guardado no cambian.");
   }
   lines.push("");
   if (queues.length === 0) {

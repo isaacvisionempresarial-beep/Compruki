@@ -133,7 +133,7 @@ export function OrdersScreen({
   const searched = useMemo(() => spanOrders.filter((order) => matchesOrder(order, query, sizeGuides, priceGuides, costGuides)), [spanOrders, query, sizeGuides, priceGuides, costGuides]);
   const present = STATUS_SEQUENCE.filter((item) => spanOrders.some((order) => order.status === item));
   const visible = searched.filter((order) => status === "todos" || order.status === status);
-  const work = workQueues(orders, sizeGuides, canManageOrderMoney);
+  const work = workQueues(orders, sizeGuides, canManageOrderMoney, costGuides);
 
   useEffect(() => {
     function focusFromHash() {
@@ -2127,8 +2127,8 @@ function moneyInput(canEdit: boolean) {
   return canEdit ? freightInput : freightInput.replace(" bg-card ", " bg-subtle ");
 }
 
-function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMoney: boolean) {
-  return attentionQueues(orders, guides, canManageOrderMoney);
+function workQueues(orders: StoreOrder[], guides: SizeGuide[], canManageOrderMoney: boolean, costGuides: CostGuide[] = []) {
+  return attentionQueues(orders, guides, canManageOrderMoney, costGuides);
 }
 
 function rowWarnings(order: StoreOrder, guides: SizeGuide[], canManageOrderMoney = true) {
