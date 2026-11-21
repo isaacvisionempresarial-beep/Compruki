@@ -10,7 +10,7 @@ import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
 import { STATUS_LABEL, type Period } from "@/lib/demo-data";
 import { cx } from "@/lib/cx";
 import { formatCop, formatDay } from "@/lib/format";
-import { attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, ordersInSpan, priceDrift, priceDriftNote, resultsByProduct, samePhoneMatches, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import { attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, costDrift, costDriftNote, ordersInSpan, priceDrift, priceDriftNote, resultsByProduct, samePhoneMatches, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
 
 const homeProductGrid = "md:grid-cols-[minmax(0,1.5fr)_8.75rem_8.75rem_8.75rem]";
 
@@ -32,6 +32,7 @@ export function Dashboard({
   storeOrders,
   sizeGuides,
   priceGuides = [],
+  costGuides = [],
   today,
   greetingName,
   canManageOrderMoney = false,
@@ -42,6 +43,7 @@ export function Dashboard({
   storeOrders: StoreOrder[];
   sizeGuides: SizeGuide[];
   priceGuides?: PriceGuide[];
+  costGuides?: CostGuide[];
   today: string;
   greetingName: string;
   canManageOrderMoney?: boolean;
@@ -86,10 +88,11 @@ export function Dashboard({
         row.order.department ?? "",
         row.order.campaignEntry ? "campaña" : "",
         priceDrift(row.order, priceGuides).length > 0 ? "la ficha cambió" : "",
+        costDriftNote(costDrift(row.order, costGuides)),
         ...row.order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""]),
       ].some((value) => value.toLocaleLowerCase("es").includes(query)),
     );
-  }, [attention, priceGuides, query]);
+  }, [attention, costGuides, priceGuides, query]);
 
   const orderWork = useMemo(() => {
     let yours = 0;
@@ -401,6 +404,7 @@ export function Dashboard({
               const place = [order.city, order.department].filter(Boolean).join(" · ");
               const products = order.lines.map((line) => `${line.quantity} × ${lineName(line)}`).join(", ");
               const driftNote = priceDriftNote(priceDrift(order, priceGuides));
+              const costNote = costDriftNote(costDrift(order, costGuides));
               const meta = [
                 place,
                 products,
@@ -433,6 +437,11 @@ export function Dashboard({
                       {driftNote ? (
                         <span className="mt-0.5 block text-xs leading-5 text-warning" title={driftNote}>
                           {driftNote}
+                        </span>
+                      ) : null}
+                      {costNote ? (
+                        <span className="mt-0.5 block text-xs leading-5 text-warning" title={costNote}>
+                          {costNote}
                         </span>
                       ) : null}
                     </span>

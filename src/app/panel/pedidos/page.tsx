@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { bogotaNow } from "@/lib/catalog";
 import { OrdersScreen } from "@/components/panel/orders-screen";
-import { listPriceGuides, listSizeGuides } from "@/server/catalog-store";
+import { listCostGuides, listPriceGuides, listSizeGuides } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
 import { requirePanelAccess } from "@/server/panel-auth";
 
@@ -12,13 +12,14 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function OrdersPage() {
-  const [orders, sizeGuides, priceGuides, access] = await Promise.all([
+  const [orders, sizeGuides, priceGuides, costGuides, access] = await Promise.all([
     listOrders(),
     listSizeGuides(),
     listPriceGuides(),
+    listCostGuides(),
     requirePanelAccess(),
   ]);
   return (
-    <OrdersScreen orders={orders} sizeGuides={sizeGuides} priceGuides={priceGuides} canManageOrderMoney={access.role === "owner"} today={bogotaNow().slice(0, 10)} />
+    <OrdersScreen orders={orders} sizeGuides={sizeGuides} priceGuides={priceGuides} costGuides={costGuides} canManageOrderMoney={access.role === "owner"} today={bogotaNow().slice(0, 10)} />
   );
 }

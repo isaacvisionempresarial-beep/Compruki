@@ -472,6 +472,39 @@ export function priceDriftNote(drifts: Array<{ title: string; stored: number; cu
   return `La ficha cambió en ${drifts.map((drift) => drift.title).join(", ")}. Este pedido conserva el precio guardado. Cambiar la ficha no reescribe el total guardado. No es dinero cobrado.`;
 }
 
+export function costDrift(order: Pick<StoreOrder, "lines">, guides: CostGuide[]) {
+  const drifts: Array<{ sku: string; title: string; fields: Array<{ label: string; stored: number; current: number }> }> = [];
+  for (const line of order.lines) {
+    const guide = guides.find((item) => item.sku === line.sku);
+    if (!readyCostGuide(guide)) continue;
+    const fields: Array<{ label: string; stored: number; current: number }> = [];
+    if (typeof line.unitCost === "number" && line.unitCost !== guide.cost) {
+      fields.push({ label: "el costo", stored: line.unitCost, current: guide.cost });
+    }
+    if (typeof line.unitShipping === "number" && line.unitShipping !== guide.shipping) {
+      fields.push({ label: "el envío estimado", stored: line.unitShipping, current: guide.shipping });
+    }
+    if (typeof line.unitCommissions === "number" && line.unitCommissions !== guide.commissions) {
+      fields.push({ label: "las comisiones estimadas", stored: line.unitCommissions, current: guide.commissions });
+    }
+    if (fields.length === 0) continue;
+    drifts.push({ sku: line.sku, title: line.title, fields });
+  }
+  return drifts;
+}
+
+export function costDriftNote(drifts: Array<{ title: string; fields: Array<{ label: string; stored: number; current: number }> }>) {
+  if (drifts.length === 0) return "";
+  const tail = "Cambiar la ficha no reescribe lo guardado. No es dinero cobrado. El total guardado no cambia.";
+  if (drifts.length === 1) {
+    const drift = drifts[0];
+    const today = drift.fields.map((field) => `${field.label} en ${formatCop(field.current)}`).join(", ");
+    const stored = drift.fields.map((field) => `${field.label} en ${formatCop(field.stored)}`).join(", ");
+    return `La ficha de ${drift.title} hoy tiene ${today}. Este pedido guardó ${stored}. ${tail}`;
+  }
+  return `La ficha cambió el costo guardado en ${drifts.map((drift) => drift.title).join(", ")}. Este pedido conserva esas cifras. ${tail}`;
+}
+
 export function normalizePhone(raw: string) {
   const digits = raw.replace(/\D/g, "");
   if (digits.length === 12 && digits.startsWith("57")) return digits.slice(2);

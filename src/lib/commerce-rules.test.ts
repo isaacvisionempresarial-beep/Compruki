@@ -8,6 +8,8 @@ import {
   orderMargin,
   orderRealizedMargin,
   orderTotal,
+  costDrift,
+  costDriftNote,
   priceDrift,
   priceDriftNote,
   attentionSheetText,
@@ -488,5 +490,25 @@ describe("precio de la ficha", () => {
     const closeSame = closeSheetText([pending], "hoy", "creados", [], [{ sku: "SKU-1", price: 80_000 }]);
     expect(closeSame).not.toContain("hoy está en");
     expect(closeSheetText([pending], "hoy", "creados")).not.toContain("hoy está en");
+  });
+
+  it("avisa si el costo de la ficha ya no es el guardado", () => {
+    const current = order({ status: "confirmado", number: "P-2032" });
+    const sameGuide = [{ sku: "SKU-1", cost: 40_000, shipping: 8_000, commissions: 2_000 }];
+    expect(costDrift(current, sameGuide)).toHaveLength(0);
+    const moved = costDrift(current, [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
+    expect(costDriftNote(moved)).toContain("hoy tiene el costo en $50.000");
+    expect(costDriftNote(moved)).toContain("guardó el costo en $40.000");
+    expect(costDriftNote(moved)).toContain("El total guardado no cambia");
+    expect(costDriftNote(moved)).not.toContain("envío estimado");
+    const freight = costDrift(current, [{ sku: "SKU-1", cost: 40_000, shipping: 9_000, commissions: 2_000 }]);
+    expect(costDriftNote(freight)).toContain("el envío estimado en $9.000");
+    expect(costDriftNote(freight)).toContain("guardó el envío estimado en $8.000");
+    const bare = order({
+      status: "confirmado",
+      lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1 }],
+    });
+    expect(costDrift(bare, [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }])).toHaveLength(0);
+    expect(costDrift(current, [])).toHaveLength(0);
   });
 });

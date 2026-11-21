@@ -56,6 +56,8 @@ import {
   dispatchSheetText,
   type CloseBasis,
   type OrderSpan,
+  costDrift,
+  costDriftNote,
   priceDrift,
   priceDriftNote,
   payableTotalLabel,
@@ -109,12 +111,14 @@ export function OrdersScreen({
   orders,
   sizeGuides,
   priceGuides = [],
+  costGuides = [],
   canManageOrderMoney = false,
   today,
 }: {
   orders: StoreOrder[];
   sizeGuides: SizeGuide[];
   priceGuides?: PriceGuide[];
+  costGuides?: CostGuide[];
   canManageOrderMoney?: boolean;
   today: string;
 }) {
@@ -125,7 +129,7 @@ export function OrdersScreen({
   const query = usePanelQuery().trim().toLocaleLowerCase("es");
   const spanOrders = useMemo(() => ordersInSpan(orders, span, today, basis), [orders, span, today, basis]);
   const summary = useMemo(() => summarizeStoreOrders(spanOrders), [spanOrders]);
-  const searched = useMemo(() => spanOrders.filter((order) => matchesOrder(order, query, sizeGuides, priceGuides)), [spanOrders, query, sizeGuides, priceGuides]);
+  const searched = useMemo(() => spanOrders.filter((order) => matchesOrder(order, query, sizeGuides, priceGuides, costGuides)), [spanOrders, query, sizeGuides, priceGuides, costGuides]);
   const present = STATUS_SEQUENCE.filter((item) => spanOrders.some((order) => order.status === item));
   const visible = searched.filter((order) => status === "todos" || order.status === status);
   const work = workQueues(orders, sizeGuides, canManageOrderMoney);
@@ -351,6 +355,7 @@ export function OrdersScreen({
           {visible.map((order) => {
             const notes = rowWarnings(order, sizeGuides, canManageOrderMoney);
             const drift = priceDriftNote(priceDrift(order, priceGuides));
+            const costNote = costDriftNote(costDrift(order, costGuides));
             return (
               <li key={order.id}>
                 <a href={orderFocusHref(order.number)} title="Abrirlo no cobra ni cambia el total guardado." className={cx("grid items-start gap-3 px-3 py-2 hover:bg-canvas md:gap-4", orderGrid)}>
@@ -368,6 +373,7 @@ export function OrdersScreen({
                       <span key={note} className="mt-2 block text-sm leading-5 text-warning">{note}</span>
                     ))}
                     {drift ? <span className="mt-2 block text-sm leading-5 text-warning">{drift}</span> : null}
+                    {costNote ? <span className="mt-2 block text-sm leading-5 text-warning">{costNote}</span> : null}
                   </span>
                   <span className="text-sm font-semibold tabular-nums md:pt-0.5 md:text-right">
                     <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">Total guardado</span>
@@ -449,6 +455,7 @@ export function OrderEditor({
 }) {
   const [state, action, pending] = useActionState(updateOrderAction, initialState);
   const margin = orderMargin(order);
+  const costNote = costDriftNote(costDrift(order, costGuides));
   const actions = actionsFor(order, sizeGuides);
   const sizeConfirmError = confirmSizeError(order, sizeGuides);
   const confirmBlocked = order.status === "pendiente_confirmacion" ? sizeConfirmError : null;
@@ -572,6 +579,7 @@ export function OrderEditor({
         <p className={cx("mt-1 text-xs leading-5", collectedWithoutCost(order) ? "text-warning" : "text-muted")}>
           {moneyNote(order, margin)}
         </p>
+        {costNote ? <p className="mt-2 text-sm leading-5 text-warning">{costNote}</p> : null}
         {readyToConfirm(order, sizeGuides) ? (
           <p className="mt-2 text-xs leading-5 text-warning">{confirmQueueNote(order, sizeGuides)}</p>
         ) : departmentNote ? (
@@ -918,9 +926,9 @@ function StatusFilter({
   );
 }
 
-function matchesOrder(order: StoreOrder, query: string, guides: SizeGuide[], priceGuides: PriceGuide[] = []) {
+function matchesOrder(order: StoreOrder, query: string, guides: SizeGuide[], priceGuides: PriceGuide[] = [], costGuides: CostGuide[] = []) {
   if (!query) return true;
-  return [priceDriftNote(priceDrift(order, priceGuides)), order.number, order.customerName, order.city, order.department ?? "", order.phone, order.document ?? "", order.address, order.reference, order.providerRef ?? "", order.internalNote ?? "", order.customerReason ?? "", order.buyerNote ?? "", order.customerNotifiedAt ? "avisé" : "", order.campaignEntry ? "campaña" : "", awaitsDropiNumber(order) || needsClosedDropiNumber(order) || needsIncidenceDropiNumber(order) ? "dropi" : "", needsDepartment(order) || needsClosedDepartment(order) ? "departamento" : "", missingSizeNote(order, guides), catalogCostQueueNote(order), collectedWithoutCost(order) ? "utilidad" : "", needsCustomerNotice(order) ? "avisar aviso" : "", needsIncidenceReason(order) ? "motivo incidencia" : "", needsReturnReason(order) ? "motivo devolución" : "", needsReturnFreight(order) ? "flete devolución" : "", readyToConfirm(order, guides) ? "confirmar" : "", readyToPrepare(order) ? "preparación preparar" : "", readyToDispatch(order) ? "despacho preparación" : "", ...order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""])].some(
+  return [priceDriftNote(priceDrift(order, priceGuides)), costDriftNote(costDrift(order, costGuides)), order.number, order.customerName, order.city, order.department ?? "", order.phone, order.document ?? "", order.address, order.reference, order.providerRef ?? "", order.internalNote ?? "", order.customerReason ?? "", order.buyerNote ?? "", order.customerNotifiedAt ? "avisé" : "", order.campaignEntry ? "campaña" : "", awaitsDropiNumber(order) || needsClosedDropiNumber(order) || needsIncidenceDropiNumber(order) ? "dropi" : "", needsDepartment(order) || needsClosedDepartment(order) ? "departamento" : "", missingSizeNote(order, guides), catalogCostQueueNote(order), collectedWithoutCost(order) ? "utilidad" : "", needsCustomerNotice(order) ? "avisar aviso" : "", needsIncidenceReason(order) ? "motivo incidencia" : "", needsReturnReason(order) ? "motivo devolución" : "", needsReturnFreight(order) ? "flete devolución" : "", readyToConfirm(order, guides) ? "confirmar" : "", readyToPrepare(order) ? "preparación preparar" : "", readyToDispatch(order) ? "despacho preparación" : "", ...order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""])].some(
     (value) => value.toLocaleLowerCase("es").includes(query),
   );
 }
