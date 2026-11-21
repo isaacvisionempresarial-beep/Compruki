@@ -1202,6 +1202,10 @@ export function validateProviderRef(raw: string) {
   return { value, error: null as string | null };
 }
 
+export function ownerOnlyOrderIntent(action: string) {
+  return action === "cobrar" || action === "quitar_cobro";
+}
+
 export function actionsFor(order: StoreOrder, guides: SizeGuide[] = []) {
   return ACTIONS.filter((action) => {
     if (action.id === "confirmar" && confirmSizeError(order, guides)) return false;

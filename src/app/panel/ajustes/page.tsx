@@ -66,6 +66,27 @@ export default async function SettingsPage() {
         </div>
       </dl>
 
+      <section className="elevate-1 mt-4 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="backup">
+        <h2 id="backup" className="text-sm font-semibold">
+          Respaldo de esta tienda
+        </h2>
+        <p className="mt-1 text-sm text-muted">
+          Copia de los pedidos y las fichas guardados en {access.tenantName}. El total guardado y el margen van en columnas distintas. No incluye el enlace secreto del cliente. Descargarla no cobra, no cambia pedidos y no envía nada a Dropi.
+        </p>
+        {access.role === "owner" ? (
+          <div className="mt-3 flex flex-wrap gap-3 text-sm font-semibold">
+            <a href="/panel/respaldo/pedidos" title="Descargarla no cobra ni cambia pedidos." className="text-accent-strong">
+              Descargar pedidos
+            </a>
+            <a href="/panel/respaldo/catalogo" title="Descargarla no cobra ni cambia pedidos." className="text-accent-strong">
+              Descargar fichas
+            </a>
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-muted">La descarga la hace el propietario. Ver esta nota no cobra ni cambia pedidos.</p>
+        )}
+      </section>
+
       <section className="elevate-1 mt-4 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="readiness">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 id="readiness" className="text-sm font-semibold">

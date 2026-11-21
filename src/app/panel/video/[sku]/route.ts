@@ -1,8 +1,8 @@
-import { getPanelAccess } from "@/server/panel-auth";
+import { assertPanelAccess } from "@/server/panel-auth";
 import { loadProductVideo } from "@/server/catalog-store";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ sku: string }> }) {
-  if (!(await getPanelAccess())) return new Response("No encontrado", { status: 404 });
+  if (!(await assertPanelAccess())) return new Response("No encontrado", { status: 404 });
   const { sku } = await params;
   const video = await loadProductVideo(sku, false);
   if (!video) return new Response("No encontrado", { status: 404 });

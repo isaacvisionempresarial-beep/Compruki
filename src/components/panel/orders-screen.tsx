@@ -56,6 +56,7 @@ import {
   whatsAppHref,
   needsCustomerReason,
   orderMargin,
+  ownerOnlyOrderIntent,
   orderRealizedMargin,
   recordedReturnFreight,
   summarizeStoreOrders,
@@ -78,7 +79,7 @@ const buttonTone = {
 } as const;
 
 function moneyStatusAction(id: string) {
-  return id === "cobrar" || id === "quitar_cobro";
+  return ownerOnlyOrderIntent(id);
 }
 
 const orderGrid = "md:grid-cols-[6.75rem_minmax(0,1.5fr)_8.75rem_12.5rem_4.25rem]";

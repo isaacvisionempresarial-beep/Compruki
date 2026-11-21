@@ -1,11 +1,11 @@
 import { agentRunsToCsv, listAgentRunsForExport } from "@/server/agent-runs";
-import { getPanelAccess } from "@/server/panel-auth";
+import { assertPanelAccess } from "@/server/panel-auth";
 
 export const dynamic = "force-dynamic";
 
 /** Auditoría CSV de corridas del tenant. Requiere sesión de panel. */
 export async function GET() {
-  if (!(await getPanelAccess())) {
+  if (!(await assertPanelAccess())) {
     return new Response("No autorizado", { status: 401 });
   }
 

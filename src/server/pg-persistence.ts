@@ -3,6 +3,7 @@ import path from "node:path";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { seedCatalog, type CatalogProduct } from "@/lib/catalog";
 import type { StoreOrder } from "@/lib/store-order";
+import { foreignIds } from "@/lib/tenant-scope";
 import { getPilotTenantId } from "@/server/tenant";
 
 const catalogFile = path.join(process.cwd(), "data", "catalog.json");
@@ -138,8 +139,14 @@ async function refuseForeignIds(
   if (error) {
     throw new Error(`No se pudo comprobar la tienda de ${table}: ${error.message}`);
   }
-  const foreign = (data ?? []).some((row) => row.tenant_id !== tenantId);
-  if (foreign) {
+  const foreign = foreignIds(
+    (data ?? []).map((row) => ({
+      id: String(row.id),
+      tenant_id: row.tenant_id == null ? null : String(row.tenant_id),
+    })),
+    tenantId,
+  );
+  if (foreign.length > 0) {
     throw new Error("Hay un identificador de otra tienda. No se escribió nada.");
   }
 }

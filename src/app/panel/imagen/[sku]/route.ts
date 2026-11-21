@@ -1,8 +1,8 @@
-import { getPanelAccess } from "@/server/panel-auth";
+import { assertPanelAccess } from "@/server/panel-auth";
 import { loadProductImage } from "@/server/catalog-store";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ sku: string }> }) {
-  if (!(await getPanelAccess())) return new Response("No encontrado", { status: 404 });
+  if (!(await assertPanelAccess())) return new Response("No encontrado", { status: 404 });
   const { sku } = await params;
   const asset = new URL(_request.url).searchParams.get("m");
   const image = await loadProductImage(sku, false, asset);

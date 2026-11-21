@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { campaignSkusInOrder } from "@/lib/campaign";
 import { parsePesos } from "@/lib/catalog";
 import { assertPanelAccess } from "@/server/panel-auth";
-import { normalizePhone, type OrderAction } from "@/lib/store-order";
+import { normalizePhone, ownerOnlyOrderIntent, type OrderAction } from "@/lib/store-order";
 import { syncQueueWithOrderIncident } from "@/server/dropi-connection";
 import { addOrderLine, applyCatalogCosts, markCustomerNotice, placeOrder, saveClosedDepartment, saveDelivery, saveFreight, saveIncidenceReason, saveInternalNote, saveOrderLines, saveProviderRef, saveReturnReason, updateOrder } from "@/server/order-store";
 
@@ -93,7 +93,7 @@ export async function updateOrderAction(_state: UpdateOrderState, formData: Form
   if (!ORDER_ACTIONS.includes(intent as OrderAction)) {
     return { error: "Esa acción no existe.", orderId };
   }
-  if ((intent === "cobrar" || intent === "quitar_cobro") && access.role !== "owner") {
+  if (ownerOnlyOrderIntent(intent) && access.role !== "owner") {
     return { error: "Solo el propietario puede marcar o quitar el cobro.", orderId };
   }
 
