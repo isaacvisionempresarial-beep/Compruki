@@ -510,5 +510,15 @@ describe("precio de la ficha", () => {
     });
     expect(costDrift(bare, [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }])).toHaveLength(0);
     expect(costDrift(current, [])).toHaveLength(0);
+    const pending = order({ status: "pendiente_confirmacion", number: "P-2033" });
+    const sameSheet = attentionSheetText([pending], [], true, [], sameGuide);
+    expect(sameSheet).not.toContain("hoy tiene el costo");
+    expect(sameSheet).not.toContain("3001234567");
+    const movedSheet = attentionSheetText([pending], [], true, [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
+    expect(movedSheet).toContain("hoy tiene el costo en $50.000");
+    expect(movedSheet).toContain("guardó el costo en $40.000");
+    expect(movedSheet).toContain("Copiarlas no reescribe lo guardado");
+    expect(movedSheet).not.toContain("3001234567");
+    expect(movedSheet).not.toContain("Calle 10");
   });
 });

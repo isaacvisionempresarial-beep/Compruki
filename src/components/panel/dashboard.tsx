@@ -462,7 +462,7 @@ export function Dashboard({
             })}
           </ul>
         )}
-        <AttentionSheet orders={storeOrders} guides={sizeGuides} priceGuides={priceGuides} canManageOrderMoney={canManageOrderMoney} />
+        <AttentionSheet orders={storeOrders} guides={sizeGuides} priceGuides={priceGuides} costGuides={costGuides} canManageOrderMoney={canManageOrderMoney} />
       </section>
 
 

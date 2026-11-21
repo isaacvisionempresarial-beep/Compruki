@@ -1216,6 +1216,7 @@ export function attentionSheetText(
   guides: SizeGuide[] = [],
   canManageOrderMoney = true,
   priceGuides: PriceGuide[] = [],
+  costGuides: CostGuide[] = [],
 ) {
   const queues = attentionQueues(orders, guides, canManageOrderMoney);
   const lines = [
@@ -1230,6 +1231,9 @@ export function attentionSheetText(
   }
   if (queues.some((queue) => queue.rows.some((row) => priceDrift(row.order, priceGuides).length > 0))) {
     lines.push("Si la ficha de hoy no es el precio guardado, van los dos montos en ese pedido. Copiarlos no reescribe el total.");
+  }
+  if (queues.some((queue) => queue.rows.some((row) => costDrift(row.order, costGuides).length > 0))) {
+    lines.push("Si la ficha de hoy no es el costo guardado, van las dos cifras en ese pedido. Copiarlas no reescribe lo guardado ni el total.");
   }
   lines.push("");
   if (queues.length === 0) {
@@ -1253,6 +1257,8 @@ export function attentionSheetText(
         }
         const drift = priceDriftNote(priceDrift(row.order, priceGuides));
         if (drift) lines.push(drift);
+        const costNote = costDriftNote(costDrift(row.order, costGuides));
+        if (costNote) lines.push(costNote);
       }
       lines.push("");
     }

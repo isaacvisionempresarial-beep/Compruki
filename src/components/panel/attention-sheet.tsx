@@ -1,20 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { attentionSheetText, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import { attentionSheetText, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
 
 export function AttentionSheet({
   orders,
   guides,
   priceGuides = [],
+  costGuides = [],
   canManageOrderMoney,
 }: {
   orders: StoreOrder[];
   guides: SizeGuide[];
   priceGuides?: PriceGuide[];
+  costGuides?: CostGuide[];
   canManageOrderMoney: boolean;
 }) {
-  const text = attentionSheetText(orders, guides, canManageOrderMoney, priceGuides);
+  const text = attentionSheetText(orders, guides, canManageOrderMoney, priceGuides, costGuides);
   const [copied, setCopied] = useState<"ok" | "fail" | null>(null);
 
   function copy() {
@@ -44,7 +46,7 @@ export function AttentionSheet({
         Por atender para copiar
       </h3>
       <p className="mt-0.5 text-xs leading-5 text-muted">
-        La misma cola, sin recorte de fecha. Si el paso es avisar, trae el mensaje. Si es anotar el número o el despacho, trae el texto para Dropi, con celular y dirección. Si la ficha de hoy no es el precio guardado, van los dos montos. Copiarla no cobra, no envía el mensaje, no reescribe el total y no crea el pedido.
+        La misma cola, sin recorte de fecha. Si el paso es avisar, trae el mensaje. Si es anotar el número o el despacho, trae el texto para Dropi, con celular y dirección. Si la ficha de hoy no es el precio guardado, van los dos montos. Si no es el costo, el envío o las comisiones guardadas, van las dos cifras. Copiarla no cobra, no envía el mensaje, no reescribe lo guardado y no crea el pedido.
       </p>
       <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
         <label className="text-sm font-semibold" htmlFor="hoja-atender">
