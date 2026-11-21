@@ -891,6 +891,7 @@ export function closeSheetText(
   span: OrderSpan,
   basis: CloseBasis = "creados",
   guides: SizeGuide[] = [],
+  priceGuides: PriceGuide[] = [],
 ) {
   const summary = summarizeStoreOrders(orders);
   const products = resultsByProduct(orders, guides);
@@ -899,6 +900,16 @@ export function closeSheetText(
     "Copiar este texto no cobra ni cambia pedidos. Dropi no está conectado: desde aquí no se crea el pedido.",
   ];
   if (span !== "todo" && basis === "movidos") lines.push("El total guardado es el del pedido, no lo cobrado en ese día.");
+  const drifted = orders.flatMap((order) => {
+    const note = priceDriftNote(priceDrift(order, priceGuides));
+    return note ? [`${order.number}. ${note}`] : [];
+  });
+  if (drifted.length > 0) {
+    lines.push(
+      "En estos pedidos la ficha de hoy no es el precio guardado. El cierre sigue con el total guardado. Cambiar la ficha no lo reescribe. No es dinero cobrado.",
+      ...drifted,
+    );
+  }
   lines.push(
     "",
     `Registrados: ${formatCop(summary.registered.amount)} · ${orderCountPhrase(summary.registered.count)}.${listedNumbers(summary.registered.numbers)} Total guardado. Sin cancelados ni devueltos. No es dinero cobrado.`,

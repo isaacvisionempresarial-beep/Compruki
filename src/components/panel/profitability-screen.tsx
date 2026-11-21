@@ -42,6 +42,7 @@ export function ProfitabilityScreen({
     () => products.map((product) => ({ sku: product.sku, variants: product.variants, sizeKind: product.sizeKind ?? null })),
     [products],
   );
+  const priceGuides = useMemo(() => products.map((product) => ({ sku: product.sku, price: product.price })), [products]);
   const holds = useMemo(() => pendingSizeHolds(orders, guides), [orders, guides]);
   const results = useMemo(
     () => resultsByProduct(ordersInSpan(orders, storePeriod, today, basis), guides),
@@ -185,6 +186,7 @@ export function ProfitabilityScreen({
               period={storePeriod}
               basis={basis}
               guides={guides}
+              priceGuides={priceGuides}
               fieldId="cierre-resultados"
             />
           </section>

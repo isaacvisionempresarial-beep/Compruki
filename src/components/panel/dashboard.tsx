@@ -377,7 +377,7 @@ export function Dashboard({
             </ul>
           </div>
         )}
-        <CloseSheet orders={storeInPeriod} period={storePeriod} basis={basis} guides={sizeGuides} fieldId="cierre-tienda" />
+        <CloseSheet orders={storeInPeriod} period={storePeriod} basis={basis} guides={sizeGuides} priceGuides={priceGuides} fieldId="cierre-tienda" />
         <div className="mt-3">
           <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="text-sm font-semibold text-accent-strong">
             Ver el detalle en Rentabilidad
