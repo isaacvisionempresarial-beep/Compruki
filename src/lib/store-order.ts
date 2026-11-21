@@ -505,6 +505,65 @@ export function costDriftNote(drifts: Array<{ title: string; fields: Array<{ lab
   return `La ficha cambió el costo guardado en ${drifts.map((drift) => drift.title).join(", ")}. Este pedido conserva esas cifras. ${tail}`;
 }
 
+function resultLines(orders: StoreOrder[], sku: string) {
+  return orders
+    .filter((order) => CONFIRMED.includes(order.status) || order.status === "devuelto")
+    .flatMap((order) => order.lines.filter((line) => line.sku === sku));
+}
+
+function storedAmounts(lines: OrderLine[], pick: (line: OrderLine) => number | undefined, current: number) {
+  const values = new Set<number>();
+  for (const line of lines) {
+    const value = pick(line);
+    if (typeof value === "number" && value !== current) values.add(value);
+  }
+  return [...values];
+}
+
+export function resultDriftNote(
+  orders: StoreOrder[],
+  sku: string,
+  priceGuides: PriceGuide[] = [],
+  costGuides: CostGuide[] = [],
+) {
+  const lines = resultLines(orders, sku);
+  if (lines.length === 0) return "";
+  const parts: string[] = [];
+  const price = priceGuides.find((guide) => guide.sku === sku);
+  if (price) {
+    const stored = storedAmounts(lines, (line) => line.unitPrice, price.price);
+    if (stored.length === 1) {
+      parts.push(
+        `La ficha hoy está en ${formatCop(price.price)}. Estos pedidos guardaron ${formatCop(stored[0])}. El margen estimado y la utilidad siguen con el precio guardado. Cambiar la ficha no los reescribe. No es dinero cobrado.`,
+      );
+    } else if (stored.length > 1) {
+      parts.push(
+        `La ficha hoy está en ${formatCop(price.price)}. Estos pedidos guardaron precios distintos. El margen estimado y la utilidad siguen con el precio guardado. Cambiar la ficha no los reescribe. No es dinero cobrado.`,
+      );
+    }
+  }
+  const cost = costGuides.find((guide) => guide.sku === sku);
+  if (readyCostGuide(cost)) {
+    const fields = [
+      { label: "el costo", current: cost.cost, stored: storedAmounts(lines, (line) => line.unitCost, cost.cost) },
+      { label: "el envío estimado", current: cost.shipping, stored: storedAmounts(lines, (line) => line.unitShipping, cost.shipping) },
+      { label: "las comisiones estimadas", current: cost.commissions, stored: storedAmounts(lines, (line) => line.unitCommissions, cost.commissions) },
+    ].filter((field) => field.stored.length > 0);
+    if (fields.length > 0 && fields.every((field) => field.stored.length === 1)) {
+      const today = fields.map((field) => `${field.label} en ${formatCop(field.current)}`).join(", ");
+      const stored = fields.map((field) => `${field.label} en ${formatCop(field.stored[0])}`).join(", ");
+      parts.push(
+        `La ficha hoy tiene ${today}. Estos pedidos guardaron ${stored}. El margen estimado y la utilidad siguen con lo guardado. Cambiar la ficha no los reescribe. No es dinero cobrado. El total guardado no cambia.`,
+      );
+    } else if (fields.length > 0) {
+      parts.push(
+        "La ficha de hoy no coincide con el costo guardado en estos pedidos. El margen estimado y la utilidad siguen con lo guardado. Cambiar la ficha no los reescribe. No es dinero cobrado. El total guardado no cambia.",
+      );
+    }
+  }
+  return parts.join(" ");
+}
+
 export function normalizePhone(raw: string) {
   const digits = raw.replace(/\D/g, "");
   if (digits.length === 12 && digits.startsWith("57")) return digits.slice(2);

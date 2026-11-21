@@ -12,6 +12,7 @@ import {
   costDriftNote,
   priceDrift,
   priceDriftNote,
+  resultDriftNote,
   attentionSheetText,
   closePhrase,
   closeSheetText,
@@ -529,5 +530,20 @@ describe("precio de la ficha", () => {
     expect(closeMoved).not.toContain("Calle 10");
     expect(closeSheetText([pending], "hoy", "creados", [], [], sameGuide)).not.toContain("hoy tiene el costo");
     expect(closeSheetText([pending], "hoy", "creados")).not.toContain("hoy tiene el costo");
+    const confirmed = order({ status: "confirmado", number: "P-2034" });
+    const priceNote = resultDriftNote([confirmed], "SKU-1", [{ sku: "SKU-1", price: 90_000 }]);
+    expect(priceNote).toContain("hoy está en $90.000");
+    expect(priceNote).toContain("guardaron $80.000");
+    expect(priceNote).toContain("siguen con el precio guardado");
+    expect(priceNote).toContain("No es dinero cobrado.");
+    expect(priceNote).not.toContain("3001234567");
+    expect(resultDriftNote([confirmed], "SKU-1", [{ sku: "SKU-1", price: 80_000 }])).toBe("");
+    expect(resultDriftNote([pending], "SKU-1", [{ sku: "SKU-1", price: 90_000 }])).toBe("");
+    expect(resultDriftNote([confirmed], "SKU-1", [])).toBe("");
+    const costNote = resultDriftNote([confirmed], "SKU-1", [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
+    expect(costNote).toContain("hoy tiene el costo en $50.000");
+    expect(costNote).toContain("guardaron el costo en $40.000");
+    expect(costNote).toContain("El total guardado no cambia.");
+    expect(resultDriftNote([bare], "SKU-1", [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }])).toBe("");
   });
 });

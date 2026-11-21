@@ -12,6 +12,7 @@ import {
   ordersInSpan,
   pendingSizeHoldPhrase,
   pendingSizeHolds,
+  resultDriftNote,
   resultsByProduct,
   widerPeriodWithResults,
   type CloseBasis,
@@ -48,17 +49,16 @@ export function ProfitabilityScreen({
     [products],
   );
   const holds = useMemo(() => pendingSizeHolds(orders, guides), [orders, guides]);
-  const results = useMemo(
-    () => resultsByProduct(ordersInSpan(orders, storePeriod, today, basis), guides),
-    [orders, guides, storePeriod, today, basis],
-  );
+  const spanOrders = useMemo(() => ordersInSpan(orders, storePeriod, today, basis), [orders, storePeriod, today, basis]);
+  const results = useMemo(() => resultsByProduct(spanOrders, guides), [spanOrders, guides]);
   const wider = results.length === 0 ? widerPeriodWithResults(orders, storePeriod, guides, today, basis) : null;
   const visible = results.filter(
     (row) =>
       !query ||
       row.title.toLocaleLowerCase("es").includes(query) ||
       row.sku.toLocaleLowerCase("es").includes(query) ||
-      row.sources.some((source) => source.number.toLocaleLowerCase("es").includes(query)),
+      row.sources.some((source) => source.number.toLocaleLowerCase("es").includes(query)) ||
+      resultDriftNote(spanOrders, row.sku, priceGuides, costGuides).toLocaleLowerCase("es").includes(query),
   );
 
   return (
@@ -122,6 +122,9 @@ export function ProfitabilityScreen({
                       <div className="min-w-0">
                         <h3 className="text-sm font-bold">{row.title}</h3>
                         <p className="mt-0.5 text-xs text-muted">{row.sku}</p>
+                        {resultDriftNote(spanOrders, row.sku, priceGuides, costGuides) ? (
+                          <p className="mt-1 text-xs leading-5 text-warning">{resultDriftNote(spanOrders, row.sku, priceGuides, costGuides)}</p>
+                        ) : null}
                         {row.sizes.length > 0 ? (
                           <ul className="mt-2 grid gap-1 text-sm leading-5" aria-label={`Tallas o tamaños de ${row.title}`}>
                             {row.sizes.map((size) => (
@@ -207,7 +210,7 @@ export function ProfitabilityScreen({
             <li>
               <span className="font-semibold text-sm">Estimado vs utilidad</span>
               <span className="mt-0.5 block text-muted">
-                Estimado = margen de confirmados. Utilidad = entregado y marcado como cobrado. Ninguna es dinero cobrado en el sitio ni el total guardado del pedido.
+                Estimado = margen de confirmados. Utilidad = entregado y marcado como cobrado. Ninguna es dinero cobrado en el sitio ni el total guardado del pedido. Si la ficha de hoy es otra, el producto muestra las dos cifras y las cuentas siguen con lo guardado.
               </span>
             </li>
             <li>

@@ -10,7 +10,7 @@ import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
 import { STATUS_LABEL, type Period } from "@/lib/demo-data";
 import { cx } from "@/lib/cx";
 import { formatCop, formatDay } from "@/lib/format";
-import { attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, costDrift, costDriftNote, ordersInSpan, priceDrift, priceDriftNote, resultsByProduct, samePhoneMatches, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import { attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, costDrift, costDriftNote, ordersInSpan, priceDrift, priceDriftNote, resultDriftNote, resultsByProduct, samePhoneMatches, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
 
 const homeProductGrid = "md:grid-cols-[minmax(0,1.5fr)_8.75rem_8.75rem_8.75rem]";
 
@@ -66,9 +66,9 @@ export function Dashboard({
   const productResults = useMemo(() => {
     if (!query) return productRows;
     return productRows.filter((row) =>
-      [row.title, row.sku, ...row.sizes.map((size) => size.label), ...row.sources.map((source) => source.number)].some((value) => value.toLocaleLowerCase("es").includes(query)),
+      [row.title, row.sku, resultDriftNote(storeInPeriod, row.sku, priceGuides, costGuides), ...row.sizes.map((size) => size.label), ...row.sources.map((source) => source.number)].some((value) => value.toLocaleLowerCase("es").includes(query)),
     );
-  }, [productRows, query]);
+  }, [costGuides, priceGuides, productRows, query, storeInPeriod]);
   const attention = useMemo(
     () => attentionQueues(storeOrders, sizeGuides, canManageOrderMoney),
     [storeOrders, sizeGuides, canManageOrderMoney],
@@ -331,6 +331,9 @@ export function Dashboard({
                   <div className="min-w-0">
                     <p className="text-base font-bold">{row.title}</p>
                     <p className="mt-1 text-xs text-muted">{row.sku}</p>
+                    {resultDriftNote(storeInPeriod, row.sku, priceGuides, costGuides) ? (
+                      <p className="mt-1 text-xs leading-5 text-warning">{resultDriftNote(storeInPeriod, row.sku, priceGuides, costGuides)}</p>
+                    ) : null}
                     {row.sources.length > 0 ? (
                       <ul className="mt-2 space-y-1 text-sm leading-5">
                         {row.sources.map((source) => (
