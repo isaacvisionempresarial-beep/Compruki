@@ -8,6 +8,7 @@ import {
   orderMargin,
   orderRealizedMargin,
   orderTotal,
+  attentionSheetText,
   closePhrase,
   closeSheetText,
   ordersInSpan,
@@ -291,5 +292,43 @@ describe("cierre de pedidos", () => {
     const movedSheet = closeSheetText([moving], "hoy", "movidos");
     expect(movedSheet).toContain("movimientos de hoy");
     expect(movedSheet).toContain("no lo cobrado en ese día");
+    const all = closeSheetText([pending, moving], "todo");
+    expect(all).toContain("Cierre · todos los pedidos");
+    expect(all).toContain("Registrados: $160.000 · 2 pedidos.");
+    expect(all).not.toContain("no lo cobrado en ese día");
+  });
+
+  it("la cola para copiar nombra el siguiente paso y deja fuera el celular", () => {
+    const ready = order({ status: "pendiente_confirmacion", number: "P-2001" });
+    const sheet = attentionSheetText([ready], [], true);
+    expect(sheet).toContain("Por atender · un pedido, un siguiente paso");
+    expect(sheet).toContain("Se pueden confirmar (1)");
+    expect(sheet).toContain("P-2001 · Ana Ruiz · Cali · Valle del Cauca");
+    expect(sheet).toContain("Siguiente paso: Confirmar.");
+    expect(sheet).toContain("no envía el mensaje");
+    expect(sheet).not.toContain("3001234567");
+    expect(sheet).not.toContain("secreto-del-cliente");
+    expect(sheet).not.toContain("Calle 10");
+    const held = order({
+      status: "pendiente_confirmacion",
+      number: "P-2003",
+      id: "55555555-5555-4555-8555-555555555555",
+      lines: [
+        {
+          sku: "SKU-1",
+          title: "Faja",
+          unitPrice: 80_000,
+          quantity: 1,
+          variant: "",
+          unitCost: 40_000,
+          unitShipping: 8_000,
+          unitCommissions: 2_000,
+        },
+      ],
+    });
+    const heldSheet = attentionSheetText([held], [{ sku: "SKU-1", variants: ["M"], sizeKind: "talla" }], false);
+    expect(heldSheet).toContain("Falta la talla o el tamaño (1)");
+    expect(heldSheet).toContain("Falta la talla de Faja.");
+    expect(heldSheet).not.toContain("Se pueden confirmar");
   });
 });

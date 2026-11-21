@@ -681,6 +681,11 @@ export function closePhrase(period: Period, basis: CloseBasis = "creados") {
   return when === "hoy" ? "pedidos creados hoy" : `pedidos creados en ${when}`;
 }
 
+export function closeSpanPhrase(span: OrderSpan, basis: CloseBasis = "creados") {
+  if (span === "todo") return "todos los pedidos";
+  return closePhrase(span, basis);
+}
+
 const DISPATCH_SHEET: OrderStatus[] = ["confirmado", "en_preparacion", "en_transporte"];
 
 export function dispatchSheetOrders(orders: StoreOrder[]) {
@@ -862,17 +867,17 @@ function listedNumbers(numbers: string[]) {
 
 export function closeSheetText(
   orders: StoreOrder[],
-  period: Period,
+  span: OrderSpan,
   basis: CloseBasis = "creados",
   guides: SizeGuide[] = [],
 ) {
   const summary = summarizeStoreOrders(orders);
   const products = resultsByProduct(orders, guides);
   const lines = [
-    `Cierre · ${closePhrase(period, basis)}`,
+    `Cierre · ${closeSpanPhrase(span, basis)}`,
     "Copiar este texto no cobra ni cambia pedidos. Dropi no está conectado: desde aquí no se crea el pedido.",
   ];
-  if (basis === "movidos") lines.push("El total guardado es el del pedido, no lo cobrado en ese día.");
+  if (span !== "todo" && basis === "movidos") lines.push("El total guardado es el del pedido, no lo cobrado en ese día.");
   lines.push(
     "",
     `Registrados: ${formatCop(summary.registered.amount)} · ${orderCountPhrase(summary.registered.count)}.${listedNumbers(summary.registered.numbers)} Total guardado. Sin cancelados ni devueltos. No es dinero cobrado.`,
@@ -903,7 +908,7 @@ export function closeSheetText(
     "Por producto",
   );
   if (products.length === 0) {
-    lines.push("En este período no hay pedidos confirmados ni devueltos.");
+    lines.push(span === "todo" ? "No hay pedidos confirmados ni devueltos." : "En este período no hay pedidos confirmados ni devueltos.");
   } else {
     for (const row of products) {
       const sources = row.sources.map((source) => `${source.number} ${STATUS_LABEL[source.status]}`).join(", ");
@@ -932,6 +937,179 @@ export function closeSheetText(
     }
   }
   lines.push("Copiar no cobra. El total guardado no cambia.");
+  return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+export type AttentionRow = {
+  order: StoreOrder;
+  note: string;
+  also: string[];
+  cta: string;
+};
+
+export function attentionQueues(orders: StoreOrder[], guides: SizeGuide[] = [], canManageOrderMoney = true) {
+  const defs: Array<{
+    id: string;
+    title: string;
+    hint: string;
+    short: string;
+    cta: string;
+    match: (order: StoreOrder) => boolean;
+    note: (order: StoreOrder) => string;
+  }> = [
+    {
+      id: "cola-confirmar",
+      title: "Se pueden confirmar",
+      hint: "Pendientes listos para confirmar. Puede faltar departamento o costo; no bloquean la confirmación. El total guardado no cambia.",
+      short: "confirmar",
+      cta: "Confirmar",
+      match: (order) => readyToConfirm(order, guides),
+      note: (order) => confirmQueueNote(order, guides) || "Listo para confirmar.",
+    },
+    {
+      id: "cola-talla",
+      title: "Falta la talla o el tamaño",
+      hint: "Pendientes que no se confirman hasta anotar la talla o el tamaño. El total guardado no cambia.",
+      short: "talla",
+      cta: "Anotar talla",
+      match: (order) => needsSize(order, guides),
+      note: (order) => missingSizeQueueNote(order, guides),
+    },
+    {
+      id: "cola-departamento",
+      title: "Falta el departamento",
+      hint: "Pedidos que todavía se pueden corregir y no tienen departamento. El total guardado no cambia.",
+      short: "departamento",
+      cta: "Anotar departamento",
+      match: needsDepartment,
+      note: () => "Falta el departamento. El total guardado no cambia.",
+    },
+    {
+      id: "cola-departamento-cerrado",
+      title: "Falta el departamento y la entrega ya no se corrige",
+      hint: "Están en transporte, entregados o devueltos. Anotar el departamento no cambia el estado ni el cobro. El total guardado no cambia.",
+      short: "departamento cerrado",
+      cta: "Anotar departamento",
+      match: needsClosedDepartment,
+      note: () => "Falta el departamento. La entrega ya no se corrige. El total guardado no cambia.",
+    },
+    {
+      id: "cola-preparacion",
+      title: "Listos para preparación",
+      hint: "Confirmados con número de Dropi anotado. Pasarlos a preparación no los envía. El total guardado no cambia.",
+      short: "preparación",
+      cta: "Preparar",
+      match: readyToPrepare,
+      note: (order) => prepareQueueNote(order),
+    },
+    {
+      id: "cola-despacho",
+      title: "Por anotar despacho",
+      hint: "Pedidos en preparación. El despacho se anota a mano. El total guardado no cambia.",
+      short: "despacho",
+      cta: "Anotar despacho",
+      match: readyToDispatch,
+      note: (order) => dispatchQueueNote(order),
+    },
+    {
+      id: "cola-motivo",
+      title: "Falta el motivo de la incidencia",
+      hint: "Sin motivo no se resuelve. El cliente ve que se detuvo, sin la causa. El total guardado no cambia.",
+      short: "motivo incidencia",
+      cta: "Anotar motivo",
+      match: needsIncidenceReason,
+      note: () => "Falta el motivo. El cliente no ve la causa. Sin él no se resuelve. El total guardado no cambia.",
+    },
+    {
+      id: "cola-devolucion",
+      title: "Falta el motivo de la devolución",
+      hint: "El cliente ve la devolución sin la causa. Anotarla no cambia el estado. El total guardado no cambia.",
+      short: "motivo devolución",
+      cta: "Anotar motivo",
+      match: needsReturnReason,
+      note: () => "Falta el motivo. El cliente no ve la causa. El total guardado no cambia.",
+    },
+    {
+      id: "cola-flete-devolucion",
+      title: "Falta anotar el flete de la devolución",
+      hint: canManageOrderMoney
+        ? "Vacío no resta. Si no hubo flete, anota 0; si lo hubo, anótalo. El total guardado no cambia."
+        : "Vacío no resta. Lo anota el propietario. El total guardado no cambia.",
+      short: "flete devolución",
+      cta: canManageOrderMoney ? "Anotar flete" : "Ver pedido",
+      match: needsReturnFreight,
+      note: () =>
+        canManageOrderMoney
+          ? "El flete no está anotado. Vacío no resta. El total guardado no cambia."
+          : "El flete no está anotado. Lo anota el propietario. El total guardado no cambia.",
+    },
+    {
+      id: "cola-costo",
+      title: "Sin costo en el pedido",
+      hint: canManageOrderMoney
+        ? "Sin costo, envío o comisiones de la ficha. Si ya está cobrado, falta para la utilidad realizada. Copiarlas no cambia el total guardado."
+        : "Sin costo, envío o comisiones de la ficha. Lo copia el propietario. El total guardado no cambia.",
+      short: "costo",
+      cta: canManageOrderMoney ? "Copiar costo" : "Ver pedido",
+      match: needsCatalogCost,
+      note: (order) =>
+        canManageOrderMoney ? costQueueWarning(order) : "Falta el costo en el pedido. Lo copia el propietario. El total guardado no cambia.",
+    },
+    {
+      id: "cola-aviso",
+      title: "Falta avisarle al cliente",
+      hint: "El estado ya cambió y todavía no marcaste que le avisaste. Esa marca no envía el mensaje. El total guardado no cambia.",
+      short: "aviso al cliente",
+      cta: "Marcar aviso",
+      match: needsCustomerNotice,
+      note: () => "Falta avisarle. El mensaje está en la ficha. El total guardado no cambia.",
+    },
+  ];
+
+  const claimed = new Set<string>();
+  const ordered = canManageOrderMoney
+    ? defs
+    : [
+        ...defs.filter((def) => def.id !== "cola-flete-devolucion" && def.id !== "cola-costo"),
+        ...defs.filter((def) => def.id === "cola-flete-devolucion" || def.id === "cola-costo"),
+      ];
+  return ordered
+    .map((def) => {
+      const rows: AttentionRow[] = [];
+      for (const order of orders) {
+        if (!def.match(order) || claimed.has(order.id)) continue;
+        claimed.add(order.id);
+        const also = defs.filter((other) => other.id !== def.id && other.match(order)).map((other) => other.short);
+        rows.push({ order, note: def.note(order), also, cta: def.cta });
+      }
+      return { id: def.id, title: def.title, hint: def.hint, rows };
+    })
+    .filter((queue) => queue.rows.length > 0);
+}
+
+export function attentionSheetText(orders: StoreOrder[], guides: SizeGuide[] = [], canManageOrderMoney = true) {
+  const queues = attentionQueues(orders, guides, canManageOrderMoney);
+  const lines = [
+    "Por atender · un pedido, un siguiente paso",
+    "Esta lista no se recorta por fecha. Copiarla no cobra, no envía el mensaje y no cambia pedidos. Dropi no está conectado: desde aquí no se crea el pedido.",
+    "",
+  ];
+  if (queues.length === 0) {
+    lines.push("No hay pedidos esperando un dato o una acción.");
+  } else {
+    for (const queue of queues) {
+      lines.push(`${queue.title} (${queue.rows.length})`);
+      for (const row of queue.rows) {
+        const place = [row.order.city, row.order.department].filter(Boolean).join(" · ");
+        lines.push(`${row.order.number} · ${row.order.customerName}${place ? ` · ${place}` : ""}`);
+        lines.push(row.note);
+        if (row.also.length > 0) lines.push(`También: ${row.also.join(", ")}.`);
+        lines.push(`Siguiente paso: ${row.cta}.`);
+      }
+      lines.push("");
+    }
+  }
+  lines.push("Copiar no cobra. El total guardado no cambia. No envía el mensaje.");
   return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 

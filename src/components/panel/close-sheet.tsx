@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Period } from "@/lib/demo-data";
-import { closePhrase, closeSheetText, type CloseBasis, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import { closeSheetText, closeSpanPhrase, type CloseBasis, type OrderSpan, type SizeGuide, type StoreOrder } from "@/lib/store-order";
 
 export function CloseSheet({
   orders,
@@ -12,7 +11,7 @@ export function CloseSheet({
   fieldId,
 }: {
   orders: StoreOrder[];
-  period: Period;
+  period: OrderSpan;
   basis: CloseBasis;
   guides?: SizeGuide[];
   fieldId: string;
@@ -47,8 +46,8 @@ export function CloseSheet({
         Cierre para copiar
       </h3>
       <p className="mt-0.5 text-xs leading-5 text-muted">
-        Mismas cifras de {closePhrase(period, basis)}. Copiarlo no cobra ni cambia pedidos. No crea el pedido en Dropi.
-        {basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
+        Mismas cifras de {closeSpanPhrase(period, basis)}. Copiarlo no cobra ni cambia pedidos. No crea el pedido en Dropi.
+        {period !== "todo" && basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
       </p>
       <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
         <label className="text-sm font-semibold" htmlFor={fieldId}>
