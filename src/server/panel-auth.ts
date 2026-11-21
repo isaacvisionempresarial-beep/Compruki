@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { getPilotTenantId } from "@/server/tenant";
 
 export type PanelRole = "owner" | "operator";
 
@@ -67,12 +68,13 @@ export async function getPanelAccess(): Promise<PanelAccess | null> {
   };
 }
 
+async function isPilotMember(access: PanelAccess) {
+  const pilotId = await getPilotTenantId();
+  return access.tenantId === pilotId;
+}
+
 export async function requirePanelUser(): Promise<User> {
-  const access = await getPanelAccess();
-  if (!access) {
-    const user = await getPanelUser();
-    redirect(user ? "/ingresar?error=sin-acceso" : "/ingresar");
-  }
+  const access = await requirePanelAccess();
   return access.user;
 }
 
@@ -82,6 +84,7 @@ export async function requirePanelAccess(): Promise<PanelAccess> {
     const user = await getPanelUser();
     redirect(user ? "/ingresar?error=sin-acceso" : "/ingresar");
   }
+  if (!(await isPilotMember(access))) redirect("/ingresar?error=otra-tienda");
   return access;
 }
 
@@ -92,11 +95,14 @@ export async function requirePanelUserOrNull(): Promise<User | null> {
 
 /** Para Server Actions: sesión + membresía, sin redirect. */
 export async function assertPanelSignedIn(): Promise<boolean> {
-  return Boolean(await getPanelAccess());
+  return Boolean(await assertPanelAccess());
 }
 
 export async function assertPanelAccess(): Promise<PanelAccess | null> {
-  return getPanelAccess();
+  const access = await getPanelAccess();
+  if (!access) return null;
+  if (!(await isPilotMember(access))) return null;
+  return access;
 }
 
 export function panelActorName(user: User): string {

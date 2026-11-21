@@ -44,6 +44,7 @@ export async function saveProducts(products: CatalogProduct[]): Promise<void> {
   }));
 
   if (rows.length > 0) {
+    await refuseForeignIds(supabase, "products", tenantId, rows.map((row) => row.id));
     const { error: upsertError } = await supabase.from("products").upsert(rows, { onConflict: "id" });
     if (upsertError) {
       throw new Error(`No se pudo guardar el catálogo: ${upsertError.message}`);
@@ -58,7 +59,7 @@ export async function saveProducts(products: CatalogProduct[]): Promise<void> {
 
   const removeIds = (existing ?? []).map((row) => row.id as string).filter((id) => !keepIds.has(id));
   if (removeIds.length > 0) {
-    const { error: deleteError } = await supabase.from("products").delete().in("id", removeIds);
+    const { error: deleteError } = await supabase.from("products").delete().in("id", removeIds).eq("tenant_id", tenantId);
     if (deleteError) {
       throw new Error(`No se pudieron quitar productos: ${deleteError.message}`);
     }
@@ -104,6 +105,7 @@ export async function saveOrders(orders: StoreOrder[]): Promise<void> {
   }));
 
   if (rows.length > 0) {
+    await refuseForeignIds(supabase, "orders", tenantId, rows.map((row) => row.id));
     const { error: upsertError } = await supabase.from("orders").upsert(rows, { onConflict: "id" });
     if (upsertError) {
       throw new Error(`No se pudieron guardar los pedidos: ${upsertError.message}`);
@@ -118,10 +120,27 @@ export async function saveOrders(orders: StoreOrder[]): Promise<void> {
 
   const removeIds = (existing ?? []).map((row) => row.id as string).filter((id) => !keepIds.has(id));
   if (removeIds.length > 0) {
-    const { error: deleteError } = await supabase.from("orders").delete().in("id", removeIds);
+    const { error: deleteError } = await supabase.from("orders").delete().in("id", removeIds).eq("tenant_id", tenantId);
     if (deleteError) {
       throw new Error(`No se pudieron quitar pedidos: ${deleteError.message}`);
     }
+  }
+}
+
+async function refuseForeignIds(
+  supabase: ReturnType<typeof createAdminSupabase>,
+  table: "products" | "orders",
+  tenantId: string,
+  ids: string[],
+) {
+  if (ids.length === 0) return;
+  const { data, error } = await supabase.from(table).select("id, tenant_id").in("id", ids);
+  if (error) {
+    throw new Error(`No se pudo comprobar la tienda de ${table}: ${error.message}`);
+  }
+  const foreign = (data ?? []).some((row) => row.tenant_id !== tenantId);
+  if (foreign) {
+    throw new Error("Hay un identificador de otra tienda. No se escribió nada.");
   }
 }
 

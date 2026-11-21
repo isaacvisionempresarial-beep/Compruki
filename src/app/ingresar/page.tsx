@@ -28,6 +28,7 @@ export default async function LoginPage({
   const initialMode = params.modo === "nueva-clave" ? "nueva-clave" : params.error === "enlace" ? "recovery" : "login";
   const linkError = params.error === "enlace";
   const accessDenied = params.error === "sin-acceso";
+  const otherStore = params.error === "otra-tienda";
 
-  return <LoginScreen initialMode={initialMode} linkError={linkError} accessDenied={accessDenied} />;
+  return <LoginScreen initialMode={initialMode} linkError={linkError} accessDenied={accessDenied} otherStore={otherStore} />;
 }

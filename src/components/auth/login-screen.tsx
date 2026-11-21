@@ -22,10 +22,12 @@ export function LoginScreen({
   initialMode = "login",
   linkError = false,
   accessDenied = false,
+  otherStore = false,
 }: {
   initialMode?: Mode;
   linkError?: boolean;
   accessDenied?: boolean;
+  otherStore?: boolean;
 }) {
   const [mode, setMode] = useState<Mode>(initialMode);
 
@@ -68,7 +70,7 @@ export function LoginScreen({
 
           <div className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 sm:px-4">
             {mode === "login" ? (
-              <LoginForm onRecover={() => setMode("recovery")} accessDenied={accessDenied} />
+              <LoginForm onRecover={() => setMode("recovery")} accessDenied={accessDenied} otherStore={otherStore} />
             ) : null}
             {mode === "recovery" ? <RecoveryForm onBack={() => setMode("login")} linkError={linkError} /> : null}
             {mode === "nueva-clave" ? <NewPasswordForm onBack={() => setMode("login")} /> : null}
@@ -79,7 +81,15 @@ export function LoginScreen({
   );
 }
 
-function LoginForm({ onRecover, accessDenied }: { onRecover: () => void; accessDenied?: boolean }) {
+function LoginForm({
+  onRecover,
+  accessDenied,
+  otherStore,
+}: {
+  onRecover: () => void;
+  accessDenied?: boolean;
+  otherStore?: boolean;
+}) {
   const [state, formAction, pending] = useActionState(signIn, initialState);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -91,6 +101,24 @@ function LoginForm({ onRecover, accessDenied }: { onRecover: () => void; accessD
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Iniciar sesión</h1>
       <p className="mt-1 text-sm text-muted">Correo de tu comercio. Escribirlo no cobra ni cambia pedidos. Dropi no está conectado.</p>
+
+      {otherStore ? (
+        <div className="mt-3 space-y-2">
+          <p role="alert" className="rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
+            Tu cuenta es de otra tienda. Este panel solo abre la tienda piloto. No se leyeron ni se cambiaron sus pedidos.
+          </p>
+          <form action={signOut}>
+            <button
+              type="submit"
+              title="Cerrarla no cobra ni cambia pedidos."
+              className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle"
+            >
+              Cerrar sesión
+            </button>
+            <p className="text-xs leading-5 text-muted">Cerrarla no cobra ni cambia pedidos.</p>
+          </form>
+        </div>
+      ) : null}
 
       {accessDenied ? (
         <div className="mt-3 space-y-2">

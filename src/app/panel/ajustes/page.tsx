@@ -51,6 +51,12 @@ export default async function SettingsPage() {
           <dd className="mt-0.5 text-sm font-semibold">{access.actorName}</dd>
         </div>
         <div>
+          <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Aislamiento</dt>
+          <dd className="mt-0.5 text-sm text-muted">
+            Esta sesión solo abre {access.tenantName}. Pedidos, catálogo y agentes salen de esa tienda. Un identificador de otra tienda no se lee ni se escribe. Verlo no cobra ni cambia pedidos.
+          </dd>
+        </div>
+        <div>
           <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Qué puede esta sesión</dt>
           <dd className="mt-0.5 text-sm text-muted">
             {access.role === "owner"
