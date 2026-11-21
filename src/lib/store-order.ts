@@ -1045,6 +1045,9 @@ export function closeSheetText(
   if (products.length === 0) {
     lines.push(span === "todo" ? "No hay pedidos confirmados ni devueltos." : "En este período no hay pedidos confirmados ni devueltos.");
   } else {
+    if (products.some((row) => resultDriftNote(orders, row.sku, priceGuides, costGuides))) {
+      lines.push("Si la ficha de hoy no es el precio o el costo guardado, va bajo ese producto. El margen y la utilidad siguen con lo guardado.");
+    }
     for (const row of products) {
       const sources = row.sources.map((source) => `${source.number} ${STATUS_LABEL[source.status]}`).join(", ");
       const estimated =
@@ -1061,12 +1064,14 @@ export function closeSheetText(
         row.returnFreight > 0
           ? `${formatCop(row.returnedAmount)} · total guardado · flete de devolución ${formatCop(row.returnFreight)} resta de la utilidad`
           : `${formatCop(row.returnedAmount)} · total guardado · no entra a la utilidad`;
+      const drift = resultDriftNote(orders, row.sku, priceGuides, costGuides);
       lines.push(
         `${row.title} (${row.sku})`,
         sources ? `Pedidos: ${sources}.` : "Sin pedidos en la cuenta.",
         `Margen estimado: ${estimated}. No es dinero cobrado.`,
         `Utilidad realizada: ${realized}. No es el total guardado.`,
         `Devuelto: ${returned}.`,
+        ...(drift ? [drift] : []),
         "",
       );
     }

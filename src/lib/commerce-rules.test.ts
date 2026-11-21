@@ -545,5 +545,16 @@ describe("precio de la ficha", () => {
     expect(costNote).toContain("guardaron el costo en $40.000");
     expect(costNote).toContain("El total guardado no cambia.");
     expect(resultDriftNote([bare], "SKU-1", [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }])).toBe("");
+    const productClose = closeSheetText([confirmed], "hoy", "creados", [], [{ sku: "SKU-1", price: 90_000 }]);
+    expect(productClose).toContain("Faja (SKU-1)");
+    expect(productClose).toContain("va bajo ese producto");
+    expect(productClose).toContain("Estos pedidos guardaron $80.000");
+    expect(productClose).toContain("siguen con el precio guardado");
+    expect(productClose).not.toContain("3001234567");
+    expect(productClose).not.toContain("Calle 10");
+    expect(closeSheetText([confirmed], "hoy", "creados", [], [{ sku: "SKU-1", price: 80_000 }])).not.toContain("va bajo ese producto");
+    const productCost = closeSheetText([confirmed], "hoy", "creados", [], [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
+    expect(productCost).toContain("guardaron el costo en $40.000");
+    expect(productCost).toContain("El margen y la utilidad siguen con lo guardado.");
   });
 });
