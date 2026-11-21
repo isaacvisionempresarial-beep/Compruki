@@ -341,4 +341,46 @@ describe("cierre de pedidos", () => {
     expect(preparingSheet).toContain("P-2010");
     expect(preparingSheet).not.toContain("Se pueden confirmar");
   });
+
+  it("sigue el pedido confirmado hasta el recaudo, sin enviarlo a Dropi", () => {
+    const blocked = order({
+      status: "confirmado",
+      number: "P-2008",
+      id: "77777777-7777-4777-8777-777777777777",
+      providerRef: "",
+    });
+    const blockedSheet = attentionSheetText([blocked], [], true);
+    expect(blockedSheet).toContain("Falta el número de Dropi (1)");
+    expect(blockedSheet).toContain("Siguiente paso: Anotar número.");
+    expect(blockedSheet).toContain("no lo envía");
+    expect(blockedSheet).not.toContain("3001234567");
+    expect(blockedSheet).not.toContain("Calle 10");
+
+    const traveling = order({
+      status: "en_transporte",
+      number: "P-2009",
+      id: "88888888-8888-4888-8888-888888888888",
+      providerRef: "DP-9",
+    });
+    const travelingSheet = attentionSheetText([traveling], [], true);
+    expect(travelingSheet).toContain("Por marcar entregado (1)");
+    expect(travelingSheet).toContain("no cobra");
+    expect(travelingSheet).toContain("recaudo sigue pendiente");
+
+    const delivered = order({
+      status: "entregado",
+      number: "P-2011",
+      id: "99999999-9999-4999-8999-999999999999",
+      collected: false,
+      providerRef: "DP-11",
+      customerNotifiedAt: "2026-11-20T18:00:00.000Z",
+    });
+    const ownerSheet = attentionSheetText([delivered], [], true);
+    expect(ownerSheet).toContain("Falta anotar el recaudo (1)");
+    expect(ownerSheet).toContain("Siguiente paso: Marcar cobrado.");
+    expect(ownerSheet).toContain("no es un cobro de este sitio");
+    const operatorSheet = attentionSheetText([delivered], [], false);
+    expect(operatorSheet).toContain("Lo marca el propietario");
+    expect(operatorSheet).toContain("Siguiente paso: Ver pedido.");
+  });
 });

@@ -10,7 +10,7 @@ import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
 import { STATUS_LABEL, type Period } from "@/lib/demo-data";
 import { cx } from "@/lib/cx";
 import { formatCop, formatDay } from "@/lib/format";
-import { attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, ordersInSpan, resultsByProduct, samePhoneMatches, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import { attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, ordersInSpan, resultsByProduct, samePhoneMatches, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type SizeGuide, type StoreOrder } from "@/lib/store-order";
 
 const homeProductGrid = "md:grid-cols-[minmax(0,1.5fr)_8.75rem_8.75rem_8.75rem]";
 
@@ -92,7 +92,7 @@ export function Dashboard({
     let yours = 0;
     let ownerMoney = 0;
     for (const queue of attention) {
-      const money = queue.id === "cola-flete-devolucion" || queue.id === "cola-costo";
+      const money = attentionQueueIsOwnerMoney(queue.id);
       if (!canManageOrderMoney && money) ownerMoney += queue.rows.length;
       else yours += queue.rows.length;
     }
@@ -466,7 +466,7 @@ export function Dashboard({
                 {canManageOrderMoney
                   ? "Cola «Por atender»: un pedido, un siguiente paso."
                   : orderWork.ownerMoney > 0
-                    ? `${orderWork.ownerMoney === 1 ? "1 pedido con flete o costo lo guarda el propietario." : `${orderWork.ownerMoney} pedidos con flete o costo los guarda el propietario.`} Tú sigues estado, entrega, talla y aviso.`
+                    ? `${orderWork.ownerMoney === 1 ? "1 pedido con flete, costo o recaudo lo guarda el propietario." : `${orderWork.ownerMoney} pedidos con flete, costo o recaudo los guarda el propietario.`} Tú sigues estado, entrega, talla y aviso.`
                     : "Este número es lo que puedes hacer: estado, entrega, talla y aviso."}
               </span>
             </Link>

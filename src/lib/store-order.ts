@@ -947,6 +947,12 @@ export type AttentionRow = {
   cta: string;
 };
 
+const OWNER_MONEY_QUEUE = new Set(["cola-cobro", "cola-flete-devolucion", "cola-costo"]);
+
+export function attentionQueueIsOwnerMoney(id: string) {
+  return OWNER_MONEY_QUEUE.has(id);
+}
+
 export function attentionQueues(orders: StoreOrder[], guides: SizeGuide[] = [], canManageOrderMoney = true) {
   const defs: Array<{
     id: string;
@@ -1012,6 +1018,27 @@ export function attentionQueues(orders: StoreOrder[], guides: SizeGuide[] = [], 
       note: (order) => dispatchQueueNote(order),
     },
     {
+      id: "cola-entrega",
+      title: "Por marcar entregado",
+      hint: "Están en transporte. Marcarlos no cobra y el recaudo sigue pendiente. El total guardado no cambia.",
+      short: "entregado",
+      cta: "Marcar entregado",
+      match: readyToDeliver,
+      note: () => "Está en transporte. Marcarlo como entregado no cobra. El recaudo sigue pendiente. El total guardado no cambia.",
+    },
+    {
+      id: "cola-numero-dropi",
+      title: "Falta el número de Dropi",
+      hint: "En un confirmado, sin número no pasa a preparación. Anotarlo no lo envía ni crea el pedido. El total guardado no cambia.",
+      short: "número Dropi",
+      cta: "Anotar número",
+      match: awaitsDropiNumber,
+      note: (order) =>
+        order.status === "confirmado"
+          ? "Sin el número de Dropi no pasa a preparación. Anotarlo no lo envía ni crea el pedido. El total guardado no cambia."
+          : "Falta el número de Dropi. Anotarlo no lo envía ni crea el pedido. El total guardado no cambia.",
+    },
+    {
       id: "cola-motivo",
       title: "Falta el motivo de la incidencia",
       hint: "Sin motivo no se resuelve. El cliente ve que se detuvo, sin la causa. El total guardado no cambia.",
@@ -1028,6 +1055,20 @@ export function attentionQueues(orders: StoreOrder[], guides: SizeGuide[] = [], 
       cta: "Anotar motivo",
       match: needsReturnReason,
       note: () => "Falta el motivo. El cliente no ve la causa. El total guardado no cambia.",
+    },
+    {
+      id: "cola-cobro",
+      title: "Falta anotar el recaudo",
+      hint: canManageOrderMoney
+        ? "Entregados sin la marca de cobro. Marcarla no es un cobro de este sitio. El total guardado no cambia."
+        : "Entregados sin la marca de cobro. La marca la guarda el propietario. El total guardado no cambia.",
+      short: "recaudo",
+      cta: canManageOrderMoney ? "Marcar cobrado" : "Ver pedido",
+      match: readyToCollect,
+      note: () =>
+        canManageOrderMoney
+          ? "Está entregado y el recaudo no está anotado. Marcarlo no es un cobro de este sitio. El total guardado no cambia."
+          : "Está entregado y el recaudo no está anotado. Lo marca el propietario. El total guardado no cambia.",
     },
     {
       id: "cola-flete-devolucion",
@@ -1070,8 +1111,8 @@ export function attentionQueues(orders: StoreOrder[], guides: SizeGuide[] = [], 
   const ordered = canManageOrderMoney
     ? defs
     : [
-        ...defs.filter((def) => def.id !== "cola-flete-devolucion" && def.id !== "cola-costo"),
-        ...defs.filter((def) => def.id === "cola-flete-devolucion" || def.id === "cola-costo"),
+        ...defs.filter((def) => !attentionQueueIsOwnerMoney(def.id)),
+        ...defs.filter((def) => attentionQueueIsOwnerMoney(def.id)),
       ];
   return ordered
     .map((def) => {
@@ -1266,6 +1307,14 @@ export function readyToPrepare(order: { status: OrderStatus; providerRef?: strin
 
 export function readyToDispatch(order: { status: OrderStatus }) {
   return order.status === "en_preparacion";
+}
+
+export function readyToDeliver(order: { status: OrderStatus }) {
+  return order.status === "en_transporte";
+}
+
+export function readyToCollect(order: { status: OrderStatus; collected: boolean }) {
+  return order.status === "entregado" && !order.collected;
 }
 
 export function prepareQueueNote(order: { status: OrderStatus; providerRef?: string }) {
