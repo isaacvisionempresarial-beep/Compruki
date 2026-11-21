@@ -25,6 +25,7 @@ import {
   orderTotal,
   prepareDropiError,
   resolveIncidenceError,
+  storedSkuLines,
   pendingCheckoutMatch,
   validateCheckout,
   validateBuyerNote,
@@ -57,28 +58,7 @@ export async function countOrdersForSku(sku: string) {
 }
 
 export async function storedLinesForSku(sku: string) {
-  const needle = sku.trim().toUpperCase();
-  if (!needle) return [];
-  const lines: Array<{
-    number: string;
-    unitPrice: number;
-    unitCost?: number;
-    unitShipping?: number;
-    unitCommissions?: number;
-  }> = [];
-  for (const order of await readOrders()) {
-    for (const line of order.lines) {
-      if (line.sku !== needle) continue;
-      lines.push({
-        number: order.number,
-        unitPrice: line.unitPrice,
-        ...(typeof line.unitCost === "number" ? { unitCost: line.unitCost } : {}),
-        ...(typeof line.unitShipping === "number" ? { unitShipping: line.unitShipping } : {}),
-        ...(typeof line.unitCommissions === "number" ? { unitCommissions: line.unitCommissions } : {}),
-      });
-    }
-  }
-  return lines;
+  return storedSkuLines(await readOrders(), sku);
 }
 
 export async function skusWithOrders() {

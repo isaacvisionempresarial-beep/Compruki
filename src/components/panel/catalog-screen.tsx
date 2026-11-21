@@ -6,7 +6,7 @@ import { MAX_PRODUCT_IMAGES, parsePesos, parseVariants, productMargin, type Cata
 import { prepareProductImage } from "@/lib/prepare-image";
 import { formatCop, formatDay } from "@/lib/format";
 import { campaignPath } from "@/lib/campaign";
-import { fichaDrift, fichaDriftNote, orderFocusHref, pendingSizeHoldPhrase, pendingSizeHolds, type StoredSkuLine, type StoreOrder } from "@/lib/store-order";
+import { fichaDrift, fichaDriftNote, orderFocusHref, pendingSizeHoldPhrase, pendingSizeHolds, storedSkuLines, type StoredSkuLine, type StoreOrder } from "@/lib/store-order";
 import { cx } from "@/lib/cx";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 import { PhotoCarousel } from "@/components/photo-carousel";
@@ -53,6 +53,24 @@ export function CatalogScreen({
       ),
     [orders, products],
   );
+  const rowDrift = useMemo(() => {
+    const notes = new Map<string, { note: string; numbers: string[] }>();
+    for (const product of products) {
+      const drift = fichaDrift(storedSkuLines(orders, product.sku), {
+        price: product.price,
+        cost: product.cost,
+        shipping: product.shipping,
+        commissions: product.commissions,
+      });
+      const note = fichaDriftNote(drift, product.price);
+      if (!note) continue;
+      notes.set(product.sku, {
+        note,
+        numbers: [...new Set([...drift.priceNumbers, ...drift.costNumbers])],
+      });
+    }
+    return notes;
+  }, [orders, products]);
 
   const searched = useMemo(
     () =>
@@ -67,9 +85,11 @@ export function CatalogScreen({
           product.variants.some((name) => name.toLocaleLowerCase("es").includes(query)) ||
           (holds.get(product.sku) ? pendingSizeHoldPhrase(holds.get(product.sku)!.orders, holds.get(product.sku)!.kind, "ficha") : "")
             .toLocaleLowerCase("es")
-            .includes(query),
+            .includes(query) ||
+          (rowDrift.get(product.sku)?.note ?? "").toLocaleLowerCase("es").includes(query) ||
+          (rowDrift.get(product.sku)?.numbers ?? []).some((number) => number.toLocaleLowerCase("es").includes(query)),
       ),
-    [products, query, holds],
+    [products, query, holds, rowDrift],
   );
   const visible = useMemo(() => searched.filter((product) => matches(product, filter)), [searched, filter]);
 
@@ -82,6 +102,11 @@ export function CatalogScreen({
           <p className="mt-0.5 text-sm text-muted">
             Precio y margen de la ficha. No son el total de un pedido ni dinero cobrado. Desactivar no cambia el precio ni la publicación. Dropi no está conectado.
           </p>
+          {rowDrift.size > 0 ? (
+            <p className="mt-1 text-xs leading-5 text-warning">
+              Si la ficha de hoy no es el precio o el costo guardado, va en esa fila. Abrir el pedido no reescribe el total ni cobra.
+            </p>
+          ) : null}
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
           {canManageCommerce ? (
@@ -157,6 +182,7 @@ export function CatalogScreen({
                   product={product}
                   hasOrders={skusInOrders.has(product.sku)}
                   hold={holds.get(product.sku) ?? null}
+                  drift={rowDrift.get(product.sku) ?? null}
                   canManageCommerce={canManageCommerce}
                 />
               ))}
@@ -203,11 +229,13 @@ function CatalogProductRow({
   product,
   hasOrders,
   hold,
+  drift,
   canManageCommerce,
 }: {
   product: CatalogProduct;
   hasOrders: boolean;
   hold: { orders: number; kind: "talla" | "tamano" } | null;
+  drift: { note: string; numbers: string[] } | null;
   canManageCommerce: boolean;
 }) {
   const margin = productMargin(product);
@@ -303,6 +331,25 @@ function CatalogProductRow({
             </span>
           </p>
           <p className="mt-1 text-xs leading-5 text-muted">El precio y el margen son de la ficha. No son dinero cobrado.</p>
+          {drift ? (
+            <div className="mt-1 text-xs leading-5 text-warning">
+              <p>{drift.note}</p>
+              {drift.numbers.length > 0 ? (
+                <p className="mt-0.5">
+                  {drift.numbers.map((number) => (
+                    <Link
+                      key={number}
+                      href={orderFocusHref(number)}
+                      title="Abrirlo no cobra ni cambia el total guardado."
+                      className="mr-2 font-semibold text-accent-strong"
+                    >
+                      {number}
+                    </Link>
+                  ))}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       </div>
     </li>

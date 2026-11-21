@@ -517,6 +517,31 @@ export type StoredSkuLine = {
   unitCommissions?: number;
 };
 
+export function storedSkuLines(
+  orders: Array<{
+    number: string;
+    lines: Array<Pick<OrderLine, "sku" | "unitPrice" | "unitCost" | "unitShipping" | "unitCommissions">>;
+  }>,
+  sku: string,
+): StoredSkuLine[] {
+  const needle = sku.trim().toUpperCase();
+  if (!needle) return [];
+  const lines: StoredSkuLine[] = [];
+  for (const order of orders) {
+    for (const line of order.lines) {
+      if (line.sku !== needle) continue;
+      lines.push({
+        number: order.number,
+        unitPrice: line.unitPrice,
+        ...(typeof line.unitCost === "number" ? { unitCost: line.unitCost } : {}),
+        ...(typeof line.unitShipping === "number" ? { unitShipping: line.unitShipping } : {}),
+        ...(typeof line.unitCommissions === "number" ? { unitCommissions: line.unitCommissions } : {}),
+      });
+    }
+  }
+  return lines;
+}
+
 export function fichaDrift(
   lines: StoredSkuLine[],
   current: { price: number | null; cost: number | null; shipping: number | null; commissions: number | null },
