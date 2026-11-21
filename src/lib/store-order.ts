@@ -274,6 +274,52 @@ export function previewMarginsWithCatalogCosts(order: StoreOrder, guides: CostGu
   };
 }
 
+export function adoptCatalogCosts(order: Pick<StoreOrder, "lines">, guides: CostGuide[]) {
+  let filled = false;
+  let replaced = false;
+  const lines: OrderLine[] = [];
+  for (const line of order.lines) {
+    const guide = guides.find((item) => item.sku === line.sku);
+    const ready = readyCostGuide(guide);
+    const missingCost = typeof line.unitCost !== "number";
+    const missingShipping = typeof line.unitShipping !== "number";
+    const missingCommissions = typeof line.unitCommissions !== "number";
+    const costDiffers = ready && typeof line.unitCost === "number" && line.unitCost !== guide.cost;
+    const shippingDiffers = ready && typeof line.unitShipping === "number" && line.unitShipping !== guide.shipping;
+    const commissionsDiffer = ready && typeof line.unitCommissions === "number" && line.unitCommissions !== guide.commissions;
+    const missing = missingCost || missingShipping || missingCommissions;
+    const differs = Boolean(costDiffers || shippingDiffers || commissionsDiffer);
+    if (!missing && !differs) {
+      lines.push(line);
+      continue;
+    }
+    if (!readyCostGuide(guide)) {
+      return {
+        lines: order.lines,
+        mode: "igual" as const,
+        error: `La ficha de ${line.title} ya no tiene el costo, el envío y las comisiones.`,
+      };
+    }
+    if (missing) filled = true;
+    if (differs) replaced = true;
+    lines.push({
+      ...line,
+      unitCost: guide.cost,
+      unitShipping: guide.shipping,
+      unitCommissions: guide.commissions,
+    });
+  }
+  const mode: "igual" | "anotar" | "reemplazar" = replaced ? "reemplazar" : filled ? "anotar" : "igual";
+  return { lines, mode, error: null as string | null };
+}
+
+export function catalogCostSummary(mode: "anotar" | "reemplazar") {
+  if (mode === "reemplazar") {
+    return "Reemplazó el costo guardado con las cifras de la ficha de hoy. El precio del pedido no cambió. El total guardado no cambió. No es dinero cobrado.";
+  }
+  return "Anotó el costo, el envío y las comisiones de la ficha. El precio del pedido no cambió. El total guardado no cambió. No es dinero cobrado.";
+}
+
 export function previewMarginsWithFreight(
   order: StoreOrder,
   draft: {

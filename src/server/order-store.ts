@@ -3,7 +3,9 @@ import { campaignSkusInOrder } from "@/lib/campaign";
 import { bogotaNow, sizeChoiceLabel, variantFits } from "@/lib/catalog";
 import { formatCop } from "@/lib/format";
 import {
+  adoptCatalogCosts,
   applyOrderAction,
+  catalogCostSummary,
   nextOrderNumber,
   normalizeOrderNumber,
   pendingPhoneIsFull,
@@ -514,47 +516,28 @@ export async function applyCatalogCosts(id: string, actorName: string) {
   if (!current) return { error: "No encontré ese pedido.", order: null, saved: false };
 
   const products = await listProducts();
-  let changed = false;
-  const lines: OrderLine[] = [];
-  for (const line of current.lines) {
-    const missingCost = typeof line.unitCost !== "number";
-    const missingShipping = typeof line.unitShipping !== "number";
-    const missingCommissions = typeof line.unitCommissions !== "number";
-    if (!missingCost && !missingShipping && !missingCommissions) {
-      lines.push(line);
-      continue;
-    }
-    const product = products.find((item) => item.sku === line.sku);
-    if (
-      !product ||
-      !Number.isInteger(product.cost) ||
-      product.cost < 0 ||
-      !Number.isInteger(product.shipping) ||
-      product.shipping < 0 ||
-      !Number.isInteger(product.commissions) ||
-      product.commissions < 0
-    ) {
-      return { error: `La ficha de ${line.title} ya no tiene el costo, el envío y las comisiones.`, order: null, saved: false };
-    }
-    changed = true;
-    lines.push({
-      ...line,
-      unitCost: missingCost ? product.cost : line.unitCost,
-      unitShipping: missingShipping ? product.shipping : line.unitShipping,
-      unitCommissions: missingCommissions ? product.commissions : line.unitCommissions,
-    });
-  }
-  if (!changed) return { error: null, order: current, saved: false };
+  const adopted = adoptCatalogCosts(
+    current,
+    products.map((product) => ({
+      sku: product.sku,
+      cost: product.cost,
+      shipping: product.shipping,
+      commissions: product.commissions,
+    })),
+  );
+  if (adopted.error) return { error: adopted.error, order: null, saved: false };
+  if (adopted.mode === "igual") return { error: null, order: current, saved: false };
 
   const order: StoreOrder = {
     ...current,
-    lines,
+    lines: adopted.lines,
+    total: current.total,
     history: [
       {
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName,
-        summary: "Anotó el costo, el envío y las comisiones de la ficha. El precio del pedido no cambió. El total guardado no cambió. No es dinero cobrado.",
+        summary: catalogCostSummary(adopted.mode),
       },
       ...current.history,
     ],

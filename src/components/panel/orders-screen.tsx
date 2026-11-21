@@ -18,6 +18,7 @@ import {
   canEditDelivery,
   canEditLines,
   canNoteDropiNumber,
+  adoptCatalogCosts,
   catalogCostLines,
   previewMarginsWithCatalogCosts,
   previewMarginsWithFreight,
@@ -1089,11 +1090,13 @@ function CatalogCostForm({
   canManageOrderMoney: boolean;
 }) {
   const [costState, costAction, costPending] = useActionState(applyCatalogCostAction, initialState);
+  const adopted = adoptCatalogCosts(order, guides);
   const rows = catalogCostLines(order, guides);
-  if (rows.length === 0) return null;
-  const ready = rows.every((row) => row.ready);
+  const replacing = adopted.mode === "reemplazar";
+  if (adopted.mode === "igual" && !adopted.error && rows.length === 0) return null;
+  const ready = !adopted.error && adopted.mode !== "igual";
   const canSave = ready;
-  const preview = ready ? previewMarginsWithCatalogCosts(order, guides) : null;
+  const preview = ready ? { estimated: orderMargin({ ...order, lines: adopted.lines }), realized: orderRealizedMargin({ ...order, lines: adopted.lines }) } : null;
 
   return (
     <form
@@ -1102,8 +1105,13 @@ function CatalogCostForm({
       className="mt-3 grid gap-2 rounded-[10px] border border-line bg-canvas px-3 py-2"
     >
       <input type="hidden" name="orderId" value={order.id} />
-      <p className="text-sm font-semibold">Costo de la ficha</p>
+      <p className="text-sm font-semibold">{replacing ? "Costo de la ficha de hoy" : "Costo de la ficha"}</p>
       <ul className="space-y-1 text-sm leading-5">
+        {costDrift(order, guides).map((drift) => (
+          <li key={`hoy:${drift.sku}`}>
+            {drift.title}: hoy {drift.fields.map((field) => `${field.label} ${formatCop(field.current)}`).join(", ")}. Guardado: {drift.fields.map((field) => `${field.label} ${formatCop(field.stored)}`).join(", ")}.
+          </li>
+        ))}
         {rows.map((row, index) => (
           <li key={`${row.sku}:${index}`}>
             {row.ready
@@ -1113,8 +1121,9 @@ function CatalogCostForm({
         ))}
       </ul>
       <p className="text-sm leading-5 text-muted">
-        El precio de este pedido no cambia. El total guardado no cambia. Siguen siendo cifras estimadas. Al usarlas se
-        anotan en este pedido; no es un guardado vacío.
+        {replacing
+          ? "Estas cifras reemplazan el costo guardado de este pedido. El precio no cambia. El total guardado no cambia. No es dinero cobrado."
+          : "El precio de este pedido no cambia. El total guardado no cambia. Siguen siendo cifras estimadas. Al usarlas se anotan en este pedido; no es un guardado vacío."}
       </p>
       {preview && preview.estimated !== null ? (
         <p className="text-sm leading-5 text-ink">
@@ -1138,7 +1147,9 @@ function CatalogCostForm({
       <p className="text-sm leading-5 text-muted">
         {canManageOrderMoney
           ? canSave
-            ? "Copia el costo, el envío y las comisiones de la ficha a este pedido. El total guardado no cambia."
+            ? replacing
+              ? "Copia el costo de hoy a este pedido. El precio y el total guardado no cambian."
+              : "Copia el costo, el envío y las comisiones de la ficha a este pedido. El total guardado no cambia."
             : "Sin las cifras de la ficha el botón queda bloqueado."
           : "Solo el propietario copia estas cifras. El total guardado no cambia."}
       </p>
@@ -1151,7 +1162,7 @@ function CatalogCostForm({
           costPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
         }`}
       >
-        {costPending ? "Guardando…" : "Usar las cifras de la ficha"}
+        {costPending ? "Guardando…" : replacing ? "Usar las cifras de hoy" : "Usar las cifras de la ficha"}
       </button>
       ) : null}
     </form>

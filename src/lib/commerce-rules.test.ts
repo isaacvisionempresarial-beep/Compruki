@@ -8,6 +8,7 @@ import {
   orderMargin,
   orderRealizedMargin,
   orderTotal,
+  adoptCatalogCosts,
   costDrift,
   costDriftNote,
   priceDrift,
@@ -556,5 +557,18 @@ describe("precio de la ficha", () => {
     const productCost = closeSheetText([confirmed], "hoy", "creados", [], [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
     expect(productCost).toContain("guardaron el costo en $40.000");
     expect(productCost).toContain("El margen y la utilidad siguen con lo guardado.");
+    const sameCosts = [{ sku: "SKU-1", cost: 40_000, shipping: 8_000, commissions: 2_000 }];
+    expect(adoptCatalogCosts(current, sameCosts).mode).toBe("igual");
+    const replaced = adoptCatalogCosts(current, [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
+    expect(replaced.mode).toBe("reemplazar");
+    expect(replaced.lines[0]?.unitCost).toBe(50_000);
+    expect(replaced.lines[0]?.unitPrice).toBe(80_000);
+    expect(replaced.error).toBeNull();
+    const filled = adoptCatalogCosts(bare, [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
+    expect(filled.mode).toBe("anotar");
+    expect(filled.lines[0]?.unitCost).toBe(50_000);
+    expect(filled.lines[0]?.unitPrice).toBe(80_000);
+    expect(adoptCatalogCosts(bare, []).error).toContain("ya no tiene");
+    expect(adoptCatalogCosts(current, []).mode).toBe("igual");
   });
 });
