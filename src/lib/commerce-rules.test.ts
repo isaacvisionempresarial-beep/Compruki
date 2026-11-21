@@ -383,4 +383,42 @@ describe("cierre de pedidos", () => {
     expect(operatorSheet).toContain("Lo marca el propietario");
     expect(operatorSheet).toContain("Siguiente paso: Ver pedido.");
   });
+
+  it("deja la incidencia con motivo para resolver y el número tardío fuera del celular", () => {
+    const open = order({
+      status: "incidencia",
+      number: "P-2012",
+      id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      customerReason: "No estaba en la dirección",
+      providerRef: "",
+    });
+    const openSheet = attentionSheetText([open], [], true);
+    expect(openSheet).toContain("Lista para resolver la incidencia (1)");
+    expect(openSheet).toContain("Siguiente paso: Resolver.");
+    expect(openSheet).toContain("No la envía a Dropi.");
+    expect(openSheet).toContain("También: aviso al cliente, número Dropi.");
+    expect(openSheet).not.toContain("3001234567");
+    expect(openSheet).not.toContain("Calle 10");
+
+    const missingReason = order({
+      status: "incidencia",
+      number: "P-2013",
+      id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      customerReason: "",
+    });
+    expect(attentionSheetText([missingReason], [], true)).toContain("Falta el motivo de la incidencia (1)");
+
+    const closed = order({
+      status: "entregado",
+      number: "P-2014",
+      id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      collected: true,
+      providerRef: "",
+      customerNotifiedAt: "2026-11-20T18:00:00.000Z",
+    });
+    const closedSheet = attentionSheetText([closed], [], true);
+    expect(closedSheet).toContain("Falta el número en un pedido ya cerrado (1)");
+    expect(closedSheet).toContain("no crea otro pedido");
+    expect(closedSheet).not.toContain("Falta anotar el recaudo");
+  });
 });

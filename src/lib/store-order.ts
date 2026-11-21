@@ -1048,6 +1048,15 @@ export function attentionQueues(orders: StoreOrder[], guides: SizeGuide[] = [], 
       note: () => "Falta el motivo. El cliente no ve la causa. Sin él no se resuelve. El total guardado no cambia.",
     },
     {
+      id: "cola-resolver",
+      title: "Lista para resolver la incidencia",
+      hint: "Ya tiene motivo. Resolverla la deja confirmada. No la envía a Dropi. El total guardado no cambia.",
+      short: "resolver",
+      cta: "Resolver",
+      match: readyToResolve,
+      note: () => "Ya tiene motivo. Resolverla la deja confirmada. No la envía a Dropi. El total guardado no cambia.",
+    },
+    {
       id: "cola-devolucion",
       title: "Falta el motivo de la devolución",
       hint: "El cliente ve la devolución sin la causa. Anotarla no cambia el estado. El total guardado no cambia.",
@@ -1104,6 +1113,15 @@ export function attentionQueues(orders: StoreOrder[], guides: SizeGuide[] = [], 
       cta: "Marcar aviso",
       match: needsCustomerNotice,
       note: () => "Falta avisarle. El mensaje está en la ficha. El total guardado no cambia.",
+    },
+    {
+      id: "cola-numero-cerrado",
+      title: "Falta el número en un pedido ya cerrado",
+      hint: "Incidencia, entregado o devuelto. Anotarlo no resuelve, no crea otro pedido y no lo envía. El total guardado no cambia.",
+      short: "número Dropi",
+      cta: "Anotar número",
+      match: needsLateDropiNumber,
+      note: () => "Falta el número de Dropi. Anotarlo no crea otro pedido ni lo envía. El total guardado no cambia.",
     },
   ];
 
@@ -1330,6 +1348,15 @@ export function dispatchQueueNote(order: { status: OrderStatus }) {
 export function resolveIncidenceError(order: { status: OrderStatus; customerReason?: string }) {
   if (order.status !== "incidencia" || order.customerReason?.trim()) return null;
   return "Anota el motivo de la incidencia antes de resolverla. Anotarlo no la resuelve.";
+}
+
+export function readyToResolve(order: { status: OrderStatus; customerReason?: string }) {
+  return order.status === "incidencia" && !resolveIncidenceError(order);
+}
+
+export function needsLateDropiNumber(order: { status: OrderStatus; providerRef?: string }) {
+  if (awaitsDropiNumber(order)) return false;
+  return needsIncidenceDropiNumber(order) || needsClosedDropiNumber(order);
 }
 
 export function canNoteDropiNumber(order: Pick<StoreOrder, "status">) {
