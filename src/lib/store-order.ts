@@ -1155,6 +1155,9 @@ export function attentionSheetText(orders: StoreOrder[], guides: SizeGuide[] = [
   if (queues.some((queue) => queue.rows.some((row) => row.cta === "Marcar aviso"))) {
     lines.push("Si el paso es avisar, el mensaje va en ese pedido. Copiarlo no lo envía.");
   }
+  if (queues.some((queue) => queue.rows.some((row) => row.cta === "Anotar número" || row.cta === "Anotar despacho"))) {
+    lines.push("Si el paso es anotar el número o el despacho, va el texto para Dropi, con celular y dirección. Copiarlo no crea el pedido.");
+  }
   lines.push("");
   if (queues.length === 0) {
     lines.push("No hay pedidos esperando un dato o una acción.");
@@ -1170,6 +1173,10 @@ export function attentionSheetText(orders: StoreOrder[], guides: SizeGuide[] = [
         if (row.cta === "Marcar aviso") {
           lines.push("Mensaje para copiar. Copiarlo no lo envía:");
           lines.push(customerMessage(row.order));
+        }
+        if (row.cta === "Anotar número" || row.cta === "Anotar despacho") {
+          lines.push("Texto para Dropi. Copiarlo no crea el pedido:");
+          lines.push(dropiHandoffText(row.order));
         }
       }
       lines.push("");

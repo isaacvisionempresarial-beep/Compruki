@@ -338,7 +338,10 @@ describe("cierre de pedidos", () => {
     });
     const preparingSheet = attentionSheetText([preparing], [], true);
     expect(preparingSheet).toContain("Por anotar despacho (1)");
-    expect(preparingSheet).toContain("P-2010");
+    expect(preparingSheet).toContain("Texto para Dropi. Copiarlo no crea el pedido:");
+    expect(preparingSheet).toContain("Celular: 3001234567");
+    expect(preparingSheet).toContain("Este texto no crea el pedido en Dropi");
+    expect(preparingSheet).not.toContain("secreto-del-cliente");
     expect(preparingSheet).not.toContain("Se pueden confirmar");
   });
 
@@ -352,9 +355,10 @@ describe("cierre de pedidos", () => {
     const blockedSheet = attentionSheetText([blocked], [], true);
     expect(blockedSheet).toContain("Falta el número de Dropi (1)");
     expect(blockedSheet).toContain("Siguiente paso: Anotar número.");
-    expect(blockedSheet).toContain("no lo envía");
-    expect(blockedSheet).not.toContain("3001234567");
-    expect(blockedSheet).not.toContain("Calle 10");
+    expect(blockedSheet).toContain("Texto para Dropi. Copiarlo no crea el pedido:");
+    expect(blockedSheet).toContain("Celular: 3001234567");
+    expect(blockedSheet).toContain("Dirección: Calle 10");
+    expect(blockedSheet).not.toContain("secreto-del-cliente");
 
     const traveling = order({
       status: "en_transporte",
@@ -366,6 +370,7 @@ describe("cierre de pedidos", () => {
     expect(travelingSheet).toContain("Por marcar entregado (1)");
     expect(travelingSheet).toContain("no cobra");
     expect(travelingSheet).toContain("recaudo sigue pendiente");
+    expect(travelingSheet).not.toContain("Celular:");
 
     const delivered = order({
       status: "entregado",
@@ -379,6 +384,7 @@ describe("cierre de pedidos", () => {
     expect(ownerSheet).toContain("Falta anotar el recaudo (1)");
     expect(ownerSheet).toContain("Siguiente paso: Marcar cobrado.");
     expect(ownerSheet).toContain("no es un cobro de este sitio");
+    expect(ownerSheet).not.toContain("Celular:");
     const operatorSheet = attentionSheetText([delivered], [], false);
     expect(operatorSheet).toContain("Lo marca el propietario");
     expect(operatorSheet).toContain("Siguiente paso: Ver pedido.");
@@ -419,6 +425,7 @@ describe("cierre de pedidos", () => {
     const closedSheet = attentionSheetText([closed], [], true);
     expect(closedSheet).toContain("Falta el número en un pedido ya cerrado (1)");
     expect(closedSheet).toContain("no crea otro pedido");
+    expect(closedSheet).toContain("Celular: 3001234567");
     expect(closedSheet).not.toContain("Falta anotar el recaudo");
   });
 

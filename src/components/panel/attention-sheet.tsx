@@ -42,7 +42,7 @@ export function AttentionSheet({
         Por atender para copiar
       </h3>
       <p className="mt-0.5 text-xs leading-5 text-muted">
-        La misma cola, sin recorte de fecha. Si el paso es avisar, el texto trae el mensaje. Copiarla no cobra, no envía el mensaje y no cambia pedidos. No crea el pedido en Dropi.
+        La misma cola, sin recorte de fecha. Si el paso es avisar, trae el mensaje. Si es anotar el número o el despacho, trae el texto para Dropi, con celular y dirección. Copiarla no cobra, no envía el mensaje y no crea el pedido.
       </p>
       <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
         <label className="text-sm font-semibold" htmlFor="hoja-atender">
