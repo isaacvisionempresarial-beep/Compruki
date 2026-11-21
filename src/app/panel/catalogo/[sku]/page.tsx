@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductEditorPage } from "@/components/panel/product-editor-page";
 import { getCatalogProduct } from "@/server/catalog-store";
-import { countOrdersForSku } from "@/server/order-store";
+import { countOrdersForSku, storedLinesForSku } from "@/server/order-store";
 import { requirePanelAccess } from "@/server/panel-auth";
 
 export const dynamic = "force-dynamic";
@@ -17,10 +17,15 @@ export default async function CatalogProductPage({ params }: { params: Promise<{
   const { sku } = await params;
   const [product, access] = await Promise.all([getCatalogProduct(sku), requirePanelAccess()]);
   if (!product) notFound();
+  const [relatedOrderCount, storedLines] = await Promise.all([
+    countOrdersForSku(product.sku),
+    storedLinesForSku(product.sku),
+  ]);
   return (
     <ProductEditorPage
       product={product}
-      relatedOrderCount={await countOrdersForSku(product.sku)}
+      relatedOrderCount={relatedOrderCount}
+      storedLines={storedLines}
       canManageCommerce={access.role === "owner"}
     />
   );

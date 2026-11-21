@@ -509,6 +509,55 @@ export function priceDrift(order: Pick<StoreOrder, "lines">, guides: PriceGuide[
   return drifts;
 }
 
+export type StoredSkuLine = {
+  number: string;
+  unitPrice: number;
+  unitCost?: number;
+  unitShipping?: number;
+  unitCommissions?: number;
+};
+
+export function fichaDrift(
+  lines: StoredSkuLine[],
+  current: { price: number | null; cost: number | null; shipping: number | null; commissions: number | null },
+) {
+  const priceNumbers: string[] = [];
+  const storedPrices = new Set<number>();
+  const costNumbers: string[] = [];
+  for (const line of lines) {
+    if (current.price !== null && line.unitPrice !== current.price) {
+      if (!priceNumbers.includes(line.number)) priceNumbers.push(line.number);
+      storedPrices.add(line.unitPrice);
+    }
+    const costDiffers =
+      (current.cost !== null && typeof line.unitCost === "number" && line.unitCost !== current.cost) ||
+      (current.shipping !== null && typeof line.unitShipping === "number" && line.unitShipping !== current.shipping) ||
+      (current.commissions !== null && typeof line.unitCommissions === "number" && line.unitCommissions !== current.commissions);
+    if (costDiffers && !costNumbers.includes(line.number)) costNumbers.push(line.number);
+  }
+  return { priceNumbers, storedPrices: [...storedPrices], costNumbers };
+}
+
+export function fichaDriftNote(
+  drift: { priceNumbers: string[]; storedPrices: number[]; costNumbers: string[] },
+  price: number | null,
+) {
+  const parts: string[] = [];
+  if (price !== null && drift.priceNumbers.length > 0) {
+    const count = drift.priceNumbers.length === 1 ? "1 pedido guardó" : `${drift.priceNumbers.length} pedidos guardaron`;
+    const stored = drift.storedPrices.length === 1 ? formatCop(drift.storedPrices[0]) : "precios distintos";
+    parts.push(
+      `La ficha está en ${formatCop(price)}. ${count} ${stored}. Guardar la ficha no reescribe el total. No es dinero cobrado.`,
+    );
+  }
+  if (drift.costNumbers.length > 0) {
+    parts.push(
+      "El costo de la ficha no es el guardado en esos pedidos. Guardar la ficha no lo reescribe. El total guardado no cambia.",
+    );
+  }
+  return parts.join(" ");
+}
+
 export function priceDriftNote(drifts: Array<{ title: string; stored: number; current: number }>) {
   if (drifts.length === 0) return "";
   if (drifts.length === 1) {

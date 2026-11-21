@@ -11,6 +11,8 @@ import {
   adoptCatalogCosts,
   costDrift,
   costDriftNote,
+  fichaDrift,
+  fichaDriftNote,
   priceDrift,
   priceDriftNote,
   resultDriftNote,
@@ -602,5 +604,18 @@ describe("precio de la ficha", () => {
     expect(mixed).toContain("También: costo de hoy.");
     expect(mixed).not.toContain("3001234567");
     expect(attentionQueues([quiet], [], true, sameCosts).some((queue) => queue.id === "cola-costo-hoy")).toBe(false);
+    const stored = [{ number: "P-2040", unitPrice: 80_000, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 }];
+    const fichaSame = fichaDrift(stored, { price: 80_000, cost: 40_000, shipping: 8_000, commissions: 2_000 });
+    expect(fichaDriftNote(fichaSame, 80_000)).toBe("");
+    const fichaPrice = fichaDrift(stored, { price: 90_000, cost: 40_000, shipping: 8_000, commissions: 2_000 });
+    expect(fichaPrice.priceNumbers).toEqual(["P-2040"]);
+    expect(fichaDriftNote(fichaPrice, 90_000)).toContain("está en $90.000");
+    expect(fichaDriftNote(fichaPrice, 90_000)).toContain("1 pedido guardó $80.000");
+    expect(fichaDriftNote(fichaPrice, 90_000)).toContain("no reescribe el total");
+    const fichaCost = fichaDrift(stored, { price: 80_000, cost: 50_000, shipping: 8_000, commissions: 2_000 });
+    expect(fichaCost.priceNumbers).toEqual([]);
+    expect(fichaCost.costNumbers).toEqual(["P-2040"]);
+    expect(fichaDriftNote(fichaCost, 80_000)).toContain("El total guardado no cambia.");
+    expect(fichaDrift([{ number: "P-2041", unitPrice: 80_000 }], { price: 80_000, cost: 50_000, shipping: 8_000, commissions: 2_000 }).costNumbers).toEqual([]);
   });
 });

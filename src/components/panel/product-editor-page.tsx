@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { ProductEditor, ProductDangerZone } from "@/components/panel/catalog-screen";
 import type { CatalogProduct } from "@/lib/catalog";
+import type { StoredSkuLine } from "@/lib/store-order";
 import { saveProductAction, type SaveProductState } from "@/server/catalog-actions";
 
 const initialState: SaveProductState = { error: null, productId: null, message: null };
@@ -11,10 +12,12 @@ const initialState: SaveProductState = { error: null, productId: null, message: 
 export function ProductEditorPage({
   product,
   relatedOrderCount = 0,
+  storedLines = [],
   canManageCommerce = false,
 }: {
   product: CatalogProduct | null;
   relatedOrderCount?: number;
+  storedLines?: StoredSkuLine[];
   canManageCommerce?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(saveProductAction, initialState);
@@ -55,6 +58,7 @@ export function ProductEditorPage({
         pending={pending}
         error={state.error}
         relatedOrderCount={relatedOrderCount}
+        storedLines={storedLines}
         canManageCommerce={canManageCommerce}
       />
       {product ? (

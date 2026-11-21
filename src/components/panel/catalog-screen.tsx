@@ -6,7 +6,7 @@ import { MAX_PRODUCT_IMAGES, parsePesos, parseVariants, productMargin, type Cata
 import { prepareProductImage } from "@/lib/prepare-image";
 import { formatCop, formatDay } from "@/lib/format";
 import { campaignPath } from "@/lib/campaign";
-import { pendingSizeHoldPhrase, pendingSizeHolds, type StoreOrder } from "@/lib/store-order";
+import { fichaDrift, fichaDriftNote, orderFocusHref, pendingSizeHoldPhrase, pendingSizeHolds, type StoredSkuLine, type StoreOrder } from "@/lib/store-order";
 import { cx } from "@/lib/cx";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 import { PhotoCarousel } from "@/components/photo-carousel";
@@ -568,12 +568,45 @@ function catalogMark(product: { published: boolean; available: boolean }) {
   return { label: "Borrador", tone: "off" as const };
 }
 
+function FichaDriftNotice({
+  lines,
+  amounts,
+}: {
+  lines: StoredSkuLine[];
+  amounts: { price: number | null; cost: number | null; shipping: number | null; commissions: number | null };
+}) {
+  const drift = fichaDrift(lines, amounts);
+  const note = fichaDriftNote(drift, amounts.price);
+  if (!note) return null;
+  const numbers = [...new Set([...drift.priceNumbers, ...drift.costNumbers])];
+  return (
+    <div className="mt-2 text-sm leading-5 text-warning">
+      <p>{note}</p>
+      {numbers.length > 0 ? (
+        <p className="mt-1">
+          {numbers.map((number) => (
+            <Link
+              key={number}
+              href={orderFocusHref(number)}
+              title="Abrirlo no cobra ni cambia el total guardado."
+              className="mr-2 font-semibold text-accent-strong"
+            >
+              {number}
+            </Link>
+          ))}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 export function ProductEditor({
   product,
   formAction,
   pending,
   error,
   relatedOrderCount = 0,
+  storedLines = [],
   canManageCommerce = false,
 }: {
   product: CatalogProduct | null;
@@ -581,6 +614,7 @@ export function ProductEditor({
   pending: boolean;
   error: string | null;
   relatedOrderCount?: number;
+  storedLines?: StoredSkuLine[];
   canManageCommerce?: boolean;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
@@ -937,6 +971,15 @@ export function ProductEditor({
                   ? "El precio, el costo y el margen son de esta ficha. Publicar y poder pedirlo son dos decisiones distintas."
                   : "Precio, costo, envío y comisiones los guarda el propietario. Puedes cambiar la disponibilidad."}
               </p>
+              <FichaDriftNotice
+                lines={storedLines}
+                amounts={{
+                  price: parsePesos(amounts.price),
+                  cost: parsePesos(amounts.cost),
+                  shipping: parsePesos(amounts.shipping),
+                  commissions: parsePesos(amounts.commissions),
+                }}
+              />
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 <MoneyField label="Precio de venta" name="price" title="Es el precio de la ficha. No es dinero cobrado." value={amounts.price} readOnly={!canManageCommerce} onValue={(price) => setAmounts((current) => ({ ...current, price }))} />
                 <MoneyField label="Costo del producto" name="cost" title="Es el costo de la ficha. No es dinero cobrado." value={amounts.cost} readOnly={!canManageCommerce} onValue={(cost) => setAmounts((current) => ({ ...current, cost }))} />

@@ -56,6 +56,31 @@ export async function countOrdersForSku(sku: string) {
   return (await readOrders()).filter((order) => order.lines.some((line) => line.sku === needle)).length;
 }
 
+export async function storedLinesForSku(sku: string) {
+  const needle = sku.trim().toUpperCase();
+  if (!needle) return [];
+  const lines: Array<{
+    number: string;
+    unitPrice: number;
+    unitCost?: number;
+    unitShipping?: number;
+    unitCommissions?: number;
+  }> = [];
+  for (const order of await readOrders()) {
+    for (const line of order.lines) {
+      if (line.sku !== needle) continue;
+      lines.push({
+        number: order.number,
+        unitPrice: line.unitPrice,
+        ...(typeof line.unitCost === "number" ? { unitCost: line.unitCost } : {}),
+        ...(typeof line.unitShipping === "number" ? { unitShipping: line.unitShipping } : {}),
+        ...(typeof line.unitCommissions === "number" ? { unitCommissions: line.unitCommissions } : {}),
+      });
+    }
+  }
+  return lines;
+}
+
 export async function skusWithOrders() {
   const skus = new Set<string>();
   for (const order of await readOrders()) {
