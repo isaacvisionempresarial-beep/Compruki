@@ -16,6 +16,8 @@ import {
   catalogDriftText,
   fichaDrift,
   fichaDriftNote,
+  skuCostGroupNote,
+  skuCostGroups,
   storedSkuLines,
   priceDrift,
   priceDriftNote,
@@ -711,6 +713,30 @@ describe("precio de la ficha", () => {
     expect(copied).not.toContain("3001234567");
     expect(copied).not.toContain("Calle 10");
     expect(catalogDriftText([{ sku: "SKU-1", title: "Faja", price: 80_000, cost: 40_000, shipping: 8_000, commissions: 2_000 }], driftSource)).toBe("");
+    const costLines = [
+      { number: "P-2060", status: "confirmado" as const, unitPrice: 80_000, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 },
+      { number: "P-2061", status: "entregado" as const, collected: true, unitPrice: 80_000, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 },
+      { number: "P-2062", status: "pendiente_confirmacion" as const, unitPrice: 80_000, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 },
+      { number: "P-2063", status: "confirmado" as const, unitPrice: 80_000 },
+    ];
+    const groups = skuCostGroups(costLines, { cost: 50_000, shipping: 8_000, commissions: 2_000 });
+    expect(groups.counted).toEqual(["P-2060", "P-2061"]);
+    expect(groups.collected).toEqual(["P-2061"]);
+    expect(groups.outside).toEqual(["P-2062"]);
+    const groupNote = skuCostGroupNote(groups);
+    expect(groupNote).toContain("P-2060 y P-2061 ya cuentan");
+    expect(groupNote).toContain("P-2061 ya está cobrado");
+    expect(groupNote).toContain("No es un cobro nuevo");
+    expect(groupNote).toContain("P-2062 sigue fuera de la cuenta");
+    expect(groupNote).not.toContain("3001234567");
+    expect(skuCostGroupNote(skuCostGroups([{ number: "P-2064", status: "confirmado", unitPrice: 80_000, unitCost: 50_000, unitShipping: 8_000, unitCommissions: 2_000 }], { cost: 50_000, shipping: 8_000, commissions: 2_000 }))).toBe("");
+    const planned = catalogDriftText(
+      [{ sku: "SKU-1", title: "Faja", price: 80_000, cost: 50_000, shipping: 8_000, commissions: 2_000 }],
+      [{ number: "P-2060", status: "confirmado", lines: [{ sku: "SKU-1", unitPrice: 80_000, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 }] }],
+    );
+    expect(planned).toContain("P-2060 ya cuenta");
+    expect(planned).toContain("el botón de la ficha lo anota");
+    expect(planned).not.toContain("3001234567");
     expect(fichaDrift([{ number: "P-2041", unitPrice: 80_000 }], { price: 80_000, cost: 50_000, shipping: 8_000, commissions: 2_000 }).costNumbers).toEqual([]);
     const listed = storedSkuLines(
       [

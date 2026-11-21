@@ -6,7 +6,7 @@ import { MAX_PRODUCT_IMAGES, parsePesos, parseVariants, productMargin, type Cata
 import { prepareProductImage } from "@/lib/prepare-image";
 import { formatCop, formatDay } from "@/lib/format";
 import { campaignPath } from "@/lib/campaign";
-import { catalogDriftText, fichaDrift, fichaDriftNote, orderFocusHref, pendingSizeHoldPhrase, pendingSizeHolds, storedSkuLines, type StoredSkuLine, type StoreOrder } from "@/lib/store-order";
+import { catalogDriftText, fichaDrift, fichaDriftNote, orderFocusHref, pendingSizeHoldPhrase, pendingSizeHolds, skuCostGroupNote, skuCostGroups, storedSkuLines, type StoredSkuLine, type StoreOrder } from "@/lib/store-order";
 import { cx } from "@/lib/cx";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 import { PhotoCarousel } from "@/components/photo-carousel";
@@ -57,7 +57,7 @@ export function CatalogScreen({
     [orders, products],
   );
   const rowDrift = useMemo(() => {
-    const notes = new Map<string, { note: string; numbers: string[]; pending: string[]; cancel: string[]; incidence: string[]; returned: string[] }>();
+    const notes = new Map<string, { note: string; plan: string; numbers: string[]; pending: string[]; cancel: string[]; incidence: string[]; returned: string[] }>();
     for (const product of products) {
       const drift = fichaDrift(storedSkuLines(orders, product.sku), {
         price: product.price,
@@ -69,6 +69,13 @@ export function CatalogScreen({
       if (!note) continue;
       notes.set(product.sku, {
         note,
+        plan: skuCostGroupNote(
+          skuCostGroups(storedSkuLines(orders, product.sku), {
+            cost: product.cost,
+            shipping: product.shipping,
+            commissions: product.commissions,
+          }),
+        ),
         numbers: [...new Set([...drift.priceNumbers, ...drift.costNumbers])],
         pending: drift.pendingNumbers,
         cancel: drift.cancelNumbers,
@@ -95,6 +102,7 @@ export function CatalogScreen({
             .toLocaleLowerCase("es")
             .includes(query) ||
           (rowDrift.get(product.sku)?.note ?? "").toLocaleLowerCase("es").includes(query) ||
+          (rowDrift.get(product.sku)?.plan ?? "").toLocaleLowerCase("es").includes(query) ||
           (rowDrift.get(product.sku)?.numbers ?? []).some((number) => number.toLocaleLowerCase("es").includes(query)),
       ),
     [products, query, holds, rowDrift],
@@ -247,7 +255,7 @@ function CatalogProductRow({
   product: CatalogProduct;
   hasOrders: boolean;
   hold: { orders: number; kind: "talla" | "tamano" } | null;
-  drift: { note: string; numbers: string[]; pending: string[]; cancel: string[]; incidence: string[]; returned: string[] } | null;
+  drift: { note: string; plan: string; numbers: string[]; pending: string[]; cancel: string[]; incidence: string[]; returned: string[] } | null;
   canManageCommerce: boolean;
 }) {
   const margin = productMargin(product);
@@ -346,6 +354,7 @@ function CatalogProductRow({
           {drift ? (
             <div className="mt-1 text-xs leading-5 text-warning">
               <p>{drift.note}</p>
+              {drift.plan ? <p className="mt-1">{drift.plan}</p> : null}
               {drift.numbers.length > 0 ? (
                 <p className="mt-0.5">
                   {drift.numbers.map((number) => (
@@ -676,7 +685,7 @@ function CatalogDriftSheet({ text }: { text: string }) {
         Fichas para copiar
       </h2>
       <p className="mt-0.5 text-xs leading-5 text-muted">
-        El catálogo completo, no el filtro de la pantalla. Van el precio, el costo, el envío y las comisiones de hoy junto a lo guardado, y el número del pedido. Si sigue pendiente o está cancelado, no entra al margen ni a la utilidad. En incidencia no suma como venta confirmada. Devuelto, el total guardado no entra a la utilidad. Copiar no cobra, no reescribe los pedidos y no cambia el total guardado.
+        El catálogo completo, no el filtro de la pantalla. Van el precio, el costo, el envío y las comisiones de hoy junto a lo guardado, y el número del pedido. Si sigue pendiente o está cancelado, no entra al margen ni a la utilidad. En incidencia no suma como venta confirmada. Devuelto, el total guardado no entra a la utilidad. El botón de la ficha sí anota el costo. Copiar esta lista no lo guarda ni cambia el total.
       </p>
       <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
         <label className="text-sm font-semibold" htmlFor="catalogo-fichas-distintas">
@@ -738,6 +747,9 @@ function SkuCostApply({
     parsePesos(amounts.commissions) !== product.commissions;
   const count = saved.costNumbers.length;
   const label = count === 1 ? "1 pedido" : `${count} pedidos`;
+  const plan = skuCostGroupNote(
+    skuCostGroups(lines, { cost: product.cost, shipping: product.shipping, commissions: product.commissions }),
+  );
   return (
     <div className="mt-3 rounded-[10px] border border-line bg-card px-3 py-2">
       <p className="text-sm font-semibold">Costo de hoy en los pedidos</p>
@@ -746,6 +758,7 @@ function SkuCostApply({
           ? `Copia el costo, el envío y las comisiones ya guardados en esta ficha a ${label}. No usa lo que está escrito y todavía no guardaste. El precio de cada pedido no cambia. El total guardado no cambia. No es dinero cobrado.`
           : "Solo el propietario copia estas cifras a los pedidos. El precio y el total guardado no cambian."}
       </p>
+      {plan ? <p className="mt-1 text-sm leading-5 text-warning">{plan}</p> : null}
       {dirty ? (
         <p className="mt-1 text-sm leading-5 text-warning">Guarda la ficha primero. Este botón usa lo ya guardado, no lo que está escrito.</p>
       ) : null}

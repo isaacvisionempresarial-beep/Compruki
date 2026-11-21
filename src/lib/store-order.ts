@@ -555,6 +555,7 @@ export function priceDrift(order: Pick<StoreOrder, "lines">, guides: PriceGuide[
 export type StoredSkuLine = {
   number: string;
   status?: OrderStatus;
+  collected?: boolean;
   unitPrice: number;
   unitCost?: number;
   unitShipping?: number;
@@ -565,6 +566,7 @@ export function storedSkuLines(
   orders: Array<{
     number: string;
     status?: OrderStatus;
+    collected?: boolean;
     lines: Array<Pick<OrderLine, "sku" | "unitPrice" | "unitCost" | "unitShipping" | "unitCommissions">>;
   }>,
   sku: string,
@@ -578,6 +580,7 @@ export function storedSkuLines(
       lines.push({
         number: order.number,
         ...(order.status ? { status: order.status } : {}),
+        ...(order.collected ? { collected: true } : {}),
         unitPrice: line.unitPrice,
         ...(typeof line.unitCost === "number" ? { unitCost: line.unitCost } : {}),
         ...(typeof line.unitShipping === "number" ? { unitShipping: line.unitShipping } : {}),
@@ -694,6 +697,52 @@ export function fichaDriftNote(
   return parts.join(" ");
 }
 
+const COST_COUNTED: OrderStatus[] = ["confirmado", "en_preparacion", "en_transporte", "entregado"];
+const COST_OUTSIDE: OrderStatus[] = ["pendiente_confirmacion", "cancelado", "incidencia", "devuelto"];
+
+function nameList(numbers: string[]) {
+  if (numbers.length <= 1) return numbers[0] ?? "";
+  if (numbers.length === 2) return `${numbers[0]} y ${numbers[1]}`;
+  return `${numbers.slice(0, -1).join(", ")} y ${numbers[numbers.length - 1]}`;
+}
+
+export function skuCostGroups(
+  lines: StoredSkuLine[],
+  current: { cost: number; shipping: number; commissions: number },
+) {
+  const drift = fichaDrift(lines, { price: null, ...current });
+  const counted: string[] = [];
+  const outside: string[] = [];
+  const collected: string[] = [];
+  for (const number of drift.costNumbers) {
+    const line = lines.find((item) => item.number === number);
+    if (line?.status && COST_OUTSIDE.includes(line.status)) outside.push(number);
+    else if (line?.status && COST_COUNTED.includes(line.status)) counted.push(number);
+    if (line?.status === "entregado" && line.collected) collected.push(number);
+  }
+  return { counted, outside, collected };
+}
+
+export function skuCostGroupNote(groups: { counted: string[]; outside: string[]; collected: string[] }) {
+  const parts: string[] = [];
+  if (groups.counted.length === 1) {
+    parts.push(`${groups.counted[0]} ya cuenta. Si copias el costo de hoy, su margen estimado pasa a usarlo. El total guardado no cambia.`);
+  } else if (groups.counted.length > 1) {
+    parts.push(`${nameList(groups.counted)} ya cuentan. Si copias el costo de hoy, su margen estimado pasa a usarlo. El total guardado no cambia.`);
+  }
+  if (groups.collected.length === 1) {
+    parts.push(`${groups.collected[0]} ya está cobrado. La utilidad pasa a usar el costo de hoy. No es un cobro nuevo. El total guardado no cambia.`);
+  } else if (groups.collected.length > 1) {
+    parts.push(`${nameList(groups.collected)} ya están cobrados. La utilidad pasa a usar el costo de hoy. No es un cobro nuevo. El total guardado no cambia.`);
+  }
+  if (groups.outside.length === 1) {
+    parts.push(`${groups.outside[0]} sigue fuera de la cuenta. Copiar el costo no lo mete al margen ni a la utilidad.`);
+  } else if (groups.outside.length > 1) {
+    parts.push(`${nameList(groups.outside)} siguen fuera de la cuenta. Copiar el costo no los mete al margen ni a la utilidad.`);
+  }
+  return parts.join(" ");
+}
+
 export function accountHoldNote(status: OrderStatus) {
   if (status === "pendiente_confirmacion") return "Sigue pendiente: no entra al margen ni a la utilidad.";
   if (status === "cancelado") return "Está cancelado: no entra al margen ni a la utilidad.";
@@ -707,6 +756,7 @@ export function catalogDriftText(
   orders: Array<{
     number: string;
     status?: OrderStatus;
+    collected?: boolean;
     lines: Array<Pick<OrderLine, "sku" | "unitPrice" | "unitCost" | "unitShipping" | "unitCommissions">>;
   }>,
 ) {
@@ -721,12 +771,24 @@ export function catalogDriftText(
     const note = fichaDriftNote(drift, product.price);
     if (!note) continue;
     const numbers = [...new Set([...drift.priceNumbers, ...drift.costNumbers])];
-    blocks.push(product.title + " (" + product.sku + ")", note, numbers.length > 0 ? "Pedidos: " + numbers.join(", ") + "." : "");
+    const plan = skuCostGroupNote(
+      skuCostGroups(storedSkuLines(orders, product.sku), {
+        cost: product.cost,
+        shipping: product.shipping,
+        commissions: product.commissions,
+      }),
+    );
+    blocks.push(
+      product.title + " (" + product.sku + ")",
+      note,
+      ...(plan ? [plan] : []),
+      numbers.length > 0 ? "Pedidos: " + numbers.join(", ") + "." : "",
+    );
   }
   if (blocks.length === 0) return "";
   return [
     "Fichas con otro precio o costo guardado",
-    "Copiar este texto no cobra, no reescribe los pedidos y no cambia el total guardado.",
+    "Copiar este texto no cobra, no reescribe los pedidos y no cambia el total guardado. Si el costo guardado es otro, el botón de la ficha lo anota. Esta lista no lo guarda. El precio del pedido no cambia.",
     "Un pedido pendiente o cancelado no entra al margen ni a la utilidad. En incidencia no suma como venta confirmada. Devuelto, el total guardado no entra a la utilidad.",
     "",
     ...blocks,
