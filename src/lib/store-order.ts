@@ -451,6 +451,27 @@ export function orderTotal(lines: Array<Pick<OrderLine, "unitPrice" | "quantity"
   return lines.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0);
 }
 
+export type PriceGuide = { sku: string; price: number };
+
+export function priceDrift(order: Pick<StoreOrder, "lines">, guides: PriceGuide[]) {
+  const drifts: Array<{ sku: string; title: string; stored: number; current: number }> = [];
+  for (const line of order.lines) {
+    const guide = guides.find((item) => item.sku === line.sku);
+    if (!guide || guide.price === line.unitPrice) continue;
+    drifts.push({ sku: line.sku, title: line.title, stored: line.unitPrice, current: guide.price });
+  }
+  return drifts;
+}
+
+export function priceDriftNote(drifts: Array<{ title: string; stored: number; current: number }>) {
+  if (drifts.length === 0) return "";
+  if (drifts.length === 1) {
+    const drift = drifts[0];
+    return `La ficha de ${drift.title} hoy está en ${formatCop(drift.current)}. Este pedido guardó ${formatCop(drift.stored)}. Cambiar la ficha no reescribe el total guardado. No es dinero cobrado.`;
+  }
+  return `La ficha cambió en ${drifts.map((drift) => drift.title).join(", ")}. Este pedido conserva el precio guardado. Cambiar la ficha no reescribe el total guardado. No es dinero cobrado.`;
+}
+
 export function normalizePhone(raw: string) {
   const digits = raw.replace(/\D/g, "");
   if (digits.length === 12 && digits.startsWith("57")) return digits.slice(2);

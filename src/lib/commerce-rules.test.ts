@@ -8,6 +8,8 @@ import {
   orderMargin,
   orderRealizedMargin,
   orderTotal,
+  priceDrift,
+  priceDriftNote,
   attentionSheetText,
   closePhrase,
   closeSheetText,
@@ -452,5 +454,18 @@ describe("cierre de pedidos", () => {
       providerRef: "",
     });
     expect(attentionSheetText([blocked], [], true)).not.toContain("Hola Ana.");
+  });
+});
+
+describe("precio de la ficha", () => {
+  it("avisa si la ficha de hoy ya no es el precio guardado", () => {
+    const current = order({ status: "confirmado", number: "P-2030" });
+    expect(priceDrift(current, [{ sku: "SKU-1", price: 80_000 }])).toHaveLength(0);
+    const moved = priceDrift(current, [{ sku: "SKU-1", price: 90_000 }]);
+    expect(moved).toEqual([{ sku: "SKU-1", title: "Faja", stored: 80_000, current: 90_000 }]);
+    expect(priceDriftNote(moved)).toContain("hoy está en $90.000");
+    expect(priceDriftNote(moved)).toContain("guardó $80.000");
+    expect(priceDriftNote(moved)).toContain("no reescribe el total guardado");
+    expect(priceDrift(current, [])).toHaveLength(0);
   });
 });

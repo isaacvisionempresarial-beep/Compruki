@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Dashboard } from "@/components/panel/dashboard";
 import { bogotaNow } from "@/lib/catalog";
 import { listPendingApprovals } from "@/server/agent-central";
-import { listSizeGuides } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
+import { listPriceGuides, listSizeGuides } from "@/server/catalog-store";
 import { requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
@@ -17,9 +17,10 @@ export default async function PanelPage() {
   const access = await requirePanelAccess();
   const today = bogotaNow().slice(0, 10);
   const greetingName = access.actorName.split(/\s+/)[0] || access.actorName;
-  const [storeOrders, sizeGuides, pendingApprovals] = await Promise.all([
+  const [storeOrders, sizeGuides, priceGuides, pendingApprovals] = await Promise.all([
     listOrders(),
     listSizeGuides(),
+    listPriceGuides(),
     listPendingApprovals(),
   ]);
 
@@ -41,6 +42,7 @@ export default async function PanelPage() {
     <Dashboard
       storeOrders={storeOrders}
       sizeGuides={sizeGuides}
+      priceGuides={priceGuides}
       today={today}
       greetingName={greetingName}
       canManageOrderMoney={access.role === "owner"}

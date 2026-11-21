@@ -10,7 +10,7 @@ import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
 import { STATUS_LABEL, type Period } from "@/lib/demo-data";
 import { cx } from "@/lib/cx";
 import { formatCop, formatDay } from "@/lib/format";
-import { attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, ordersInSpan, resultsByProduct, samePhoneMatches, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import { attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, ordersInSpan, priceDrift, resultsByProduct, samePhoneMatches, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
 
 const homeProductGrid = "md:grid-cols-[minmax(0,1.5fr)_8.75rem_8.75rem_8.75rem]";
 
@@ -31,6 +31,7 @@ export type AgentPendingSummary = {
 export function Dashboard({
   storeOrders,
   sizeGuides,
+  priceGuides = [],
   today,
   greetingName,
   canManageOrderMoney = false,
@@ -40,6 +41,7 @@ export function Dashboard({
 }: {
   storeOrders: StoreOrder[];
   sizeGuides: SizeGuide[];
+  priceGuides?: PriceGuide[];
   today: string;
   greetingName: string;
   canManageOrderMoney?: boolean;
@@ -83,10 +85,11 @@ export function Dashboard({
         row.order.city,
         row.order.department ?? "",
         row.order.campaignEntry ? "campaña" : "",
+        priceDrift(row.order, priceGuides).length > 0 ? "la ficha cambió" : "",
         ...row.order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""]),
       ].some((value) => value.toLocaleLowerCase("es").includes(query)),
     );
-  }, [attention, query]);
+  }, [attention, priceGuides, query]);
 
   const orderWork = useMemo(() => {
     let yours = 0;
@@ -403,6 +406,7 @@ export function Dashboard({
                 order.campaignEntry ? "Campaña" : "",
                 phoneCount === 1 ? "mismo celular en otro" : phoneCount > 1 ? `mismo celular en ${phoneCount} más` : "",
                 row.also.length > 0 ? `También: ${row.also.join(", ")}` : "",
+                priceDrift(order, priceGuides).length > 0 ? "La ficha cambió. El total guardado no se reescribe." : "",
               ]
                 .filter(Boolean)
                 .join(" · ");

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { OrderEditor } from "@/components/panel/orders-screen";
-import { listCostGuides, listOrderableProducts, listSizeGuides } from "@/server/catalog-store";
+import { listCostGuides, listOrderableProducts, listPriceGuides, listSizeGuides } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
 import { requirePanelAccess } from "@/server/panel-auth";
 
@@ -15,12 +15,13 @@ export async function generateMetadata({ params }: { params: Promise<{ number: s
 
 export default async function OrderPage({ params }: { params: Promise<{ number: string }> }) {
   const { number } = await params;
-  const [orders, access, products, sizeGuides, costGuides] = await Promise.all([
+  const [orders, access, products, sizeGuides, costGuides, priceGuides] = await Promise.all([
     listOrders(),
     requirePanelAccess(),
     listOrderableProducts(),
     listSizeGuides(),
     listCostGuides(),
+    listPriceGuides(),
   ]);
   const order = orders.find((item) => item.number === decodeURIComponent(number));
   if (!order) notFound();
@@ -30,6 +31,7 @@ export default async function OrderPage({ params }: { params: Promise<{ number: 
       orders={orders}
       products={products}
       sizeGuides={sizeGuides}
+      priceGuides={priceGuides}
       costGuides={costGuides}
       canManageOrderMoney={access.role === "owner"}
     />

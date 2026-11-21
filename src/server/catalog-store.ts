@@ -252,6 +252,10 @@ export async function listCostGuides() {
   }));
 }
 
+export async function listPriceGuides() {
+  return (await listProducts()).map((product) => ({ sku: product.sku, price: product.price }));
+}
+
 export async function getPublicProduct(sku: string) {
   const product = (await readProducts()).find((item) => item.published && item.sku === sku.toUpperCase());
   return product ? toPublicProduct(product) : null;
