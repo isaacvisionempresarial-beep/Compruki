@@ -925,6 +925,7 @@ export function closeSheetText(
   basis: CloseBasis = "creados",
   guides: SizeGuide[] = [],
   priceGuides: PriceGuide[] = [],
+  costGuides: CostGuide[] = [],
 ) {
   const summary = summarizeStoreOrders(orders);
   const products = resultsByProduct(orders, guides);
@@ -941,6 +942,16 @@ export function closeSheetText(
     lines.push(
       "En estos pedidos la ficha de hoy no es el precio guardado. El cierre sigue con el total guardado. Cambiar la ficha no lo reescribe. No es dinero cobrado.",
       ...drifted,
+    );
+  }
+  const costDrifted = orders.flatMap((order) => {
+    const note = costDriftNote(costDrift(order, costGuides));
+    return note ? [`${order.number}. ${note}`] : [];
+  });
+  if (costDrifted.length > 0) {
+    lines.push(
+      "En estos pedidos la ficha de hoy no es el costo guardado. El cierre sigue con el costo guardado y el total guardado. Cambiar la ficha no los reescribe. No es dinero cobrado.",
+      ...costDrifted,
     );
   }
   lines.push(

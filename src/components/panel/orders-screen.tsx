@@ -235,7 +235,7 @@ export function OrdersScreen({
           }
         />
       </dl>
-      <CloseSheet orders={spanOrders} period={span} basis={basis} guides={sizeGuides} priceGuides={priceGuides} fieldId="cierre-pedidos" />
+      <CloseSheet orders={spanOrders} period={span} basis={basis} guides={sizeGuides} priceGuides={priceGuides} costGuides={costGuides} fieldId="cierre-pedidos" />
       <section className="mt-5" aria-labelledby="por-atender">
         <h2 id="por-atender" className="text-sm font-semibold">
           Por atender

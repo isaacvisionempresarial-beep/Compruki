@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { closeSheetText, closeSpanPhrase, priceDrift, type CloseBasis, type OrderSpan, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import { closeSheetText, closeSpanPhrase, costDrift, priceDrift, type CloseBasis, type CostGuide, type OrderSpan, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
 
 export function CloseSheet({
   orders,
@@ -9,6 +9,7 @@ export function CloseSheet({
   basis,
   guides = [],
   priceGuides = [],
+  costGuides = [],
   fieldId,
 }: {
   orders: StoreOrder[];
@@ -16,10 +17,12 @@ export function CloseSheet({
   basis: CloseBasis;
   guides?: SizeGuide[];
   priceGuides?: PriceGuide[];
+  costGuides?: CostGuide[];
   fieldId: string;
 }) {
-  const text = closeSheetText(orders, period, basis, guides, priceGuides);
+  const text = closeSheetText(orders, period, basis, guides, priceGuides, costGuides);
   const drifted = orders.some((order) => priceDrift(order, priceGuides).length > 0);
+  const costDrifted = orders.some((order) => costDrift(order, costGuides).length > 0);
   const [copied, setCopied] = useState<"ok" | "fail" | null>(null);
 
   function copy() {
@@ -49,12 +52,17 @@ export function CloseSheet({
         Cierre para copiar
       </h3>
       <p className="mt-0.5 text-xs leading-5 text-muted">
-        Mismas cifras de {closeSpanPhrase(period, basis)}. Si la ficha de hoy no es el precio guardado, van los dos montos. Copiarlo no cobra, no reescribe el total y no crea el pedido en Dropi.
+        Mismas cifras de {closeSpanPhrase(period, basis)}. Si la ficha de hoy no es el precio guardado, van los dos montos. Si no es el costo, el envío o las comisiones guardadas, van las dos cifras. Copiarlo no cobra, no reescribe lo guardado y no crea el pedido en Dropi.
         {period !== "todo" && basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
       </p>
       {drifted ? (
         <p className="mt-2 text-sm leading-5 text-warning">
           Hay pedidos con otro precio en la ficha de hoy. El texto trae los dos montos. El cierre sigue con el total guardado. No es dinero cobrado.
+        </p>
+      ) : null}
+      {costDrifted ? (
+        <p className="mt-2 text-sm leading-5 text-warning">
+          Hay pedidos con otro costo en la ficha de hoy. El texto trae las dos cifras. El cierre sigue con el costo guardado y el total guardado. No es dinero cobrado.
         </p>
       ) : null}
       <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">

@@ -520,5 +520,14 @@ describe("precio de la ficha", () => {
     expect(movedSheet).toContain("Copiarlas no reescribe lo guardado");
     expect(movedSheet).not.toContain("3001234567");
     expect(movedSheet).not.toContain("Calle 10");
+    const closeMoved = closeSheetText([pending], "hoy", "creados", [], [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
+    expect(closeMoved).toContain("El cierre sigue con el costo guardado");
+    expect(closeMoved).toContain("P-2033. La ficha de Faja hoy tiene el costo en $50.000");
+    expect(closeMoved).toContain("guardó el costo en $40.000");
+    expect(closeMoved).toContain("Registrados: $80.000");
+    expect(closeMoved).not.toContain("3001234567");
+    expect(closeMoved).not.toContain("Calle 10");
+    expect(closeSheetText([pending], "hoy", "creados", [], [], sameGuide)).not.toContain("hoy tiene el costo");
+    expect(closeSheetText([pending], "hoy", "creados")).not.toContain("hoy tiene el costo");
   });
 });
