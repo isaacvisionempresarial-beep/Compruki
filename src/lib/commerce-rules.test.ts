@@ -240,4 +240,25 @@ describe("cierre de pedidos", () => {
     expect(sheet).not.toContain("secreto-del-cliente");
     expect(sheet).toContain("no crea el pedido en Dropi");
   });
+
+  it("incluye en Hoy un pedido viejo que se movió hoy y conserva su total guardado", () => {
+    const moved = order({
+      status: "en_preparacion",
+      number: "P-2002",
+      createdAt: "2026-11-01T15:00:00.000Z",
+      providerRef: "DP-10",
+      history: [{ id: "evt-1", at: "2026-11-20T18:00:00.000Z", actorName: "Ana", summary: "Pasó el pedido a preparación." }],
+    });
+    const quiet = order({
+      status: "confirmado",
+      number: "P-1999",
+      createdAt: "2026-11-01T15:00:00.000Z",
+      history: [{ id: "evt-2", at: "2026-11-02T18:00:00.000Z", actorName: "Ana", summary: "Confirmó el pedido." }],
+    });
+    expect(ordersInSpan([moved, quiet], "hoy", "2026-11-20", "creados")).toHaveLength(0);
+    expect(ordersInSpan([moved, quiet], "hoy", "2026-11-20", "movidos").map((item) => item.number)).toEqual(["P-2002"]);
+    const summary = summarizeStoreOrders(ordersInSpan([moved], "hoy", "2026-11-20", "movidos"));
+    expect(summary.confirmed.amount).toBe(moved.total);
+    expect(dispatchSheetText(ordersInSpan([moved], "hoy", "2026-11-20", "movidos"))).toContain("Pedido P-2002");
+  });
 });

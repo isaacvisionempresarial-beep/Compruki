@@ -627,15 +627,17 @@ function marginOf(orders: StoreOrder[], marginFor: (order: StoreOrder) => number
   return { amount, missing };
 }
 
-export function storeOrdersInPeriod(orders: StoreOrder[], period: Period, today = bogotaNow().slice(0, 10)) {
-  const maxDays = period === "hoy" ? 0 : period === "7d" ? 6 : 29;
+function dateInSpan(iso: string, span: Period, today: string) {
   const todayMs = Date.parse(`${today}T00:00:00-05:00`);
-  return orders.filter((order) => {
-    const ms = Date.parse(`${order.createdAt.slice(0, 10)}T00:00:00-05:00`);
-    if (Number.isNaN(ms)) return false;
-    const days = Math.round((todayMs - ms) / 86_400_000);
-    return days >= 0 && days <= maxDays;
-  });
+  const ms = Date.parse(`${iso.slice(0, 10)}T00:00:00-05:00`);
+  if (Number.isNaN(todayMs) || Number.isNaN(ms)) return false;
+  const days = Math.round((todayMs - ms) / 86_400_000);
+  const maxDays = span === "hoy" ? 0 : span === "7d" ? 6 : 29;
+  return days >= 0 && days <= maxDays;
+}
+
+export function storeOrdersInPeriod(orders: StoreOrder[], period: Period, today = bogotaNow().slice(0, 10)) {
+  return orders.filter((order) => dateInSpan(order.createdAt, period, today));
 }
 
 export function periodPhrase(period: Period) {
@@ -645,9 +647,26 @@ export function periodPhrase(period: Period) {
 }
 
 export type OrderSpan = Period | "todo";
+export type CloseBasis = "creados" | "movidos";
 
-export function ordersInSpan(orders: StoreOrder[], span: OrderSpan, today = bogotaNow().slice(0, 10)) {
+export function orderTouchedInSpan(
+  order: Pick<StoreOrder, "createdAt" | "history">,
+  span: OrderSpan,
+  today = bogotaNow().slice(0, 10),
+) {
+  if (span === "todo") return true;
+  if (dateInSpan(order.createdAt, span, today)) return true;
+  return (order.history ?? []).some((event) => dateInSpan(event.at, span, today));
+}
+
+export function ordersInSpan(
+  orders: StoreOrder[],
+  span: OrderSpan,
+  today = bogotaNow().slice(0, 10),
+  basis: CloseBasis = "creados",
+) {
   if (span === "todo") return orders;
+  if (basis === "movidos") return orders.filter((order) => orderTouchedInSpan(order, span, today));
   return storeOrdersInPeriod(orders, span, today);
 }
 

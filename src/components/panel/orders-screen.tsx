@@ -51,6 +51,7 @@ import {
   spanPhrase,
   dispatchSheetOrders,
   dispatchSheetText,
+  type CloseBasis,
   type OrderSpan,
   payableTotalLabel,
   syncFocusHref,
@@ -112,8 +113,9 @@ export function OrdersScreen({
   const router = useRouter();
   const [status, setStatus] = useState<OrderStatus | "todos">("todos");
   const [span, setSpan] = useState<OrderSpan>("todo");
+  const [basis, setBasis] = useState<CloseBasis>("creados");
   const query = usePanelQuery().trim().toLocaleLowerCase("es");
-  const spanOrders = useMemo(() => ordersInSpan(orders, span, today), [orders, span, today]);
+  const spanOrders = useMemo(() => ordersInSpan(orders, span, today, basis), [orders, span, today, basis]);
   const summary = useMemo(() => summarizeStoreOrders(spanOrders), [spanOrders]);
   const searched = useMemo(() => spanOrders.filter((order) => matchesOrder(order, query, sizeGuides)), [spanOrders, query, sizeGuides]);
   const present = STATUS_SEQUENCE.filter((item) => spanOrders.some((order) => order.status === item));
@@ -140,20 +142,36 @@ export function OrdersScreen({
       <p className="mt-0.5 text-sm text-muted">
         {span === "todo"
           ? "Las cifras y la lista son de todos los pedidos. La cola Por atender tampoco se recorta. Abrirlos no cobra ni cambia el total guardado. Dropi no está conectado."
-          : `Las cifras y la lista son de ${spanPhrase(span)}. La cola Por atender sigue con los que esperan, aunque sean de otro día. Cambiar el período no cobra ni cambia el total guardado. Dropi no está conectado.`}
+          : basis === "movidos"
+            ? `Las cifras y la lista son pedidos con un movimiento en ${spanPhrase(span)}, aunque se hayan creado antes. El total guardado es el del pedido, no lo cobrado ese día. La cola Por atender no se recorta. Dropi no está conectado.`
+            : `Las cifras y la lista son de los creados en ${spanPhrase(span)}. La cola Por atender sigue con los que esperan, aunque sean de otro día. Cambiar el período no cobra ni cambia el total guardado. Dropi no está conectado.`}
       </p>
       <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Período de las cifras y la lista">
         {ORDER_SPANS.map((item) => (
           <StatusFilter
             key={item.id}
             label={item.label}
-            count={ordersInSpan(orders, item.id, today).length}
+            count={ordersInSpan(orders, item.id, today, basis).length}
             selected={span === item.id}
             onSelect={() => setSpan(item.id)}
           />
         ))}
       </div>
-      <p className="mt-2 text-xs leading-5 text-muted">Elegir un período no cobra ni cambia el total guardado.</p>
+      {span === "todo" ? (
+        <p className="mt-2 text-xs leading-5 text-muted">Elegir un período no cobra ni cambia el total guardado.</p>
+      ) : (
+        <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Qué fecha usa el período">
+          <StatusFilter label="Creados" count={ordersInSpan(orders, span, today, "creados").length} selected={basis === "creados"} onSelect={() => setBasis("creados")} />
+          <StatusFilter label="Movidos" count={ordersInSpan(orders, span, today, "movidos").length} selected={basis === "movidos"} onSelect={() => setBasis("movidos")} />
+        </div>
+      )}
+      {span === "todo" ? null : (
+        <p className="mt-2 text-xs leading-5 text-muted">
+          {basis === "movidos"
+            ? "Movidos mira el historial del pedido. El total guardado no es el dinero de ese día. Elegirlo no cobra ni cambia pedidos."
+            : "Creados mira solo la fecha en que entró el pedido. Elegirlo no cobra ni cambia el total guardado."}
+        </p>
+      )}
 
       <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
         <div className="order-2 min-w-0 xl:order-1">
@@ -284,8 +302,10 @@ export function OrdersScreen({
         </p>
       ) : (
         <>
-          <DispatchSheet orders={spanOrders} />
-          <h2 className="mt-3 text-sm font-semibold">{span === "todo" ? "Todos los pedidos" : `Pedidos de ${spanPhrase(span)}`}</h2>
+          <DispatchSheet orders={spanOrders} moved={span !== "todo" && basis === "movidos"} />
+          <h2 className="mt-3 text-sm font-semibold">
+            {span === "todo" ? "Todos los pedidos" : basis === "movidos" ? `Movidos ${spanPhrase(span)}` : `Creados ${spanPhrase(span)}`}
+          </h2>
           <p className="mt-0.5 text-xs text-muted">Buscar o filtrar solo cambia esta lista. No cobra ni cambia el total guardado.</p>
           <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Filtrar por estado">
             <StatusFilter
@@ -893,7 +913,7 @@ function emptyListMessage(query: string, status: OrderStatus | "todos", span: Or
   return "No hay pedidos en este estado.";
 }
 
-function DispatchSheet({ orders }: { orders: StoreOrder[] }) {
+function DispatchSheet({ orders, moved }: { orders: StoreOrder[]; moved: boolean }) {
   const rows = dispatchSheetOrders(orders);
   const text = dispatchSheetText(rows);
   const [copied, setCopied] = useState<"ok" | "fail" | null>(null);
@@ -925,7 +945,9 @@ function DispatchSheet({ orders }: { orders: StoreOrder[] }) {
         Hoja para copiar ({rows.length})
       </h2>
       <p className="mt-0.5 text-xs leading-5 text-muted">
-        Confirmados, en preparación o en despacho de este período. Copiarla no crea el pedido en Dropi ni cambia el total guardado.
+        {moved
+          ? "Confirmados, en preparación o en despacho que se movieron en este período. El total guardado es el del pedido. Copiarla no crea el pedido en Dropi ni lo cambia."
+          : "Confirmados, en preparación o en despacho de este período. Copiarla no crea el pedido en Dropi ni cambia el total guardado."}
       </p>
       {rows.length === 0 ? (
         <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
