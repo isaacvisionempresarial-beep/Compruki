@@ -272,11 +272,11 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
             )}
 
             <p className="mt-3 text-xs leading-5 text-muted">
-              Si este mismo pedido ya está pendiente, no se crea otro. El total guardado no cambia.
+              Si este mismo pedido ya está pendiente, no se crea otro. Un celular puede dejar hasta 3 pendientes a la vez. El total guardado no cambia.
             </p>
             <button
               type="submit"
-              title="Confirmar deja el pedido pendiente. Si ya existe, no crea otro. Nadie cobra aquí."
+              title="Confirmar deja el pedido pendiente. Si ya existe o el celular ya tiene 3, no crea otro. Nadie cobra aquí."
               disabled={pending || !canConfirm}
               className={`mt-3 inline-flex h-10 w-full scroll-mb-24 items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark ${
                 pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"

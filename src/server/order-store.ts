@@ -4,7 +4,9 @@ import { bogotaNow, sizeChoiceLabel, variantFits } from "@/lib/catalog";
 import { formatCop } from "@/lib/format";
 import {
   applyOrderAction,
+  nextOrderNumber,
   normalizeOrderNumber,
+  pendingPhoneIsFull,
   canEditDelivery,
   needsClosedDepartment,
   validateDepartment,
@@ -101,6 +103,16 @@ export async function placeOrder(input: CheckoutInput) {
   const now = bogotaNow();
   const repeated = orders.find((order) => pendingCheckoutMatch(order, input, now));
   if (repeated) return { error: null, order: repeated, repeated: true };
+  if (pendingPhoneIsFull(orders, input.phone)) {
+    return {
+      error: "Este celular ya tiene 3 pedidos pendientes. No se creó otro. Cuando la tienda confirme uno, se puede dejar uno distinto. El total guardado no cambió. Nadie cobra en la tienda.",
+      order: null,
+    };
+  }
+  const number = nextOrderNumber(orders.map((order) => order.number));
+  if (!number) {
+    return { error: "No hay un número libre para el pedido. No se creó. Nadie cobra en la tienda.", order: null };
+  }
 
   const catalog = await listProducts();
   const lines = [];
@@ -131,7 +143,7 @@ export async function placeOrder(input: CheckoutInput) {
   const document = validateDocument(input.document).value;
   const order: StoreOrder = {
     id: `ord_${randomUUID().slice(0, 8)}`,
-    number: `P-${2000 + orders.length + 1}`,
+    number,
     idempotencyKey: input.idempotencyKey,
     viewToken: randomUUID(),
     status: "pendiente_confirmacion",

@@ -464,6 +464,29 @@ export function normalizeOrderNumber(raw: string) {
   return raw.trim().toUpperCase();
 }
 
+export const PENDING_PHONE_LIMIT = 3;
+
+/** Siguiente P- libre. Usa el mayor número ya usado, no la cantidad de filas. */
+export function nextOrderNumber(numbers: string[]) {
+  let max = 2000;
+  for (const raw of numbers) {
+    const match = /^P-(\d{4,6})$/.exec(normalizeOrderNumber(raw));
+    if (!match) continue;
+    const value = Number(match[1]);
+    if (value > max && value < 1_000_000) max = value;
+  }
+  const next = max + 1;
+  if (next > 999_999) return null;
+  return `P-${next}`;
+}
+
+export function pendingPhoneIsFull(orders: Array<{ status: OrderStatus; phone: string }>, phone: string) {
+  const normalized = normalizePhone(phone);
+  if (!/^3\d{9}$/.test(normalized)) return false;
+  const pending = orders.filter((order) => order.status === "pendiente_confirmacion" && order.phone === normalized).length;
+  return pending >= PENDING_PHONE_LIMIT;
+}
+
 export function validateCheckout(input: CheckoutInput) {
   const name = input.customerName.trim();
   const phone = normalizePhone(input.phone);
