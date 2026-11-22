@@ -12,10 +12,12 @@ import {
   ordersInSpan,
   pendingSizeHoldPhrase,
   pendingSizeHolds,
+  outsideCostCopyNote,
   periodCostShiftNote,
   resultDriftNote,
   resultsByProduct,
   skuCostPreviewNote,
+  storedSkuLines,
   widerPeriodWithResults,
   type CloseBasis,
   type CostGuide,
@@ -25,6 +27,12 @@ import {
 import { CloseSheet } from "@/components/panel/close-sheet";
 import { CloseBasisControl, PeriodControl } from "@/components/panel/period-control";
 import { usePanelQuery } from "@/components/panel/panel-shell";
+
+function outsideCopyNote(all: StoreOrder[], sku: string, guides: CostGuide[]) {
+  const guide = guides.find((item) => item.sku === sku);
+  if (!guide) return "";
+  return outsideCostCopyNote(storedSkuLines(all, sku), guide);
+}
 
 function periodCostPreview(shown: StoreOrder[], all: StoreOrder[], sku: string, guides: CostGuide[]) {
   const guide = guides.find((item) => item.sku === sku);
@@ -73,7 +81,8 @@ export function ProfitabilityScreen({
       row.sku.toLocaleLowerCase("es").includes(query) ||
       row.sources.some((source) => source.number.toLocaleLowerCase("es").includes(query)) ||
       resultDriftNote(spanOrders, row.sku, priceGuides, costGuides).toLocaleLowerCase("es").includes(query) ||
-      periodCostPreview(spanOrders, orders, row.sku, costGuides).toLocaleLowerCase("es").includes(query),
+      periodCostPreview(spanOrders, orders, row.sku, costGuides).toLocaleLowerCase("es").includes(query) ||
+      outsideCopyNote(orders, row.sku, costGuides).toLocaleLowerCase("es").includes(query),
   );
 
   return (
@@ -143,6 +152,9 @@ export function ProfitabilityScreen({
                         ) : null}
                         {periodCostPreview(spanOrders, orders, row.sku, costGuides) ? (
                           <p className="mt-1 text-xs leading-5">{periodCostPreview(spanOrders, orders, row.sku, costGuides)}</p>
+                        ) : null}
+                        {outsideCopyNote(orders, row.sku, costGuides) ? (
+                          <p className="mt-1 text-xs leading-5">{outsideCopyNote(orders, row.sku, costGuides)}</p>
                         ) : null}
                         {row.sizes.length > 0 ? (
                           <ul className="mt-2 grid gap-1 text-sm leading-5" aria-label={`Tallas o tamaños de ${row.title}`}>

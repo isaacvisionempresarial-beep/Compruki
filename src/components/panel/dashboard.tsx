@@ -10,7 +10,13 @@ import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
 import { STATUS_LABEL, type Period } from "@/lib/demo-data";
 import { cx } from "@/lib/cx";
 import { formatCop, formatDay } from "@/lib/format";
-import { accountHoldNote, attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, costDrift, costDriftNote, ordersInSpan, priceDrift, priceDriftNote, resultDriftNote, resultsByProduct, samePhoneMatches, periodCostShiftNote, skuCostPreviewNote, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import { accountHoldNote, attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, costDrift, costDriftNote, ordersInSpan, priceDrift, priceDriftNote, resultDriftNote, resultsByProduct, samePhoneMatches, outsideCostCopyNote, periodCostShiftNote, skuCostPreviewNote, storedSkuLines, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+
+function outsideCopyNote(all: StoreOrder[], sku: string, guides: CostGuide[]) {
+  const guide = guides.find((item) => item.sku === sku);
+  if (!guide) return "";
+  return outsideCostCopyNote(storedSkuLines(all, sku), guide);
+}
 
 function periodCostPreview(shown: StoreOrder[], all: StoreOrder[], sku: string, guides: CostGuide[]) {
   const guide = guides.find((item) => item.sku === sku);
@@ -77,7 +83,7 @@ export function Dashboard({
   const productResults = useMemo(() => {
     if (!query) return productRows;
     return productRows.filter((row) =>
-      [row.title, row.sku, resultDriftNote(storeInPeriod, row.sku, priceGuides, costGuides), periodCostPreview(storeInPeriod, storeOrders, row.sku, costGuides), ...row.sizes.map((size) => size.label), ...row.sources.map((source) => source.number)].some((value) => value.toLocaleLowerCase("es").includes(query)),
+      [row.title, row.sku, resultDriftNote(storeInPeriod, row.sku, priceGuides, costGuides), periodCostPreview(storeInPeriod, storeOrders, row.sku, costGuides), outsideCopyNote(storeOrders, row.sku, costGuides), ...row.sizes.map((size) => size.label), ...row.sources.map((source) => source.number)].some((value) => value.toLocaleLowerCase("es").includes(query)),
     );
   }, [costGuides, priceGuides, productRows, query, storeInPeriod]);
   const attention = useMemo(
@@ -349,6 +355,9 @@ export function Dashboard({
                     ) : null}
                     {periodCostPreview(storeInPeriod, storeOrders, row.sku, costGuides) ? (
                       <p className="mt-1 text-xs leading-5">{periodCostPreview(storeInPeriod, storeOrders, row.sku, costGuides)}</p>
+                    ) : null}
+                    {outsideCopyNote(storeOrders, row.sku, costGuides) ? (
+                      <p className="mt-1 text-xs leading-5">{outsideCopyNote(storeOrders, row.sku, costGuides)}</p>
                     ) : null}
                     {row.sources.length > 0 ? (
                       <ul className="mt-2 space-y-1 text-sm leading-5">

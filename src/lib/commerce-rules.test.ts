@@ -16,6 +16,7 @@ import {
   catalogDriftText,
   fichaDrift,
   fichaDriftNote,
+  outsideCostCopyNote,
   skuCostGroupNote,
   skuCostGroups,
   periodCostShiftNote,
@@ -595,10 +596,13 @@ describe("precio de la ficha", () => {
     expect(outsideClose).toContain("Fuera de este período");
     expect(outsideClose).toContain("P-2082");
     expect(outsideClose).toContain("La ficha también copia esos pedidos");
+    expect(outsideClose).toContain("P-2083 guarda el costo en $40.000 y pasaría a $50.000");
+    expect(outsideClose).toContain("Sigue pendiente: no entra al margen ni a la utilidad.");
+    expect(outsideClose).toContain("el margen estimado y la utilidad no se mueven");
+    expect(outsideClose).not.toContain("3001234567");
     expect(outsideClose).toContain("Fuera de este período, el margen estimado pasa de $30.000 a $20.000");
     expect(outsideClose).toContain("La ficha también copia esos pedidos. Esta vista no guarda el costo.");
     expect(outsideClose).toContain("No suma pendientes, cancelados, en incidencia ni devueltos.");
-    expect(outsideClose).not.toContain("P-2083");
     expect(outsideClose).not.toContain("3001234567");
     expect(outsideClose).not.toContain("Calle 10");
     expect(closeSheetText([confirmed], "todo", "creados", [], [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }])).not.toContain("fuera de este período");
@@ -862,6 +866,23 @@ describe("precio de la ficha", () => {
     expect(onlyAway).not.toContain("3001234567");
     expect(periodShift).not.toContain("Calle 10");
     expect(periodCostShiftNote([order({ number: "P-2092", status: "pendiente_confirmacion" })], [previewGuide], "este período")).toBe("");
+    const outsideCopy = outsideCostCopyNote(
+      [
+        { number: "P-2100", status: "pendiente_confirmacion", unitPrice: 80_000, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 },
+        { number: "P-2101", status: "cancelado", unitPrice: 80_000, unitCost: 30_000, unitShipping: 8_000, unitCommissions: 2_000 },
+        { number: "P-2102", status: "confirmado", unitPrice: 80_000, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 },
+        { number: "P-2103", status: "devuelto", unitPrice: 80_000, unitShipping: 8_000, unitCommissions: 2_000 },
+      ],
+      previewGuide,
+    );
+    expect(outsideCopy).toContain("P-2100 y P-2101 guardan el costo en cifras distintas y pasarían a $50.000");
+    expect(outsideCopy).toContain("Sigue pendiente: no entra al margen ni a la utilidad.");
+    expect(outsideCopy).toContain("Está cancelado: no entra al margen ni a la utilidad.");
+    expect(outsideCopy).toContain("Siguen fuera: el margen estimado y la utilidad no se mueven.");
+    expect(outsideCopy).not.toContain("P-2102");
+    expect(outsideCopy).not.toContain("P-2103");
+    expect(outsideCopy).not.toContain("3001234567");
+    expect(outsideCostCopyNote([{ number: "P-2102", status: "confirmado", unitPrice: 80_000, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 }], previewGuide)).toBe("");
     expect(periodCostShiftNote([order({ number: "P-2090", status: "confirmado", lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1, unitCost: 50_000, unitShipping: 8_000, unitCommissions: 2_000 }] })], [previewGuide])).toBe("");
     expect(planned).toContain("Si aparece un margen, es el que quedaría en los que ya cuentan");
     expect(planned).not.toContain("3001234567");

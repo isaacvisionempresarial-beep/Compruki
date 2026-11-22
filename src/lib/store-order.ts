@@ -894,6 +894,42 @@ export function skuCostPreviewNote(orders: CostPreviewOrder[], sku: string, guid
   return parts.join(" ");
 }
 
+export function outsideCostCopyNote(
+  lines: StoredSkuLine[],
+  current: { cost: number; shipping: number; commissions: number },
+) {
+  if (!readyCostGuide({ sku: "", cost: current.cost, shipping: current.shipping, commissions: current.commissions })) return "";
+  const outside = lines.filter((line) => line.status && COST_OUTSIDE.includes(line.status));
+  const fields: Array<{ key: "unitCost" | "unitShipping" | "unitCommissions"; label: string; today: number }> = [
+    { key: "unitCost", label: "el costo", today: current.cost },
+    { key: "unitShipping", label: "el envío estimado", today: current.shipping },
+    { key: "unitCommissions", label: "las comisiones estimadas", today: current.commissions },
+  ];
+  const bits: string[] = [];
+  const touched = new Set<string>();
+  for (const field of fields) {
+    const rows = outside.filter((line) => typeof line[field.key] === "number" && line[field.key] !== field.today);
+    if (rows.length === 0) continue;
+    for (const row of rows) touched.add(row.number);
+    const storedValues = [...new Set(rows.map((row) => row[field.key] as number))];
+    const who = nameList(rows.map((row) => row.number));
+    const verb = rows.length === 1 ? "guarda" : "guardan";
+    const move = rows.length === 1 ? "pasaría" : "pasarían";
+    const stored = storedValues.length === 1 ? formatCop(storedValues[0]) : "cifras distintas";
+    bits.push(`${who} ${verb} ${field.label} en ${stored} y ${move} a ${formatCop(field.today)}`);
+  }
+  if (bits.length === 0) return "";
+  const holds = [
+    ...new Set(
+      outside
+        .filter((line) => touched.has(line.number) && line.status)
+        .map((line) => accountHoldNote(line.status as OrderStatus)),
+    ),
+  ].filter(Boolean);
+  const stay = touched.size === 1 ? "Sigue fuera" : "Siguen fuera";
+  return `Si copias en los que siguen fuera, ${bits.join(". ")}. ${holds.join(" ")} ${stay}: el margen estimado y la utilidad no se mueven. El precio y el total guardado no cambian.`;
+}
+
 export function skuCostGroupNote(groups: { counted: string[]; outside: string[]; collected: string[] }) {
   const parts: string[] = [];
   if (groups.counted.length === 1) {
@@ -964,11 +1000,17 @@ export function catalogDriftText(
       shipping: product.shipping,
       commissions: product.commissions,
     });
+    const outsideCopy = outsideCostCopyNote(storedSkuLines(orders, product.sku), {
+      cost: product.cost,
+      shipping: product.shipping,
+      commissions: product.commissions,
+    });
     blocks.push(
       product.title + " (" + product.sku + ")",
       note,
       ...(plan ? [plan] : []),
       ...(preview ? [preview] : []),
+      ...(outsideCopy ? [outsideCopy] : []),
       numbers.length > 0 ? "Pedidos: " + numbers.join(", ") + "." : "",
     );
   }
@@ -1634,6 +1676,7 @@ export function closeSheetText(
         `Devuelto: ${returned}.`,
         ...(drift ? [drift] : []),
         ...(preview ? [preview] : []),
+        ...(guide ? [outsideCostCopyNote(storedSkuLines([...orders, ...rest], row.sku), guide)].filter(Boolean) : []),
         "",
       );
     }
