@@ -730,21 +730,17 @@ function pesosAt(rows: Array<{ number: string; amount: number }>) {
   return `${parts.slice(0, -1).join(", en ")} y en ${parts[parts.length - 1]}`;
 }
 
-export function skuCostPreviewNote(
-  orders: Array<{
-    number: string;
-    status?: OrderStatus;
-    collected?: boolean;
-    total?: number;
-    actualShipping?: number;
-    collectionCost?: number;
-    lines: Array<Pick<OrderLine, "sku" | "unitPrice" | "unitCost" | "unitShipping" | "unitCommissions"> & Partial<Pick<OrderLine, "quantity" | "title">>>;
-  }>,
-  sku: string,
-  guide: CostGuide,
-  place = "",
-) {
-  if (!readyCostGuide(guide)) return "";
+type CostPreviewOrder = {
+  number: string;
+  status?: OrderStatus;
+  collected?: boolean;
+  total?: number;
+  actualShipping?: number;
+  collectionCost?: number;
+  lines: Array<Pick<OrderLine, "sku" | "unitPrice" | "unitCost" | "unitShipping" | "unitCommissions"> & Partial<Pick<OrderLine, "quantity" | "title">>>;
+};
+
+function costPreviewParts(orders: CostPreviewOrder[], sku: string, guide: CostGuide, place: string) {
   const margins: Array<{ number: string; amount: number }> = [];
   const open: string[] = [];
   const realized: Array<{ number: string; amount: number }> = [];
@@ -801,9 +797,17 @@ export function skuCostPreviewNote(
       `${nameList(realizedOpen)} ya están cobrados, pero la utilidad realizada no cierra: falta el costo de otra línea. No es un cobro nuevo. El total guardado no cambia.`,
     );
   }
-  if (parts.length > 0 && place) {
-    parts.push(`La ficha también copia los que ya cuentan fuera de ${place}. Esta vista no guarda el costo.`);
-  }
+  return parts;
+}
+
+export function skuCostPreviewNote(orders: CostPreviewOrder[], sku: string, guide: CostGuide, place = "", rest: CostPreviewOrder[] = []) {
+  if (!readyCostGuide(guide)) return "";
+  const parts = costPreviewParts(orders, sku, guide, place);
+  if (!place) return parts.join(" ");
+  const away = costPreviewParts(rest, sku, guide, "");
+  if (parts.length === 0 && away.length === 0) return "";
+  if (away.length === 0) parts.push("Esta vista no guarda el costo.");
+  else parts.push(`Fuera de ${place}: ${away.join(" ")} La ficha también copia esos pedidos. Esta vista no guarda el costo.`);
   return parts.join(" ");
 }
 
@@ -1447,6 +1451,7 @@ export function closeSheetText(
   guides: SizeGuide[] = [],
   priceGuides: PriceGuide[] = [],
   costGuides: CostGuide[] = [],
+  rest: StoreOrder[] = [],
 ) {
   const summary = summarizeStoreOrders(orders);
   const products = resultsByProduct(orders, guides);
@@ -1535,7 +1540,7 @@ export function closeSheetText(
           : `${formatCop(row.returnedAmount)} · total guardado · no entra a la utilidad`;
       const drift = resultDriftNote(orders, row.sku, priceGuides, costGuides);
       const guide = costGuides.find((item) => item.sku === row.sku);
-      const preview = guide ? skuCostPreviewNote(orders, row.sku, guide, span === "todo" ? "" : "este período") : "";
+      const preview = guide ? skuCostPreviewNote(orders, row.sku, guide, span === "todo" ? "" : "este período", span === "todo" ? [] : rest) : "";
       lines.push(
         `${row.title} (${row.sku})`,
         sources ? `Pedidos: ${sources}.` : "Sin pedidos en la cuenta.",

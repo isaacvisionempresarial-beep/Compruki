@@ -12,10 +12,11 @@ import { cx } from "@/lib/cx";
 import { formatCop, formatDay } from "@/lib/format";
 import { accountHoldNote, attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, costDrift, costDriftNote, ordersInSpan, priceDrift, priceDriftNote, resultDriftNote, resultsByProduct, samePhoneMatches, skuCostPreviewNote, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
 
-function periodCostPreview(orders: StoreOrder[], sku: string, guides: CostGuide[]) {
+function periodCostPreview(shown: StoreOrder[], all: StoreOrder[], sku: string, guides: CostGuide[]) {
   const guide = guides.find((item) => item.sku === sku);
   if (!guide) return "";
-  return skuCostPreviewNote(orders, sku, guide, "este período");
+  const seen = new Set(shown.map((order) => order.number));
+  return skuCostPreviewNote(shown, sku, guide, "este período", all.filter((order) => !seen.has(order.number)));
 }
 
 const homeProductGrid = "md:grid-cols-[minmax(0,1.5fr)_8.75rem_8.75rem_8.75rem]";
@@ -72,7 +73,7 @@ export function Dashboard({
   const productResults = useMemo(() => {
     if (!query) return productRows;
     return productRows.filter((row) =>
-      [row.title, row.sku, resultDriftNote(storeInPeriod, row.sku, priceGuides, costGuides), periodCostPreview(storeInPeriod, row.sku, costGuides), ...row.sizes.map((size) => size.label), ...row.sources.map((source) => source.number)].some((value) => value.toLocaleLowerCase("es").includes(query)),
+      [row.title, row.sku, resultDriftNote(storeInPeriod, row.sku, priceGuides, costGuides), periodCostPreview(storeInPeriod, storeOrders, row.sku, costGuides), ...row.sizes.map((size) => size.label), ...row.sources.map((source) => source.number)].some((value) => value.toLocaleLowerCase("es").includes(query)),
     );
   }, [costGuides, priceGuides, productRows, query, storeInPeriod]);
   const attention = useMemo(
@@ -341,8 +342,8 @@ export function Dashboard({
                     {resultDriftNote(storeInPeriod, row.sku, priceGuides, costGuides) ? (
                       <p className="mt-1 text-xs leading-5 text-warning">{resultDriftNote(storeInPeriod, row.sku, priceGuides, costGuides)}</p>
                     ) : null}
-                    {periodCostPreview(storeInPeriod, row.sku, costGuides) ? (
-                      <p className="mt-1 text-xs leading-5">{periodCostPreview(storeInPeriod, row.sku, costGuides)}</p>
+                    {periodCostPreview(storeInPeriod, storeOrders, row.sku, costGuides) ? (
+                      <p className="mt-1 text-xs leading-5">{periodCostPreview(storeInPeriod, storeOrders, row.sku, costGuides)}</p>
                     ) : null}
                     {row.sources.length > 0 ? (
                       <ul className="mt-2 space-y-1 text-sm leading-5">
@@ -393,7 +394,7 @@ export function Dashboard({
             </ul>
           </div>
         )}
-        <CloseSheet orders={storeInPeriod} period={storePeriod} basis={basis} guides={sizeGuides} priceGuides={priceGuides} costGuides={costGuides} fieldId="cierre-tienda" />
+        <CloseSheet orders={storeInPeriod} rest={storeOrders.filter((order) => !storeInPeriod.some((shown) => shown.number === order.number))} period={storePeriod} basis={basis} guides={sizeGuides} priceGuides={priceGuides} costGuides={costGuides} fieldId="cierre-tienda" />
         <div className="mt-3">
           <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="text-sm font-semibold text-accent-strong">
             Ver el detalle en Rentabilidad

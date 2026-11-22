@@ -25,10 +25,11 @@ import { CloseSheet } from "@/components/panel/close-sheet";
 import { CloseBasisControl, PeriodControl } from "@/components/panel/period-control";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 
-function periodCostPreview(orders: StoreOrder[], sku: string, guides: CostGuide[]) {
+function periodCostPreview(shown: StoreOrder[], all: StoreOrder[], sku: string, guides: CostGuide[]) {
   const guide = guides.find((item) => item.sku === sku);
   if (!guide) return "";
-  return skuCostPreviewNote(orders, sku, guide, "este período");
+  const seen = new Set(shown.map((order) => order.number));
+  return skuCostPreviewNote(shown, sku, guide, "este período", all.filter((order) => !seen.has(order.number)));
 }
 
 const resultGrid = "md:grid-cols-[minmax(0,1.5fr)_8.75rem_8.75rem_8.75rem]";
@@ -67,7 +68,7 @@ export function ProfitabilityScreen({
       row.sku.toLocaleLowerCase("es").includes(query) ||
       row.sources.some((source) => source.number.toLocaleLowerCase("es").includes(query)) ||
       resultDriftNote(spanOrders, row.sku, priceGuides, costGuides).toLocaleLowerCase("es").includes(query) ||
-      periodCostPreview(spanOrders, row.sku, costGuides).toLocaleLowerCase("es").includes(query),
+      periodCostPreview(spanOrders, orders, row.sku, costGuides).toLocaleLowerCase("es").includes(query),
   );
 
   return (
@@ -134,8 +135,8 @@ export function ProfitabilityScreen({
                         {resultDriftNote(spanOrders, row.sku, priceGuides, costGuides) ? (
                           <p className="mt-1 text-xs leading-5 text-warning">{resultDriftNote(spanOrders, row.sku, priceGuides, costGuides)}</p>
                         ) : null}
-                        {periodCostPreview(spanOrders, row.sku, costGuides) ? (
-                          <p className="mt-1 text-xs leading-5">{periodCostPreview(spanOrders, row.sku, costGuides)}</p>
+                        {periodCostPreview(spanOrders, orders, row.sku, costGuides) ? (
+                          <p className="mt-1 text-xs leading-5">{periodCostPreview(spanOrders, orders, row.sku, costGuides)}</p>
                         ) : null}
                         {row.sizes.length > 0 ? (
                           <ul className="mt-2 grid gap-1 text-sm leading-5" aria-label={`Tallas o tamaños de ${row.title}`}>
@@ -201,7 +202,8 @@ export function ProfitabilityScreen({
               </div>
             )}
             <CloseSheet
-              orders={ordersInSpan(orders, storePeriod, today, basis)}
+              orders={spanOrders}
+              rest={orders.filter((order) => !spanOrders.some((shown) => shown.number === order.number))}
               period={storePeriod}
               basis={basis}
               guides={guides}

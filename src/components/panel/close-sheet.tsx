@@ -5,6 +5,7 @@ import { closeSheetText, closeSpanPhrase, costDrift, priceDrift, type CloseBasis
 
 export function CloseSheet({
   orders,
+  rest = [],
   period,
   basis,
   guides = [],
@@ -13,6 +14,7 @@ export function CloseSheet({
   fieldId,
 }: {
   orders: StoreOrder[];
+  rest?: StoreOrder[];
   period: OrderSpan;
   basis: CloseBasis;
   guides?: SizeGuide[];
@@ -20,7 +22,7 @@ export function CloseSheet({
   costGuides?: CostGuide[];
   fieldId: string;
 }) {
-  const text = closeSheetText(orders, period, basis, guides, priceGuides, costGuides);
+  const text = closeSheetText(orders, period, basis, guides, priceGuides, costGuides, rest);
   const drifted = orders.some((order) => priceDrift(order, priceGuides).length > 0);
   const costDrifted = orders.some((order) => costDrift(order, costGuides).length > 0);
   const [copied, setCopied] = useState<"ok" | "fail" | null>(null);
@@ -52,7 +54,8 @@ export function CloseSheet({
         Cierre para copiar
       </h3>
       <p className="mt-0.5 text-xs leading-5 text-muted">
-        Mismas cifras de {closeSpanPhrase(period, basis)}. Si la ficha de hoy no es el precio guardado, van los dos montos. Si no es el costo, el envío o las comisiones guardadas, van las dos cifras. Copiarlo no cobra, no reescribe lo guardado y no crea el pedido en Dropi.
+        Mismas cifras de {closeSpanPhrase(period, basis)}. Si la ficha de hoy no es el precio guardado, van los dos montos. Si no es el costo, el envío o las comisiones guardadas, van las dos cifras.
+        {period === "todo" ? "" : " Si un pedido que ya cuenta queda fuera de este período, el texto dice su margen."} Copiarlo no cobra, no reescribe lo guardado y no crea el pedido en Dropi.
         {period !== "todo" && basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
       </p>
       {drifted ? (

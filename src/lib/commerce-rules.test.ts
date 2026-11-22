@@ -588,7 +588,15 @@ describe("precio de la ficha", () => {
     expect(productCost).toContain("El margen y la utilidad siguen con lo guardado.");
     expect(productCost).toContain("Si copias en los que ya cuentan de este período, el margen estimado de P-2034 queda en $20.000");
     expect(productCost).toContain("Esta vista no guarda el costo.");
+    expect(productCost).not.toContain("Fuera de este período");
     expect(productCost).not.toContain("3001234567");
+    const outsideClose = closeSheetText([confirmed], "hoy", "creados", [], [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }], [order({ number: "P-2082", status: "confirmado" }), order({ number: "P-2083", status: "pendiente_confirmacion" })]);
+    expect(outsideClose).toContain("Fuera de este período");
+    expect(outsideClose).toContain("P-2082");
+    expect(outsideClose).toContain("La ficha también copia esos pedidos");
+    expect(outsideClose).not.toContain("P-2083");
+    expect(outsideClose).not.toContain("3001234567");
+    expect(outsideClose).not.toContain("Calle 10");
     expect(closeSheetText([confirmed], "todo", "creados", [], [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }])).not.toContain("fuera de este período");
     const sameCosts = [{ sku: "SKU-1", cost: 40_000, shipping: 8_000, commissions: 2_000 }];
     expect(adoptCatalogCosts(current, sameCosts).mode).toBe("igual");
@@ -779,7 +787,30 @@ describe("precio de la ficha", () => {
     expect(previewNote).not.toContain("3001234567");
     expect(previewNote).not.toContain("Calle 10");
     expect(previewNote).not.toContain("este período");
-    expect(skuCostPreviewNote([order({ number: "P-2070", status: "confirmado" })], "SKU-1", previewGuide, "este período")).toContain("fuera de este período");
+    expect(skuCostPreviewNote([order({ number: "P-2070", status: "confirmado" })], "SKU-1", previewGuide, "este período")).not.toContain("Fuera de este período");
+    const outsidePreview = skuCostPreviewNote(
+      [order({ number: "P-2070", status: "confirmado" })],
+      "SKU-1",
+      previewGuide,
+      "este período",
+      [order({ number: "P-2080", status: "confirmado" }), order({ number: "P-2081", status: "cancelado" })],
+    );
+    expect(outsidePreview).toContain("Fuera de este período");
+    expect(outsidePreview).toContain("el margen estimado de P-2080 queda en $20.000");
+    expect(outsidePreview).toContain("La ficha también copia esos pedidos");
+    expect(outsidePreview).not.toContain("P-2081");
+    expect(outsidePreview).not.toContain("3001234567");
+    expect(outsidePreview).not.toContain("Calle 10");
+    const onlyOutside = skuCostPreviewNote(
+      [order({ number: "P-2074", status: "confirmado", lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1, unitCost: 50_000, unitShipping: 8_000, unitCommissions: 2_000 }] })],
+      "SKU-1",
+      previewGuide,
+      "este período",
+      [order({ number: "P-2080", status: "confirmado" })],
+    );
+    expect(onlyOutside).toContain("P-2080");
+    expect(onlyOutside).not.toContain("P-2074");
+    expect(onlyOutside).not.toContain("3001234567");
     expect(
       skuCostPreviewNote(
         [order({ number: "P-2074", status: "confirmado", lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1, unitCost: 50_000, unitShipping: 8_000, unitCommissions: 2_000 }] })],
