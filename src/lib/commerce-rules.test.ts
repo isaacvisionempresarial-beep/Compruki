@@ -586,6 +586,10 @@ describe("precio de la ficha", () => {
     const productCost = closeSheetText([confirmed], "hoy", "creados", [], [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
     expect(productCost).toContain("P-2034 guardó el costo en $40.000");
     expect(productCost).toContain("El margen y la utilidad siguen con lo guardado.");
+    expect(productCost).toContain("Si copias en los que ya cuentan de este período, el margen estimado de P-2034 queda en $20.000");
+    expect(productCost).toContain("Esta vista no guarda el costo.");
+    expect(productCost).not.toContain("3001234567");
+    expect(closeSheetText([confirmed], "todo", "creados", [], [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }])).not.toContain("fuera de este período");
     const sameCosts = [{ sku: "SKU-1", cost: 40_000, shipping: 8_000, commissions: 2_000 }];
     expect(adoptCatalogCosts(current, sameCosts).mode).toBe("igual");
     const replaced = adoptCatalogCosts(current, [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
@@ -774,6 +778,8 @@ describe("precio de la ficha", () => {
     expect(previewNote).not.toContain("P-2072");
     expect(previewNote).not.toContain("3001234567");
     expect(previewNote).not.toContain("Calle 10");
+    expect(previewNote).not.toContain("este período");
+    expect(skuCostPreviewNote([order({ number: "P-2070", status: "confirmado" })], "SKU-1", previewGuide, "este período")).toContain("fuera de este período");
     expect(
       skuCostPreviewNote(
         [order({ number: "P-2074", status: "confirmado", lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1, unitCost: 50_000, unitShipping: 8_000, unitCommissions: 2_000 }] })],

@@ -14,14 +14,22 @@ import {
   pendingSizeHolds,
   resultDriftNote,
   resultsByProduct,
+  skuCostPreviewNote,
   widerPeriodWithResults,
   type CloseBasis,
+  type CostGuide,
   type ProductSource,
   type StoreOrder,
 } from "@/lib/store-order";
 import { CloseSheet } from "@/components/panel/close-sheet";
 import { CloseBasisControl, PeriodControl } from "@/components/panel/period-control";
 import { usePanelQuery } from "@/components/panel/panel-shell";
+
+function periodCostPreview(orders: StoreOrder[], sku: string, guides: CostGuide[]) {
+  const guide = guides.find((item) => item.sku === sku);
+  if (!guide) return "";
+  return skuCostPreviewNote(orders, sku, guide, "este período");
+}
 
 const resultGrid = "md:grid-cols-[minmax(0,1.5fr)_8.75rem_8.75rem_8.75rem]";
 
@@ -58,7 +66,8 @@ export function ProfitabilityScreen({
       row.title.toLocaleLowerCase("es").includes(query) ||
       row.sku.toLocaleLowerCase("es").includes(query) ||
       row.sources.some((source) => source.number.toLocaleLowerCase("es").includes(query)) ||
-      resultDriftNote(spanOrders, row.sku, priceGuides, costGuides).toLocaleLowerCase("es").includes(query),
+      resultDriftNote(spanOrders, row.sku, priceGuides, costGuides).toLocaleLowerCase("es").includes(query) ||
+      periodCostPreview(spanOrders, row.sku, costGuides).toLocaleLowerCase("es").includes(query),
   );
 
   return (
@@ -124,6 +133,9 @@ export function ProfitabilityScreen({
                         <p className="mt-0.5 text-xs text-muted">{row.sku}</p>
                         {resultDriftNote(spanOrders, row.sku, priceGuides, costGuides) ? (
                           <p className="mt-1 text-xs leading-5 text-warning">{resultDriftNote(spanOrders, row.sku, priceGuides, costGuides)}</p>
+                        ) : null}
+                        {periodCostPreview(spanOrders, row.sku, costGuides) ? (
+                          <p className="mt-1 text-xs leading-5">{periodCostPreview(spanOrders, row.sku, costGuides)}</p>
                         ) : null}
                         {row.sizes.length > 0 ? (
                           <ul className="mt-2 grid gap-1 text-sm leading-5" aria-label={`Tallas o tamaños de ${row.title}`}>
