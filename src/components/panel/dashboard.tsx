@@ -67,6 +67,10 @@ export function Dashboard({
     [storeOrders, storePeriod, today, basis],
   );
   const storeSummary = useMemo(() => summarizeStoreOrders(storeInPeriod), [storeInPeriod]);
+  const periodShift = useMemo(() => {
+    const seen = new Set(storeInPeriod.map((order) => order.number));
+    return periodCostShiftNote(storeInPeriod, costGuides, "este período", storeOrders.filter((order) => !seen.has(order.number)));
+  }, [costGuides, storeInPeriod, storeOrders]);
   const productRows = useMemo(() => resultsByProduct(storeInPeriod, sizeGuides), [storeInPeriod, sizeGuides]);
   const widerStorePeriod =
     productRows.length === 0 ? widerPeriodWithResults(storeOrders, storePeriod, sizeGuides, today, basis) : null;
@@ -310,9 +314,7 @@ export function Dashboard({
             </dd>
           </div>
         </dl>
-        {periodCostShiftNote(storeInPeriod, costGuides, "este período") ? (
-          <p className="mt-3 text-sm leading-5">{periodCostShiftNote(storeInPeriod, costGuides, "este período")}</p>
-        ) : null}
+        {periodShift ? <p className="mt-3 text-sm leading-5">{periodShift}</p> : null}
         <h3 className="mt-3 text-sm font-semibold">Por producto ({productResults.length})</h3>
         <p className="mt-0.5 text-xs text-muted">
           Mismo período y la misma fecha · detalle en Rentabilidad

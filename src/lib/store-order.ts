@@ -820,9 +820,9 @@ function costPreviewParts(orders: CostPreviewOrder[], sku: string, guide: CostGu
   return parts;
 }
 
-export function periodCostShiftNote(orders: StoreOrder[], guides: CostGuide[], place = "") {
+function countedCostShift(orders: StoreOrder[], guides: CostGuide[]) {
   const ready = guides.filter((guide) => readyCostGuide(guide));
-  if (ready.length === 0 || orders.length === 0) return "";
+  if (ready.length === 0 || orders.length === 0) return null;
   let touchedCollected = false;
   let touched = 0;
   const nextOrders = orders.map((order) => {
@@ -841,18 +841,44 @@ export function periodCostShiftNote(orders: StoreOrder[], guides: CostGuide[], p
     if (order.status === "entregado" && order.collected) touchedCollected = true;
     return { ...order, lines, total: order.total };
   });
-  if (touched === 0) return "";
+  if (touched === 0) return null;
   const before = summarizeStoreOrders(orders);
   const after = summarizeStoreOrders(nextOrders);
+  return {
+    touchedCollected,
+    marginBefore: before.estimatedMargin.amount,
+    marginAfter: after.estimatedMargin.amount,
+    realizedBefore: before.realized.amount,
+    realizedAfter: after.realized.amount,
+  };
+}
+
+export function periodCostShiftNote(orders: StoreOrder[], guides: CostGuide[], place = "", rest: StoreOrder[] = []) {
+  const here = countedCostShift(orders, guides);
+  const away = place ? countedCostShift(rest, guides) : null;
+  if (!here && !away) return "";
   const where = place ? ` de ${place}` : "";
-  const elsewhere = place ? ` Los que ya cuentan fuera de ${place} no están en esta suma.` : "";
-  const parts = [
-    `Si copias el costo de hoy de cada ficha en los que ya cuentan${where}, el margen estimado ${costShiftPhrase(before.estimatedMargin.amount, after.estimatedMargin.amount)}. No es dinero cobrado. El total guardado no cambia. No suma pendientes, cancelados, en incidencia ni devueltos.${elsewhere}`,
-  ];
-  if (touchedCollected) {
+  const held = "No suma pendientes, cancelados, en incidencia ni devueltos.";
+  const parts: string[] = [];
+  if (here) {
     parts.push(
-      `La utilidad realizada ${costShiftPhrase(before.realized.amount, after.realized.amount)}. No es un cobro nuevo. El total guardado no cambia.`,
+      `Si copias el costo de hoy de cada ficha en los que ya cuentan${where}, el margen estimado ${costShiftPhrase(here.marginBefore, here.marginAfter)}. No es dinero cobrado. El total guardado no cambia. ${held}`,
     );
+    if (here.touchedCollected) {
+      parts.push(
+        `La utilidad realizada ${costShiftPhrase(here.realizedBefore, here.realizedAfter)}. No es un cobro nuevo. El total guardado no cambia.`,
+      );
+    }
+  }
+  if (away && place) {
+    parts.push(
+      `Fuera de ${place}, el margen estimado ${costShiftPhrase(away.marginBefore, away.marginAfter)}. La ficha también copia esos pedidos. Esta vista no guarda el costo. ${held}`,
+    );
+    if (away.touchedCollected) {
+      parts.push(
+        `Fuera de ${place}, la utilidad realizada ${costShiftPhrase(away.realizedBefore, away.realizedAfter)}. No es un cobro nuevo. El total guardado no cambia.`,
+      );
+    }
   }
   return parts.join(" ");
 }
@@ -1562,7 +1588,7 @@ export function closeSheetText(
   if (summary.realized.missingNumbers.length > 0) {
     lines.push(`Cobrado sin costo, no entra a la utilidad:${listedNumbers(summary.realized.missingNumbers)}`);
   }
-  const periodShift = periodCostShiftNote(orders, costGuides, span === "todo" ? "" : "este período");
+  const periodShift = periodCostShiftNote(orders, costGuides, span === "todo" ? "" : "este período", span === "todo" ? [] : rest);
   if (periodShift) lines.push(periodShift);
   if (summary.returnFreight > 0) {
     lines.push(`Flete de devolución: ${formatCop(summary.returnFreight)}.${listedNumbers(summary.returnFreightNumbers)} Resta de la utilidad.`);

@@ -133,6 +133,10 @@ export function OrdersScreen({
   const query = usePanelQuery().trim().toLocaleLowerCase("es");
   const spanOrders = useMemo(() => ordersInSpan(orders, span, today, basis), [orders, span, today, basis]);
   const summary = useMemo(() => summarizeStoreOrders(spanOrders), [spanOrders]);
+  const periodShift = useMemo(() => {
+    const seen = new Set(spanOrders.map((order) => order.number));
+    return periodCostShiftNote(spanOrders, costGuides, span === "todo" ? "" : "este período", span === "todo" ? [] : orders.filter((order) => !seen.has(order.number)));
+  }, [costGuides, orders, span, spanOrders]);
   const searched = useMemo(() => spanOrders.filter((order) => matchesOrder(order, query, sizeGuides, priceGuides, costGuides)), [spanOrders, query, sizeGuides, priceGuides, costGuides]);
   const present = STATUS_SEQUENCE.filter((item) => spanOrders.some((order) => order.status === item));
   const visible = searched.filter((order) => status === "todos" || order.status === status);
@@ -239,9 +243,7 @@ export function OrdersScreen({
           }
         />
       </dl>
-      {periodCostShiftNote(spanOrders, costGuides, span === "todo" ? "" : "este período") ? (
-        <p className="mt-3 text-sm leading-5">{periodCostShiftNote(spanOrders, costGuides, span === "todo" ? "" : "este período")}</p>
-      ) : null}
+      {periodShift ? <p className="mt-3 text-sm leading-5">{periodShift}</p> : null}
       <CloseSheet orders={spanOrders} rest={orders.filter((order) => !spanOrders.some((shown) => shown.number === order.number))} period={span} basis={basis} guides={sizeGuides} priceGuides={priceGuides} costGuides={costGuides} fieldId="cierre-pedidos" />
       <section className="mt-5" aria-labelledby="por-atender">
         <h2 id="por-atender" className="text-sm font-semibold">

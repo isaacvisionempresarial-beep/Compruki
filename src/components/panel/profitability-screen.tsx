@@ -60,6 +60,10 @@ export function ProfitabilityScreen({
   );
   const holds = useMemo(() => pendingSizeHolds(orders, guides), [orders, guides]);
   const spanOrders = useMemo(() => ordersInSpan(orders, storePeriod, today, basis), [orders, storePeriod, today, basis]);
+  const periodShift = useMemo(() => {
+    const seen = new Set(spanOrders.map((order) => order.number));
+    return periodCostShiftNote(spanOrders, costGuides, "este período", orders.filter((order) => !seen.has(order.number)));
+  }, [costGuides, orders, spanOrders]);
   const results = useMemo(() => resultsByProduct(spanOrders, guides), [spanOrders, guides]);
   const wider = results.length === 0 ? widerPeriodWithResults(orders, storePeriod, guides, today, basis) : null;
   const visible = results.filter(
@@ -94,9 +98,7 @@ export function ProfitabilityScreen({
                   Cifras de {closePhrase(storePeriod, basis)}. Verlas no cobra ni cambia pedidos.
                   {basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
                 </p>
-                {periodCostShiftNote(spanOrders, costGuides, "este período") ? (
-                  <p className="mt-2 text-sm leading-5">{periodCostShiftNote(spanOrders, costGuides, "este período")}</p>
-                ) : null}
+                {periodShift ? <p className="mt-2 text-sm leading-5">{periodShift}</p> : null}
               </div>
               <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                 <CloseBasisControl basis={basis} onChange={setBasis} name="base-resultados" />
