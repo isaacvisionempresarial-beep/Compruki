@@ -18,6 +18,7 @@ import {
   fichaDriftNote,
   skuCostGroupNote,
   skuCostGroups,
+  skuCostPreviewNote,
   skuCostScope,
   storedSkuLines,
   priceDrift,
@@ -745,6 +746,42 @@ describe("precio de la ficha", () => {
     expect(skuCostScope("incidencia")).toBe("fuera");
     expect(skuCostScope("devuelto")).toBe("fuera");
     expect(skuCostScope(undefined)).toBeNull();
+    const previewGuide = { sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 };
+    const previewNote = skuCostPreviewNote(
+      [
+        order({ number: "P-2070", status: "confirmado" }),
+        order({ number: "P-2071", status: "entregado", collected: true, actualShipping: 10_000, collectionCost: 3_000 }),
+        order({ number: "P-2072", status: "pendiente_confirmacion" }),
+        order({
+          number: "P-2073",
+          status: "confirmado",
+          total: 90_000,
+          lines: [
+            { sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 },
+            { sku: "OTRO", title: "Otro", unitPrice: 10_000, quantity: 1 },
+          ],
+        }),
+      ],
+      "SKU-1",
+      previewGuide,
+    );
+    expect(previewNote).toContain("el margen estimado queda en $20.000 en P-2070 y en $20.000 en P-2071");
+    expect(previewNote).toContain("Sumados, $40.000");
+    expect(previewNote).toContain("P-2071 ya está cobrado");
+    expect(previewNote).toContain("su utilidad realizada queda en $17.000");
+    expect(previewNote).toContain("No es un cobro nuevo");
+    expect(previewNote).toContain("P-2073 no cierra el margen estimado");
+    expect(previewNote).not.toContain("P-2072");
+    expect(previewNote).not.toContain("3001234567");
+    expect(previewNote).not.toContain("Calle 10");
+    expect(
+      skuCostPreviewNote(
+        [order({ number: "P-2074", status: "confirmado", lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1, unitCost: 50_000, unitShipping: 8_000, unitCommissions: 2_000 }] })],
+        "SKU-1",
+        previewGuide,
+      ),
+    ).toBe("");
+    expect(planned).toContain("Si aparece un margen, es el que quedaría en los que ya cuentan");
     expect(planned).not.toContain("3001234567");
     expect(fichaDrift([{ number: "P-2041", unitPrice: 80_000 }], { price: 80_000, cost: 50_000, shipping: 8_000, commissions: 2_000 }).costNumbers).toEqual([]);
     const listed = storedSkuLines(

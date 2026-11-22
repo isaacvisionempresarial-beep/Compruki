@@ -723,6 +723,85 @@ export function skuCostGroups(
   return { counted, outside, collected };
 }
 
+function pesosAt(rows: Array<{ number: string; amount: number }>) {
+  const parts = rows.map((row) => `${formatCop(row.amount)} en ${row.number}`);
+  if (parts.length <= 1) return parts[0] ?? "";
+  if (parts.length === 2) return `${parts[0]} y en ${parts[1]}`;
+  return `${parts.slice(0, -1).join(", en ")} y en ${parts[parts.length - 1]}`;
+}
+
+export function skuCostPreviewNote(
+  orders: Array<{
+    number: string;
+    status?: OrderStatus;
+    collected?: boolean;
+    total?: number;
+    actualShipping?: number;
+    collectionCost?: number;
+    lines: Array<Pick<OrderLine, "sku" | "unitPrice" | "unitCost" | "unitShipping" | "unitCommissions"> & Partial<Pick<OrderLine, "quantity" | "title">>>;
+  }>,
+  sku: string,
+  guide: CostGuide,
+) {
+  if (!readyCostGuide(guide)) return "";
+  const margins: Array<{ number: string; amount: number }> = [];
+  const open: string[] = [];
+  const realized: Array<{ number: string; amount: number }> = [];
+  const realizedOpen: string[] = [];
+  for (const order of orders) {
+    if (skuCostScope(order.status) !== "cuentan") continue;
+    if (order.lines.some((line) => typeof line.quantity !== "number")) continue;
+    const adopted = adoptSkuCosts({ lines: order.lines as OrderLine[], total: order.total ?? 0 }, sku, guide);
+    if (adopted.error || adopted.mode !== "reemplazar") continue;
+    const next = { ...order, lines: adopted.lines, total: order.total ?? 0 } as StoreOrder;
+    const margin = orderMargin(next);
+    if (margin === null) open.push(order.number);
+    else margins.push({ number: order.number, amount: margin });
+    if (order.status === "entregado" && order.collected) {
+      if (typeof order.total !== "number") realizedOpen.push(order.number);
+      else {
+        const profit = orderRealizedMargin(next);
+        if (profit === null) realizedOpen.push(order.number);
+        else realized.push({ number: order.number, amount: profit });
+      }
+    }
+  }
+  const parts: string[] = [];
+  if (margins.length === 1) {
+    parts.push(
+      `Si copias en los que ya cuentan, el margen estimado de ${margins[0].number} queda en ${formatCop(margins[0].amount)}. No es dinero cobrado. El total guardado no cambia.`,
+    );
+  } else if (margins.length > 1) {
+    const sum = margins.reduce((total, row) => total + row.amount, 0);
+    parts.push(
+      `Si copias en los que ya cuentan, el margen estimado queda en ${pesosAt(margins)}. Sumados, ${formatCop(sum)}. No es dinero cobrado. El total guardado no cambia.`,
+    );
+  }
+  if (open.length === 1) {
+    parts.push(`${open[0]} no cierra el margen estimado: otra línea no tiene costo, envío o comisiones. El total guardado no cambia.`);
+  } else if (open.length > 1) {
+    parts.push(`${nameList(open)} no cierran el margen estimado: otra línea no tiene costo, envío o comisiones. El total guardado no cambia.`);
+  }
+  if (realized.length === 1) {
+    parts.push(
+      `${realized[0].number} ya está cobrado. Si copias, su utilidad realizada queda en ${formatCop(realized[0].amount)}, con el flete y el recaudo ya anotados. No es un cobro nuevo. El total guardado no cambia.`,
+    );
+  } else if (realized.length > 1) {
+    const sum = realized.reduce((total, row) => total + row.amount, 0);
+    parts.push(
+      `${nameList(realized.map((row) => row.number))} ya están cobrados. Si copias, la utilidad realizada queda en ${pesosAt(realized)}. Sumadas, ${formatCop(sum)}. No es un cobro nuevo. El total guardado no cambia.`,
+    );
+  }
+  if (realizedOpen.length === 1) {
+    parts.push(`${realizedOpen[0]} ya está cobrado, pero la utilidad realizada no cierra: falta el costo de otra línea. No es un cobro nuevo. El total guardado no cambia.`);
+  } else if (realizedOpen.length > 1) {
+    parts.push(
+      `${nameList(realizedOpen)} ya están cobrados, pero la utilidad realizada no cierra: falta el costo de otra línea. No es un cobro nuevo. El total guardado no cambia.`,
+    );
+  }
+  return parts.join(" ");
+}
+
 export function skuCostGroupNote(groups: { counted: string[]; outside: string[]; collected: string[] }) {
   const parts: string[] = [];
   if (groups.counted.length === 1) {
@@ -787,17 +866,24 @@ export function catalogDriftText(
         commissions: product.commissions,
       }),
     );
+    const preview = skuCostPreviewNote(orders, product.sku, {
+      sku: product.sku,
+      cost: product.cost,
+      shipping: product.shipping,
+      commissions: product.commissions,
+    });
     blocks.push(
       product.title + " (" + product.sku + ")",
       note,
       ...(plan ? [plan] : []),
+      ...(preview ? [preview] : []),
       numbers.length > 0 ? "Pedidos: " + numbers.join(", ") + "." : "",
     );
   }
   if (blocks.length === 0) return "";
   return [
     "Fichas con otro precio o costo guardado",
-    "Copiar este texto no cobra, no reescribe los pedidos y no cambia el total guardado. Si el costo guardado es otro, la ficha tiene un botón para los que ya cuentan y otro para los que siguen fuera. Esta lista no lo guarda. El precio del pedido no cambia.",
+    "Copiar este texto no cobra, no reescribe los pedidos y no cambia el total guardado. Si el costo guardado es otro, la ficha tiene un botón para los que ya cuentan y otro para los que siguen fuera. Esta lista no lo guarda. Si aparece un margen, es el que quedaría en los que ya cuentan. El precio del pedido no cambia.",
     "Un pedido pendiente o cancelado no entra al margen ni a la utilidad. En incidencia no suma como venta confirmada. Devuelto, el total guardado no entra a la utilidad.",
     "",
     ...blocks,

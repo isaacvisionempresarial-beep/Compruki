@@ -6,7 +6,7 @@ import { MAX_PRODUCT_IMAGES, parsePesos, parseVariants, productMargin, type Cata
 import { prepareProductImage } from "@/lib/prepare-image";
 import { formatCop, formatDay } from "@/lib/format";
 import { campaignPath } from "@/lib/campaign";
-import { catalogDriftText, fichaDrift, fichaDriftNote, orderFocusHref, pendingSizeHoldPhrase, pendingSizeHolds, skuCostGroupNote, skuCostGroups, storedSkuLines, type StoredSkuLine, type StoreOrder } from "@/lib/store-order";
+import { catalogDriftText, fichaDrift, fichaDriftNote, orderFocusHref, pendingSizeHoldPhrase, pendingSizeHolds, skuCostGroupNote, skuCostGroups, skuCostPreviewNote, storedSkuLines, type StoredSkuLine, type StoreOrder } from "@/lib/store-order";
 import { cx } from "@/lib/cx";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 import { PhotoCarousel } from "@/components/photo-carousel";
@@ -57,7 +57,7 @@ export function CatalogScreen({
     [orders, products],
   );
   const rowDrift = useMemo(() => {
-    const notes = new Map<string, { note: string; plan: string; numbers: string[]; pending: string[]; cancel: string[]; incidence: string[]; returned: string[] }>();
+    const notes = new Map<string, { note: string; plan: string; preview: string; numbers: string[]; pending: string[]; cancel: string[]; incidence: string[]; returned: string[] }>();
     for (const product of products) {
       const drift = fichaDrift(storedSkuLines(orders, product.sku), {
         price: product.price,
@@ -76,6 +76,12 @@ export function CatalogScreen({
             commissions: product.commissions,
           }),
         ),
+        preview: skuCostPreviewNote(orders, product.sku, {
+          sku: product.sku,
+          cost: product.cost,
+          shipping: product.shipping,
+          commissions: product.commissions,
+        }),
         numbers: [...new Set([...drift.priceNumbers, ...drift.costNumbers])],
         pending: drift.pendingNumbers,
         cancel: drift.cancelNumbers,
@@ -103,6 +109,7 @@ export function CatalogScreen({
             .includes(query) ||
           (rowDrift.get(product.sku)?.note ?? "").toLocaleLowerCase("es").includes(query) ||
           (rowDrift.get(product.sku)?.plan ?? "").toLocaleLowerCase("es").includes(query) ||
+          (rowDrift.get(product.sku)?.preview ?? "").toLocaleLowerCase("es").includes(query) ||
           (rowDrift.get(product.sku)?.numbers ?? []).some((number) => number.toLocaleLowerCase("es").includes(query)),
       ),
     [products, query, holds, rowDrift],
@@ -255,7 +262,7 @@ function CatalogProductRow({
   product: CatalogProduct;
   hasOrders: boolean;
   hold: { orders: number; kind: "talla" | "tamano" } | null;
-  drift: { note: string; plan: string; numbers: string[]; pending: string[]; cancel: string[]; incidence: string[]; returned: string[] } | null;
+  drift: { note: string; plan: string; preview: string; numbers: string[]; pending: string[]; cancel: string[]; incidence: string[]; returned: string[] } | null;
   canManageCommerce: boolean;
 }) {
   const margin = productMargin(product);
@@ -355,6 +362,7 @@ function CatalogProductRow({
             <div className="mt-1 text-xs leading-5 text-warning">
               <p>{drift.note}</p>
               {drift.plan ? <p className="mt-1">{drift.plan}</p> : null}
+              {drift.preview ? <p className="mt-1">{drift.preview}</p> : null}
               {drift.numbers.length > 0 ? (
                 <p className="mt-0.5">
                   {drift.numbers.map((number) => (
@@ -685,7 +693,7 @@ function CatalogDriftSheet({ text }: { text: string }) {
         Fichas para copiar
       </h2>
       <p className="mt-0.5 text-xs leading-5 text-muted">
-        El catálogo completo, no el filtro de la pantalla. Van el precio, el costo, el envío y las comisiones de hoy junto a lo guardado, y el número del pedido. Si sigue pendiente o está cancelado, no entra al margen ni a la utilidad. En incidencia no suma como venta confirmada. Devuelto, el total guardado no entra a la utilidad. En la ficha, un botón anota el costo en los que ya cuentan y otro en los que siguen fuera. Copiar esta lista no lo guarda ni cambia el total.
+        El catálogo completo, no el filtro de la pantalla. Van el precio, el costo, el envío y las comisiones de hoy junto a lo guardado, y el número del pedido. Si sigue pendiente o está cancelado, no entra al margen ni a la utilidad. En incidencia no suma como venta confirmada. Devuelto, el total guardado no entra a la utilidad. En la ficha, un botón anota el costo en los que ya cuentan y otro en los que siguen fuera. Si aparece un margen, es el que quedaría en los que ya cuentan. Copiar esta lista no lo guarda ni cambia el total.
       </p>
       <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
         <label className="text-sm font-semibold" htmlFor="catalogo-fichas-distintas">
@@ -726,11 +734,13 @@ function SkuCostApply({
   product,
   lines,
   amounts,
+  costPreview,
   canManageCommerce,
 }: {
   product: CatalogProduct;
   lines: StoredSkuLine[];
   amounts: { cost: string; shipping: string; commissions: string };
+  costPreview: string;
   canManageCommerce: boolean;
 }) {
   const [state, action, pending] = useActionState(applySkuCatalogCostAction, skuCostInitial);
@@ -758,6 +768,7 @@ function SkuCostApply({
           : "Solo el propietario copia estas cifras a los pedidos. El precio y el total guardado no cambian."}
       </p>
       {plan ? <p className="mt-1 text-sm leading-5 text-warning">{plan}</p> : null}
+      {costPreview ? <p className="mt-1 text-sm leading-5">{costPreview}</p> : null}
       {dirty ? (
         <p className="mt-1 text-sm leading-5 text-warning">Guarda la ficha primero. Este botón usa lo ya guardado, no lo que está escrito.</p>
       ) : null}
@@ -872,6 +883,7 @@ export function ProductEditor({
   error,
   relatedOrderCount = 0,
   storedLines = [],
+  costPreview = "",
   canManageCommerce = false,
 }: {
   product: CatalogProduct | null;
@@ -880,6 +892,7 @@ export function ProductEditor({
   error: string | null;
   relatedOrderCount?: number;
   storedLines?: StoredSkuLine[];
+  costPreview?: string;
   canManageCommerce?: boolean;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
@@ -1250,6 +1263,7 @@ export function ProductEditor({
                   product={product}
                   lines={storedLines}
                   amounts={amounts}
+                  costPreview={costPreview}
                   canManageCommerce={canManageCommerce}
                 />
               ) : null}

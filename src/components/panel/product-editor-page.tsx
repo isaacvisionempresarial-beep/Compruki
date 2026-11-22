@@ -13,11 +13,13 @@ export function ProductEditorPage({
   product,
   relatedOrderCount = 0,
   storedLines = [],
+  costPreview = "",
   canManageCommerce = false,
 }: {
   product: CatalogProduct | null;
   relatedOrderCount?: number;
   storedLines?: StoredSkuLine[];
+  costPreview?: string;
   canManageCommerce?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(saveProductAction, initialState);
@@ -59,6 +61,7 @@ export function ProductEditorPage({
         error={state.error}
         relatedOrderCount={relatedOrderCount}
         storedLines={storedLines}
+        costPreview={costPreview}
         canManageCommerce={canManageCommerce}
       />
       {product ? (
