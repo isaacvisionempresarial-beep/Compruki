@@ -544,7 +544,7 @@ export async function applyCatalogCosts(id: string, actorName: string) {
         id: `evt_${randomUUID().slice(0, 8)}`,
         at: bogotaNow(),
         actorName,
-        summary: catalogCostSummary(adopted.mode),
+        summary: catalogCostSummary(adopted.mode, current, adopted.lines),
       },
       ...current.history,
     ],

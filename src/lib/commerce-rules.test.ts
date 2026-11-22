@@ -10,6 +10,8 @@ import {
   orderTotal,
   adoptCatalogCosts,
   adoptSkuCosts,
+  catalogCostMix,
+  catalogCostSummary,
   costDrift,
   costDriftNote,
   orderCostCopyNote,
@@ -682,6 +684,65 @@ describe("precio de la ficha", () => {
     const fillCollected = orderCostCopyNote(order({ status: "entregado", collected: true, number: "P-2107", lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1 }] }), todayCost);
     expect(fillCollected).toContain("La utilidad realizada hoy no cierra y quedaría en $20.000");
     expect(fillCollected).toContain("No es un cobro nuevo");
+    const halfGuide = [{ sku: "SKU-1", cost: 50_000, shipping: 9_000, commissions: 2_000 }];
+    const half = order({
+      status: "entregado",
+      collected: true,
+      number: "P-2108",
+      providerRef: "DP-2108",
+      customerNotifiedAt: "2026-11-20T16:00:00.000Z",
+      id: "88888888-8888-4888-8888-888888888888",
+      lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1, unitShipping: 8_000, unitCommissions: 2_000 }],
+    });
+    const halfAdopted = adoptCatalogCosts(half, halfGuide);
+    expect(halfAdopted.mode).toBe("reemplazar");
+    expect(catalogCostMix(half.lines, halfAdopted.lines).filled).toBe(true);
+    expect(catalogCostMix(half.lines, halfAdopted.lines).replaced).toBe(true);
+    const halfNote = orderCostCopyNote(half, halfGuide);
+    expect(halfNote).toContain("Si las copias, anotas lo que falta y reemplazas lo que ya no coincide");
+    expect(halfNote).toContain("Falta el costo de Faja, hoy en $50.000");
+    expect(halfNote).toContain("El envío estimado de Faja pasaría de $8.000 a $9.000");
+    expect(halfNote).toContain("hoy no cierra y quedaría en $19.000");
+    expect(halfNote).toContain("Este pedido ya cuenta");
+    expect(halfNote).toContain("La utilidad realizada hoy no cierra y quedaría en $19.000");
+    expect(halfNote).not.toContain("Si las usas");
+    expect(halfNote).not.toContain("3001234567");
+    const halfQueues = attentionQueues([half], [], true, halfGuide);
+    expect(halfQueues.map((queue) => queue.id)).toEqual(["cola-costo"]);
+    expect(halfQueues[0]?.rows[0]?.cta).toBe("Copiar costo y cifras");
+    expect(halfQueues[0]?.rows[0]?.note).toContain("anotas lo que falta y reemplazas lo que ya no coincide");
+    expect(halfQueues[0]?.rows[0]?.also).toContain("costo de hoy");
+    const halfSheet = attentionSheetText([half], [], true, [], halfGuide);
+    expect(halfSheet).toContain("Siguiente paso: Copiar costo y cifras.");
+    expect(halfSheet).toContain("la misma copia anota lo que falta y reemplaza lo que ya no coincide");
+    expect(halfSheet).not.toContain("3001234567");
+    expect(halfSheet).not.toContain("Calle 10");
+    const halfOutside = order({
+      status: "pendiente_confirmacion",
+      number: "P-2109",
+      lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1, unitShipping: 8_000, unitCommissions: 2_000 }],
+    });
+    const outsideMix = orderCostCopyNote(halfOutside, halfGuide);
+    expect(outsideMix).toContain("anotas lo que falta y reemplazas lo que ya no coincide");
+    expect(outsideMix).toContain("Este pedido sigue fuera");
+    expect(outsideMix).toContain("El margen estimado y la utilidad no se mueven");
+    expect(outsideMix).not.toContain("ya cuenta");
+    const savedMix = catalogCostSummary("reemplazar", half, halfAdopted.lines);
+    expect(savedMix).toContain("Anotó lo que faltaba y reemplazó lo que ya no coincidía");
+    expect(savedMix).toContain("El pedido ya contaba");
+    expect(savedMix).toContain("El margen estimado no cerraba y queda en $19.000");
+    expect(savedMix).toContain("La utilidad realizada no cerraba y queda en $19.000");
+    expect(savedMix).toContain("El total guardado no cambió");
+    expect(savedMix).not.toContain("3001234567");
+    const savedOutside = catalogCostSummary("reemplazar", halfOutside, adoptCatalogCosts(halfOutside, halfGuide).lines);
+    expect(savedOutside).toContain("sigue fuera de la cuenta");
+    expect(savedOutside).toContain("no se movieron");
+    expect(savedOutside).not.toContain("ya contaba");
+    const savedFill = catalogCostSummary("anotar", bare, adoptCatalogCosts(bare, todayCost).lines);
+    expect(savedFill).toContain("Anotó el costo, el envío y las comisiones de la ficha.");
+    expect(savedFill).toContain("El pedido ya contaba");
+    expect(savedFill).toContain("El margen estimado no cerraba y queda en $20.000");
+    expect(savedFill).not.toContain("reemplazó lo que ya no coincidía");
     expect(quietSheet).not.toContain("3001234567");
     expect(quietSheet).not.toContain("Calle 10");
     const operatorSheet = attentionSheetText([quiet], [], false, [], todayCost);

@@ -20,6 +20,7 @@ import {
   canNoteDropiNumber,
   adoptCatalogCosts,
   catalogCostLines,
+  catalogCostMix,
   previewMarginsWithCatalogCosts,
   previewMarginsWithFreight,
   catalogCostQueueNote,
@@ -1110,6 +1111,8 @@ function CatalogCostForm({
   const [costState, costAction, costPending] = useActionState(applyCatalogCostAction, initialState);
   const adopted = adoptCatalogCosts(order, guides);
   const rows = catalogCostLines(order, guides);
+  const mix = catalogCostMix(order.lines, adopted.lines);
+  const mixed = mix.filled && mix.replaced;
   const replacing = adopted.mode === "reemplazar";
   if (adopted.mode === "igual" && !adopted.error && rows.length === 0) return null;
   const ready = !adopted.error && adopted.mode !== "igual";
@@ -1147,9 +1150,11 @@ function CatalogCostForm({
         ))}
       </ul>
       <p className="text-sm leading-5 text-muted">
-        {replacing
-          ? "Estas cifras reemplazan el costo guardado de este pedido. El precio no cambia. El total guardado no cambia. No es dinero cobrado."
-          : "El precio de este pedido no cambia. El total guardado no cambia. Siguen siendo cifras estimadas. Al usarlas se anotan en este pedido; no es un guardado vacío."}
+        {mixed
+          ? "Estas cifras anotan lo que falta y reemplazan lo que ya no coincide. El precio no cambia. El total guardado no cambia. No es dinero cobrado."
+          : replacing
+            ? "Estas cifras reemplazan el costo guardado de este pedido. El precio no cambia. El total guardado no cambia. No es dinero cobrado."
+            : "El precio de este pedido no cambia. El total guardado no cambia. Siguen siendo cifras estimadas. Al usarlas se anotan en este pedido; no es un guardado vacío."}
       </p>
       {copyNote ? (
         <p className="text-sm leading-5 text-ink">{copyNote}</p>
@@ -1175,9 +1180,11 @@ function CatalogCostForm({
       <p className="text-sm leading-5 text-muted">
         {canManageOrderMoney
           ? canSave
-            ? replacing
-              ? "Copia el costo de hoy a este pedido. El precio y el total guardado no cambian."
-              : "Copia el costo, el envío y las comisiones de la ficha a este pedido. El total guardado no cambia."
+            ? mixed
+              ? "Copia lo que falta y reemplaza lo que ya no coincide. El precio y el total guardado no cambian."
+              : replacing
+                ? "Copia el costo de hoy a este pedido. El precio y el total guardado no cambian."
+                : "Copia el costo, el envío y las comisiones de la ficha a este pedido. El total guardado no cambia."
             : "Sin las cifras de la ficha el botón queda bloqueado."
           : "Solo el propietario copia estas cifras. El total guardado no cambia."}
       </p>
@@ -1190,7 +1197,7 @@ function CatalogCostForm({
           costPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
         }`}
       >
-        {costPending ? "Guardando…" : replacing ? "Usar las cifras de hoy" : "Usar las cifras de la ficha"}
+        {costPending ? "Guardando…" : mixed ? "Anotar y usar las cifras de hoy" : replacing ? "Usar las cifras de hoy" : "Usar las cifras de la ficha"}
       </button>
       ) : null}
     </form>

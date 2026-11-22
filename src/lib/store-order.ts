@@ -356,11 +356,94 @@ export function adoptSkuCosts(order: Pick<StoreOrder, "lines" | "total">, sku: s
   return { lines, total: order.total, mode: "reemplazar" as const, error: null as string | null };
 }
 
-export function catalogCostSummary(mode: "anotar" | "reemplazar") {
-  if (mode === "reemplazar") {
-    return "Reemplazó el costo guardado con las cifras de la ficha de hoy. El precio del pedido no cambió. El total guardado no cambió. No es dinero cobrado.";
+function joinSpanish(items: string[]) {
+  if (items.length <= 1) return items[0] ?? "";
+  if (items.length === 2) return `${items[0]} y ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")} y ${items[items.length - 1]}`;
+}
+
+function sentenceCase(value: string) {
+  return value ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : value;
+}
+
+export function catalogCostMix(before: OrderLine[], after: OrderLine[]) {
+  const gaps: string[] = [];
+  const swaps: string[] = [];
+  const count = Math.min(before.length, after.length);
+  for (let index = 0; index < count; index += 1) {
+    const was = before[index];
+    const now = after[index];
+    const missing: Array<{ label: string; amount: number }> = [];
+    const changed: Array<{ label: string; stored: number; current: number }> = [];
+    const fields: Array<[string, number | undefined, number | undefined]> = [
+      ["el costo", was.unitCost, now.unitCost],
+      ["el envío estimado", was.unitShipping, now.unitShipping],
+      ["las comisiones estimadas", was.unitCommissions, now.unitCommissions],
+    ];
+    for (const [label, previous, next] of fields) {
+      if (typeof next !== "number") continue;
+      if (typeof previous !== "number") missing.push({ label, amount: next });
+      else if (previous !== next) changed.push({ label, stored: previous, current: next });
+    }
+    if (missing.length === 1) gaps.push(`Falta ${missing[0].label} de ${was.title}, hoy en ${formatCop(missing[0].amount)}.`);
+    else if (missing.length > 1) {
+      gaps.push(
+        `Faltan ${joinSpanish(missing.map((item) => item.label))} de ${was.title}, hoy en ${joinSpanish(missing.map((item) => formatCop(item.amount)))}.`,
+      );
+    }
+    if (changed.length === 1) {
+      swaps.push(
+        `${sentenceCase(changed[0].label)} de ${was.title} pasaría de ${formatCop(changed[0].stored)} a ${formatCop(changed[0].current)}.`,
+      );
+    } else if (changed.length > 1) {
+      const [first, ...rest] = changed;
+      swaps.push(
+        `${sentenceCase(first.label)} de ${was.title} pasaría de ${formatCop(first.stored)} a ${formatCop(first.current)} y ${joinSpanish(rest.map((item) => `${item.label} de ${formatCop(item.stored)} a ${formatCop(item.current)}`))}.`,
+      );
+    }
   }
-  return "Anotó el costo, el envío y las comisiones de la ficha. El precio del pedido no cambió. El total guardado no cambió. No es dinero cobrado.";
+  return { filled: gaps.length > 0, replaced: swaps.length > 0, detail: [...gaps, ...swaps].join(" ") };
+}
+
+function costShiftSaved(before: number | null, after: number) {
+  if (before === null) return `no cerraba y queda en ${formatCop(after)}`;
+  if (before === after) return `sigue en ${formatCop(after)}`;
+  return `pasa de ${formatCop(before)} a ${formatCop(after)}`;
+}
+
+export function catalogCostSummary(mode: "anotar" | "reemplazar", order?: StoreOrder, nextLines?: OrderLine[]) {
+  const mix = order && nextLines ? catalogCostMix(order.lines, nextLines) : null;
+  const action =
+    mix?.filled && mix.replaced
+      ? "Anotó lo que faltaba y reemplazó lo que ya no coincidía con la ficha de hoy."
+      : mode === "reemplazar"
+        ? "Reemplazó el costo guardado con las cifras de la ficha de hoy."
+        : "Anotó el costo, el envío y las comisiones de la ficha.";
+  const kept = "El precio del pedido no cambió. El total guardado no cambió. No es dinero cobrado.";
+  if (!order || !nextLines) return `${action} ${kept}`;
+  const next = { ...order, lines: nextLines, total: order.total };
+  const scope = skuCostScope(order.status);
+  const parts = [action];
+  if (scope === "fuera") {
+    parts.push("El pedido sigue fuera de la cuenta. El margen estimado y la utilidad no se movieron.");
+  } else if (scope === "cuentan") {
+    const after = orderMargin(next);
+    parts.push(
+      after === null
+        ? "El pedido ya contaba. El margen estimado no cierra: otra línea sigue sin costo, envío o comisiones."
+        : `El pedido ya contaba. El margen estimado ${costShiftSaved(orderMargin(order), after)}.`,
+    );
+    if (order.status === "entregado" && order.collected) {
+      const profit = orderRealizedMargin(next);
+      if (profit !== null) {
+        parts.push(
+          `La utilidad realizada ${costShiftSaved(orderRealizedMargin(order), profit)}, con el flete y el recaudo ya anotados. No es un cobro nuevo.`,
+        );
+      }
+    }
+  }
+  parts.push(kept);
+  return parts.join(" ");
 }
 
 export function previewMarginsWithFreight(
@@ -1074,19 +1157,28 @@ export function costDriftNote(drifts: Array<{ title: string; fields: Array<{ lab
 export function orderCostCopyNote(order: StoreOrder, guides: CostGuide[]) {
   const adopted = adoptCatalogCosts(order, guides);
   if (adopted.error || adopted.mode === "igual") return "";
+  const mix = catalogCostMix(order.lines, adopted.lines);
+  const mixed = mix.filled && mix.replaced;
+  const verb = mixed ? "Si las copias" : adopted.mode === "anotar" ? "Si las anotas" : "Si las usas";
+  const preface = mixed ? `${verb}, anotas lo que falta y reemplazas lo que ya no coincide. ${mix.detail}` : "";
   const scope = skuCostScope(order.status);
-  const verb = adopted.mode === "anotar" ? "Si las anotas" : "Si las usas";
   if (scope === "fuera") {
     const hold = accountHoldNote(order.status);
-    return `${verb}, este pedido sigue fuera. ${hold} El margen estimado y la utilidad no se mueven. El precio y el total guardado no cambian.`.replace(/ +/g, " ").trim();
+    const body = mixed
+      ? `Este pedido sigue fuera. ${hold} El margen estimado y la utilidad no se mueven. El precio y el total guardado no cambian.`
+      : `${verb}, este pedido sigue fuera. ${hold} El margen estimado y la utilidad no se mueven. El precio y el total guardado no cambian.`;
+    return `${preface} ${body}`.replace(/ +/g, " ").trim();
   }
-  if (scope !== "cuentan") return "";
+  if (scope !== "cuentan") return preface.trim();
   const next = { ...order, lines: adopted.lines };
   const after = orderMargin(next);
   const parts: string[] = [];
+  if (preface) parts.push(preface);
   if (after !== null) {
     parts.push(
-      `${verb}, el margen estimado de este pedido ${costShiftPhrase(orderMargin(order), after)}. Este pedido ya cuenta. No es dinero cobrado. El total guardado no cambia.`,
+      mixed
+        ? `El margen estimado de este pedido ${costShiftPhrase(orderMargin(order), after)}. Este pedido ya cuenta. No es dinero cobrado. El total guardado no cambia.`
+        : `${verb}, el margen estimado de este pedido ${costShiftPhrase(orderMargin(order), after)}. Este pedido ya cuenta. No es dinero cobrado. El total guardado no cambia.`,
     );
   }
   if (order.status === "entregado" && order.collected) {
@@ -1097,7 +1189,7 @@ export function orderCostCopyNote(order: StoreOrder, guides: CostGuide[]) {
       );
     }
   }
-  return parts.join(" ");
+  return parts.join(" ").replace(/ +/g, " ").trim();
 }
 
 function resultEntries(orders: StoreOrder[], sku: string) {
@@ -1876,8 +1968,8 @@ export function attentionQueues(
       id: "cola-costo",
       title: "Sin costo en el pedido",
       hint: canManageOrderMoney
-        ? "Sin costo, envío o comisiones de la ficha. Si ya está cobrado, falta para la utilidad realizada. Copiarlas no cambia el total guardado."
-        : "Sin costo, envío o comisiones de la ficha. Lo copia el propietario. El total guardado no cambia.",
+        ? "Sin costo, envío o comisiones de la ficha. Si otra cifra ya no coincide, la misma copia la reemplaza. Si ya está cobrado, falta para la utilidad realizada. Copiarlas no cambia el total guardado."
+        : "Sin costo, envío o comisiones de la ficha. Si otra cifra ya no coincide, la misma copia del propietario la reemplaza. El total guardado no cambia.",
       short: "costo",
       cta: canManageOrderMoney ? "Copiar costo" : "Ver pedido",
       match: needsCatalogCost,
@@ -1939,7 +2031,12 @@ export function attentionQueues(
         if (!def.match(order) || claimed.has(order.id)) continue;
         claimed.add(order.id);
         const also = defs.filter((other) => other.id !== def.id && other.match(order)).map((other) => other.short);
-        rows.push({ order, note: def.note(order), also, cta: def.cta });
+        let cta = def.cta;
+        if (def.id === "cola-costo" && canManageOrderMoney) {
+          const adopted = adoptCatalogCosts(order, costGuides);
+          if (!adopted.error && catalogCostMix(order.lines, adopted.lines).replaced) cta = "Copiar costo y cifras";
+        }
+        rows.push({ order, note: def.note(order), also, cta });
       }
       return { id: def.id, title: def.title, hint: def.hint, rows };
     })
@@ -1972,6 +2069,9 @@ export function attentionSheetText(
   }
   if (queues.some((queue) => queue.rows.some((row) => row.cta === "Usar las cifras de hoy"))) {
     lines.push("Si el paso es usar las cifras de hoy, esta lista no las guarda. El precio y el total guardado no cambian.");
+  }
+  if (queues.some((queue) => queue.rows.some((row) => row.cta === "Copiar costo y cifras"))) {
+    lines.push("Si el paso es copiar costo y cifras, la misma copia anota lo que falta y reemplaza lo que ya no coincide. Esta lista no las guarda. El precio y el total guardado no cambian.");
   }
   lines.push("");
   if (queues.length === 0) {
