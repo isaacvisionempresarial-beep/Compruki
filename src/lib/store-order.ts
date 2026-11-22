@@ -743,6 +743,15 @@ export function skuCostGroupNote(groups: { counted: string[]; outside: string[];
   return parts.join(" ");
 }
 
+export type SkuCostScope = "cuentan" | "fuera";
+
+export function skuCostScope(status: OrderStatus | undefined): SkuCostScope | null {
+  if (!status) return null;
+  if (COST_COUNTED.includes(status)) return "cuentan";
+  if (COST_OUTSIDE.includes(status)) return "fuera";
+  return null;
+}
+
 export function accountHoldNote(status: OrderStatus) {
   if (status === "pendiente_confirmacion") return "Sigue pendiente: no entra al margen ni a la utilidad.";
   if (status === "cancelado") return "Está cancelado: no entra al margen ni a la utilidad.";
@@ -788,7 +797,7 @@ export function catalogDriftText(
   if (blocks.length === 0) return "";
   return [
     "Fichas con otro precio o costo guardado",
-    "Copiar este texto no cobra, no reescribe los pedidos y no cambia el total guardado. Si el costo guardado es otro, el botón de la ficha lo anota. Esta lista no lo guarda. El precio del pedido no cambia.",
+    "Copiar este texto no cobra, no reescribe los pedidos y no cambia el total guardado. Si el costo guardado es otro, la ficha tiene un botón para los que ya cuentan y otro para los que siguen fuera. Esta lista no lo guarda. El precio del pedido no cambia.",
     "Un pedido pendiente o cancelado no entra al margen ni a la utilidad. En incidencia no suma como venta confirmada. Devuelto, el total guardado no entra a la utilidad.",
     "",
     ...blocks,

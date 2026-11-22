@@ -28,7 +28,7 @@ const filters = [
 type FilterId = (typeof filters)[number]["id"];
 
 const lifecycleInitial: ProductLifecycleState = { error: null, message: null };
-const skuCostInitial: SkuCostState = { error: null, saved: 0 };
+const skuCostInitial: SkuCostState = { error: null, saved: 0, scope: null };
 
 export function CatalogScreen({
   products,
@@ -685,7 +685,7 @@ function CatalogDriftSheet({ text }: { text: string }) {
         Fichas para copiar
       </h2>
       <p className="mt-0.5 text-xs leading-5 text-muted">
-        El catálogo completo, no el filtro de la pantalla. Van el precio, el costo, el envío y las comisiones de hoy junto a lo guardado, y el número del pedido. Si sigue pendiente o está cancelado, no entra al margen ni a la utilidad. En incidencia no suma como venta confirmada. Devuelto, el total guardado no entra a la utilidad. El botón de la ficha sí anota el costo. Copiar esta lista no lo guarda ni cambia el total.
+        El catálogo completo, no el filtro de la pantalla. Van el precio, el costo, el envío y las comisiones de hoy junto a lo guardado, y el número del pedido. Si sigue pendiente o está cancelado, no entra al margen ni a la utilidad. En incidencia no suma como venta confirmada. Devuelto, el total guardado no entra a la utilidad. En la ficha, un botón anota el costo en los que ya cuentan y otro en los que siguen fuera. Copiar esta lista no lo guarda ni cambia el total.
       </p>
       <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
         <label className="text-sm font-semibold" htmlFor="catalogo-fichas-distintas">
@@ -745,24 +745,23 @@ function SkuCostApply({
     parsePesos(amounts.cost) !== product.cost ||
     parsePesos(amounts.shipping) !== product.shipping ||
     parsePesos(amounts.commissions) !== product.commissions;
-  const count = saved.costNumbers.length;
-  const label = count === 1 ? "1 pedido" : `${count} pedidos`;
-  const plan = skuCostGroupNote(
-    skuCostGroups(lines, { cost: product.cost, shipping: product.shipping, commissions: product.commissions }),
-  );
+  const groups = skuCostGroups(lines, { cost: product.cost, shipping: product.shipping, commissions: product.commissions });
+  const plan = skuCostGroupNote(groups);
+  const countedLabel = groups.counted.length === 1 ? "1 pedido que ya cuenta" : `${groups.counted.length} pedidos que ya cuentan`;
+  const outsideLabel = groups.outside.length === 1 ? "1 pedido que sigue fuera" : `${groups.outside.length} pedidos que siguen fuera`;
   return (
     <div className="mt-3 rounded-[10px] border border-line bg-card px-3 py-2">
       <p className="text-sm font-semibold">Costo de hoy en los pedidos</p>
       <p className="mt-1 text-sm leading-5 text-muted">
         {canManageCommerce
-          ? `Copia el costo, el envío y las comisiones ya guardados en esta ficha a ${label}. No usa lo que está escrito y todavía no guardaste. El precio de cada pedido no cambia. El total guardado no cambia. No es dinero cobrado.`
+          ? "Cada botón copia un grupo. El de los que ya cuentan no toca a los que siguen fuera. No usa lo que está escrito y todavía no guardaste. El precio de cada pedido no cambia. El total guardado no cambia. No es dinero cobrado."
           : "Solo el propietario copia estas cifras a los pedidos. El precio y el total guardado no cambian."}
       </p>
       {plan ? <p className="mt-1 text-sm leading-5 text-warning">{plan}</p> : null}
       {dirty ? (
         <p className="mt-1 text-sm leading-5 text-warning">Guarda la ficha primero. Este botón usa lo ya guardado, no lo que está escrito.</p>
       ) : null}
-      {count > 0 ? (
+      {saved.costNumbers.length > 0 ? (
         <p className="mt-1 text-sm leading-5">
           {saved.costNumbers.map((number) => (
             <Link
@@ -783,25 +782,46 @@ function SkuCostApply({
       ) : null}
       {state.saved > 0 ? (
         <p role="status" className="mt-1 text-sm text-accent-strong">
-          Quedó anotado en {state.saved === 1 ? "1 pedido" : `${state.saved} pedidos`}. El precio y el total guardado no cambiaron. No es dinero cobrado.
+          {state.scope === "fuera"
+            ? `Quedó anotado en ${state.saved === 1 ? "1 pedido que sigue fuera" : `${state.saved} pedidos que siguen fuera`}. No entran al margen ni a la utilidad. El precio y el total guardado no cambiaron.`
+            : `Quedó anotado en ${state.saved === 1 ? "1 pedido que ya cuenta" : `${state.saved} pedidos que ya cuentan`}. Los que siguen fuera no cambiaron. El precio y el total guardado no cambiaron.`}
         </p>
       ) : null}
       {canManageCommerce ? (
-        <button
-          type="button"
-          title="El precio y el total guardado no cambian. No es dinero cobrado."
-          disabled={pending || dirty || count === 0}
-          className={`mt-2 inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold ${
-            pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
-          }`}
-          onClick={() => {
-            const data = new FormData();
-            data.set("sku", product.sku);
-            action(data);
-          }}
-        >
-          {pending ? "…" : "Usar las cifras de hoy"}
-        </button>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <button
+            type="button"
+            title="No toca a los que siguen fuera. El precio y el total guardado no cambian."
+            disabled={pending || dirty || groups.counted.length === 0}
+            className={`inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold ${
+              pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+            }`}
+            onClick={() => {
+              const data = new FormData();
+              data.set("sku", product.sku);
+              data.set("scope", "cuentan");
+              action(data);
+            }}
+          >
+            {pending ? "…" : `Usar las cifras de hoy en ${countedLabel}`}
+          </button>
+          <button
+            type="button"
+            title="No los mete al margen ni a la utilidad. El precio y el total guardado no cambian."
+            disabled={pending || dirty || groups.outside.length === 0}
+            className={`inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold ${
+              pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+            }`}
+            onClick={() => {
+              const data = new FormData();
+              data.set("sku", product.sku);
+              data.set("scope", "fuera");
+              action(data);
+            }}
+          >
+            {pending ? "…" : `Usarlas en ${outsideLabel}`}
+          </button>
+        </div>
       ) : null}
     </div>
   );

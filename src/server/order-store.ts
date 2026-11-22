@@ -5,6 +5,7 @@ import { formatCop } from "@/lib/format";
 import {
   adoptCatalogCosts,
   adoptSkuCosts,
+  skuCostScope,
   applyOrderAction,
   catalogCostSummary,
   nextOrderNumber,
@@ -552,8 +553,9 @@ export async function applyCatalogCosts(id: string, actorName: string) {
   return { error: null, order, saved: true };
 }
 
-export async function applySkuCatalogCosts(sku: string, actorName: string) {
+export async function applySkuCatalogCosts(sku: string, actorName: string, scope: "cuentan" | "fuera") {
   const needle = sku.trim().toUpperCase();
+  if (scope !== "cuentan" && scope !== "fuera") return { error: "Elige si copias los que ya cuentan o los que siguen fuera.", saved: 0 };
   if (!needle) return { error: "Falta el SKU.", saved: 0 };
   const product = (await listProducts()).find((item) => item.sku === needle);
   if (!product) return { error: "No encontré esa ficha.", saved: 0 };
@@ -564,8 +566,12 @@ export async function applySkuCatalogCosts(sku: string, actorName: string) {
   if (blocked?.adopted.error) return { error: blocked.adopted.error, saved: 0 };
   let saved = 0;
   const next = plans.map(({ current, adopted }) => {
-    if (adopted.mode !== "reemplazar") return current;
+    if (adopted.mode !== "reemplazar" || skuCostScope(current.status) !== scope) return current;
     saved += 1;
+    const summary =
+      scope === "cuentan"
+        ? "Desde la ficha, reemplazó el costo guardado con las cifras de hoy en un pedido que ya cuenta. El precio del pedido no cambió. El total guardado no cambió. No es dinero cobrado."
+        : "Desde la ficha, reemplazó el costo guardado con las cifras de hoy. El pedido sigue fuera de la cuenta. El precio no cambió. El total guardado no cambió. No es dinero cobrado.";
     return {
       ...current,
       lines: adopted.lines,
@@ -575,8 +581,7 @@ export async function applySkuCatalogCosts(sku: string, actorName: string) {
           id: `evt_${randomUUID().slice(0, 8)}`,
           at: bogotaNow(),
           actorName,
-          summary:
-            "Desde la ficha, reemplazó el costo guardado con las cifras de hoy. El precio del pedido no cambió. El total guardado no cambió. No es dinero cobrado.",
+          summary,
         },
         ...current.history,
       ],

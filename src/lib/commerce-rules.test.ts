@@ -18,6 +18,7 @@ import {
   fichaDriftNote,
   skuCostGroupNote,
   skuCostGroups,
+  skuCostScope,
   storedSkuLines,
   priceDrift,
   priceDriftNote,
@@ -735,7 +736,15 @@ describe("precio de la ficha", () => {
       [{ number: "P-2060", status: "confirmado", lines: [{ sku: "SKU-1", unitPrice: 80_000, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 }] }],
     );
     expect(planned).toContain("P-2060 ya cuenta");
-    expect(planned).toContain("el botón de la ficha lo anota");
+    expect(planned).toContain("un botón para los que ya cuentan y otro para los que siguen fuera");
+    expect(skuCostScope("confirmado")).toBe("cuentan");
+    expect(skuCostScope("en_transporte")).toBe("cuentan");
+    expect(skuCostScope("entregado")).toBe("cuentan");
+    expect(skuCostScope("pendiente_confirmacion")).toBe("fuera");
+    expect(skuCostScope("cancelado")).toBe("fuera");
+    expect(skuCostScope("incidencia")).toBe("fuera");
+    expect(skuCostScope("devuelto")).toBe("fuera");
+    expect(skuCostScope(undefined)).toBeNull();
     expect(planned).not.toContain("3001234567");
     expect(fichaDrift([{ number: "P-2041", unitPrice: 80_000 }], { price: 80_000, cost: 50_000, shipping: 8_000, commissions: 2_000 }).costNumbers).toEqual([]);
     const listed = storedSkuLines(

@@ -177,22 +177,24 @@ export async function applyCatalogCostAction(_state: UpdateOrderState, formData:
   return { error: null, orderId };
 }
 
-export type SkuCostState = { error: string | null; saved: number };
+export type SkuCostState = { error: string | null; saved: number; scope: "cuentan" | "fuera" | null };
 
 export async function applySkuCatalogCostAction(_state: SkuCostState, formData: FormData): Promise<SkuCostState> {
   const sku = String(formData.get("sku") ?? "");
+  const scope = formData.get("scope") === "fuera" ? "fuera" : formData.get("scope") === "cuentan" ? "cuentan" : null;
   const access = await assertPanelAccess();
-  if (!access) return { error: "Tu sesión no permite copiar el costo.", saved: 0 };
-  if (access.role !== "owner") return { error: "Solo el propietario puede copiar el costo de la ficha a los pedidos.", saved: 0 };
-  const result = await applySkuCatalogCosts(sku, access.actorName);
-  if (result.error) return { error: result.error, saved: 0 };
-  if (result.saved === 0) return { error: null, saved: 0 };
+  if (!access) return { error: "Tu sesión no permite copiar el costo.", saved: 0, scope };
+  if (access.role !== "owner") return { error: "Solo el propietario puede copiar el costo de la ficha a los pedidos.", saved: 0, scope };
+  if (!scope) return { error: "Elige si copias los que ya cuentan o los que siguen fuera.", saved: 0, scope: null };
+  const result = await applySkuCatalogCosts(sku, access.actorName, scope);
+  if (result.error) return { error: result.error, saved: 0, scope };
+  if (result.saved === 0) return { error: null, saved: 0, scope };
   refreshOrderScreens();
   revalidatePath("/panel/catalogo");
   revalidatePath(`/panel/catalogo/${encodeURIComponent(sku.trim().toUpperCase())}`);
   revalidatePath("/panel/rentabilidad");
   revalidatePath("/panel");
-  return { error: null, saved: result.saved };
+  return { error: null, saved: result.saved, scope };
 }
 
 export async function saveProviderRefAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
