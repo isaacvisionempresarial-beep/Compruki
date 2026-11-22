@@ -2030,7 +2030,11 @@ export function attentionQueues(
       for (const order of orders) {
         if (!def.match(order) || claimed.has(order.id)) continue;
         claimed.add(order.id);
-        const also = defs.filter((other) => other.id !== def.id && other.match(order)).map((other) => other.short);
+        const also = defs.filter((other) => other.id !== def.id && other.match(order)).map((other) => {
+          if (other.id !== "cola-costo" || !canManageOrderMoney) return other.short;
+          const adopted = adoptCatalogCosts(order, costGuides);
+          return !adopted.error && catalogCostMix(order.lines, adopted.lines).replaced ? "costo y cifras" : other.short;
+        });
         let cta = def.cta;
         if (def.id === "cola-costo" && canManageOrderMoney) {
           const adopted = adoptCatalogCosts(order, costGuides);
@@ -2041,6 +2045,15 @@ export function attentionQueues(
       return { id: def.id, title: def.title, hint: def.hint, rows };
     })
     .filter((queue) => queue.rows.length > 0);
+}
+
+export function attentionCostAside(note: string, order: StoreOrder, guides: CostGuide[], canManageOrderMoney = true) {
+  const copy = orderCostCopyNote(order, guides);
+  if (!copy || note.includes(copy)) return "";
+  const who = canManageOrderMoney
+    ? "El botón del pedido lo copia. Esta lista no lo guarda."
+    : "Lo copia el propietario. Esta lista no lo guarda.";
+  return `Ese costo no es el siguiente paso. ${copy} ${who}`;
 }
 
 export function attentionSheetText(
@@ -2073,6 +2086,13 @@ export function attentionSheetText(
   if (queues.some((queue) => queue.rows.some((row) => row.cta === "Copiar costo y cifras"))) {
     lines.push("Si el paso es copiar costo y cifras, la misma copia anota lo que falta y reemplaza lo que ya no coincide. Esta lista no las guarda. El precio y el total guardado no cambian.");
   }
+  if (queues.some((queue) => queue.rows.some((row) => attentionCostAside(row.note, row.order, costGuides, canManageOrderMoney)))) {
+    lines.push(
+      canManageOrderMoney
+        ? "Si el costo va en También, no es el siguiente paso. El botón del pedido lo copia. Esta lista no lo guarda. El precio y el total guardado no cambian."
+        : "Si el costo va en También, no es el siguiente paso. Lo copia el propietario. Esta lista no lo guarda. El precio y el total guardado no cambian.",
+    );
+  }
   lines.push("");
   if (queues.length === 0) {
     lines.push("No hay pedidos esperando un dato o una acción.");
@@ -2084,6 +2104,8 @@ export function attentionSheetText(
         lines.push(`${row.order.number} · ${row.order.customerName}${place ? ` · ${place}` : ""}`);
         lines.push(row.note);
         if (row.also.length > 0) lines.push(`También: ${row.also.join(", ")}.`);
+        const costAside = attentionCostAside(row.note, row.order, costGuides, canManageOrderMoney);
+        if (costAside) lines.push(costAside);
         lines.push(`Siguiente paso: ${row.cta}.`);
         if (row.cta === "Marcar aviso") {
           lines.push("Mensaje para copiar. Copiarlo no lo envía:");

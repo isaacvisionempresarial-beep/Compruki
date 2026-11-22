@@ -30,6 +30,7 @@ import {
   costQueueWarning,
   applyOrderAction,
   attentionQueues,
+  attentionCostAside,
   customerMessage,
   dispatchQueueNote,
   dropiHandoffText,
@@ -307,6 +308,11 @@ export function OrdersScreen({
                             <span className="font-semibold text-warning">{row.note}</span>
                             {row.also.length > 0 ? (
                               <span className="mt-1 block text-xs text-muted">También: {row.also.join(", ")}</span>
+                            ) : null}
+                            {attentionCostAside(row.note, row.order, costGuides, canManageOrderMoney) ? (
+                              <span className="mt-1 block text-xs leading-5 text-muted">
+                                {attentionCostAside(row.note, row.order, costGuides, canManageOrderMoney)}
+                              </span>
                             ) : null}
                           </span>
                           <span className="font-semibold text-primary md:pt-0.5">{row.cta}</span>

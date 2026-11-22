@@ -31,6 +31,7 @@ import {
   resultDriftNote,
   attentionQueues,
   attentionSheetText,
+  attentionCostAside,
   closePhrase,
   closeSheetText,
   ordersInSpan,
@@ -715,6 +716,7 @@ describe("precio de la ficha", () => {
     const halfSheet = attentionSheetText([half], [], true, [], halfGuide);
     expect(halfSheet).toContain("Siguiente paso: Copiar costo y cifras.");
     expect(halfSheet).toContain("la misma copia anota lo que falta y reemplaza lo que ya no coincide");
+    expect(halfSheet).not.toContain("Ese costo no es el siguiente paso");
     expect(halfSheet).not.toContain("3001234567");
     expect(halfSheet).not.toContain("Calle 10");
     const halfOutside = order({
@@ -759,7 +761,46 @@ describe("precio de la ficha", () => {
     const mixed = attentionSheetText([ready], [], true, [], todayCost);
     expect(mixed).toContain("Siguiente paso: Preparar.");
     expect(mixed).toContain("También: costo de hoy.");
+    expect(mixed).toContain("Si el costo va en También, no es el siguiente paso");
+    expect(mixed).toContain("Ese costo no es el siguiente paso");
+    expect(mixed).toContain("Si las usas, el margen estimado de este pedido pasa de $30.000 a $20.000");
+    expect(mixed).toContain("Este pedido ya cuenta");
+    expect(mixed).toContain("El botón del pedido lo copia. Esta lista no lo guarda.");
     expect(mixed).not.toContain("3001234567");
+    expect(mixed).not.toContain("Calle 10");
+    const later = order({
+      status: "confirmado",
+      number: "P-2110",
+      providerRef: "DP-2110",
+      customerNotifiedAt: "2026-11-20T16:00:00.000Z",
+      id: "99999999-9999-4999-8999-999999999999",
+      lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1, unitShipping: 8_000, unitCommissions: 2_000 }],
+    });
+    const laterSheet = attentionSheetText([later], [], true, [], halfGuide);
+    expect(laterSheet).toContain("Siguiente paso: Preparar.");
+    expect(laterSheet).toContain("También: costo y cifras, costo de hoy.");
+    expect(laterSheet).toContain("Ese costo no es el siguiente paso");
+    expect(laterSheet).toContain("anotas lo que falta y reemplazas lo que ya no coincide");
+    expect(laterSheet).toContain("hoy no cierra y quedaría en $19.000");
+    expect(laterSheet).not.toContain("3001234567");
+    expect(laterSheet).not.toContain("Calle 10");
+    const waitFill = order({
+      status: "pendiente_confirmacion",
+      number: "P-2111",
+      lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1 }],
+    });
+    const waitSheet = attentionSheetText([waitFill], [], true, [], todayCost);
+    expect(waitSheet).toContain("También: costo.");
+    expect(waitSheet).toContain("Ese costo no es el siguiente paso");
+    expect(waitSheet).toContain("Si las anotas, este pedido sigue fuera");
+    expect(waitSheet).not.toContain("ya cuenta");
+    expect(waitSheet).not.toContain("3001234567");
+    expect(waitSheet).not.toContain("Calle 10");
+    const operatorLater = attentionSheetText([ready], [], false, [], todayCost);
+    expect(operatorLater).toContain("Ese costo no es el siguiente paso");
+    expect(operatorLater).toContain("Lo copia el propietario. Esta lista no lo guarda.");
+    expect(operatorLater).not.toContain("El botón del pedido lo copia");
+    expect(attentionCostAside("Si las usas, el margen estimado de este pedido pasa de $30.000 a $20.000. Este pedido ya cuenta. No es dinero cobrado. El total guardado no cambia.", ready, todayCost)).toBe("");
     expect(attentionQueues([quiet], [], true, sameCosts).some((queue) => queue.id === "cola-costo-hoy")).toBe(false);
     const stored = [{ number: "P-2040", unitPrice: 80_000, unitCost: 40_000, unitShipping: 8_000, unitCommissions: 2_000 }];
     const fichaSame = fichaDrift(stored, { price: 80_000, cost: 40_000, shipping: 8_000, commissions: 2_000 });
