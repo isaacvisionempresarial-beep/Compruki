@@ -1073,11 +1073,12 @@ export function costDriftNote(drifts: Array<{ title: string; fields: Array<{ lab
 
 export function orderCostCopyNote(order: StoreOrder, guides: CostGuide[]) {
   const adopted = adoptCatalogCosts(order, guides);
-  if (adopted.error || adopted.mode !== "reemplazar") return "";
+  if (adopted.error || adopted.mode === "igual") return "";
   const scope = skuCostScope(order.status);
+  const verb = adopted.mode === "anotar" ? "Si las anotas" : "Si las usas";
   if (scope === "fuera") {
     const hold = accountHoldNote(order.status);
-    return `Si las usas, este pedido sigue fuera. ${hold} El margen estimado y la utilidad no se mueven. El precio y el total guardado no cambian.`.replace(/ +/g, " ").trim();
+    return `${verb}, este pedido sigue fuera. ${hold} El margen estimado y la utilidad no se mueven. El precio y el total guardado no cambian.`.replace(/ +/g, " ").trim();
   }
   if (scope !== "cuentan") return "";
   const next = { ...order, lines: adopted.lines };
@@ -1085,7 +1086,7 @@ export function orderCostCopyNote(order: StoreOrder, guides: CostGuide[]) {
   const parts: string[] = [];
   if (after !== null) {
     parts.push(
-      `Si las usas, el margen estimado de este pedido ${costShiftPhrase(orderMargin(order), after)}. Este pedido ya cuenta. No es dinero cobrado. El total guardado no cambia.`,
+      `${verb}, el margen estimado de este pedido ${costShiftPhrase(orderMargin(order), after)}. Este pedido ya cuenta. No es dinero cobrado. El total guardado no cambia.`,
     );
   }
   if (order.status === "entregado" && order.collected) {
@@ -1880,8 +1881,13 @@ export function attentionQueues(
       short: "costo",
       cta: canManageOrderMoney ? "Copiar costo" : "Ver pedido",
       match: needsCatalogCost,
-      note: (order) =>
-        canManageOrderMoney ? costQueueWarning(order) : "Falta el costo en el pedido. Lo copia el propietario. El total guardado no cambia.",
+      note: (order) => {
+        const warning = canManageOrderMoney
+          ? costQueueWarning(order)
+          : "Falta el costo en el pedido. Lo copia el propietario. El total guardado no cambia.";
+        const fill = orderCostCopyNote(order, costGuides);
+        return fill ? `${warning} ${fill}` : warning;
+      },
     },
     {
       id: "cola-costo-hoy",

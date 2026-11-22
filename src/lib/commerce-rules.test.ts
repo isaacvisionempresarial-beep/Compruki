@@ -671,6 +671,17 @@ describe("precio de la ficha", () => {
     expect(outsideCopyNote).not.toContain("ya cuenta");
     expect(outsideCopyNote).not.toContain("3001234567");
     expect(orderCostCopyNote(order({ status: "confirmado", number: "P-2105", lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1, unitCost: 50_000, unitShipping: 8_000, unitCommissions: 2_000 }] }), todayCost)).toBe("");
+    const fillNote = orderCostCopyNote(bare, todayCost);
+    expect(fillNote).toContain("Si las anotas, el margen estimado de este pedido hoy no cierra y quedaría en $20.000");
+    expect(fillNote).toContain("Este pedido ya cuenta");
+    expect(fillNote).not.toContain("3001234567");
+    const fillOutside = orderCostCopyNote(order({ status: "pendiente_confirmacion", number: "P-2106", lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1 }] }), todayCost);
+    expect(fillOutside).toContain("Si las anotas, este pedido sigue fuera");
+    expect(fillOutside).toContain("El margen estimado y la utilidad no se mueven");
+    expect(fillOutside).not.toContain("ya cuenta");
+    const fillCollected = orderCostCopyNote(order({ status: "entregado", collected: true, number: "P-2107", lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1 }] }), todayCost);
+    expect(fillCollected).toContain("La utilidad realizada hoy no cierra y quedaría en $20.000");
+    expect(fillCollected).toContain("No es un cobro nuevo");
     expect(quietSheet).not.toContain("3001234567");
     expect(quietSheet).not.toContain("Calle 10");
     const operatorSheet = attentionSheetText([quiet], [], false, [], todayCost);

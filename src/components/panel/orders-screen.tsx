@@ -1114,7 +1114,7 @@ function CatalogCostForm({
   if (adopted.mode === "igual" && !adopted.error && rows.length === 0) return null;
   const ready = !adopted.error && adopted.mode !== "igual";
   const canSave = ready;
-  const copyNote = replacing ? orderCostCopyNote(order, guides) : "";
+  const copyNote = orderCostCopyNote(order, guides);
   const preview = ready
     ? {
         beforeEstimated: orderMargin(order),
