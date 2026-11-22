@@ -70,6 +70,7 @@ import {
   samePhoneMatches,
   whatsAppHref,
   needsCustomerReason,
+  costShiftPhrase,
   orderMargin,
   ownerOnlyOrderIntent,
   orderRealizedMargin,
@@ -1102,7 +1103,14 @@ function CatalogCostForm({
   if (adopted.mode === "igual" && !adopted.error && rows.length === 0) return null;
   const ready = !adopted.error && adopted.mode !== "igual";
   const canSave = ready;
-  const preview = ready ? { estimated: orderMargin({ ...order, lines: adopted.lines }), realized: orderRealizedMargin({ ...order, lines: adopted.lines }) } : null;
+  const preview = ready
+    ? {
+        beforeEstimated: orderMargin(order),
+        estimated: orderMargin({ ...order, lines: adopted.lines }),
+        beforeRealized: orderRealizedMargin(order),
+        realized: orderRealizedMargin({ ...order, lines: adopted.lines }),
+      }
+    : null;
 
   return (
     <form
@@ -1133,7 +1141,7 @@ function CatalogCostForm({
       </p>
       {preview && preview.estimated !== null ? (
         <p className="text-sm leading-5 text-ink">
-          Si las usas, el margen estimado de este pedido queda en {formatCop(preview.estimated)}. No es dinero cobrado. El
+          Si las usas, el margen estimado de este pedido {costShiftPhrase(preview.beforeEstimated, preview.estimated)}. No es dinero cobrado. El
           total guardado no cambia.
         </p>
       ) : null}
@@ -1141,7 +1149,7 @@ function CatalogCostForm({
         <p className="text-sm leading-5 text-muted">
           Este pedido ya está cobrado.
           {preview && preview.realized !== null
-            ? ` Si las usas, la utilidad realizada de este pedido queda en ${formatCop(preview.realized)}, con el flete y el recaudo que ya están anotados. El total guardado no cambia.`
+            ? ` Si las usas, la utilidad realizada de este pedido ${costShiftPhrase(preview.beforeRealized, preview.realized)}, con el flete y el recaudo que ya están anotados. El total guardado no cambia.`
             : " Si las usas, la utilidad realizada pasa a contarlas, con el flete y el recaudo que ya están anotados. El total guardado no cambia."}
         </p>
       ) : null}

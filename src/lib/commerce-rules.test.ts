@@ -586,7 +586,7 @@ describe("precio de la ficha", () => {
     const productCost = closeSheetText([confirmed], "hoy", "creados", [], [], [{ sku: "SKU-1", cost: 50_000, shipping: 8_000, commissions: 2_000 }]);
     expect(productCost).toContain("P-2034 guardó el costo en $40.000");
     expect(productCost).toContain("El margen y la utilidad siguen con lo guardado.");
-    expect(productCost).toContain("Si copias en los que ya cuentan de este período, el margen estimado de P-2034 queda en $20.000");
+    expect(productCost).toContain("Si copias en los que ya cuentan de este período, el margen estimado de P-2034 pasa de $30.000 a $20.000");
     expect(productCost).toContain("Esta vista no guarda el costo.");
     expect(productCost).not.toContain("Fuera de este período");
     expect(productCost).not.toContain("3001234567");
@@ -777,10 +777,10 @@ describe("precio de la ficha", () => {
       "SKU-1",
       previewGuide,
     );
-    expect(previewNote).toContain("el margen estimado queda en $20.000 en P-2070 y en $20.000 en P-2071");
-    expect(previewNote).toContain("Sumados, $40.000");
+    expect(previewNote).toContain("el margen estimado pasa de $30.000 a $20.000 en P-2070 y de $30.000 a $20.000 en P-2071");
+    expect(previewNote).toContain("Sumados, pasan de $60.000 a $40.000");
     expect(previewNote).toContain("P-2071 ya está cobrado");
-    expect(previewNote).toContain("su utilidad realizada queda en $17.000");
+    expect(previewNote).toContain("su utilidad realizada pasa de $27.000 a $17.000");
     expect(previewNote).toContain("No es un cobro nuevo");
     expect(previewNote).toContain("P-2073 no cierra el margen estimado");
     expect(previewNote).not.toContain("P-2072");
@@ -796,7 +796,7 @@ describe("precio de la ficha", () => {
       [order({ number: "P-2080", status: "confirmado" }), order({ number: "P-2081", status: "cancelado" })],
     );
     expect(outsidePreview).toContain("Fuera de este período");
-    expect(outsidePreview).toContain("el margen estimado de P-2080 queda en $20.000");
+    expect(outsidePreview).toContain("el margen estimado de P-2080 pasa de $30.000 a $20.000");
     expect(outsidePreview).toContain("La ficha también copia esos pedidos");
     expect(outsidePreview).not.toContain("P-2081");
     expect(outsidePreview).not.toContain("3001234567");

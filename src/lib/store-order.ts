@@ -723,11 +723,28 @@ export function skuCostGroups(
   return { counted, outside, collected };
 }
 
-function pesosAt(rows: Array<{ number: string; amount: number }>) {
-  const parts = rows.map((row) => `${formatCop(row.amount)} en ${row.number}`);
+export function costShiftPhrase(before: number | null, after: number) {
+  if (before === null) return `hoy no cierra y quedaría en ${formatCop(after)}`;
+  if (before === after) return `sigue en ${formatCop(after)}`;
+  return `pasa de ${formatCop(before)} a ${formatCop(after)}`;
+}
+
+function shiftList(rows: Array<{ number: string; before: number | null; after: number }>, bare: boolean) {
+  const parts = rows.map((row) => {
+    if (bare && row.before !== null) return `de ${formatCop(row.before)} a ${formatCop(row.after)} en ${row.number}`;
+    return `${costShiftPhrase(row.before, row.after)} en ${row.number}`;
+  });
   if (parts.length <= 1) return parts[0] ?? "";
-  if (parts.length === 2) return `${parts[0]} y en ${parts[1]}`;
-  return `${parts.slice(0, -1).join(", en ")} y en ${parts[parts.length - 1]}`;
+  if (parts.length === 2) return `${parts[0]} y ${parts[1]}`;
+  return `${parts.slice(0, -1).join(", ")} y ${parts[parts.length - 1]}`;
+}
+
+function shiftSum(rows: Array<{ before: number | null; after: number }>, plural: string) {
+  if (rows.some((row) => row.before === null)) return "";
+  const before = rows.reduce((total, row) => total + (row.before ?? 0), 0);
+  const after = rows.reduce((total, row) => total + row.after, 0);
+  if (before === after) return ` ${plural}, siguen en ${formatCop(after)}.`;
+  return ` ${plural}, pasan de ${formatCop(before)} a ${formatCop(after)}.`;
 }
 
 type CostPreviewOrder = {
@@ -741,25 +758,26 @@ type CostPreviewOrder = {
 };
 
 function costPreviewParts(orders: CostPreviewOrder[], sku: string, guide: CostGuide, place: string) {
-  const margins: Array<{ number: string; amount: number }> = [];
+  const margins: Array<{ number: string; before: number | null; after: number }> = [];
   const open: string[] = [];
-  const realized: Array<{ number: string; amount: number }> = [];
+  const realized: Array<{ number: string; before: number | null; after: number }> = [];
   const realizedOpen: string[] = [];
   for (const order of orders) {
     if (skuCostScope(order.status) !== "cuentan") continue;
     if (order.lines.some((line) => typeof line.quantity !== "number")) continue;
     const adopted = adoptSkuCosts({ lines: order.lines as OrderLine[], total: order.total ?? 0 }, sku, guide);
     if (adopted.error || adopted.mode !== "reemplazar") continue;
+    const current = { ...order, total: order.total ?? 0 } as StoreOrder;
     const next = { ...order, lines: adopted.lines, total: order.total ?? 0 } as StoreOrder;
-    const margin = orderMargin(next);
-    if (margin === null) open.push(order.number);
-    else margins.push({ number: order.number, amount: margin });
+    const after = orderMargin(next);
+    if (after === null) open.push(order.number);
+    else margins.push({ number: order.number, before: orderMargin(current), after });
     if (order.status === "entregado" && order.collected) {
       if (typeof order.total !== "number") realizedOpen.push(order.number);
       else {
         const profit = orderRealizedMargin(next);
         if (profit === null) realizedOpen.push(order.number);
-        else realized.push({ number: order.number, amount: profit });
+        else realized.push({ number: order.number, before: orderRealizedMargin(current), after: profit });
       }
     }
   }
@@ -767,12 +785,13 @@ function costPreviewParts(orders: CostPreviewOrder[], sku: string, guide: CostGu
   const parts: string[] = [];
   if (margins.length === 1) {
     parts.push(
-      `Si copias en los que ya cuentan${countedWhere}, el margen estimado de ${margins[0].number} queda en ${formatCop(margins[0].amount)}. No es dinero cobrado. El total guardado no cambia.`,
+      `Si copias en los que ya cuentan${countedWhere}, el margen estimado de ${margins[0].number} ${costShiftPhrase(margins[0].before, margins[0].after)}. No es dinero cobrado. El total guardado no cambia.`,
     );
   } else if (margins.length > 1) {
-    const sum = margins.reduce((total, row) => total + row.amount, 0);
+    const everyMove = margins.every((row) => row.before !== null && row.before !== row.after);
+    const listed = everyMove ? `pasa ${shiftList(margins, true)}.${shiftSum(margins, "Sumados")}` : `queda así: ${shiftList(margins, false)}.`;
     parts.push(
-      `Si copias en los que ya cuentan${countedWhere}, el margen estimado queda en ${pesosAt(margins)}. Sumados, ${formatCop(sum)}. No es dinero cobrado. El total guardado no cambia.`,
+      `Si copias en los que ya cuentan${countedWhere}, el margen estimado ${listed} No es dinero cobrado. El total guardado no cambia.`,
     );
   }
   if (open.length === 1) {
@@ -782,12 +801,13 @@ function costPreviewParts(orders: CostPreviewOrder[], sku: string, guide: CostGu
   }
   if (realized.length === 1) {
     parts.push(
-      `${realized[0].number} ya está cobrado. Si copias, su utilidad realizada queda en ${formatCop(realized[0].amount)}, con el flete y el recaudo ya anotados. No es un cobro nuevo. El total guardado no cambia.`,
+      `${realized[0].number} ya está cobrado. Si copias, su utilidad realizada ${costShiftPhrase(realized[0].before, realized[0].after)}, con el flete y el recaudo ya anotados. No es un cobro nuevo. El total guardado no cambia.`,
     );
   } else if (realized.length > 1) {
-    const sum = realized.reduce((total, row) => total + row.amount, 0);
+    const everyMove = realized.every((row) => row.before !== null && row.before !== row.after);
+    const listed = everyMove ? `pasa ${shiftList(realized, true)}.${shiftSum(realized, "Sumadas")}` : `queda así: ${shiftList(realized, false)}.`;
     parts.push(
-      `${nameList(realized.map((row) => row.number))} ya están cobrados. Si copias, la utilidad realizada queda en ${pesosAt(realized)}. Sumadas, ${formatCop(sum)}. No es un cobro nuevo. El total guardado no cambia.`,
+      `${nameList(realized.map((row) => row.number))} ya están cobrados. Si copias, la utilidad realizada ${listed} No es un cobro nuevo. El total guardado no cambia.`,
     );
   }
   if (realizedOpen.length === 1) {
