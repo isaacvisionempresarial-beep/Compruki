@@ -71,6 +71,7 @@ import {
   whatsAppHref,
   needsCustomerReason,
   costShiftPhrase,
+  periodCostShiftNote,
   orderMargin,
   ownerOnlyOrderIntent,
   orderRealizedMargin,
@@ -238,6 +239,9 @@ export function OrdersScreen({
           }
         />
       </dl>
+      {periodCostShiftNote(spanOrders, costGuides, span === "todo" ? "" : "este período") ? (
+        <p className="mt-3 text-sm leading-5">{periodCostShiftNote(spanOrders, costGuides, span === "todo" ? "" : "este período")}</p>
+      ) : null}
       <CloseSheet orders={spanOrders} rest={orders.filter((order) => !spanOrders.some((shown) => shown.number === order.number))} period={span} basis={basis} guides={sizeGuides} priceGuides={priceGuides} costGuides={costGuides} fieldId="cierre-pedidos" />
       <section className="mt-5" aria-labelledby="por-atender">
         <h2 id="por-atender" className="text-sm font-semibold">

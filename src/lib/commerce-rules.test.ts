@@ -18,6 +18,7 @@ import {
   fichaDriftNote,
   skuCostGroupNote,
   skuCostGroups,
+  periodCostShiftNote,
   skuCostPreviewNote,
   skuCostScope,
   storedSkuLines,
@@ -594,6 +595,8 @@ describe("precio de la ficha", () => {
     expect(outsideClose).toContain("Fuera de este período");
     expect(outsideClose).toContain("P-2082");
     expect(outsideClose).toContain("La ficha también copia esos pedidos");
+    expect(outsideClose).toContain("Los que ya cuentan fuera de este período no están en esta suma.");
+    expect(outsideClose).toContain("No suma pendientes, cancelados, en incidencia ni devueltos.");
     expect(outsideClose).not.toContain("P-2083");
     expect(outsideClose).not.toContain("3001234567");
     expect(outsideClose).not.toContain("Calle 10");
@@ -818,6 +821,23 @@ describe("precio de la ficha", () => {
         previewGuide,
       ),
     ).toBe("");
+    const periodShift = periodCostShiftNote(
+      [
+        order({ number: "P-2090", status: "confirmado" }),
+        order({ number: "P-2091", status: "entregado", collected: true, actualShipping: 10_000, collectionCost: 3_000 }),
+        order({ number: "P-2092", status: "pendiente_confirmacion" }),
+      ],
+      [previewGuide],
+      "este período",
+    );
+    expect(periodShift).toContain("el margen estimado pasa de $60.000 a $40.000");
+    expect(periodShift).toContain("La utilidad realizada pasa de $27.000 a $17.000");
+    expect(periodShift).toContain("No suma pendientes, cancelados, en incidencia ni devueltos.");
+    expect(periodShift).toContain("Los que ya cuentan fuera de este período no están en esta suma.");
+    expect(periodShift).not.toContain("3001234567");
+    expect(periodShift).not.toContain("Calle 10");
+    expect(periodCostShiftNote([order({ number: "P-2092", status: "pendiente_confirmacion" })], [previewGuide], "este período")).toBe("");
+    expect(periodCostShiftNote([order({ number: "P-2090", status: "confirmado", lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1, unitCost: 50_000, unitShipping: 8_000, unitCommissions: 2_000 }] })], [previewGuide])).toBe("");
     expect(planned).toContain("Si aparece un margen, es el que quedaría en los que ya cuentan");
     expect(planned).not.toContain("3001234567");
     expect(fichaDrift([{ number: "P-2041", unitPrice: 80_000 }], { price: 80_000, cost: 50_000, shipping: 8_000, commissions: 2_000 }).costNumbers).toEqual([]);

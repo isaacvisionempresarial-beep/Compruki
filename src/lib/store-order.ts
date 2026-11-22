@@ -820,6 +820,43 @@ function costPreviewParts(orders: CostPreviewOrder[], sku: string, guide: CostGu
   return parts;
 }
 
+export function periodCostShiftNote(orders: StoreOrder[], guides: CostGuide[], place = "") {
+  const ready = guides.filter((guide) => readyCostGuide(guide));
+  if (ready.length === 0 || orders.length === 0) return "";
+  let touchedCollected = false;
+  let touched = 0;
+  const nextOrders = orders.map((order) => {
+    if (skuCostScope(order.status) !== "cuentan") return order;
+    let lines = order.lines;
+    let changed = false;
+    for (const guide of ready) {
+      const adopted = adoptSkuCosts({ lines, total: order.total }, guide.sku, guide);
+      if (adopted.mode === "reemplazar") {
+        lines = adopted.lines;
+        changed = true;
+      }
+    }
+    if (!changed) return order;
+    touched += 1;
+    if (order.status === "entregado" && order.collected) touchedCollected = true;
+    return { ...order, lines, total: order.total };
+  });
+  if (touched === 0) return "";
+  const before = summarizeStoreOrders(orders);
+  const after = summarizeStoreOrders(nextOrders);
+  const where = place ? ` de ${place}` : "";
+  const elsewhere = place ? ` Los que ya cuentan fuera de ${place} no están en esta suma.` : "";
+  const parts = [
+    `Si copias el costo de hoy de cada ficha en los que ya cuentan${where}, el margen estimado ${costShiftPhrase(before.estimatedMargin.amount, after.estimatedMargin.amount)}. No es dinero cobrado. El total guardado no cambia. No suma pendientes, cancelados, en incidencia ni devueltos.${elsewhere}`,
+  ];
+  if (touchedCollected) {
+    parts.push(
+      `La utilidad realizada ${costShiftPhrase(before.realized.amount, after.realized.amount)}. No es un cobro nuevo. El total guardado no cambia.`,
+    );
+  }
+  return parts.join(" ");
+}
+
 export function skuCostPreviewNote(orders: CostPreviewOrder[], sku: string, guide: CostGuide, place = "", rest: CostPreviewOrder[] = []) {
   if (!readyCostGuide(guide)) return "";
   const parts = costPreviewParts(orders, sku, guide, place);
@@ -1525,6 +1562,8 @@ export function closeSheetText(
   if (summary.realized.missingNumbers.length > 0) {
     lines.push(`Cobrado sin costo, no entra a la utilidad:${listedNumbers(summary.realized.missingNumbers)}`);
   }
+  const periodShift = periodCostShiftNote(orders, costGuides, span === "todo" ? "" : "este período");
+  if (periodShift) lines.push(periodShift);
   if (summary.returnFreight > 0) {
     lines.push(`Flete de devolución: ${formatCop(summary.returnFreight)}.${listedNumbers(summary.returnFreightNumbers)} Resta de la utilidad.`);
   }

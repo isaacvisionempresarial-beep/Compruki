@@ -12,6 +12,7 @@ import {
   ordersInSpan,
   pendingSizeHoldPhrase,
   pendingSizeHolds,
+  periodCostShiftNote,
   resultDriftNote,
   resultsByProduct,
   skuCostPreviewNote,
@@ -93,6 +94,9 @@ export function ProfitabilityScreen({
                   Cifras de {closePhrase(storePeriod, basis)}. Verlas no cobra ni cambia pedidos.
                   {basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
                 </p>
+                {periodCostShiftNote(spanOrders, costGuides, "este período") ? (
+                  <p className="mt-2 text-sm leading-5">{periodCostShiftNote(spanOrders, costGuides, "este período")}</p>
+                ) : null}
               </div>
               <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                 <CloseBasisControl basis={basis} onChange={setBasis} name="base-resultados" />

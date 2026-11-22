@@ -10,7 +10,7 @@ import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
 import { STATUS_LABEL, type Period } from "@/lib/demo-data";
 import { cx } from "@/lib/cx";
 import { formatCop, formatDay } from "@/lib/format";
-import { accountHoldNote, attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, costDrift, costDriftNote, ordersInSpan, priceDrift, priceDriftNote, resultDriftNote, resultsByProduct, samePhoneMatches, skuCostPreviewNote, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import { accountHoldNote, attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, costDrift, costDriftNote, ordersInSpan, priceDrift, priceDriftNote, resultDriftNote, resultsByProduct, samePhoneMatches, periodCostShiftNote, skuCostPreviewNote, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
 
 function periodCostPreview(shown: StoreOrder[], all: StoreOrder[], sku: string, guides: CostGuide[]) {
   const guide = guides.find((item) => item.sku === sku);
@@ -310,6 +310,9 @@ export function Dashboard({
             </dd>
           </div>
         </dl>
+        {periodCostShiftNote(storeInPeriod, costGuides, "este período") ? (
+          <p className="mt-3 text-sm leading-5">{periodCostShiftNote(storeInPeriod, costGuides, "este período")}</p>
+        ) : null}
         <h3 className="mt-3 text-sm font-semibold">Por producto ({productResults.length})</h3>
         <p className="mt-0.5 text-xs text-muted">
           Mismo período y la misma fecha · detalle en Rentabilidad
