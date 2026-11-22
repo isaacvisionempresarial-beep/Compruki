@@ -10,7 +10,7 @@ import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
 import { STATUS_LABEL, type Period } from "@/lib/demo-data";
 import { cx } from "@/lib/cx";
 import { formatCop, formatDay } from "@/lib/format";
-import { accountHoldNote, attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, costDrift, costDriftNote, ordersInSpan, priceDrift, priceDriftNote, resultDriftNote, resultsByProduct, samePhoneMatches, outsideCostCopyNote, periodCostShiftNote, skuCostPreviewNote, storedSkuLines, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import { accountHoldNote, attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, costDrift, costDriftNote, ordersInSpan, priceDrift, priceDriftNote, resultDriftNote, resultsByProduct, samePhoneMatches, orderCostCopyNote, outsideCostCopyNote, periodCostShiftNote, skuCostPreviewNote, storedSkuLines, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
 
 function outsideCopyNote(all: StoreOrder[], sku: string, guides: CostGuide[]) {
   const guide = guides.find((item) => item.sku === sku);
@@ -106,6 +106,7 @@ export function Dashboard({
         row.order.campaignEntry ? "campaña" : "",
         priceDrift(row.order, priceGuides).length > 0 ? "la ficha cambió" : "",
         costDriftNote(costDrift(row.order, costGuides)),
+        orderCostCopyNote(row.order, costGuides),
         priceDrift(row.order, priceGuides).length > 0 || costDrift(row.order, costGuides).length > 0 ? accountHoldNote(row.order.status) : "",
         ...row.order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""]),
       ].some((value) => value.toLocaleLowerCase("es").includes(query)),
@@ -433,6 +434,7 @@ export function Dashboard({
               const products = order.lines.map((line) => `${line.quantity} × ${lineName(line)}`).join(", ");
               const driftNote = priceDriftNote(priceDrift(order, priceGuides));
               const costNote = costDriftNote(costDrift(order, costGuides));
+              const copyNote = orderCostCopyNote(order, costGuides);
               const hold = driftNote || costNote ? accountHoldNote(order.status) : "";
               const meta = [
                 place,
@@ -473,6 +475,7 @@ export function Dashboard({
                           {costNote}
                         </span>
                       ) : null}
+                      {copyNote ? <span className="mt-0.5 block text-xs leading-5">{copyNote}</span> : null}
                       {hold ? (
                         <span className="mt-0.5 block text-xs leading-5 text-warning" title={hold}>
                           {hold}

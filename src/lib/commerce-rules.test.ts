@@ -12,6 +12,7 @@ import {
   adoptSkuCosts,
   costDrift,
   costDriftNote,
+  orderCostCopyNote,
   accountHoldNote,
   catalogDriftText,
   fichaDrift,
@@ -660,6 +661,16 @@ describe("precio de la ficha", () => {
     expect(quietSheet).toContain("Siguiente paso: Usar las cifras de hoy.");
     expect(quietSheet).toContain("hoy tiene el costo en $50.000");
     expect(quietSheet).toContain("esta lista no las guarda");
+    expect(quietSheet).toContain("Este pedido ya cuenta");
+    expect(quietSheet).toContain("el margen estimado de este pedido pasa de $30.000 a $20.000");
+    expect(quietSheet).toContain("La utilidad realizada pasa de $30.000 a $20.000");
+    const outsideOrder = order({ status: "pendiente_confirmacion", number: "P-2104" });
+    const outsideCopyNote = orderCostCopyNote(outsideOrder, todayCost);
+    expect(outsideCopyNote).toContain("este pedido sigue fuera");
+    expect(outsideCopyNote).toContain("El margen estimado y la utilidad no se mueven");
+    expect(outsideCopyNote).not.toContain("ya cuenta");
+    expect(outsideCopyNote).not.toContain("3001234567");
+    expect(orderCostCopyNote(order({ status: "confirmado", number: "P-2105", lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1, unitCost: 50_000, unitShipping: 8_000, unitCommissions: 2_000 }] }), todayCost)).toBe("");
     expect(quietSheet).not.toContain("3001234567");
     expect(quietSheet).not.toContain("Calle 10");
     const operatorSheet = attentionSheetText([quiet], [], false, [], todayCost);

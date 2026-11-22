@@ -71,6 +71,7 @@ import {
   whatsAppHref,
   needsCustomerReason,
   costShiftPhrase,
+  orderCostCopyNote,
   periodCostShiftNote,
   orderMargin,
   ownerOnlyOrderIntent,
@@ -365,6 +366,7 @@ export function OrdersScreen({
             const notes = rowWarnings(order, sizeGuides, canManageOrderMoney);
             const drift = priceDriftNote(priceDrift(order, priceGuides));
             const costNote = costDriftNote(costDrift(order, costGuides));
+            const copyNote = orderCostCopyNote(order, costGuides);
             const hold = drift || costNote ? accountHoldNote(order.status) : "";
             return (
               <li key={order.id}>
@@ -384,6 +386,7 @@ export function OrdersScreen({
                     ))}
                     {drift ? <span className="mt-2 block text-sm leading-5 text-warning">{drift}</span> : null}
                     {costNote ? <span className="mt-2 block text-sm leading-5 text-warning">{costNote}</span> : null}
+                    {copyNote ? <span className="mt-1 block text-sm leading-5">{copyNote}</span> : null}
                     {hold ? <span className="mt-2 block text-sm leading-5 text-warning">{hold}</span> : null}
                   </span>
                   <span className="text-sm font-semibold tabular-nums md:pt-0.5 md:text-right">
@@ -467,6 +470,7 @@ export function OrderEditor({
   const [state, action, pending] = useActionState(updateOrderAction, initialState);
   const margin = orderMargin(order);
   const costNote = costDriftNote(costDrift(order, costGuides));
+  const copyNote = orderCostCopyNote(order, costGuides);
   const actions = actionsFor(order, sizeGuides);
   const sizeConfirmError = confirmSizeError(order, sizeGuides);
   const confirmBlocked = order.status === "pendiente_confirmacion" ? sizeConfirmError : null;
@@ -591,6 +595,7 @@ export function OrderEditor({
           {moneyNote(order, margin)}
         </p>
         {costNote ? <p className="mt-2 text-sm leading-5 text-warning">{costNote}</p> : null}
+        {copyNote ? <p className="mt-1 text-sm leading-5">{copyNote}</p> : null}
         {priceDrift(order, priceGuides).length > 0 || costNote ? (
           accountHoldNote(order.status) ? <p className="mt-2 text-sm leading-5 text-warning">{accountHoldNote(order.status)}</p> : null
         ) : null}
@@ -942,7 +947,7 @@ function StatusFilter({
 
 function matchesOrder(order: StoreOrder, query: string, guides: SizeGuide[], priceGuides: PriceGuide[] = [], costGuides: CostGuide[] = []) {
   if (!query) return true;
-  return [priceDriftNote(priceDrift(order, priceGuides)), costDriftNote(costDrift(order, costGuides)), priceDrift(order, priceGuides).length > 0 || costDrift(order, costGuides).length > 0 ? accountHoldNote(order.status) : "", order.number, order.customerName, order.city, order.department ?? "", order.phone, order.document ?? "", order.address, order.reference, order.providerRef ?? "", order.internalNote ?? "", order.customerReason ?? "", order.buyerNote ?? "", order.customerNotifiedAt ? "avisé" : "", order.campaignEntry ? "campaña" : "", awaitsDropiNumber(order) || needsClosedDropiNumber(order) || needsIncidenceDropiNumber(order) ? "dropi" : "", needsDepartment(order) || needsClosedDepartment(order) ? "departamento" : "", missingSizeNote(order, guides), catalogCostQueueNote(order), collectedWithoutCost(order) ? "utilidad" : "", needsCustomerNotice(order) ? "avisar aviso" : "", needsIncidenceReason(order) ? "motivo incidencia" : "", needsReturnReason(order) ? "motivo devolución" : "", needsReturnFreight(order) ? "flete devolución" : "", readyToConfirm(order, guides) ? "confirmar" : "", readyToPrepare(order) ? "preparación preparar" : "", readyToDispatch(order) ? "despacho preparación" : "", ...order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""])].some(
+  return [priceDriftNote(priceDrift(order, priceGuides)), costDriftNote(costDrift(order, costGuides)), orderCostCopyNote(order, costGuides), priceDrift(order, priceGuides).length > 0 || costDrift(order, costGuides).length > 0 ? accountHoldNote(order.status) : "", order.number, order.customerName, order.city, order.department ?? "", order.phone, order.document ?? "", order.address, order.reference, order.providerRef ?? "", order.internalNote ?? "", order.customerReason ?? "", order.buyerNote ?? "", order.customerNotifiedAt ? "avisé" : "", order.campaignEntry ? "campaña" : "", awaitsDropiNumber(order) || needsClosedDropiNumber(order) || needsIncidenceDropiNumber(order) ? "dropi" : "", needsDepartment(order) || needsClosedDepartment(order) ? "departamento" : "", missingSizeNote(order, guides), catalogCostQueueNote(order), collectedWithoutCost(order) ? "utilidad" : "", needsCustomerNotice(order) ? "avisar aviso" : "", needsIncidenceReason(order) ? "motivo incidencia" : "", needsReturnReason(order) ? "motivo devolución" : "", needsReturnFreight(order) ? "flete devolución" : "", readyToConfirm(order, guides) ? "confirmar" : "", readyToPrepare(order) ? "preparación preparar" : "", readyToDispatch(order) ? "despacho preparación" : "", ...order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""])].some(
     (value) => value.toLocaleLowerCase("es").includes(query),
   );
 }
@@ -1109,6 +1114,7 @@ function CatalogCostForm({
   if (adopted.mode === "igual" && !adopted.error && rows.length === 0) return null;
   const ready = !adopted.error && adopted.mode !== "igual";
   const canSave = ready;
+  const copyNote = replacing ? orderCostCopyNote(order, guides) : "";
   const preview = ready
     ? {
         beforeEstimated: orderMargin(order),
@@ -1145,13 +1151,15 @@ function CatalogCostForm({
           ? "Estas cifras reemplazan el costo guardado de este pedido. El precio no cambia. El total guardado no cambia. No es dinero cobrado."
           : "El precio de este pedido no cambia. El total guardado no cambia. Siguen siendo cifras estimadas. Al usarlas se anotan en este pedido; no es un guardado vacío."}
       </p>
-      {preview && preview.estimated !== null ? (
+      {copyNote ? (
+        <p className="text-sm leading-5 text-ink">{copyNote}</p>
+      ) : preview && preview.estimated !== null ? (
         <p className="text-sm leading-5 text-ink">
           Si las usas, el margen estimado de este pedido {costShiftPhrase(preview.beforeEstimated, preview.estimated)}. No es dinero cobrado. El
           total guardado no cambia.
         </p>
       ) : null}
-      {order.status === "entregado" && order.collected && ready ? (
+      {copyNote ? null : order.status === "entregado" && order.collected && ready ? (
         <p className="text-sm leading-5 text-muted">
           Este pedido ya está cobrado.
           {preview && preview.realized !== null

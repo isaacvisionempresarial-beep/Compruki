@@ -1071,6 +1071,34 @@ export function costDriftNote(drifts: Array<{ title: string; fields: Array<{ lab
   return `La ficha cambió el costo guardado en ${drifts.map((drift) => drift.title).join(", ")}. Este pedido conserva esas cifras. ${tail}`;
 }
 
+export function orderCostCopyNote(order: StoreOrder, guides: CostGuide[]) {
+  const adopted = adoptCatalogCosts(order, guides);
+  if (adopted.error || adopted.mode !== "reemplazar") return "";
+  const scope = skuCostScope(order.status);
+  if (scope === "fuera") {
+    const hold = accountHoldNote(order.status);
+    return `Si las usas, este pedido sigue fuera. ${hold} El margen estimado y la utilidad no se mueven. El precio y el total guardado no cambian.`.replace(/ +/g, " ").trim();
+  }
+  if (scope !== "cuentan") return "";
+  const next = { ...order, lines: adopted.lines };
+  const after = orderMargin(next);
+  const parts: string[] = [];
+  if (after !== null) {
+    parts.push(
+      `Si las usas, el margen estimado de este pedido ${costShiftPhrase(orderMargin(order), after)}. Este pedido ya cuenta. No es dinero cobrado. El total guardado no cambia.`,
+    );
+  }
+  if (order.status === "entregado" && order.collected) {
+    const profit = orderRealizedMargin(next);
+    if (profit !== null) {
+      parts.push(
+        `La utilidad realizada ${costShiftPhrase(orderRealizedMargin(order), profit)}, con el flete y el recaudo ya anotados. No es un cobro nuevo. El total guardado no cambia.`,
+      );
+    }
+  }
+  return parts.join(" ");
+}
+
 function resultEntries(orders: StoreOrder[], sku: string) {
   return orders
     .filter((order) => CONFIRMED.includes(order.status) || order.status === "devuelto")
@@ -1865,7 +1893,7 @@ export function attentionQueues(
       cta: canManageOrderMoney ? "Usar las cifras de hoy" : "Ver pedido",
       match: (order) => costDrift(order, costGuides).length > 0,
       note: (order) => {
-        const detail = costDriftNote(costDrift(order, costGuides));
+        const detail = [costDriftNote(costDrift(order, costGuides)), orderCostCopyNote(order, costGuides)].filter(Boolean).join(" ");
         return canManageOrderMoney
           ? `${detail} El botón del pedido copia esas cifras. Esta lista no las guarda.`
           : `${detail} Lo copia el propietario.`;
