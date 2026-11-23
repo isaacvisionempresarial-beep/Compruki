@@ -169,35 +169,55 @@ export function OrdersScreen({
             ? `Las cifras y la lista son pedidos con un movimiento en ${spanPhrase(span)}, aunque se hayan creado antes. El total guardado es el del pedido, no lo cobrado ese día. La cola Por atender no se recorta. Dropi no está conectado.`
             : `Las cifras y la lista son de los creados en ${spanPhrase(span)}. La cola Por atender sigue con los que esperan, aunque sean de otro día. Cambiar el período no cobra ni cambia el total guardado. Dropi no está conectado.`}
       </p>
-      <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Período de las cifras y la lista">
-        {ORDER_SPANS.map((item) => (
-          <StatusFilter
-            key={item.id}
-            label={item.label}
-            count={ordersInSpan(orders, item.id, today, basis).length}
-            selected={span === item.id}
-            onSelect={() => setSpan(item.id)}
-          />
-        ))}
-      </div>
-      {span === "todo" ? (
-        <p className="mt-2 text-xs leading-5 text-muted">Elegir un período no cobra ni cambia el total guardado.</p>
-      ) : (
-        <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Qué fecha usa el período">
-          <StatusFilter label="Creados" count={ordersInSpan(orders, span, today, "creados").length} selected={basis === "creados"} onSelect={() => setBasis("creados")} />
-          <StatusFilter label="Movidos" count={ordersInSpan(orders, span, today, "movidos").length} selected={basis === "movidos"} onSelect={() => setBasis("movidos")} />
+      <div className="elevate-1 mt-3 grid items-stretch gap-4 rounded-[14px] border border-line bg-card px-3 py-3 sm:grid-cols-2 sm:gap-x-6">
+        <div className="flex min-w-0 flex-col">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Período</p>
+          <p className="mt-0.5 text-xs leading-5 text-muted">
+            Cambia las cifras y la lista. Por atender no se recorta. Elegir no cobra ni cambia el total guardado.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2 sm:mt-auto sm:pt-3" role="radiogroup" aria-label="Período de las cifras y la lista">
+            {ORDER_SPANS.map((item) => (
+              <StatusFilter
+                key={item.id}
+                label={item.label}
+                count={ordersInSpan(orders, item.id, today, basis).length}
+                selected={span === item.id}
+                onSelect={() => setSpan(item.id)}
+              />
+            ))}
+          </div>
         </div>
-      )}
-      {span === "todo" ? null : (
-        <p className="mt-2 text-xs leading-5 text-muted">
-          {basis === "movidos"
-            ? "Movidos mira el historial del pedido. El total guardado no es el dinero de ese día. Elegirlo no cobra ni cambia pedidos."
-            : "Creados mira solo la fecha en que entró el pedido. Elegirlo no cobra ni cambia el total guardado."}
-        </p>
-      )}
+        <div className="flex min-w-0 flex-col">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Fecha</p>
+          <p className="mt-0.5 text-xs leading-5 text-muted">
+            {span === "todo"
+              ? "Con todos los pedidos no hace falta elegir fecha. El total guardado no cambia."
+              : basis === "movidos"
+                ? "Movidos mira el historial del pedido. El total guardado no es el dinero de ese día. Elegirlo no cobra."
+                : "Creados mira solo la fecha en que entró el pedido. Elegirlo no cobra ni cambia el total guardado."}
+          </p>
+          {span === "todo" ? (
+            <p className="mt-3 text-sm font-semibold sm:mt-auto sm:pt-3">Todos los pedidos</p>
+          ) : (
+            <div className="mt-3 flex flex-wrap gap-2 sm:mt-auto sm:pt-3" role="radiogroup" aria-label="Qué fecha usa el período">
+              <StatusFilter label="Creados" count={ordersInSpan(orders, span, today, "creados").length} selected={basis === "creados"} onSelect={() => setBasis("creados")} />
+              <StatusFilter label="Movidos" count={ordersInSpan(orders, span, today, "movidos").length} selected={basis === "movidos"} onSelect={() => setBasis("movidos")} />
+            </div>
+          )}
+        </div>
+      </div>
+      <p className="mt-2 text-xs leading-5 text-muted">
+        Dropi no está conectado. El número se anota en{" "}
+        <Link href="/panel/sincronizacion" title="Abrirla no cobra. El total guardado no cambia." className="font-semibold text-accent-strong">
+          Sincronización
+        </Link>
+        .
+      </p>
 
-      <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
-        <div className="order-2 min-w-0 xl:order-1">
+      <h2 className="mt-5 text-sm font-semibold">Cifras del período</h2>
+      <p className="mt-0.5 text-xs leading-5 text-muted">
+        Siguen el período de arriba. Buscar o filtrar por estado solo cambia la lista de abajo. No cobra ni cambia el total guardado.
+      </p>
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         <SummaryCard label="Registrados" value={formatCop(summary.registered.amount)} detail={`${countLabel(summary.registered.count)}. Total guardado.`} numbers={summary.registered.numbers} />
         <SummaryCard label="Confirmados" value={formatCop(summary.confirmed.amount)} detail={`${countLabel(summary.confirmed.count)}. Total guardado.`} numbers={summary.confirmed.numbers} />
@@ -252,11 +272,11 @@ export function OrdersScreen({
         <h2 id="por-atender" className="text-sm font-semibold">
           Por atender
         </h2>
-        <p className="mt-0.5 text-xs text-muted">
-          Un pedido, un siguiente paso. Ábrelo para completar el dato o la acción.
+        <p className="mt-0.5 text-xs leading-5 text-muted">
+          Cada pedido sale una sola vez, en su siguiente paso. Ábrelo para completar el dato o la acción.
           {canManageOrderMoney
-            ? ""
-            : " Si puedes hacer algo, ese es el paso. El flete y el costo quedan después y los guarda el propietario."}
+            ? " Ahí se confirma, se anota la entrega, el despacho y el cobro."
+            : " Si puedes hacer algo, ese es el paso. El flete, el costo y el cobro quedan después y los guarda el propietario."}
         </p>
         {work.length === 0 ? (
           <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
@@ -340,7 +360,9 @@ export function OrdersScreen({
           <h2 className="mt-3 text-sm font-semibold">
             {span === "todo" ? "Todos los pedidos" : basis === "movidos" ? `Movidos ${spanPhrase(span)}` : `Creados ${spanPhrase(span)}`}
           </h2>
-          <p className="mt-0.5 text-xs text-muted">Buscar o filtrar solo cambia esta lista. No cobra ni cambia el total guardado.</p>
+          <p className="mt-0.5 text-xs leading-5 text-muted">
+            Buscar o filtrar solo cambia esta lista. En cada pedido se abre la ficha. No cobra ni cambia el total guardado.
+          </p>
           <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Filtrar por estado">
             <StatusFilter
               label="Todos"
@@ -420,41 +442,6 @@ export function OrdersScreen({
           )}
         </>
       )}
-        </div>
-
-        <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3.75rem] xl:order-2">
-          <h2 className="text-sm font-semibold">Cómo se usa</h2>
-          <ul className="mt-2 space-y-2 text-xs leading-5">
-            <li>
-              <span className="font-semibold text-sm">Por atender</span>
-              <span className="mt-0.5 block text-muted">
-                {canManageOrderMoney
-                  ? "Cada pedido sale una sola vez, en su siguiente paso."
-                  : "Cada pedido sale una sola vez. Si puedes hacer algo, ese es el paso; el flete y el costo quedan después."}
-              </span>
-            </li>
-            <li>
-              <span className="font-semibold text-sm">Cifras</span>
-              <span className="mt-0.5 block text-muted">Son de todos. Buscar o filtrar solo cambia la lista. No cobra ni cambia el total guardado.</span>
-            </li>
-            <li>
-              <span className="font-semibold text-sm">Cada ficha</span>
-              <span className="mt-0.5 block text-muted">
-                {canManageOrderMoney
-                  ? "Ahí se confirma, entrega, despacho y cobro."
-                  : "Ahí se confirma, entrega y despacho. El cobro lo marca el propietario."}
-              </span>
-            </li>
-          </ul>
-          <p className="mt-3 text-xs leading-5 text-muted">
-            Dropi no está conectado. El número se anota en{" "}
-            <Link href="/panel/sincronizacion" title="Abrirla no cobra. El total guardado no cambia." className="font-semibold text-accent-strong">
-              Sincronización
-            </Link>
-            .
-          </p>
-        </aside>
-      </div>
     </div>
   );
 }

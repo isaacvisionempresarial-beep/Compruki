@@ -89,36 +89,54 @@ export function ProfitabilityScreen({
     <div className="mx-auto max-w-[1600px] pb-8">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Resultados</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Rentabilidad</h1>
-      <p className="mt-1 text-sm text-muted">
+      <p className="mt-1 max-w-2xl text-sm leading-5 text-muted">
         {canManageOrderMoney
-          ? "Lo que dejaron los pedidos · no es el margen del precio actual. Verla no cobra ni cambia los pedidos. Dropi no está conectado."
-          : "Lo que dejaron los pedidos · no es el margen del precio actual. Esta página solo lee. El flete, el costo y el cobro los guarda el propietario. Verla no cobra ni cambia los pedidos. Dropi no está conectado."}
+          ? "Lo que dejaron los pedidos. No es el margen del precio actual. Verla no cobra ni cambia los pedidos. Dropi no está conectado."
+          : "Lo que dejaron los pedidos. No es el margen del precio actual. Esta página solo lee. El flete, el costo y el cobro los guarda el propietario. Verla no cobra ni cambia los pedidos. Dropi no está conectado."}
       </p>
 
-      <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
-        <div className="order-2 min-w-0 xl:order-1">
-          <section aria-labelledby="resultados-reales">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 id="resultados-reales" className="text-base font-bold">
-                  Qué dejaron los pedidos
-                </h2>
-                <p className="mt-0.5 text-xs text-muted">
-                  Cifras de {closePhrase(storePeriod, basis)}. Verlas no cobra ni cambia pedidos.
-                  {basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
-                </p>
-                {periodShift ? <p className="mt-2 text-sm leading-5">{periodShift}</p> : null}
-              </div>
-              <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-                <CloseBasisControl basis={basis} onChange={setBasis} name="base-resultados" />
-                <PeriodControl
-                  period={storePeriod}
-                  onChange={setStorePeriod}
-                  name="periodo-resultados"
-                  legend="Período de los resultados por producto"
-                />
-              </div>
+      <section className="mt-5" aria-labelledby="resultados-reales">
+        <h2 id="resultados-reales" className="text-base font-bold">Qué dejaron los pedidos</h2>
+        <p className="mt-0.5 max-w-2xl text-xs leading-5 text-muted">
+          Cifras de {closePhrase(storePeriod, basis)}. Entran confirmados y devoluciones. Devuelto es el total guardado, no el margen. La muestra no entra. Verlas no cobra ni cambia pedidos.
+          {basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
+        </p>
+        <div className="elevate-1 mt-3 grid items-stretch gap-4 rounded-[14px] border border-line bg-card px-3 py-3 sm:grid-cols-2 sm:gap-x-6">
+          <div className="flex min-w-0 flex-col">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Fecha</p>
+            <p className="mt-0.5 text-xs leading-5 text-muted">
+              Creados mira cuándo entró el pedido. Movidos incluye uno viejo si cambió en el período. Elegir no cobra.
+            </p>
+            <div className="mt-3 sm:mt-auto sm:pt-3">
+              <CloseBasisControl basis={basis} onChange={setBasis} name="base-resultados" wide />
             </div>
+          </div>
+          <div className="flex min-w-0 flex-col">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Período</p>
+            <p className="mt-0.5 text-xs leading-5 text-muted">
+              Solo cambia las cifras de esta página. No cobra ni cambia pedidos.
+            </p>
+            <div className="mt-3 sm:mt-auto sm:pt-3">
+              <PeriodControl
+                period={storePeriod}
+                onChange={setStorePeriod}
+                name="periodo-resultados"
+                legend="Período de los resultados por producto"
+                wide
+              />
+            </div>
+          </div>
+        </div>
+        <h3 className="mt-4 text-sm font-semibold">La cuenta por producto</h3>
+        <p className="mt-0.5 max-w-2xl text-xs leading-5 text-muted">
+          Estimado es el margen de confirmados. Utilidad es lo entregado y marcado como cobrado. Ninguna es dinero cobrado en el sitio ni el total guardado del pedido. Si la ficha de hoy es otra, el producto muestra las dos cifras y las cuentas siguen con lo guardado. Los pedidos van bajo «Ver pedidos».{" "}
+          {canManageOrderMoney ? "El precio de la ficha se cambia en " : "El precio de la ficha lo cambia el propietario en "}
+          <Link href="/panel/catalogo" title="Abrirlo no cobra ni cambia el precio ni la publicación." className="font-semibold text-accent-strong">
+            Catálogo
+          </Link>
+          .
+        </p>
+        {periodShift ? <p className="mt-3 text-sm leading-5">{periodShift}</p> : null}
             {results.length === 0 ? (
               <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
                 En este período no hay pedidos confirmados ni devueltos.
@@ -229,37 +247,8 @@ export function ProfitabilityScreen({
               costGuides={costGuides}
               fieldId="cierre-resultados"
             />
-          </section>
-        </div>
-
-        <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3.75rem] xl:order-2">
-          <h2 className="text-sm font-semibold">Cómo se lee</h2>
-          <ul className="mt-2 space-y-2 text-xs leading-5">
-            <li>
-              <span className="font-semibold text-sm">Qué cuenta</span>
-              <span className="mt-0.5 block text-muted">Confirmados y devoluciones. Devuelto es el total guardado, no el margen. La muestra no entra.</span>
-            </li>
-            <li>
-              <span className="font-semibold text-sm">Estimado vs utilidad</span>
-              <span className="mt-0.5 block text-muted">
-                Estimado = margen de confirmados. Utilidad = entregado y marcado como cobrado. Ninguna es dinero cobrado en el sitio ni el total guardado del pedido. Si la ficha de hoy es otra, el producto muestra las dos cifras y las cuentas siguen con lo guardado.
-              </span>
-            </li>
-            <li>
-              <span className="font-semibold text-sm">Pedidos</span>
-              <span className="mt-0.5 block text-muted">
-                Bajo «Ver pedidos».{" "}
-                {canManageOrderMoney ? "Precio actual en " : "El precio de la ficha lo cambia el propietario en "}
-                <Link href="/panel/catalogo" title="Abrirlo no cobra ni cambia el precio ni la publicación." className="font-semibold text-accent-strong">
-                  Catálogo
-                </Link>
-                .
-              </span>
-            </li>
-          </ul>
-          <p className="mt-3 text-xs leading-5 text-muted">Cifras de COMPRUKI. Leerlas no cobra ni cambia los pedidos. Dropi no está conectado.</p>
-        </aside>
-      </div>
+      </section>
+      <p className="mt-3 text-xs leading-5 text-muted">Cifras de COMPRUKI. Leerlas no cobra ni cambia los pedidos. Dropi no está conectado.</p>
     </div>
   );
 }
