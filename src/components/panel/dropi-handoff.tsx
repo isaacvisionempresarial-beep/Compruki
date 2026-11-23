@@ -168,7 +168,7 @@ function DropiRefForm({ order }: { order: StoreOrder }) {
           {refState.error}
         </p>
       ) : null}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <button
           type="submit"
           name="intent"
@@ -182,16 +182,19 @@ function DropiRefForm({ order }: { order: StoreOrder }) {
           Anotar número
         </button>
         {order.providerRef ? (
-          <button
-            type="submit"
-            name="intent"
-            value="quitar"
-            title="Quitarlo no cobra. El total guardado no cambia."
-            disabled={refPending}
-            className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold disabled:cursor-wait"
-          >
-            Quitar número
-          </button>
+          <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <button
+              type="submit"
+              name="intent"
+              value="quitar"
+              title="Quitarlo no cobra. El total guardado no cambia."
+              disabled={refPending}
+              className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold disabled:cursor-wait"
+            >
+              Quitar número
+            </button>
+          </nav>
         ) : null}
       </div>
     </form>

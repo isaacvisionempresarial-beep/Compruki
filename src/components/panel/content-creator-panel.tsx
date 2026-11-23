@@ -201,7 +201,7 @@ function DraftCard({ sku, draft, enabled }: { sku: string; draft: ContentDraft; 
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{draft.channel}</p>
       <h4 className="mt-1 text-sm font-semibold">{draft.title}</h4>
       <p className="mt-2 flex-1 text-sm leading-5 text-muted whitespace-pre-wrap">{draft.body}</p>
-      <p className="mt-2 text-sm font-semibold">CTA: {draft.cta}</p>
+      <p className="mt-2 text-sm font-semibold">Invitación: {draft.cta}</p>
 
       <form action={action} className="mt-3">
         <input type="hidden" name="sku" value={sku} />

@@ -34,10 +34,10 @@ export function AgentBudgetPanel({
     <section className="mt-6" aria-labelledby="presupuesto-ia">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tope</p>
       <h2 id="presupuesto-ia" className="mt-0.5 text-base font-bold">
-        Presupuesto y activación (P0-IA)
+        Presupuesto y activación
       </h2>
       <p className="mt-1 text-sm text-muted">
-        Activación y tope mensual por rol (HU-AG05). Solo el propietario los cambia. Si un rol está
+        Activación y tope mensual por rol. Solo el propietario los cambia. Si un rol está
         apagado o sin presupuesto, Enrutar / Buscar / Generar / Calcular se cancelan. OpenAI no está
         conectado: el costo estimado sigue en cero. Verlo o guardarlo no cobra ni cambia pedidos. El costo estimado no es dinero cobrado.
       </p>
@@ -116,6 +116,7 @@ function AgentConfigForm({
       ) : null}
 
       <form action={action} className="mt-3 grid gap-2">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Ajuste</p>
         <input type="hidden" name="agentId" value={role.id} />
         <label className="flex items-center gap-2 text-sm font-semibold">
           <input

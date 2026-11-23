@@ -208,7 +208,7 @@ export function AgentsScreen({
                     </p>
                   </div>
                   <span className="shrink-0 rounded-[10px] border border-line px-2 py-1 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
-                    local
+                    Local
                   </span>
                 </div>
                 <p className="mt-2 text-sm text-muted">
@@ -265,6 +265,7 @@ export function AgentsScreen({
           action={runAnalystAction}
           className="elevate-1 mt-3 grid gap-2 rounded-[14px] border border-line bg-card px-4 py-3 sm:grid-cols-[1fr_auto]"
         >
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase sm:col-span-2">Calcular</p>
           {explorer.query ? <input type="hidden" name="q" value={explorer.query} /> : null}
           {explorer.category ? <input type="hidden" name="categoria" value={explorer.category} /> : null}
           {creator.selectedSku ? <input type="hidden" name="sku" value={creator.selectedSku} /> : null}

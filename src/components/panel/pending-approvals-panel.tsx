@@ -21,7 +21,7 @@ export function PendingApprovalsPanel({
         Pendientes humanos
       </h2>
       <p className="mt-1 text-sm text-muted">
-        Bandeja de AG-01 · list_pending_approvals. Solo el propietario aprueba un borrador y lo escribe en
+        Bandeja de AG-01. Solo el propietario aprueba un borrador y lo escribe en
         el catálogo. Un operador puede rechazarlo. Pedidos se atienden en Pedidos. Revisar esta bandeja no cobra ni cambia pedidos. OpenAI no está
         conectado.
       </p>
@@ -77,7 +77,7 @@ function liveDiffs(
   const resolvedTitle = title.trim().slice(0, 200) || preview.fallbackTitle;
   const resolvedBody = body.trim().slice(0, 4000);
   const resolvedCta = cta.trim().slice(0, 120);
-  const ctaLine = resolvedCta ? `CTA: ${resolvedCta}` : "";
+  const ctaLine = resolvedCta ? `Invitación: ${resolvedCta}` : "";
   const before = new Map(preview.diffs.map((diff) => [diff.field, diff.before]));
 
   const rows: Array<{ field: string; before: string; after: string }> = [];
@@ -189,6 +189,7 @@ function DraftReviewForm({
       </div>
       <input type="hidden" name="kind" value="borrador" />
       <input type="hidden" name="id" value={id} />
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Edición</p>
       <label className="block">
         <span className="mb-1 block text-sm font-semibold">Título a escribir</span>
         <input
@@ -215,7 +216,7 @@ function DraftReviewForm({
         />
       </label>
       <label className="block">
-        <span className="mb-1 block text-sm font-semibold">CTA</span>
+        <span className="mb-1 block text-sm font-semibold">Invitación</span>
         <input
           name="cta"
           title="Escribirlo no publica ni cobra. El precio y la publicación no cambian."

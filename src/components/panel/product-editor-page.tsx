@@ -49,10 +49,13 @@ export function ProductEditorPage({
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
       {!canManageCommerce ? (
-        <p className="mb-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-          Solo el propietario cambia precio, costo, envío, comisiones, publicación, SKU, alta y eliminación.
-          Puedes editar textos, fotos y disponibilidad. No es el precio ni la publicación. No cobra.
-        </p>
+        <div className="elevate-1 mb-3 rounded-[14px] border border-line bg-card px-3 py-2">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Permiso</p>
+          <p className="mt-0.5 text-sm text-muted">
+            Solo el propietario cambia precio, costo, envío, comisiones, publicación, SKU, alta y eliminación.
+            Puedes editar textos, fotos y disponibilidad. No es el precio ni la publicación. No cobra.
+          </p>
+        </div>
       ) : null}
       {state.message ? (
         <p role="status" className="mb-3 rounded-[14px] bg-accent-tint px-3 py-2 text-sm font-medium text-accent-strong">

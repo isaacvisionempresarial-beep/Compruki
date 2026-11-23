@@ -76,7 +76,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
   if (blocked || payload.length === 0) {
     return (
       <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Bloqueo</p>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
         <p className="mt-0.5 text-sm text-muted">No hay productos que se puedan pedir. No registra pedido ni cobra.</p>
         <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>

@@ -120,7 +120,7 @@ export function ConnectionsScreen({
                 <p className="mt-0.5 font-semibold text-warning">No conectado</p>
               </li>
               <li className="rounded-[10px] border border-line px-3 py-2">
-                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Agentes P0-IA</p>
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Agentes prioritarios</p>
                 <p className="mt-0.5 font-semibold">Modo determinista</p>
                 <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
                   <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
