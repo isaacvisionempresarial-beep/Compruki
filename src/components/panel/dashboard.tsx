@@ -202,7 +202,7 @@ export function Dashboard({
                 {canApproveCatalog ? "" : ". Puedes rechazar. Aprobar un borrador o una corrida lo guarda el propietario."}
               </p>
             </div>
-            <Link href="/panel/agentes#pendientes-humanos" title="Abrirla no cobra ni cambia pedidos." className="text-sm font-semibold text-accent-strong">
+            <Link href="/panel/agentes#pendientes-humanos" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
               Abrir bandeja
             </Link>
           </div>
@@ -387,7 +387,7 @@ export function Dashboard({
             <h2 id="por-producto" className="text-sm font-semibold">Por producto ({productResults.length})</h2>
             <p className="mt-0.5 text-xs text-muted">Mismo período y la misma fecha que las cifras de arriba.</p>
           </div>
-          <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="text-sm font-semibold text-accent-strong">
+          <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
             Ver el detalle en Rentabilidad
           </Link>
         </div>

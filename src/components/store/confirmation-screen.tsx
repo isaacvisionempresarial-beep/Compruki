@@ -172,10 +172,14 @@ export function ConfirmationScreen({
               <p className="mt-1">{order.buyerNote}</p>
             </section>
           ) : null}
-          <Link href="/tienda/condiciones" title="Leerlas no cobra. El total guardado no cambia." className="inline-flex text-sm font-semibold text-accent-strong">
-            Condiciones de la compra
-          </Link>
-          <p className="text-xs leading-5 text-muted">Leerlas no cobra. El total guardado no cambia.</p>        </div>
+          <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <Link href="/tienda/condiciones" title="Leerlas no cobra. El total guardado no cambia." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+              Condiciones de la compra
+            </Link>
+          </nav>
+          <p className="text-xs leading-5 text-muted">Leerlas no cobra. El total guardado no cambia.</p>
+        </div>
       </div>
     </div>
   );

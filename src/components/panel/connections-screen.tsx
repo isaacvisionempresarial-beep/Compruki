@@ -120,7 +120,7 @@ export function ConnectionsScreen({
               <li className="rounded-[10px] border border-line px-3 py-2">
                 <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">Agentes P0-IA</p>
                 <p className="mt-0.5 font-semibold">Modo determinista</p>
-                <Link href="/panel/agentes" title="Abrirlo no cobra ni cambia pedidos." className="mt-1 inline-flex text-sm font-semibold text-accent-strong">
+                <Link href="/panel/agentes" title="Abrirlo no cobra ni cambia pedidos." className="mt-2 inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
                   Abrir centro de agentes
                 </Link>
               </li>
@@ -239,7 +239,7 @@ export function ConnectionsScreen({
             <Link
               href="/panel/sincronizacion"
               title="Abrirla no cobra. El total guardado no cambia."
-              className="mt-2 inline-flex text-sm font-semibold text-accent-strong"
+              className="mt-3 inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
             >
               Abrir sincronización
             </Link>

@@ -75,12 +75,16 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
 
   if (blocked || payload.length === 0) {
     return (
-      <p className="text-sm text-muted">
-        No hay productos que se puedan pedir. No registra pedido ni cobra.{" "}
-        <Link href="/tienda/carrito" title="Volver no confirma el pedido ni cobra." className="font-semibold text-accent-strong">
-          Volver al carrito
-        </Link>
-      </p>
+      <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3">
+        <p className="text-sm text-muted">No hay productos que se puedan pedir. No registra pedido ni cobra.</p>
+        <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <Link href="/tienda/carrito" title="Volver no confirma el pedido ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+            Volver al carrito
+          </Link>
+        </nav>
+        <p className="mt-2 text-xs leading-5 text-muted">Volver no confirma el pedido ni cobra.</p>
+      </section>
     );
   }
 
@@ -138,21 +142,24 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
           <p className="mt-1.5 text-xs leading-5 text-muted">
             Confirmar registra en la tienda y no cobra. Dropi no está conectado: no crea el pedido ahí.
           </p>
-          <p className="mt-2 text-sm leading-5 text-muted">
-            <Link href="/tienda/carrito" title="Volver no confirma el pedido ni cobra." className="font-semibold text-accent-strong">
+          <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <Link href="/tienda/carrito" title="Volver no confirma el pedido ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
               Volver al carrito
             </Link>
-            <span className="mt-1 block text-xs">Volver no confirma el pedido ni cobra.</span>
-          </p>
+          </nav>
+          <p className="mt-2 text-xs leading-5 text-muted">Volver no confirma el pedido ni cobra.</p>
 
         </section>
 
         <div className="space-y-2">
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="entrega-titulo">
-            <h2 id="entrega-titulo" className="text-sm font-semibold">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Entrega</p>
+            <h2 id="entrega-titulo" className="mt-0.5 text-sm font-semibold">
               Quién recibe
             </h2>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase sm:col-span-2">Persona</p>
               <div className="sm:col-span-2">
                 <Field label="Nombre de quien recibe" htmlFor="customerName" hint="No es un pago. Al confirmar, el pedido queda pendiente.">
                   <input
@@ -196,6 +203,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                   className={inputClass}
                 />
               </Field>
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase sm:col-span-2">Dónde</p>
               <Field label="Departamento" htmlFor="department" hint="Por ejemplo, Sucre o Antioquia. No es la ciudad. No es un pago.">
                 <input
                   id="department"
@@ -251,7 +259,8 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
           </section>
 
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pago-titulo">
-            <h2 id="pago-titulo" className="text-sm font-semibold">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pago</p>
+            <h2 id="pago-titulo" className="mt-0.5 text-sm font-semibold">
               Cómo se paga
             </h2>
             <fieldset className="mt-3 space-y-2">
@@ -283,13 +292,16 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                 <label htmlFor="accepted">
                   Acepto las condiciones: el pedido queda pendiente, el envío se acuerda antes de despachar y pago el precio
                   publicado al recibir.
-                </label>{" "}
-                <Link href="/tienda/condiciones" title="Leerlas no confirma el pedido ni cobra." className="scroll-mb-24 font-semibold text-accent-strong">
-                  Leerlas
-                </Link>
-                <span className="mt-1 block text-xs leading-5 text-muted">Leerlas no confirma el pedido ni cobra.</span>
+                </label>
               </p>
             </div>
+            <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+              <Link href="/tienda/condiciones" title="Leerlas no confirma el pedido ni cobra." className="inline-flex h-9 scroll-mb-24 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+                Leer condiciones
+              </Link>
+            </nav>
+            <p className="mt-2 text-xs leading-5 text-muted">Leerlas no confirma el pedido ni cobra.</p>
 
             {state.error ? (
               <p role="alert" className="mt-3 rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
@@ -327,7 +339,8 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
             >
               {pending ? "Registrando…" : `Confirmar · pagas ${formatCop(total)} al recibir`}
             </button>
-          </section>        </div>
+          </section>
+        </div>
       </form>
     </div>
   );

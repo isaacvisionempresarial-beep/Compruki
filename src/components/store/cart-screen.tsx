@@ -106,12 +106,15 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
       </section>
 
         {rows.length === 0 ? (
-          <p className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 text-sm leading-5 text-muted">
-            El carrito está vacío. Vacío no registra pedido ni cobra.{" "}
-            <Link href="/tienda" title="Verlos no cambia los precios publicados ni crea un pedido." className="font-semibold text-accent-strong">
-              Ver productos
-            </Link>
-          </p>
+          <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3">
+            <p className="text-sm leading-5 text-muted">El carrito está vacío. Vacío no registra pedido ni cobra.</p>
+            <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+              <Link href="/tienda" title="Verlos no cambia los precios publicados ni crea un pedido." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+                Ver productos
+              </Link>
+            </nav>
+          </section>
         ) : (
           <div className="elevate-1 overflow-hidden rounded-[14px] border border-line bg-card">
             <div

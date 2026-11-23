@@ -211,7 +211,7 @@ export function AgentsScreen({
                   Margen estimado {formatCop(product.margin)}. No es dinero cobrado.
                   {product.variants.length > 0 ? ` · ${product.variants.length} variantes` : ""}
                 </p>
-                <Link href={`/panel/catalogo/${encodeURIComponent(product.sku)}`} title="Abrirla no cobra ni cambia el precio ni la publicación." className="mt-2 inline-flex text-sm font-semibold text-accent-strong">
+                <Link href={`/panel/catalogo/${encodeURIComponent(product.sku)}`} title="Abrirla no cobra ni cambia el precio ni la publicación." className="mt-2 inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
                   Abrir en catálogo
                 </Link>
               </li>
@@ -364,7 +364,7 @@ export function AgentsScreen({
         <p className="mt-1 text-sm text-muted">Todavía no se usan. Verlos no cobra ni cambia pedidos.</p>
         <ul className="mt-3 space-y-2">
           {later.map((role) => (
-            <li key={role.id} className="rounded-[14px] border border-line bg-card px-4 py-2.5">
+            <li key={role.id} className="elevate-1 rounded-[14px] border border-line bg-card px-4 py-2.5">
               <p className="text-sm font-semibold">
                 <span className="text-muted">{role.id} · </span>
                 {role.name}
@@ -378,24 +378,23 @@ export function AgentsScreen({
 
       <p className="mt-6 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Historial</p>
 
-      <section className="mt-3" aria-labelledby="corridas">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 id="corridas" className="text-base font-bold">
-              Corridas recientes
-            </h2>
-            <p className="mt-1 text-sm text-muted">
-              Últimas 8 en pantalla. Las corridas nuevas guardan quién las lanzó. Verlas o bajar el CSV no cobra ni cambia pedidos. El CSV trae hasta 500 del tenant.
-            </p>
-          </div>
+      <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="corridas">
+        <h2 id="corridas" className="text-base font-bold">
+          Corridas recientes
+        </h2>
+        <p className="mt-1 text-sm text-muted">
+          Últimas 8 en pantalla. Las corridas nuevas guardan quién las lanzó. Verlas o bajar el CSV no cobra ni cambia pedidos. El CSV trae hasta 500 del tenant.
+        </p>
+        <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
           <a
             href="/panel/agentes/export"
             title="Bajarlo no cobra ni cambia pedidos."
-            className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle"
+            className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
           >
             Descargar CSV
           </a>
-        </div>
+        </nav>
         {view.recentRuns.length === 0 ? (
           <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3 text-sm text-muted">
             Todavía no hay corridas. Usa Enrutar, Buscar, Generar borradores o Calcular para dejar el
