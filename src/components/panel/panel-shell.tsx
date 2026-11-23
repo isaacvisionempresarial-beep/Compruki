@@ -23,15 +23,33 @@ function navTitle(href: string) {
   return "Abrirlo no cobra ni cambia pedidos.";
 }
 
-const items: Array<{ id: string; label: string; icon: IconName; href?: string }> = [
-  { id: "panel", label: "Panel principal", icon: "panel", href: "/panel" },
-  { id: "agentes", label: "Centro de agentes", icon: "spark", href: "/panel/agentes" },
-  { id: "pedidos", label: "Pedidos", icon: "orders", href: "/panel/pedidos" },
-  { id: "sincronizacion", label: "Sincronización", icon: "sync", href: "/panel/sincronizacion" },
-  { id: "catalogo", label: "Catálogo", icon: "catalog", href: "/panel/catalogo" },
-  { id: "rentabilidad", label: "Rentabilidad", icon: "chart", href: "/panel/rentabilidad" },
-  { id: "conexiones", label: "Conexiones", icon: "link", href: "/panel/conexiones" },
-  { id: "ajustes", label: "Configuración", icon: "settings", href: "/panel/ajustes" },
+const groups: Array<{ id: string; label: string; items: Array<{ id: string; label: string; icon: IconName; href: string }> }> = [
+  {
+    id: "tienda",
+    label: "Tienda",
+    items: [
+      { id: "panel", label: "Panel principal", icon: "panel", href: "/panel" },
+      { id: "pedidos", label: "Pedidos", icon: "orders", href: "/panel/pedidos" },
+      { id: "catalogo", label: "Catálogo", icon: "catalog", href: "/panel/catalogo" },
+      { id: "rentabilidad", label: "Rentabilidad", icon: "chart", href: "/panel/rentabilidad" },
+    ],
+  },
+  {
+    id: "operacion",
+    label: "Operación",
+    items: [
+      { id: "sincronizacion", label: "Sincronización", icon: "sync", href: "/panel/sincronizacion" },
+      { id: "conexiones", label: "Conexiones", icon: "link", href: "/panel/conexiones" },
+    ],
+  },
+  {
+    id: "sistema",
+    label: "Sistema",
+    items: [
+      { id: "agentes", label: "Centro de agentes", icon: "spark", href: "/panel/agentes" },
+      { id: "ajustes", label: "Configuración", icon: "settings", href: "/panel/ajustes" },
+    ],
+  },
 ];
 
 type PanelShellProps = {
@@ -146,39 +164,41 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
                   className="h-10 w-full rounded-[10px] border border-line bg-card pr-3 pl-9 text-sm text-ink placeholder:text-muted focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
                 />
               </label>
-              <span className="hidden h-9 items-center rounded-[10px] border border-line bg-card px-3 text-xs font-semibold sm:inline-flex">
+              <span className="hidden h-9 items-center rounded-[10px] border border-line bg-card px-3 text-xs font-semibold lg:inline-flex">
                 COP $
               </span>
-              <span className="hidden h-9 items-center rounded-[10px] border border-line bg-card px-3 text-xs font-semibold min-[1440px]:inline-flex">
-                {storeName}
-              </span>
-              <div className="hidden items-center gap-2 min-[1440px]:flex">
-                <span className="grid h-8 w-8 place-items-center rounded-full bg-primary text-xs font-bold text-on-dark">
+              <div className="hidden min-w-0 items-center gap-2 lg:flex">
+                <span className="hidden h-9 max-w-40 items-center truncate rounded-[10px] border border-line bg-card px-3 text-xs font-semibold min-[1200px]:inline-flex">
+                  {storeName}
+                </span>
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary text-xs font-bold text-on-dark">
                   {initials}
                 </span>
-                <span className="leading-tight">
+                <span className="hidden leading-tight min-[1200px]:block">
                   <span className="block text-sm font-semibold">{actorName}</span>
                   <span className="block text-xs text-muted">{roleLabel}</span>
                 </span>
               </div>
-              <a
-                href="/ingresar?modo=nueva-clave"
-                title="Abrirla no cobra ni cambia pedidos."
-                className="inline-flex h-10 items-center rounded-[10px] px-2 text-sm font-semibold text-accent-strong hover:bg-subtle"
-              >
-                Clave
-              </a>
-              <form action={signOut}>
-                <button
-                  type="submit"
-                  aria-label="Cerrar sesión"
-                  title="Salir no cobra ni cambia pedidos."
-                  className="inline-flex h-10 items-center gap-2 rounded-[10px] px-2 text-sm font-semibold text-ink hover:bg-subtle"
+              <nav aria-label="Cuenta" className="flex shrink-0 items-center">
+                <a
+                  href="/ingresar?modo=nueva-clave"
+                  title="Abrirla no cobra ni cambia pedidos."
+                  className="inline-flex h-10 items-center rounded-[10px] px-2 text-sm font-semibold text-accent-strong hover:bg-subtle"
                 >
-                  <Icon name="logout" className="h-5 w-5" />
-                  <span className="hidden min-[1440px]:inline">Salir</span>
-                </button>
-              </form>
+                  Clave
+                </a>
+                <form action={signOut}>
+                  <button
+                    type="submit"
+                    aria-label="Cerrar sesión"
+                    title="Salir no cobra ni cambia pedidos."
+                    className="inline-flex h-10 items-center gap-2 rounded-[10px] px-2 text-sm font-semibold text-ink hover:bg-subtle"
+                  >
+                    <Icon name="logout" className="h-5 w-5" />
+                    <span className="hidden min-[1200px]:inline">Salir</span>
+                  </button>
+                </form>
+              </nav>
             </div>
           </header>
           <main id="contenido" tabIndex={-1} className="px-4 py-3 outline-none sm:px-6 lg:px-8">
@@ -221,45 +241,37 @@ function Sidebar({
         ) : null}
       </div>
 
-      <p className="px-4 pb-2 text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Navegación del sistema</p>
+      <p className="px-4 pb-2 text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Secciones</p>
 
       <nav aria-label="Secciones del panel" className="flex-1 overflow-y-auto px-2.5 pb-3">
-        <ul className="space-y-0.5">
-          {items.map((item) => {
-            const active = item.href ? (item.href === "/panel" ? pathname === "/panel" : pathname.startsWith(item.href)) : false;
-            return (
-              <li key={item.id}>
-                {item.href ? (
-                  <Link
-                    href={item.href}
-                    title={navTitle(item.href)}
-                    aria-current={active ? "page" : undefined}
-                    onClick={onNavigate}
-                    className={
-                      active
-                        ? "flex h-10 items-center gap-3 rounded-[10px] bg-[#EEF2FA] px-3 text-sm font-semibold text-primary"
-                        : "flex h-10 items-center gap-3 rounded-[10px] px-3 text-sm font-medium text-on-dark-muted hover:bg-white/10 hover:text-white"
-                    }
-                  >
-                    <Icon name={item.icon} className={cx("h-5 w-5", active ? "text-accent-strong" : undefined)} />
-                    {item.label}
-                  </Link>
-                ) : (
-                  <button
-                    type="button"
-                    disabled
-                    title="Disponible en la siguiente etapa"
-                    className="flex h-10 w-full cursor-not-allowed items-center gap-3 rounded-[10px] px-3 text-left text-sm font-medium text-on-dark-muted/80"
-                  >
-                    <Icon name={item.icon} className="h-5 w-5" />
-                    {item.label}
-                    <span className="sr-only">, disponible en la siguiente etapa</span>
-                  </button>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+        {groups.map((group) => (
+          <div key={group.id} className="mt-3 first:mt-0">
+            <p className="px-3 pb-1 text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">{group.label}</p>
+            <ul className="space-y-0.5">
+              {group.items.map((item) => {
+                const active = item.href === "/panel" ? pathname === "/panel" : pathname.startsWith(item.href);
+                return (
+                  <li key={item.id}>
+                    <Link
+                      href={item.href}
+                      title={navTitle(item.href)}
+                      aria-current={active ? "page" : undefined}
+                      onClick={onNavigate}
+                      className={
+                        active
+                          ? "flex h-10 items-center gap-3 rounded-[10px] bg-[#EEF2FA] px-3 text-sm font-semibold text-primary"
+                          : "flex h-10 items-center gap-3 rounded-[10px] px-3 text-sm font-medium text-on-dark-muted hover:bg-white/10 hover:text-white"
+                      }
+                    >
+                      <Icon name={item.icon} className={cx("h-5 w-5", active ? "text-accent-strong" : undefined)} />
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
       </nav>
 
       <div className="m-2 rounded-[14px] border border-white/10 bg-white/5 px-3 py-2">

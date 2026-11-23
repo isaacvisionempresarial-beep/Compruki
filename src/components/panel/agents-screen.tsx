@@ -51,7 +51,7 @@ export function AgentsScreen({
   const ag04 = agentIsOn(view, "AG-04");
 
   return (
-    <div className="mx-auto max-w-[1100px] pb-8">
+    <div className="mx-auto max-w-[1600px] pb-8">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Centro de agentes</h1>
       <p className="mt-1 max-w-2xl text-sm text-muted">{view.status.message}</p>
@@ -76,16 +76,9 @@ export function AgentsScreen({
         </p>
       ) : null}
 
-      <PendingApprovalsPanel items={view.pendingApprovals} canApproveCatalog={canApproveCatalog} />
+      <p className="mt-6 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cifras</p>
 
-      <CentralRouterPanel
-        route={central.route}
-        defaultIntent={central.defaultIntent}
-        enabled={ag01}
-        canTurnOn={canApproveCatalog}
-      />
-
-      <section className="elevate-1 mt-4 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="resumen-tienda">
+      <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="resumen-tienda">
         <h2 id="resumen-tienda" className="text-sm font-semibold">
           Resumen determinista de la tienda
         </h2>
@@ -96,20 +89,34 @@ export function AgentsScreen({
           <Stat label="Pedidos abiertos" value={view.storeSummary.openOrders} />
           <Stat label="Pendiente confirmación" value={view.storeSummary.pendingConfirmation} />
         </dl>
-        <div className="mt-3 flex flex-wrap gap-3 text-sm font-semibold">
-          <Link href="/panel/catalogo" title="Abrirlo no cobra ni cambia pedidos." className="text-accent-strong">
+        <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <Link href="/panel/catalogo" title="Abrirlo no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
             Ir al catálogo
           </Link>
-          <Link href="/panel/pedidos" title="Abrirlos no cobra ni cambia el total guardado." className="text-accent-strong">
+          <Link href="/panel/pedidos" title="Abrirlos no cobra ni cambia el total guardado." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
             Ir a pedidos
           </Link>
-          <Link href="/panel/conexiones" title="Verlas no cobra ni cambia pedidos." className="text-accent-strong">
+          <Link href="/panel/conexiones" title="Verlas no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
             Ver conexiones
           </Link>
-        </div>
+        </nav>
       </section>
 
-      <section className="mt-6" aria-labelledby="explorador">
+      <p className="mt-6 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Atención</p>
+
+      <PendingApprovalsPanel items={view.pendingApprovals} canApproveCatalog={canApproveCatalog} />
+
+      <CentralRouterPanel
+        route={central.route}
+        defaultIntent={central.defaultIntent}
+        enabled={ag01}
+        canTurnOn={canApproveCatalog}
+      />
+
+      <p className="mt-6 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Agentes</p>
+
+      <section className="mt-3" aria-labelledby="explorador">
         <h2 id="explorador" className="text-base font-bold">
           Explorador de productos (catálogo local)
         </h2>
@@ -348,7 +355,9 @@ export function AgentsScreen({
         canEdit={canApproveCatalog}
       />
 
-      <section className="mt-6" aria-labelledby="mas-adelante">
+      <p className="mt-6 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Después</p>
+
+      <section className="mt-3" aria-labelledby="mas-adelante">
         <h2 id="mas-adelante" className="text-base font-bold">
           Más adelante (P1 / P2)
         </h2>
@@ -367,7 +376,9 @@ export function AgentsScreen({
         </ul>
       </section>
 
-      <section className="mt-6" aria-labelledby="corridas">
+      <p className="mt-6 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Historial</p>
+
+      <section className="mt-3" aria-labelledby="corridas">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 id="corridas" className="text-base font-bold">
