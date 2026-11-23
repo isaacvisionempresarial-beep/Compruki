@@ -168,52 +168,8 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
         <strong className="truncate font-bold text-ink">{product.title}</strong>
       </nav>
 
-      <section className="mt-2 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)]" aria-label="Información principal del producto">
-        <div className="order-2 min-w-0 xl:order-1">
-          <div className="grid gap-3">
-            {slides.length === 0 ? (
-              <div className="grid min-h-36 place-items-center rounded-[14px] border border-line bg-subtle px-4 text-center">
-                <div>
-                  <p className="text-sm font-semibold text-muted">Sin foto en la ficha</p>
-                  <p className="mt-1 text-xs text-muted">El precio publicado no cambia. La ficha muestra solo lo revisado en el catálogo.</p>
-                </div>
-              </div>
-            ) : (
-              <PhotoCarousel
-                slides={slides}
-                label={`Fotos de ${product.title}`}
-                frameClassName="aspect-[4/5] w-full max-h-[70vh] overflow-hidden rounded-[14px]"
-                index={photo}
-                onIndexChange={setPhoto}
-                onOpen={() => setLightboxOpen(true)}
-                priority
-                corner={
-                  <div className="pointer-events-none absolute top-4 left-4 z-10 rounded-[10px] bg-card/90 px-3 py-2 text-[10px] font-extrabold tracking-[0.08em] text-muted uppercase backdrop-blur-sm">
-                    {product.available ? "Disponible para pedir" : "No se puede pedir ahora"}
-                  </div>
-                }
-              />
-            )}
-            {product.hasVideo ? (
-              <>
-                <video controls preload="metadata" title="Verlo no cambia el precio publicado ni crea un pedido." className="max-h-[70vh] w-full rounded-[14px] bg-subtle" src={`/tienda/video/${product.sku}`}>
-                  Tu navegador no reproduce este video.
-                </video>
-                <p className="text-xs leading-5 text-muted">Verlo no cambia el precio publicado ni crea un pedido.</p>
-              </>
-            ) : null}
-          </div>
-          <p className="mt-3 flex items-center gap-2 text-[11px] text-muted">
-            <span aria-hidden="true">▣</span>
-            {slides.length > 1
-              ? "Fotos del catálogo, completas. Las flechas las pasan en el mismo espacio. Verlas no cambia el precio publicado ni crea un pedido."
-              : slides.length === 1
-                ? "Foto del catálogo, completa. Amplía para verla mejor. Verla no cambia el precio publicado ni crea un pedido."
-                : "Cuando haya foto revisada, aparece aquí."}
-          </p>
-        </div>
-
-        <aside className="elevate-1 store-hero order-1 rounded-[14px] border border-line px-3 py-2 xl:sticky xl:top-[3rem] xl:order-2">
+      <div className="mt-3 grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,28rem)]">
+        <section className="elevate-1 store-hero rounded-[14px] border border-line px-3 py-3" aria-label="Información principal del producto">
           <p className="text-[10px] font-bold tracking-[0.08em] text-accent-strong uppercase">
             Tienda piloto
             {product.category ? ` · ${product.category}` : ""}
@@ -363,7 +319,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                 type="button"
                 disabled={!canBuy}
                 title="Pedirlo lleva al pago. No confirma el pedido ni cobra."
-                className="flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-extrabold text-on-dark transition-colors enabled:hover:bg-primary-soft disabled:cursor-not-allowed disabled:opacity-55"
+                className="flex h-10 w-full items-center justify-center sm:w-auto sm:min-w-56 rounded-[10px] bg-primary px-4 text-sm font-extrabold text-on-dark transition-colors enabled:hover:bg-primary-soft disabled:cursor-not-allowed disabled:opacity-55"
                 onClick={goCheckout}
               >
                 {needsSizeChoice
@@ -377,7 +333,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                 type="submit"
                 disabled={!canBuy}
                 title="Agregarlo no registra pedido ni cobra."
-                className="flex h-10 w-full items-center justify-center rounded-[10px] border border-line bg-canvas text-sm font-semibold text-ink transition-colors enabled:hover:border-accent enabled:hover:bg-accent-tint disabled:cursor-not-allowed disabled:opacity-55"
+                className="flex h-10 w-full items-center justify-center sm:w-auto sm:min-w-56 rounded-[10px] border border-line bg-canvas text-sm font-semibold text-ink transition-colors enabled:hover:border-accent enabled:hover:bg-accent-tint disabled:cursor-not-allowed disabled:opacity-55"
               >
                 Agregar al carrito
               </button>
@@ -404,8 +360,50 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               <span className="mt-0.5 block text-xs text-muted">Solo lo escrito en esta ficha. Dropi no está conectado.</span>
             </li>
           </ul>
-        </aside>
-      </section>
+        </section>
+        <div className="min-w-0">
+          <div className="grid gap-3">
+            {slides.length === 0 ? (
+              <div className="grid min-h-36 place-items-center rounded-[14px] border border-line bg-subtle px-4 text-center">
+                <div>
+                  <p className="text-sm font-semibold text-muted">Sin foto en la ficha</p>
+                  <p className="mt-1 text-xs text-muted">El precio publicado no cambia. La ficha muestra solo lo revisado en el catálogo.</p>
+                </div>
+              </div>
+            ) : (
+              <PhotoCarousel
+                slides={slides}
+                label={`Fotos de ${product.title}`}
+                frameClassName="aspect-[4/5] w-full max-h-[70vh] overflow-hidden rounded-[14px]"
+                index={photo}
+                onIndexChange={setPhoto}
+                onOpen={() => setLightboxOpen(true)}
+                priority
+                corner={
+                  <div className="pointer-events-none absolute top-4 left-4 z-10 rounded-[10px] bg-card/90 px-3 py-2 text-[10px] font-extrabold tracking-[0.08em] text-muted uppercase backdrop-blur-sm">
+                    {product.available ? "Disponible para pedir" : "No se puede pedir ahora"}
+                  </div>
+                }
+              />
+            )}
+            {product.hasVideo ? (
+              <>
+                <video controls preload="metadata" title="Verlo no cambia el precio publicado ni crea un pedido." className="max-h-[70vh] w-full rounded-[14px] bg-subtle" src={`/tienda/video/${product.sku}`}>
+                  Tu navegador no reproduce este video.
+                </video>
+                <p className="text-xs leading-5 text-muted">Verlo no cambia el precio publicado ni crea un pedido.</p>
+              </>
+            ) : null}
+          </div>
+          <p className="mt-3 flex items-center gap-2 text-[11px] text-muted">
+            <span aria-hidden="true">▣</span>
+            {slides.length > 1
+              ? "Fotos del catálogo, completas. Las flechas las pasan en el mismo espacio. Verlas no cambia el precio publicado ni crea un pedido."
+              : slides.length === 1
+                ? "Foto del catálogo, completa. Amplía para verla mejor. Verla no cambia el precio publicado ni crea un pedido."
+                : "Cuando haya foto revisada, aparece aquí."}
+          </p>        </div>
+      </div>
 
       {pieces.length > 0 ? (
         <section id="lo-especial" className="scroll-mt-16 border-t border-line pt-3 pb-2" aria-label="Características y beneficios">
@@ -430,32 +428,32 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
         </section>
       ) : null}
 
-      <div className="scroll-mt-16 grid items-start gap-3 border-t border-line pt-3 pb-2 xl:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)]">
+      <div className="scroll-mt-16 space-y-3 border-t border-line pt-3 pb-2">
         <section id="detalles" className="min-w-0" aria-label="Antes de pedir">
           <h2 className="text-base font-extrabold tracking-tight">Antes de pedir</h2>
-          <dl className="mt-2 divide-y divide-line overflow-hidden rounded-[14px] border border-line bg-card">
+          <dl className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
               ["Envío", "No incluido. Se acuerda con la dirección. Sin fecha prometida. No se cobra aquí."],
               ["Pago", "Pagas al recibir el precio publicado. Nadie cobra aquí. El pedido queda pendiente de confirmación."],
               ["Cambios", "Se acuerdan con la tienda. No se inventa una política aquí. No cambia el precio publicado ni crea un pedido."],
               ["Dropi", "No está conectado. Esta ficha no crea pedido en Dropi."],
             ].map(([label, value]) => (
-              <div key={label} className="px-3 py-2">
+              <div key={label} className="rounded-[14px] border border-line bg-card px-3 py-2">
                 <dt className="text-sm font-bold text-ink">{label}</dt>
                 <dd className="mt-0.5 text-xs leading-5 text-muted">{value}</dd>
               </div>
             ))}
-            {product.answers ? (
-              <div className="px-3 py-2">
-                <dt className="text-sm font-bold text-ink">Lo que puedes saber</dt>
-                <dd className="mt-0.5 text-xs leading-5 whitespace-pre-line text-muted">{product.answers}</dd>
-                <p className="mt-1 text-xs leading-5 text-muted">Leerlas no cambia el precio publicado ni crea un pedido.</p>
-              </div>
-            ) : null}
           </dl>
+          {product.answers ? (
+            <div className="mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
+              <p className="text-sm font-bold text-ink">Lo que puedes saber</p>
+              <p className="mt-0.5 text-xs leading-5 whitespace-pre-line text-muted">{product.answers}</p>
+              <p className="mt-1 text-xs leading-5 text-muted">Leerlas no cambia el precio publicado ni crea un pedido.</p>
+            </div>
+          ) : null}
         </section>
 
-        <div id="preguntas" className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3rem]">
+        <div id="preguntas" className="elevate-1 max-w-xl rounded-[14px] border border-line bg-card px-3 py-3">
           <ProductQuestion product={product} />
         </div>
       </div>
@@ -536,7 +534,7 @@ function ProductQuestion({ product }: { product: PublicProduct }) {
           type="submit"
           disabled={!canAsk}
           title="Preguntar no se envía a la tienda ni cobra."
-          className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold hover:bg-subtle disabled:cursor-not-allowed disabled:opacity-55"
+          className="inline-flex h-10 w-full items-center justify-center sm:w-auto sm:min-w-56 rounded-[10px] border border-line bg-card px-4 text-sm font-semibold hover:bg-subtle disabled:cursor-not-allowed disabled:opacity-55"
         >
           Preguntar
         </button>
