@@ -135,18 +135,24 @@ function DraftReviewForm({
   return (
     <form action={action} className="mt-2 grid gap-2">
       <div className="rounded-[10px] border border-line bg-canvas px-3 py-2">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
-            Antes / después → {preview.applyTarget || "catálogo"}
-          </p>
-          <button
-            type="button"
-            title="Verla no cobra ni cambia pedidos."
-            onClick={() => setOpen((value) => !value)}
-            className="text-xs font-semibold text-accent-strong"
-          >
-            {open ? "Ocultar" : "Ver comparación"}
-          </button>
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Comparación</p>
+            <p className="mt-0.5 text-sm font-semibold">
+              Antes / después → {preview.applyTarget || "catálogo"}
+            </p>
+          </div>
+          <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <button
+              type="button"
+              title="Verla no cobra ni cambia pedidos."
+              onClick={() => setOpen((value) => !value)}
+              className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
+            >
+              {open ? "Ocultar" : "Ver comparación"}
+            </button>
+          </nav>
         </div>
         {open ? (
           <div className="mt-2 space-y-3">
@@ -158,11 +164,11 @@ function DraftReviewForm({
               diffs.map((diff) => (
                 <div key={diff.field} className="grid gap-2 sm:grid-cols-2">
                   <div>
-                    <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">{diff.field} · ahora</p>
+                    <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{diff.field} · ahora</p>
                     <p className="mt-1 whitespace-pre-wrap text-muted">{clip(diff.before)}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
+                    <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
                       {diff.field} · {canApproveCatalog ? "si apruebas" : "si el propietario aprueba"}
                       {diff.changed ? "" : " · igual"}
                     </p>

@@ -1335,7 +1335,10 @@ export function ProductEditor({
                 ) : null}
               </div>
               <fieldset className="mt-3 space-y-2">
-                <legend className="text-sm font-semibold">Publicación y disponibilidad</legend>
+                <legend>
+                  <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</span>
+                  <span className="mt-0.5 block text-sm font-semibold text-ink">Publicación y disponibilidad</span>
+                </legend>
                 {canManageCommerce ? (
                   <label className="flex items-start gap-3 text-sm leading-5">
                     <input
@@ -1507,7 +1510,10 @@ export function ProductEditor({
               </Field>
               {variantsText.trim() ? (
                 <fieldset className="mt-3">
-                  <legend className="text-sm font-semibold">Qué va a elegir el comprador</legend>
+                  <legend>
+                    <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Criterio</span>
+                    <span className="mt-0.5 block text-sm font-semibold text-ink">Qué va a elegir el comprador</span>
+                  </legend>
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
                     <label className="flex items-center gap-3 rounded-[10px] border border-line bg-card px-3 py-2 text-sm">
                       <input type="radio" name="sizeKind" value="talla" title="Elegirlas no es el precio ni la publicación." checked={sizeKind === "talla"} onChange={() => setSizeKind("talla")} />

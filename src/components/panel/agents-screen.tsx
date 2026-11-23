@@ -216,9 +216,12 @@ export function AgentsScreen({
                   Margen estimado {formatCop(product.margin)}. No es dinero cobrado.
                   {product.variants.length > 0 ? ` · ${product.variants.length} variantes` : ""}
                 </p>
-                <Link href={`/panel/catalogo/${encodeURIComponent(product.sku)}`} title="Abrirla no cobra ni cambia el precio ni la publicación." className="mt-2 inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
-                  Abrir en catálogo
-                </Link>
+                <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                  <Link href={`/panel/catalogo/${encodeURIComponent(product.sku)}`} title="Abrirla no cobra ni cambia el precio ni la publicación." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+                    Abrir en catálogo
+                  </Link>
+                </nav>
               </li>
             ))}
           </ul>

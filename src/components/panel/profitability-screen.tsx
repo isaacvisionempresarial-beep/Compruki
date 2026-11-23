@@ -198,8 +198,9 @@ export function ProfitabilityScreen({
                         ) : null}
                         {row.sources.length > 0 ? (
                           <details className="mt-3">
-                            <summary className="cursor-pointer text-sm font-semibold text-accent-strong" title="Verlos no cobra ni cambia el total guardado.">
-                              Ver pedidos ({row.sources.length})
+                            <summary className="cursor-pointer" title="Verlos no cobra ni cambia el total guardado.">
+                              <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Fuentes</span>
+                              <span className="mt-0.5 block text-sm font-semibold text-accent-strong">Ver pedidos ({row.sources.length})</span>
                             </summary>
                             <ul className="mt-2 space-y-1 text-sm leading-5">
                               {row.sources.map((source) => (

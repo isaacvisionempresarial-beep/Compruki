@@ -136,6 +136,7 @@ function DropiRefForm({ order }: { order: StoreOrder }) {
   return (
     <form action={refAction} className="mt-3 grid gap-3">
       <input type="hidden" name="orderId" value={order.id} />
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Dato</p>
       <label className="text-sm font-semibold" htmlFor={`dropi-${order.id}`}>
         Número en Dropi
         <input

@@ -207,13 +207,16 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
             >
               {product.variants.length > 0 && product.sizeKind ? (
                 <fieldset>
-                  <div className="flex items-baseline justify-between gap-3">
-                    <legend className="text-sm font-bold">
-                      {sizeLabelCap}:{" "}
-                      <span className="font-semibold text-muted">{variant || "elige uno"}</span>
-                    </legend>
-                    <span className="text-[11px] text-muted">El precio no cambia. Elegirlo no cobra.</span>
-                  </div>
+                  <legend className="w-full">
+                    <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Elección</span>
+                    <span className="mt-0.5 flex items-baseline justify-between gap-3">
+                      <span className="text-sm font-bold">
+                        {sizeLabelCap}:{" "}
+                        <span className="font-semibold text-muted">{variant || "elige uno"}</span>
+                      </span>
+                      <span className="text-[11px] font-normal text-muted">El precio no cambia. Elegirlo no cobra.</span>
+                    </span>
+                  </legend>
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {product.variants.map((name) => {
                       const selected = variant === name;

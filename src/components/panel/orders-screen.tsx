@@ -631,8 +631,9 @@ export function OrderEditor({
           ) : null}
           {confirmBlocked || prepareDropiError(order) || resolveBlocked ? (
             <details className="mt-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
-              <summary className="cursor-pointer text-sm font-semibold text-muted" title="Abrirlo no cobra ni cambia el total guardado.">
-                Acciones bloqueadas y mensaje al cliente
+              <summary className="cursor-pointer" title="Abrirlo no cobra ni cambia el total guardado.">
+                <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Bloqueo</span>
+                <span className="mt-0.5 block text-sm font-semibold text-muted">Acciones bloqueadas y mensaje al cliente</span>
               </summary>
               <div className="mt-2 flex flex-wrap gap-2">
                 {confirmBlocked ? (
@@ -702,8 +703,9 @@ export function OrderEditor({
           ) : null}
           {actions.filter((item) => !needsCustomerReason(item.id)).length > 0 ? (
             <details className="mt-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
-              <summary className="cursor-pointer text-sm font-semibold text-muted" title="Abrirlo no cobra ni cambia el total guardado.">
-                Si más adelante… mensaje al cliente
+              <summary className="cursor-pointer" title="Abrirlo no cobra ni cambia el total guardado.">
+                <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
+                <span className="mt-0.5 block text-sm font-semibold text-muted">Si más adelante… mensaje al cliente</span>
               </summary>
               {actions
                 .filter((item) => !needsCustomerReason(item.id))
