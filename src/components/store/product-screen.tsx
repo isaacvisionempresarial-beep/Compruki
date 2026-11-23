@@ -180,9 +180,12 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               {descriptionIsLong ? descriptionParagraphs[0] : product.description.trim()}
             </p>
             {descriptionIsLong ? (
-              <a href="#descripcion" title="Leerla no cambia el precio publicado ni crea un pedido." className="mt-2 inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
-                Leer la descripción completa
-              </a>
+              <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                <a href="#descripcion" title="Leerla no cambia el precio publicado ni crea un pedido." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+                  Leer la descripción completa
+                </a>
+              </nav>
             ) : null}
             <p className="mt-1 text-xs leading-5 text-muted">Leerla no cambia el precio publicado ni crea un pedido.</p>
             </>
@@ -423,9 +426,12 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               <p key={`${index}-${paragraph.slice(0, 16)}`}>{paragraph}</p>
             ))}
           </div>
-          <a href="#detalles" title="Ir ahí no cambia el precio publicado ni crea un pedido." className="mt-3 inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
-            Ver antes de pedir
-          </a>
+          <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <a href="#detalles" title="Ir ahí no cambia el precio publicado ni crea un pedido." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+              Ver antes de pedir
+            </a>
+          </nav>
           <p className="mt-1 text-xs leading-5 text-muted">Ir ahí no cambia el precio publicado ni crea un pedido.</p>
         </section>
       ) : null}
@@ -449,7 +455,8 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
           </dl>
           {product.answers ? (
             <div className="mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
-              <p className="text-sm font-bold text-ink">Lo que puedes saber</p>
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Respuestas</p>
+              <p className="mt-0.5 text-sm font-bold text-ink">Lo que puedes saber</p>
               <p className="mt-0.5 text-xs leading-5 whitespace-pre-line text-muted">{product.answers}</p>
               <p className="mt-1 text-xs leading-5 text-muted">Leerlas no cambia el precio publicado ni crea un pedido.</p>
             </div>

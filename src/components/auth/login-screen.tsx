@@ -107,14 +107,17 @@ function LoginForm({
             Tu cuenta es de otra tienda. Este panel solo abre la tienda piloto. No se leyeron ni se cambiaron sus pedidos.
           </p>
           <form action={signOut}>
-            <button
-              type="submit"
-              title="Cerrarla no cobra ni cambia pedidos."
-              className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle"
-            >
-              Cerrar sesión
-            </button>
-            <p className="text-xs leading-5 text-muted">Cerrarla no cobra ni cambia pedidos.</p>
+            <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+              <button
+                type="submit"
+                title="Cerrarla no cobra ni cambia pedidos."
+                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
+              >
+                Cerrar sesión
+              </button>
+            </nav>
+            <p className="mt-1 text-xs leading-5 text-muted">Cerrarla no cobra ni cambia pedidos.</p>
           </form>
         </div>
       ) : null}
@@ -126,14 +129,17 @@ function LoginForm({
             (tabla memberships) o cierra sesión.
           </p>
           <form action={signOut}>
-            <button
-              type="submit"
-              title="Cerrarla no cobra ni cambia pedidos."
-              className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle"
-            >
-              Cerrar sesión
-            </button>
-            <p className="text-xs leading-5 text-muted">Cerrarla no cobra ni cambia pedidos.</p>
+            <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+              <button
+                type="submit"
+                title="Cerrarla no cobra ni cambia pedidos."
+                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
+              >
+                Cerrar sesión
+              </button>
+            </nav>
+            <p className="mt-1 text-xs leading-5 text-muted">Cerrarla no cobra ni cambia pedidos.</p>
           </form>
         </div>
       ) : null}

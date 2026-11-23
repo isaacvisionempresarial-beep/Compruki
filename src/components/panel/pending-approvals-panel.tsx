@@ -242,14 +242,15 @@ function DraftReviewForm({
           ? "Escribe el texto de la ficha. El precio y la publicación no cambian."
           : "Si el propietario lo aprueba, escribe ese texto. El precio y la publicación no cambian."}
       </p>
-      <div className="flex flex-wrap gap-2">
+      <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
         <button
           type="submit"
           name="decision"
           value="approve"
           title="Aprobarlo escribe el texto. El precio y la publicación no cambian. No cobra."
           disabled={pending || approveDisabled || !canApproveCatalog}
-          className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-xs font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
+          className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
         >
           {pending ? "…" : "Aprobar texto"}
         </button>
@@ -259,11 +260,11 @@ function DraftReviewForm({
           value="reject"
           title="Rechazarlo no escribe en el catálogo ni cobra."
           disabled={pending}
-          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-xs font-semibold text-ink hover:bg-subtle disabled:opacity-55"
+          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-55"
         >
           {pending ? "…" : "Rechazar"}
         </button>
-      </div>
+      </nav>
       {state.error ? (
         <p role="alert" className="text-sm font-medium text-danger">
           {state.error}
@@ -304,7 +305,8 @@ function ApprovalButtons({
           Solo el propietario puede aprobar esta corrida. Puedes rechazarla.
         </p>
       ) : null}
-      <div className="flex flex-wrap gap-2">
+      <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
         <form action={action}>
           <input type="hidden" name="kind" value={kind} />
           <input type="hidden" name="id" value={id} />
@@ -313,7 +315,7 @@ function ApprovalButtons({
             type="submit"
             title="Aprobarla no cobra ni cambia el total guardado."
             disabled={pending || approveBlocked}
-            className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-xs font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
+            className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
           >
             {pending ? "…" : "Aprobar"}
           </button>
@@ -326,12 +328,12 @@ function ApprovalButtons({
             type="submit"
             title="Rechazarla no cobra ni cambia pedidos."
             disabled={pending}
-            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-xs font-semibold text-ink hover:bg-subtle disabled:opacity-55"
+            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-55"
           >
             {pending ? "…" : "Rechazar"}
           </button>
         </form>
-      </div>
+      </nav>
       {state.error ? (
         <p role="alert" className="mt-2 text-sm font-medium text-danger">
           {state.error}

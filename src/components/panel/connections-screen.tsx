@@ -192,20 +192,32 @@ export function ConnectionsScreen({
               Lee el aviso público de autorización. No abre el ingreso, no pide la contraseña y no cobra. El total guardado no cambia.
             </p>
             <form action={inspect} className="mt-3">
-              <button
-                type="submit"
-                title="Consultarlo no autoriza la cuenta, no pide la contraseña y no cobra."
-                disabled={inspecting}
-                className={`inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-canvas ${
-                  inspecting ? "cursor-wait opacity-70" : ""
-                }`}
-              >
-                {inspecting ? "Consultando…" : "Ver anuncio oficial"}
-              </button>
+              <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                <button
+                  type="submit"
+                  title="Consultarlo no autoriza la cuenta, no pide la contraseña y no cobra."
+                  disabled={inspecting}
+                  className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-canvas ${
+                    inspecting ? "cursor-wait opacity-70" : ""
+                  }`}
+                >
+                  {inspecting ? "Consultando…" : "Ver anuncio oficial"}
+                </button>
+              </nav>
             </form>
-            <p className="mt-3 text-sm leading-5 text-ink" role="status">
-              {advertisement?.detail ?? "Todavía no hay un anuncio en esta visita."}
-            </p>
+            {advertisement?.detail ? (
+              <p className="mt-3 text-sm leading-5 text-ink" role="status">
+                {advertisement.detail}
+              </p>
+            ) : (
+              <div className="mt-3">
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+                <p className="mt-0.5 text-sm leading-5 text-muted" role="status">
+                  Todavía no hay un anuncio en esta visita.
+                </p>
+              </div>
+            )}
           </section>
 
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="conexion-consulta">
@@ -217,23 +229,31 @@ export function ConnectionsScreen({
               Opcional. Solo prueba el saludo; no autoriza la cuenta. Probarlo no cobra ni cambia pedidos. El total guardado no cambia.
             </p>
             <form action={action} className="mt-3">
-              <button
-                type="submit"
-                title="Probarlo no cobra ni cambia pedidos."
-                disabled={pending}
-                className={`inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-canvas ${
-                  pending ? "cursor-wait opacity-70" : ""
-                }`}
-              >
-                {pending ? "Consultando…" : "Probar saludo"}
-              </button>
+              <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                <button
+                  type="submit"
+                  title="Probarlo no cobra ni cambia pedidos."
+                  disabled={pending}
+                  className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-canvas ${
+                    pending ? "cursor-wait opacity-70" : ""
+                  }`}
+                >
+                  {pending ? "Consultando…" : "Probar saludo"}
+                </button>
+              </nav>
             </form>
             {probe ? (
               <p className="mt-3 text-sm leading-5 text-ink" role="status">
                 {probe.detail}
               </p>
             ) : (
-              <p className="mt-3 text-xs leading-5 text-muted">Todavía no hay un saludo en esta visita. Probarlo no cobra ni cambia pedidos.</p>
+              <div className="mt-3">
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+                <p className="mt-0.5 text-sm leading-5 text-muted">
+                  Todavía no hay un saludo en esta visita. Probarlo no cobra ni cambia pedidos.
+                </p>
+              </div>
             )}
           </section>
 
