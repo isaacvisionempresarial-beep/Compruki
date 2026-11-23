@@ -93,8 +93,13 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
         <p className="mt-2 text-xs leading-5 text-muted">Consultar no cobra ni cambia el total guardado. Leerlas no registra pedido ni cobra.</p>
       </section>
 
-      <div className="mt-3 min-w-0">
-          <label className="block">
+      <section className="mt-3 min-w-0" aria-labelledby="catalogo-publicado">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Catálogo</p>
+        <h2 id="catalogo-publicado" className="mt-0.5 text-base font-bold">Productos publicados</h2>
+        <p className="mt-1 text-sm text-muted">Solo lo revisado. Ver una ficha no crea un pedido ni cambia el precio publicado.</p>
+        <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Lista</p>
+          <label className="mt-2 block">
             <span className="sr-only">Buscar producto</span>
             <input
               type="search"
@@ -104,7 +109,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Buscar por nombre o SKU"
               title="Buscar no cambia los precios publicados ni crea un pedido."
-              className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm shadow-[0_1px_0_rgb(34_38_56/0.02)] transition-[border-color,box-shadow] focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
+              className="h-10 w-full rounded-[10px] border border-line bg-canvas px-3 text-sm shadow-[0_1px_0_rgb(34_38_56/0.02)] transition-[border-color,box-shadow] focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
             />
             <span className="mt-1 block text-xs leading-5 text-muted">Buscar no cambia los precios publicados ni crea un pedido.</span>
           </label>
@@ -133,6 +138,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
             <p className="mt-2 text-xs leading-5 text-muted">Filtrar no cambia los precios publicados ni crea un pedido.</p>
             </>
           ) : null}
+        </div>
 
           {visible.length === 0 ? (
             <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
@@ -234,7 +240,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
               ))}
             </ul>
           )}
-      </div>
+      </section>
     </div>
   );
 }

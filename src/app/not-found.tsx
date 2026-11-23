@@ -26,7 +26,7 @@ export default function NotFound() {
           },
           {
             label: "Panel",
-            text: "Pedidos, sincronización, catálogo y rentabilidad de la tienda piloto.",
+            text: "Tienda, operación y sistema: pedidos, catálogo, rentabilidad, sincronización y agentes.",
           },
           {
             label: "Dropi",

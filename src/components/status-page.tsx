@@ -51,8 +51,11 @@ export function StatusPage({
         </ul>
       </section>
 
-      <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
-        <div className="flex flex-wrap gap-2">{actions.map((action) => <ActionControl key={action.label} action={action} />)}</div>
+      <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          {actions.map((action) => <ActionControl key={action.label} action={action} />)}
+        </div>
       </div>
     </div>
   );

@@ -180,18 +180,13 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
             <>
             <p className="mt-2 text-sm leading-5 text-muted">
               {descriptionIsLong ? descriptionParagraphs[0] : product.description.trim()}
-              {descriptionIsLong ? (
-                <>
-                  {" "}
-                  <a href="#descripcion" title="Leerla no cambia el precio publicado ni crea un pedido." className="font-semibold text-accent-strong">
-                    Leer la descripción completa
-                  </a>
-                </>
-              ) : null}
             </p>
-            {descriptionIsLong ? null : (
-              <p className="mt-1 text-xs leading-5 text-muted">Leerla no cambia el precio publicado ni crea un pedido.</p>
-            )}
+            {descriptionIsLong ? (
+              <a href="#descripcion" title="Leerla no cambia el precio publicado ni crea un pedido." className="mt-2 inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+                Leer la descripción completa
+              </a>
+            ) : null}
+            <p className="mt-1 text-xs leading-5 text-muted">Leerla no cambia el precio publicado ni crea un pedido.</p>
             </>
           ) : null}
 
@@ -350,16 +345,19 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
             </p>
           )}
 
-          <ul className="mt-2 space-y-2 border-t border-line pt-2 text-sm leading-5">
-            <li>
-              <span className="font-semibold">Pagas al recibir</span>
-              <span className="mt-0.5 block text-xs text-muted">Es el precio publicado. Nadie cobra aquí. El envío se acuerda aparte.</span>
-            </li>
-            <li>
-              <span className="font-semibold">Información clara</span>
-              <span className="mt-0.5 block text-xs text-muted">Solo lo escrito en esta ficha. Dropi no está conectado.</span>
-            </li>
-          </ul>
+          <div className="mt-2 border-t border-line pt-2">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">En esta compra</p>
+            <ul className="mt-2 space-y-2 text-sm leading-5">
+              <li>
+                <span className="font-semibold">Pagas al recibir</span>
+                <span className="mt-0.5 block text-xs text-muted">Es el precio publicado. Nadie cobra aquí. El envío se acuerda aparte.</span>
+              </li>
+              <li>
+                <span className="font-semibold">Información clara</span>
+                <span className="mt-0.5 block text-xs text-muted">Solo lo escrito en esta ficha. Dropi no está conectado.</span>
+              </li>
+            </ul>
+          </div>
         </section>
         <div className="min-w-0">
           <div className="grid gap-3">
@@ -406,7 +404,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
       </div>
 
       {pieces.length > 0 ? (
-        <section id="lo-especial" className="scroll-mt-16 border-t border-line pt-3 pb-2" aria-label="Características y beneficios">
+        <section id="lo-especial" className="elevate-1 mt-3 scroll-mt-16 rounded-[14px] border border-line bg-card px-3 py-3" aria-label="Características y beneficios">
           <h2 className="text-base font-extrabold tracking-tight">Características y beneficios</h2>
           <p className="mt-1 max-w-xl text-xs leading-5 text-muted">Sale del catálogo. Si falta un dato, no se inventa. Leerlas no cambia el precio publicado ni crea un pedido.</p>
           <div className="mt-2 max-w-3xl space-y-2">{renderHighlightPieces(pieces)}</div>
@@ -414,7 +412,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
       ) : null}
 
       {descriptionIsLong ? (
-        <section id="descripcion" className="scroll-mt-16 border-t border-line pt-3 pb-2" aria-label="Descripción">
+        <section id="descripcion" className="elevate-1 mt-3 scroll-mt-16 rounded-[14px] border border-line bg-card px-3 py-3" aria-label="Descripción">
           <h2 className="text-base font-extrabold tracking-tight">Descripción</h2>
           <p className="mt-1 max-w-xl text-xs leading-5 text-muted">Leerla no cambia el precio publicado ni crea un pedido.</p>
           <div className="mt-2 max-w-2xl space-y-2 text-sm leading-5 text-muted">
@@ -422,15 +420,17 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               <p key={`${index}-${paragraph.slice(0, 16)}`}>{paragraph}</p>
             ))}
           </div>
-          <a href="#detalles" title="Ir ahí no cambia el precio publicado ni crea un pedido." className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-accent-strong hover:underline">
-            Ver antes de pedir <span aria-hidden="true">→</span>
+          <a href="#detalles" title="Ir ahí no cambia el precio publicado ni crea un pedido." className="mt-3 inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+            Ver antes de pedir
           </a>
+          <p className="mt-1 text-xs leading-5 text-muted">Ir ahí no cambia el precio publicado ni crea un pedido.</p>
         </section>
       ) : null}
 
-      <div className="scroll-mt-16 space-y-3 border-t border-line pt-3 pb-2">
+      <div className="mt-3 scroll-mt-16 space-y-3">
         <section id="detalles" className="min-w-0" aria-label="Antes de pedir">
-          <h2 className="text-base font-extrabold tracking-tight">Antes de pedir</h2>
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Ficha</p>
+          <h2 className="mt-0.5 text-base font-extrabold tracking-tight">Antes de pedir</h2>
           <dl className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
               ["Envío", "No incluido. Se acuerda con la dirección. Sin fecha prometida. No se cobra aquí."],
@@ -458,10 +458,13 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
         </div>
       </div>
 
-      <a href="#contenido" title="Volver no registra pedido ni cobra." className="mt-3 inline-flex text-sm font-semibold text-accent-strong hover:underline">
-        Volver al producto <span className="ml-1" aria-hidden="true">↑</span>
-      </a>
-      <p className="mt-1 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>
+      <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <a href="#contenido" title="Volver no registra pedido ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+          Volver al producto
+        </a>
+      </nav>
+      <p className="mt-2 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>
 
       <dialog
         ref={dialogRef}
