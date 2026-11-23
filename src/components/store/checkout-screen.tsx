@@ -91,10 +91,10 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
   return (
     <div>
       <section className="store-hero relative overflow-hidden rounded-[14px] border border-line px-3 py-2 sm:px-4">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-accent-strong uppercase">Pago contra entrega</p>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Carrito</p>
         <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">Datos de entrega</h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Al confirmar queda pendiente. Nadie cobra aquí. Pagas {formatCop(total)} al recibir. Dropi no está
+          Pago contra entrega. Al confirmar queda pendiente. Nadie cobra aquí. Pagas {formatCop(total)} al recibir. Dropi no está
           conectado.
         </p>
       </section>

@@ -59,10 +59,10 @@ export default function ConditionsPage() {
   return (
     <div>
       <section className="store-hero relative overflow-hidden rounded-[14px] border border-line px-3 py-2 sm:px-4">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-accent-strong uppercase">Tienda piloto · Colombia</p>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedido</p>
         <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">Condiciones de la compra</h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Lo que aceptas al dejar el pedido. Leerlas no registra pedido ni cobra. Dropi no está conectado. La identidad de la tienda sigue en prueba.
+          Tienda piloto · Colombia. Lo que aceptas al dejar el pedido. Leerlas no registra pedido ni cobra. Dropi no está conectado. La identidad de la tienda sigue en prueba.
         </p>
       </section>
 

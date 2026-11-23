@@ -144,7 +144,7 @@ export function Dashboard({
     <div className="mx-auto max-w-[1600px] pb-8">
       <header className="flex flex-col gap-4 border-b border-line pb-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel principal</p>
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda</p>
           <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Hola {greetingName}</h1>
           <p className="mt-1 text-sm font-semibold">Tu tienda está en modo venta</p>
           <p className="mt-1 max-w-2xl text-sm leading-5 text-muted">
@@ -177,7 +177,7 @@ export function Dashboard({
         <Link
           href="/panel/agentes?intent=margen%20LAM-MES-01"
           title="Abrirlo no cobra ni cambia pedidos."
-          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-accent-strong hover:bg-subtle"
+          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
         >
           Probar Central
         </Link>

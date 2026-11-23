@@ -18,10 +18,10 @@ export function LookupScreen() {
   return (
     <div>
       <section className="store-hero relative overflow-hidden rounded-[14px] border border-line px-3 py-2 sm:px-4">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-accent-strong uppercase">Seguimiento</p>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedido</p>
         <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">Consultar pedido</h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Número del pedido y celular de la entrega. Varios intentos seguidos se detienen un rato y no abren el pedido. Consultar no cobra ni cambia el total guardado. Dropi no está conectado.
+          Seguimiento. Número del pedido y celular de la entrega. Varios intentos seguidos se detienen un rato y no abren el pedido. Consultar no cobra ni cambia el total guardado. Dropi no está conectado.
         </p>
       </section>
 

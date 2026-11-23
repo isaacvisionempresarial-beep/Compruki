@@ -23,7 +23,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
-      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sistema</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Configuración</h1>
       <p className="mt-1 text-sm text-muted">
         Datos de tu cuenta y del tenant activo. Verlos no cobra ni cambia pedidos. Dropi no está conectado.

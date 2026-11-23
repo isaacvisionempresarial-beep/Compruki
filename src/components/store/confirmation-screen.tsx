@@ -70,7 +70,7 @@ export function ConfirmationScreen({
   return (
     <div>
       <section className="store-hero relative overflow-hidden rounded-[14px] border border-line px-3 py-2 sm:px-4">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-accent-strong uppercase">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
           {repeated ? "Pedido ya pendiente" : justPlaced ? "Pedido registrado" : "Tu pedido"}
         </p>
         <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">{order.number}</h1>

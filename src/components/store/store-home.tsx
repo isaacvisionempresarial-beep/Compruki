@@ -48,12 +48,12 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
   return (
     <div>
       <section className="store-hero relative overflow-hidden rounded-[14px] border border-line px-3 py-2 sm:px-4">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-accent-strong uppercase">Tienda piloto · Colombia</p>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Inicio</p>
         <h1 className="mt-1 max-w-xl text-[24px] leading-7 font-extrabold tracking-tight">
           Pagas al recibir
         </h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Elige y deja el pedido. El envío se acuerda aparte. Los precios son los publicados. Nadie cobra aquí. Dropi no está conectado.
+          Tienda piloto · Colombia. Elige y deja el pedido. El envío se acuerda aparte. Los precios son los publicados. Nadie cobra aquí. Dropi no está conectado.
         </p>
       </section>
 

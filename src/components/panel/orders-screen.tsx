@@ -160,14 +160,14 @@ export function OrdersScreen({
 
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
-      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda pública</p>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Pedidos recibidos</h1>
       <p className="mt-0.5 text-sm text-muted">
         {span === "todo"
-          ? "Las cifras y la lista son de todos los pedidos. La cola Por atender tampoco se recorta. Abrirlos no cobra ni cambia el total guardado. Dropi no está conectado."
+          ? "Tienda pública. Las cifras y la lista son de todos los pedidos. La cola Por atender tampoco se recorta. Abrirlos no cobra ni cambia el total guardado. Dropi no está conectado."
           : basis === "movidos"
-            ? `Las cifras y la lista son pedidos con un movimiento en ${spanPhrase(span)}, aunque se hayan creado antes. El total guardado es el del pedido, no lo cobrado ese día. La cola Por atender no se recorta. Dropi no está conectado.`
-            : `Las cifras y la lista son de los creados en ${spanPhrase(span)}. La cola Por atender sigue con los que esperan, aunque sean de otro día. Cambiar el período no cobra ni cambia el total guardado. Dropi no está conectado.`}
+            ? `Tienda pública. Las cifras y la lista son pedidos con un movimiento en ${spanPhrase(span)}, aunque se hayan creado antes. El total guardado es el del pedido, no lo cobrado ese día. La cola Por atender no se recorta. Dropi no está conectado.`
+            : `Tienda pública. Las cifras y la lista son de los creados en ${spanPhrase(span)}. La cola Por atender sigue con los que esperan, aunque sean de otro día. Cambiar el período no cobra ni cambia el total guardado. Dropi no está conectado.`}
       </p>
       <div className="elevate-1 mt-3 grid items-stretch gap-4 rounded-[14px] border border-line bg-card px-3 py-3 sm:grid-cols-2 sm:gap-x-6">
         <div className="flex min-w-0 flex-col">
@@ -501,7 +501,7 @@ export function OrderEditor({
       ) : null}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
         <div className="min-w-0">
-          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedidos</p>
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda</p>
           <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">{order.number}</h1>
           <p className="mt-1 text-xs text-muted">
             {formatDay(order.createdAt.slice(0, 10))} · {order.customerName} · {order.city}

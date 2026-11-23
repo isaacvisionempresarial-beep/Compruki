@@ -170,11 +170,9 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
 
       <div className="mt-3 grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,28rem)]">
         <section className="elevate-1 store-hero rounded-[14px] border border-line px-3 py-3" aria-label="Información principal del producto">
-          <p className="text-[10px] font-bold tracking-[0.08em] text-accent-strong uppercase">
-            Tienda piloto
-            {product.category ? ` · ${product.category}` : ""}
-          </p>
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Ficha</p>
           <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">{product.title}</h1>
+          <p className="mt-1 text-xs text-muted">{`Tienda piloto${product.category ? ` · ${product.category}` : ""}.`}</p>
           <p className="mt-1 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">SKU {product.sku}</p>
           {descriptionParagraphs.length > 0 ? (
             <>

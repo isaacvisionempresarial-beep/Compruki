@@ -128,10 +128,10 @@ export function CatalogScreen({
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
       <div className="min-w-0">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Catálogo interno</p>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda</p>
         <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Catálogo</h1>
         <p className="mt-1 max-w-2xl text-sm leading-5 text-muted">
-          Precio y margen de la ficha. No son el total de un pedido ni dinero cobrado. Desactivar no cambia el precio ni la publicación. Dropi no está conectado.
+          Catálogo interno. Precio y margen de la ficha. No son el total de un pedido ni dinero cobrado. Desactivar no cambia el precio ni la publicación. Dropi no está conectado.
         </p>
       </div>
       <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
@@ -1070,7 +1070,7 @@ export function ProductEditor({
     <div ref={panelRef} className="scroll-mt-16">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
         <div className="min-w-0">
-          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Catálogo</p>
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda</p>
           <h1 id="ficha-titulo" className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">
             {product ? product.title : "Nuevo producto"}
           </h1>

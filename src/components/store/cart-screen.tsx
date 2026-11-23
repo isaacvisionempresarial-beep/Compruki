@@ -44,7 +44,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
   return (
     <div>
       <section className="store-hero relative overflow-hidden rounded-[14px] border border-line px-3 py-2 sm:px-4">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-accent-strong uppercase">Este navegador</p>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Este navegador</p>
         <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">Carrito</h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
           Precios publicados de la ficha. Se guarda en este navegador. Abrirlo no cobra. Pagas al recibir. Envío aparte.

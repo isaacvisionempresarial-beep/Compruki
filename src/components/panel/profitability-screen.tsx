@@ -87,12 +87,12 @@ export function ProfitabilityScreen({
 
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
-      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Resultados</p>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Rentabilidad</h1>
       <p className="mt-1 max-w-2xl text-sm leading-5 text-muted">
         {canManageOrderMoney
-          ? "Lo que dejaron los pedidos. No es el margen del precio actual. Verla no cobra ni cambia los pedidos. Dropi no está conectado."
-          : "Lo que dejaron los pedidos. No es el margen del precio actual. Esta página solo lee. El flete, el costo y el cobro los guarda el propietario. Verla no cobra ni cambia los pedidos. Dropi no está conectado."}
+          ? "Resultados. Lo que dejaron los pedidos. No es el margen del precio actual. Verla no cobra ni cambia los pedidos. Dropi no está conectado."
+          : "Resultados. Lo que dejaron los pedidos. No es el margen del precio actual. Esta página solo lee. El flete, el costo y el cobro los guarda el propietario. Verla no cobra ni cambia los pedidos. Dropi no está conectado."}
       </p>
 
       <section className="mt-5" aria-labelledby="resultados-reales">

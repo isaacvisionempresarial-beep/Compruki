@@ -26,7 +26,7 @@ export function ConnectionsScreen({
 
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
-      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Conexión</p>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Operación</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Dropi</h1>
       <p className="mt-1 max-w-2xl text-sm leading-5 text-muted">
         Dropi no está conectado. Nada aquí consulta la cuenta; falta autorización oficial. El total guardado no cambia.
