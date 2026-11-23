@@ -314,22 +314,21 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                 </p>
               ) : null}
 
-              <button
-                type="button"
-                disabled={!canBuy}
-                title="Pedirlo lleva al pago. No confirma el pedido ni cobra."
-                className="flex h-10 w-full items-center justify-center sm:w-auto sm:min-w-56 rounded-[10px] bg-primary px-4 text-sm font-extrabold text-on-dark transition-colors enabled:hover:bg-primary-soft disabled:cursor-not-allowed disabled:opacity-55"
-                onClick={goCheckout}
-              >
-                {needsSizeChoice
-                  ? product.sizeKind === "tamano"
-                    ? "Elige el tamaño"
-                    : "Elige la talla"
-                  : "Pedir · pagas al recibir"}
-              </button>
-              <p className="text-xs leading-5 text-muted">Pedirlo lleva al pago. No confirma el pedido ni cobra.</p>
               <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
                 <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                <button
+                  type="button"
+                  disabled={!canBuy}
+                  title="Pedirlo lleva al pago. No confirma el pedido ni cobra."
+                  className="inline-flex h-9 w-full items-center justify-center sm:w-auto sm:min-w-56 rounded-[10px] bg-primary px-4 text-sm font-extrabold text-on-dark transition-colors enabled:hover:bg-primary-soft disabled:cursor-not-allowed disabled:opacity-55"
+                  onClick={goCheckout}
+                >
+                  {needsSizeChoice
+                    ? product.sizeKind === "tamano"
+                      ? "Elige el tamaño"
+                      : "Elige la talla"
+                    : "Pedir · pagas al recibir"}
+                </button>
                 <button
                   type="submit"
                   disabled={!canBuy}
@@ -339,7 +338,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                   Agregar al carrito
                 </button>
               </nav>
-              <p className="text-xs leading-5 text-muted">Agregarlo no registra pedido ni cobra.</p>
+              <p className="text-xs leading-5 text-muted">Pedirlo lleva al pago. No confirma el pedido ni cobra. Agregarlo no registra pedido ni cobra.</p>
               {added ? (
                 <p className="text-sm text-accent-strong" role="status">
                   Quedó en el carrito. No registra pedido ni es dinero cobrado.

@@ -107,16 +107,19 @@ export function LookupScreen() {
               {state.error}
             </p>
           ) : null}
-          <button
-            type="submit"
-            title="Consultar no cobra ni cambia el total guardado."
-            disabled={pending || !canSearch}
-            className={`inline-flex h-10 w-full scroll-mb-24 items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark ${
-              pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
-            }`}
-          >
-            {pending ? "Buscando…" : "Ver el pedido · no cobra"}
-          </button>
+          <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <button
+              type="submit"
+              title="Consultar no cobra ni cambia el total guardado."
+              disabled={pending || !canSearch}
+              className={`inline-flex h-9 scroll-mb-24 sm:min-w-56 items-center justify-center rounded-[10px] bg-accent px-3 text-sm font-extrabold text-primary-dark ${
+                pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
+              }`}
+            >
+              {pending ? "Buscando…" : "Ver el pedido · no cobra"}
+            </button>
+          </nav>
         </form>
     </div>
   );

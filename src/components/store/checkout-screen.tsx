@@ -331,16 +331,19 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
             <p className="mt-3 text-xs leading-5 text-muted">
               Si este mismo pedido ya está pendiente, no se crea otro. Un celular puede dejar hasta 3 pendientes a la vez. Muchos intentos seguidos desde el mismo lugar se detienen un rato y no crean otro. El total guardado no cambia.
             </p>
-            <button
-              type="submit"
-              title="Confirmar deja el pedido pendiente. Si ya existe o el celular ya tiene 3, no crea otro. Nadie cobra aquí."
-              disabled={pending || !canConfirm}
-              className={`mt-3 inline-flex h-10 w-full scroll-mb-24 sm:w-auto sm:min-w-56 items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark ${
-                pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
-              }`}
-            >
-              {pending ? "Registrando…" : `Confirmar · pagas ${formatCop(total)} al recibir`}
-            </button>
+            <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+              <button
+                type="submit"
+                title="Confirmar deja el pedido pendiente. Si ya existe o el celular ya tiene 3, no crea otro. Nadie cobra aquí."
+                disabled={pending || !canConfirm}
+                className={`inline-flex h-9 scroll-mb-24 sm:min-w-56 items-center justify-center rounded-[10px] bg-accent px-3 text-sm font-extrabold text-primary-dark ${
+                  pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
+                }`}
+              >
+                {pending ? "Registrando…" : `Confirmar · pagas ${formatCop(total)} al recibir`}
+              </button>
+            </nav>
           </section>
         </div>
       </form>

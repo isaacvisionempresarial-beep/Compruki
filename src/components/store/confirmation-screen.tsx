@@ -379,16 +379,19 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
           {state.error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        title="Guardar la entrega no cobra. El total guardado no cambia."
-        disabled={pending || !canSave}
-        className={`inline-flex h-10 scroll-mb-24 items-center justify-center rounded-[10px] bg-accent px-3 text-sm font-extrabold text-primary-dark ${
-          pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
-        }`}
-      >
-        {pending ? "Guardando…" : "Guardar entrega · no cobra"}
-      </button>
+      <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <button
+          type="submit"
+          title="Guardar la entrega no cobra. El total guardado no cambia."
+          disabled={pending || !canSave}
+          className={`inline-flex h-9 scroll-mb-24 items-center justify-center rounded-[10px] bg-accent px-3 text-sm font-extrabold text-primary-dark ${
+            pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
+          }`}
+        >
+          {pending ? "Guardando…" : "Guardar entrega · no cobra"}
+        </button>
+      </nav>
     </form>
   );
 }

@@ -69,36 +69,45 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
             </p>
             {canContinue ? (
               <>
-                <Link
-                  href="/tienda/pagar"
-                  title="Continuar no confirma el pedido ni cobra."
-                  className="mt-3 inline-flex h-10 sm:w-auto sm:min-w-56 items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark"
-                >
-                  Continuar · pagas al recibir
-                </Link>
+                <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                  <Link
+                    href="/tienda/pagar"
+                    title="Continuar no confirma el pedido ni cobra."
+                    className="inline-flex h-9 sm:min-w-56 items-center justify-center rounded-[10px] bg-accent px-3 text-sm font-extrabold text-primary-dark"
+                  >
+                    Continuar · pagas al recibir
+                  </Link>
+                </nav>
                 <p className="mt-2 text-xs leading-5 text-muted">Continuar no confirma el pedido ni cobra.</p>
               </>
             ) : rows.length > 0 ? (
               <div className="mt-3">
-                <p
-                  className="inline-flex h-10 sm:w-auto sm:min-w-56 cursor-not-allowed items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark opacity-55"
-                  aria-disabled="true"
-                  title="Continuar no confirma el pedido ni cobra."
-                >
-                  Continuar · pagas al recibir
-                </p>
+                <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                  <p
+                    className="inline-flex h-9 sm:min-w-56 cursor-not-allowed items-center justify-center rounded-[10px] bg-accent px-3 text-sm font-extrabold text-primary-dark opacity-55"
+                    aria-disabled="true"
+                    title="Continuar no confirma el pedido ni cobra."
+                  >
+                    Continuar · pagas al recibir
+                  </p>
+                </nav>
                 <p className="mt-2 text-sm leading-5 text-coral-strong">{blockedHint}</p>
                 <p className="mt-2 text-xs leading-5 text-muted">Continuar no confirma el pedido ni cobra.</p>
               </div>
             ) : (
               <>
-                <Link
-                  href="/tienda"
-                  title="Verlos no cambia los precios publicados ni crea un pedido."
-                  className="mt-3 inline-flex h-10 sm:w-auto sm:min-w-56 items-center justify-center rounded-[10px] bg-primary text-sm font-semibold text-on-dark"
-                >
-                  Ver productos
-                </Link>
+                <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                  <Link
+                    href="/tienda"
+                    title="Verlos no cambia los precios publicados ni crea un pedido."
+                    className="inline-flex h-9 sm:min-w-56 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark"
+                  >
+                    Ver productos
+                  </Link>
+                </nav>
                 <p className="mt-2 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>
               </>
             )}
