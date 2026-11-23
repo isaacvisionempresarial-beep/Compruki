@@ -202,7 +202,8 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
                     {!product.hasImage && product.images.length === 0 ? (
                       <div className="grid h-32 place-items-center bg-subtle px-2 text-center sm:h-36">
                         <span>
-                          <span className="block text-xs font-semibold text-muted">Sin foto</span>
+                          <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</span>
+                          <span className="mt-0.5 block text-xs font-semibold text-muted">Sin foto</span>
                           <span className="mt-1 block text-[11px] leading-4 text-muted">El precio publicado no cambia.</span>
                         </span>
                       </div>
@@ -231,7 +232,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
                       ) : null}
                       <div className="mt-2 flex items-end justify-between gap-2">
                         <div>
-                          <p className="text-[11px] leading-4 text-muted">Precio publicado</p>
+                          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Precio publicado</p>
                           <p className="text-base font-extrabold tabular-nums">{formatCop(product.price)}</p>
                         </div>
                         <span className="inline-flex h-8 shrink-0 items-center rounded-[8px] bg-primary px-2.5 text-xs font-semibold text-on-dark transition-colors group-hover:bg-primary-soft">

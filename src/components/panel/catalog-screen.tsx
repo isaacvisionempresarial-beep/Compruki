@@ -291,7 +291,10 @@ function CatalogProductRow({
               className="h-full w-full object-contain"
             />
           ) : (
-            <span className="px-1 text-center text-[10px] font-semibold text-muted" title="El precio de la ficha no cambia.">Sin foto</span>
+            <span className="px-1 text-center" title="El precio de la ficha no cambia.">
+              <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</span>
+              <span className="mt-0.5 block text-[10px] font-semibold text-muted">Sin foto</span>
+            </span>
           )}
         </div>
 

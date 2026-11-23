@@ -1236,16 +1236,18 @@ function CatalogCostForm({
           : "Solo el propietario copia estas cifras. El total guardado no cambia."}
       </p>
       {canManageOrderMoney ? (
-      <button
-        type="submit"
-        title="El total guardado no cambia. No es dinero cobrado."
-        disabled={costPending || !canSave}
-        className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
-          costPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
-        }`}
-      >
-        {costPending ? "Guardando…" : mixed ? "Anotar y usar las cifras de hoy" : replacing ? "Usar las cifras de hoy" : "Usar las cifras de la ficha"}
-      </button>
+        <FormTools>
+          <button
+            type="submit"
+            title="El total guardado no cambia. No es dinero cobrado."
+            disabled={costPending || !canSave}
+            className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
+              costPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+            }`}
+          >
+            {costPending ? "Guardando…" : mixed ? "Anotar y usar las cifras de hoy" : replacing ? "Usar las cifras de hoy" : "Usar las cifras de la ficha"}
+          </button>
+        </FormTools>
       ) : null}
     </form>
   );
@@ -1400,16 +1402,18 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
         </p>
       ) : null}
       {canManageOrderMoney ? (
-      <button
-        type="submit"
-        title="El total guardado no cambia. No es dinero cobrado."
-        disabled={freightPending || !canSave}
-        className={`inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
-          freightPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
-        }`}
-      >
-        {showCollection ? "Guardar flete y recaudo" : "Guardar flete"}
-      </button>
+        <FormTools>
+          <button
+            type="submit"
+            title="El total guardado no cambia. No es dinero cobrado."
+            disabled={freightPending || !canSave}
+            className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
+              freightPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+            }`}
+          >
+            {showCollection ? "Guardar flete y recaudo" : "Guardar flete"}
+          </button>
+        </FormTools>
       ) : (
         <p className="text-sm leading-5 text-muted">Solo el propietario guarda el flete y el recaudo. No cobra.</p>
       )}
@@ -1515,16 +1519,18 @@ function AddProductForm({ order, products }: { order: StoreOrder; products: Orde
           {addState.error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        title="Agregarlo puede cambiar el total guardado. No es dinero cobrado."
-        disabled={addPending || !canAdd}
-        className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
-          addPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
-        }`}
-      >
-        Agregar producto
-      </button>
+      <FormTools>
+        <button
+          type="submit"
+          title="Agregarlo puede cambiar el total guardado. No es dinero cobrado."
+          disabled={addPending || !canAdd}
+          className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
+            addPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+          }`}
+        >
+          Agregar producto
+        </button>
+      </FormTools>
     </form>
   );
 }
@@ -1711,16 +1717,18 @@ function LinesForm({
           {linesState.error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        title="Guardarlas puede cambiar el total guardado. No es dinero cobrado."
-        disabled={linesPending || !canSave}
-        className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
-          linesPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
-        }`}
-      >
-        Guardar productos
-      </button>
+      <FormTools>
+        <button
+          type="submit"
+          title="Guardarlas puede cambiar el total guardado. No es dinero cobrado."
+          disabled={linesPending || !canSave}
+          className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
+            linesPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+          }`}
+        >
+          Guardar productos
+        </button>
+      </FormTools>
       <p className="text-xs leading-5 text-muted">
         Guardar no es dinero cobrado. Si cambia la cantidad o quitas un producto, el total guardado sí puede cambiar.
       </p>
@@ -1766,16 +1774,18 @@ function ClosedDepartmentForm({ order }: { order: StoreOrder }) {
           {departmentState.error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        title="Anotarlo no cobra. El total guardado no cambia."
-        disabled={departmentPending || !canSave}
-        className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
-          departmentPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
-        }`}
-      >
-        Anotar departamento
-      </button>
+      <FormTools>
+        <button
+          type="submit"
+          title="Anotarlo no cobra. El total guardado no cambia."
+          disabled={departmentPending || !canSave}
+          className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
+            departmentPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+          }`}
+        >
+          Anotar departamento
+        </button>
+      </FormTools>
     </form>
   );
 }
@@ -1896,16 +1906,18 @@ function DeliveryForm({ order }: { order: StoreOrder }) {
           {deliveryState.error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        title="Guardarla no cobra. El total guardado no cambia."
-        disabled={deliveryPending || !canSave}
-        className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
-          deliveryPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
-        }`}
-      >
-        {deliveryPending ? "Guardando…" : "Guardar entrega · no cobra"}
-      </button>
+      <FormTools>
+        <button
+          type="submit"
+          title="Guardarla no cobra. El total guardado no cambia."
+          disabled={deliveryPending || !canSave}
+          className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
+            deliveryPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+          }`}
+        >
+          {deliveryPending ? "Guardando…" : "Guardar entrega · no cobra"}
+        </button>
+      </FormTools>
     </form>
   );
 }
@@ -1974,16 +1986,18 @@ function ReturnReasonForm({ order }: { order: StoreOrder }) {
           {reasonState.error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        title="Guardarlo no cobra. El total guardado no cambia."
-        disabled={reasonPending || !canSave}
-        className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
-          reasonPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
-        }`}
-      >
-        {reasonPending ? "Guardando…" : "Guardar motivo"}
-      </button>
+      <FormTools>
+        <button
+          type="submit"
+          title="Guardarlo no cobra. El total guardado no cambia."
+          disabled={reasonPending || !canSave}
+          className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
+            reasonPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+          }`}
+        >
+          {reasonPending ? "Guardando…" : "Guardar motivo"}
+        </button>
+      </FormTools>
     </form>
   );
 }
@@ -2029,16 +2043,18 @@ function IncidenceReasonForm({ order }: { order: StoreOrder }) {
           {reasonState.error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        title="Anotarlo no cobra. El total guardado no cambia."
-        disabled={reasonPending || !canSave}
-        className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
-          reasonPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
-        }`}
-      >
-        {reasonPending ? "Guardando…" : "Guardar motivo"}
-      </button>
+      <FormTools>
+        <button
+          type="submit"
+          title="Anotarlo no cobra. El total guardado no cambia."
+          disabled={reasonPending || !canSave}
+          className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
+            reasonPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+          }`}
+        >
+          {reasonPending ? "Guardando…" : "Guardar motivo"}
+        </button>
+      </FormTools>
     </form>
   );
 }
@@ -2089,16 +2105,18 @@ function InternalNoteForm({ order }: { order: StoreOrder }) {
           {noteState.error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        title="Guardarla no cobra. El total guardado no cambia."
-        disabled={notePending || !canSave}
-        className={`inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
-          notePending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
-        }`}
-      >
-        Guardar nota
-      </button>
+      <FormTools>
+        <button
+          type="submit"
+          title="Guardarla no cobra. El total guardado no cambia."
+          disabled={notePending || !canSave}
+          className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
+            notePending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+          }`}
+        >
+          Guardar nota
+        </button>
+      </FormTools>
     </form>
   );
 }
@@ -2208,20 +2226,31 @@ function CustomerNotice({ order }: { order: StoreOrder }) {
           {noticeState.error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        title="No envía el mensaje ni cobra. El total guardado no cambia."
-        disabled={noticePending}
-        className="inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-card px-3 text-sm font-semibold disabled:cursor-wait"
-      >
-        {marked ? "Quitar aviso" : "Ya avisé al cliente"}
-      </button>
+      <FormTools>
+        <button
+          type="submit"
+          title="No envía el mensaje ni cobra. El total guardado no cambia."
+          disabled={noticePending}
+          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold disabled:cursor-wait"
+        >
+          {marked ? "Quitar aviso" : "Ya avisé al cliente"}
+        </button>
+      </FormTools>
     </form>
   );
 }
 
 const freightInput =
   "mt-1 h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none";
+
+function FormTools({ children }: { children: ReactNode }) {
+  return (
+    <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+      <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+      {children}
+    </nav>
+  );
+}
 
 function moneyInput(canEdit: boolean) {
   return canEdit ? freightInput : freightInput.replace(" bg-card ", " bg-subtle ");

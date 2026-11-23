@@ -83,7 +83,8 @@ export function PhotoCarousel({
   const photo = broken ? (
     <div className={multiple ? "grid h-full w-full place-items-center px-3 text-center" : "grid min-h-36 w-full place-items-center px-3 text-center"}>
       <span>
-        <span className="block text-xs font-semibold text-muted">Sin foto</span>
+        <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</span>
+        <span className="mt-0.5 block text-xs font-semibold text-muted">Sin foto</span>
         <span className="mt-1 block text-[11px] leading-4 text-muted">{brokenNote}</span>
       </span>
     </div>

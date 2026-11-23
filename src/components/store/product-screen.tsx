@@ -192,8 +192,8 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
           ) : null}
 
           <div className="mt-2 border-y border-line py-2">
-            <p className="text-[11px] font-semibold text-muted">Precio publicado</p>
-            <p className="text-lg font-extrabold tracking-tight tabular-nums">{formatCop(product.price)}</p>
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Precio publicado</p>
+            <p className="mt-0.5 text-lg font-extrabold tracking-tight tabular-nums">{formatCop(product.price)}</p>
             <p className="mt-1 text-xs leading-5 text-muted">
               Pagas al recibir. Envío aparte. No es dinero cobrado. Dropi no está conectado.
             </p>
