@@ -83,13 +83,15 @@ export function SyncScreen({
     <div className="mx-auto max-w-[1600px] pb-8">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Dropi, a mano</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Sincronización</h1>
-      <p className="mt-0.5 text-sm text-muted">
-        Copia la entrega y anota el número. Ver esta lista no cobra. Dropi no está conectado: no se envía desde aquí y el total guardado no cambia.
+      <p className="mt-1 max-w-2xl text-sm leading-5 text-muted">
+        Copia la entrega y anota el número a mano. Ver esta lista no cobra. Dropi no está conectado: no se envía desde aquí y el total guardado no cambia. El estado de la cuenta está en{" "}
+        <Link href="/panel/conexiones" title="Verlas no cobra ni cambia pedidos." className="font-semibold text-accent-strong">
+          Conexiones
+        </Link>
+        .
       </p>
 
-      <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
-        <div className="order-2 min-w-0 xl:order-1">
-      <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="cola-dropi">
+      <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="cola-dropi">
         <h2 id="cola-dropi" className="text-sm font-semibold">
           Cola de envío ({blockedJobs.length} bloqueados · {noticeJobs.length} avisos · {reconciledJobs.length} conciliados)
         </h2>
@@ -170,10 +172,15 @@ export function SyncScreen({
           </ul>
         ) : null}
       </section>
+
+      <h2 className="mt-5 text-sm font-semibold">Dónde anotar el número</h2>
+      <p className="mt-0.5 max-w-2xl text-xs leading-5 text-muted">
+        Confirmados en adelante. Los pendientes se confirman en Pedidos. Aquí se copia la entrega y se anota el número a mano. El total guardado no cambia.
+      </p>
       {groups.map((group) => {
         const visible = group.rows.filter((order) => matchesSync(order, query));
         return (
-          <section key={group.id} className="mt-3 first:mt-0" aria-labelledby={group.id}>
+          <section key={group.id} className="mt-3" aria-labelledby={group.id}>
             <h2 id={group.id} className="text-sm font-semibold">
               {group.title} ({group.rows.length})
             </h2>
@@ -220,31 +227,6 @@ export function SyncScreen({
           </div>
         )}
       </section>
-        </div>
-
-        <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3.75rem] xl:order-2">
-          <h2 className="text-sm font-semibold">Cómo se usa</h2>
-          <ul className="mt-2 space-y-2 text-xs leading-5">
-            <li>
-              <span className="font-semibold text-sm">Falta número</span>
-              <span className="mt-0.5 block text-muted">
-                Confirmados en adelante. Los pendientes se confirman en Pedidos.
-              </span>
-            </li>
-            <li>
-              <span className="font-semibold text-sm">Qué haces aquí</span>
-              <span className="mt-0.5 block text-muted">Copiar entrega y anotar el número a mano. El total guardado no cambia.</span>
-            </li>
-          </ul>
-          <p className="mt-3 text-xs leading-5 text-muted">
-            Leer esto no cobra. Dropi no está conectado. Estado de la cuenta en{" "}
-            <Link href="/panel/conexiones" title="Verlas no cobra ni cambia pedidos." className="font-semibold text-accent-strong">
-              Conexiones
-            </Link>
-            .
-          </p>
-        </aside>
-      </div>
     </div>
   );
 }

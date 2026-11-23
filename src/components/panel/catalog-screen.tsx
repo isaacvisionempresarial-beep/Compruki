@@ -127,46 +127,53 @@ export function CatalogScreen({
 
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
-      <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-        <div className="min-w-0">
-          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Catálogo interno</p>
-          <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Catálogo</h1>
-          <p className="mt-0.5 text-sm text-muted">
-            Precio y margen de la ficha. No son el total de un pedido ni dinero cobrado. Desactivar no cambia el precio ni la publicación. Dropi no está conectado.
-          </p>
-          {rowDrift.size > 0 ? (
-            <p className="mt-1 text-xs leading-5 text-warning">
-              Si la ficha de hoy no es el precio o el costo guardado, va en esa fila. Pendiente o cancelado no entra al margen ni a la utilidad. En incidencia no suma como venta confirmada. Devuelto, el total no entra a la utilidad. Abrir el pedido no reescribe el total ni cobra.
-            </p>
-          ) : null}
-        </div>
-        <div className="flex shrink-0 flex-wrap gap-2">
-          {canManageCommerce ? (
-            <Link
-              href="/panel/catalogo/nuevo"
-              title="Crearlo no cobra ni confirma un pedido."
-              className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold hover:bg-subtle"
-            >
-              Nuevo producto
-            </Link>
-          ) : (
-            <p className="inline-flex h-10 items-center text-sm text-muted">Solo el propietario crea productos. No cobra.</p>
-          )}
-          <button
-            type="button"
-            disabled
-            title="Disponible cuando Dropi esté autorizado. No cobra."
-            className="inline-flex h-10 cursor-not-allowed items-center justify-center rounded-[10px] bg-subtle px-4 text-sm font-semibold text-muted"
-          >
-            Importar desde Dropi
-            <span className="sr-only">, pendiente de autorización</span>
-          </button>
-        </div>
+      <div className="min-w-0">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Catálogo interno</p>
+        <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Catálogo</h1>
+        <p className="mt-1 max-w-2xl text-sm leading-5 text-muted">
+          Precio y margen de la ficha. No son el total de un pedido ni dinero cobrado. Desactivar no cambia el precio ni la publicación. Dropi no está conectado.
+        </p>
       </div>
+      <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        {canManageCommerce ? (
+          <Link
+            href="/panel/catalogo/nuevo"
+            title="Crearlo no cobra ni confirma un pedido."
+            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
+          >
+            Nuevo producto
+          </Link>
+        ) : (
+          <p className="text-sm text-muted">Solo el propietario crea productos. No cobra.</p>
+        )}
+        <button
+          type="button"
+          disabled
+          title="Disponible cuando Dropi esté autorizado. No cobra."
+          className="inline-flex h-9 cursor-not-allowed items-center justify-center rounded-[10px] bg-subtle px-3 text-sm font-semibold text-muted"
+        >
+          Importar desde Dropi
+          <span className="sr-only">, pendiente de autorización</span>
+        </button>
+      </nav>
 
-      <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
-        <div className="order-2 min-w-0 xl:order-1">
-          <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Filtrar productos">
+      <section className="mt-5" aria-labelledby="fichas-titulo">
+        <h2 id="fichas-titulo" className="text-base font-bold">Fichas</h2>
+        <p className="mt-0.5 max-w-2xl text-xs leading-5 text-muted">
+          {canManageCommerce
+            ? "Cada ficha guarda precio, costo, publicación y fotos. Se edita en su página."
+            : "Textos, fotos y disponibilidad se editan en su página. Precio, publicación y alta los guarda el propietario."}{" "}
+          Lo publicado se ve en la tienda. Copiar el enlace no cambia el precio ni crea una campaña. Lo vendido está en{" "}
+          <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="font-semibold text-accent-strong">
+            Rentabilidad
+          </Link>
+          . Leer esto no cobra ni cambia el precio ni la publicación.
+        </p>
+        <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Lista</p>
+          <p className="mt-0.5 text-xs leading-5 text-muted">Filtrar no cobra ni cambia el precio ni la publicación.</p>
+          <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Filtrar productos">
             {filters.map((item) => {
               const count = searched.filter((product) => matches(product, item.id, rowDrift.has(product.sku))).length;
               const selectedFilter = filter === item.id;
@@ -179,7 +186,7 @@ export function CatalogScreen({
                   title="Filtrar no cobra ni cambia el precio ni la publicación."
                   className={cx(
                     "min-h-9 rounded-[10px] px-2.5 text-sm font-semibold",
-                    selectedFilter ? "bg-primary text-on-dark" : "border border-line bg-card text-muted",
+                    selectedFilter ? "bg-primary text-on-dark" : "border border-line bg-canvas text-muted",
                   )}
                   onClick={() => setFilter(item.id)}
                 >
@@ -189,8 +196,13 @@ export function CatalogScreen({
               );
             })}
           </div>
-          <p className="mt-2 text-xs leading-5 text-muted">Filtrar no cobra ni cambia el precio ni la publicación.</p>
-          <CatalogDriftSheet text={driftText} />
+        </div>
+        {rowDrift.size > 0 ? (
+          <p className="mt-3 text-xs leading-5 text-warning">
+            Si la ficha de hoy no es el precio o el costo guardado, va en esa fila. Pendiente o cancelado no entra al margen ni a la utilidad. En incidencia no suma como venta confirmada. Devuelto, el total no entra a la utilidad. Abrir el pedido no reescribe el total ni cobra.
+          </p>
+        ) : null}
+        <CatalogDriftSheet text={driftText} />
 
           {visible.length === 0 ? (
             <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
@@ -221,39 +233,7 @@ export function CatalogScreen({
               ))}
             </ul>
           )}
-        </div>
-
-        <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3.75rem] xl:order-2">
-          <h2 className="text-sm font-semibold">Cómo se usa</h2>
-          <ul className="mt-2 space-y-2 text-xs leading-5">
-            <li>
-              <span className="font-semibold text-sm">Cada ficha</span>
-              <span className="mt-0.5 block text-muted">
-                {canManageCommerce
-                  ? "Precio, costo, publicación y fotos con historial. Se edita en su página."
-                  : "Textos, fotos y disponibilidad se editan en su página. Precio, publicación y alta los guarda el propietario."}
-              </span>
-            </li>
-            <li>
-              <span className="font-semibold text-sm">La tienda</span>
-              <span className="mt-0.5 block text-muted">
-                Lo publicado se ve afuera. Copiar el enlace no cambia el precio ni crea una campaña.
-              </span>
-            </li>
-            <li>
-              <span className="font-semibold text-sm">Pedidos</span>
-              <span className="mt-0.5 block text-muted">
-                Lo vendido está en{" "}
-                <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="font-semibold text-accent-strong">
-                  Rentabilidad
-                </Link>
-                .
-              </span>
-            </li>
-          </ul>
-          <p className="mt-3 text-xs leading-5 text-muted">Leer esto no cobra ni cambia el precio ni la publicación. Dropi no está conectado.</p>
-        </aside>
-      </div>
+      </section>
     </div>
   );
 }
