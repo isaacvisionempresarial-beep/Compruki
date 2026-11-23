@@ -79,7 +79,8 @@ export function AgentsScreen({
       <p className="mt-6 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cifras</p>
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="resumen-tienda">
-        <h2 id="resumen-tienda" className="text-sm font-semibold">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Local</p>
+        <h2 id="resumen-tienda" className="mt-0.5 text-sm font-semibold">
           Resumen determinista de la tienda
         </h2>
         <p className="mt-1 text-sm text-muted">Cifras del catálogo y pedidos locales. No pasan por un modelo. Verlas no cobra ni cambia pedidos.</p>

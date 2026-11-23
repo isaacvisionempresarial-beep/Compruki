@@ -33,7 +33,8 @@ export function DropiHandoff({ order }: { order: StoreOrder }) {
 
       <div className="grid items-start gap-3 lg:grid-cols-2">
         <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="sync-datos">
-          <h2 id="sync-datos" className="text-sm font-semibold">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Copia</p>
+          <h2 id="sync-datos" className="mt-0.5 text-sm font-semibold">
             Datos para Dropi
           </h2>
           <p className="mt-1 text-xs leading-5 text-muted">
@@ -42,7 +43,8 @@ export function DropiHandoff({ order }: { order: StoreOrder }) {
           <DropiCopy order={order} />
         </section>
         <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="sync-anotar">
-          <h2 id="sync-anotar" className="text-sm font-semibold">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Número</p>
+          <h2 id="sync-anotar" className="mt-0.5 text-sm font-semibold">
             Anotar el número
           </h2>
           <DropiRefForm order={order} />

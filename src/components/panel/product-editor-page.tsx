@@ -30,7 +30,8 @@ export function ProductEditorPage({
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Catálogo</p>
         <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Nuevo producto</h1>
         <section className="elevate-1 mt-5 max-w-2xl rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="alta-bloqueada">
-          <h2 id="alta-bloqueada" className="text-sm font-semibold">Alta</h2>
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Permiso</p>
+          <h2 id="alta-bloqueada" className="mt-0.5 text-sm font-semibold">Alta</h2>
           <p className="mt-1 text-sm text-muted">
             Solo el propietario puede crear productos. Puedes editar textos, fotos y disponibilidad de los que ya están. No cobra ni cambia pedidos.
           </p>

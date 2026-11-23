@@ -190,7 +190,8 @@ export function Dashboard({
         >
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h2 id="pendientes-agentes-home" className="text-sm font-semibold">
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Bandeja</p>
+              <h2 id="pendientes-agentes-home" className="mt-0.5 text-sm font-semibold">
                 Pendientes humanos ({agentPendingSummary.total})
               </h2>
               <p className="mt-0.5 text-xs text-muted">

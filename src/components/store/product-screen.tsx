@@ -405,7 +405,8 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
 
       {pieces.length > 0 ? (
         <section id="lo-especial" className="elevate-1 mt-3 scroll-mt-16 rounded-[14px] border border-line bg-card px-3 py-3" aria-label="Características y beneficios">
-          <h2 className="text-base font-extrabold tracking-tight">Características y beneficios</h2>
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Beneficios</p>
+          <h2 className="mt-0.5 text-base font-extrabold tracking-tight">Características y beneficios</h2>
           <p className="mt-1 max-w-xl text-xs leading-5 text-muted">Sale del catálogo. Si falta un dato, no se inventa. Leerlas no cambia el precio publicado ni crea un pedido.</p>
           <div className="mt-2 max-w-3xl space-y-2">{renderHighlightPieces(pieces)}</div>
         </section>
@@ -413,7 +414,8 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
 
       {descriptionIsLong ? (
         <section id="descripcion" className="elevate-1 mt-3 scroll-mt-16 rounded-[14px] border border-line bg-card px-3 py-3" aria-label="Descripción">
-          <h2 className="text-base font-extrabold tracking-tight">Descripción</h2>
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Texto</p>
+          <h2 className="mt-0.5 text-base font-extrabold tracking-tight">Descripción</h2>
           <p className="mt-1 max-w-xl text-xs leading-5 text-muted">Leerla no cambia el precio publicado ni crea un pedido.</p>
           <div className="mt-2 max-w-2xl space-y-2 text-sm leading-5 text-muted">
             {descriptionParagraphs.map((paragraph, index) => (

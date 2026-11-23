@@ -58,7 +58,8 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
       </section>
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="como-pedir">
-        <h2 id="como-pedir" className="text-sm font-semibold">Cómo pedir</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pasos</p>
+        <h2 id="como-pedir" className="mt-0.5 text-sm font-semibold">Cómo pedir</h2>
         <ul className="mt-3 grid gap-3 sm:grid-cols-3">
           <li>
             <span className="font-semibold text-sm">Elige</span>

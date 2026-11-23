@@ -139,7 +139,8 @@ export function ConfirmationScreen({
             <CustomerDelivery order={order} token={token} />
           ) : (
             <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 text-sm leading-5">
-              <h2 className="text-sm font-semibold">Entrega</h2>
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Destino</p>
+              <h2 className="mt-0.5 text-sm font-semibold">Entrega</h2>
               <p className="mt-1">{order.customerName}</p>
               <p>{order.phone}</p>
               {order.document ? <p>Cédula {order.document}</p> : null}
@@ -169,7 +170,8 @@ export function ConfirmationScreen({
             </details>
           ) : order.buyerNote ? (
             <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 text-sm leading-5">
-              <h2 className="text-sm font-semibold">Aviso para la tienda</h2>
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Aviso</p>
+              <h2 className="mt-0.5 text-sm font-semibold">Aviso para la tienda</h2>
               <p className="mt-1">{order.buyerNote}</p>
             </section>
           ) : null}
@@ -240,7 +242,8 @@ function OrderProgress({ order, sizes }: { order: CustomerOrder; sizes: Customer
   const note = customerProgressNote(order.status, order.collected);
   return (
     <section aria-label="Avance" className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
-      <h2 className="text-sm font-semibold">Avance</h2>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pasos</p>
+      <h2 className="mt-0.5 text-sm font-semibold">Avance</h2>
       <ol className="mt-2 space-y-1.5">
         {steps.map((step) => (
           <li
@@ -309,7 +312,8 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
     <form action={action} className="elevate-1 space-y-2 rounded-[14px] border border-line bg-card px-3 py-2">
       <input type="hidden" name="orderId" value={order.id} />
       <input type="hidden" name="token" value={token} />
-      <h2 className="text-sm font-semibold">Entrega</h2>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Destino</p>
+      <h2 className="mt-0.5 text-sm font-semibold">Entrega</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <Field label="Nombre de quien recibe" htmlFor="customerName" hint="Guardarlo no cobra. El total guardado no cambia.">
@@ -394,7 +398,8 @@ function Field({ label, htmlFor, hint, children }: { label: string; htmlFor: str
 function ProductList({ order, images }: { order: CustomerOrder; images: CustomerImages[] }) {
   return (
     <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
-      <h2 className="text-sm font-semibold">Productos</h2>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Líneas</p>
+      <h2 className="mt-0.5 text-sm font-semibold">Productos</h2>
       <ul className="mt-2 space-y-2 text-sm">
         {order.lines.map((line) => {
           const photos = photosOf(images, line.sku);
@@ -482,7 +487,8 @@ function CustomerSizeForm({
     <form action={action} className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
       <input type="hidden" name="orderId" value={order.id} />
       <input type="hidden" name="token" value={token} />
-      <h2 className="text-sm font-semibold">Productos</h2>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Líneas</p>
+      <h2 className="mt-0.5 text-sm font-semibold">Productos</h2>
       <ul className="mt-2 space-y-2">
         {order.lines.map((line, index) => {
           const choice = choices[index];

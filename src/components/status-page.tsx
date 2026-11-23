@@ -40,7 +40,8 @@ export function StatusPage({
       <p className="mt-1.5 max-w-2xl text-sm leading-5 text-muted">{body}</p>
 
       <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="status-guia">
-        <h2 id="status-guia" className="text-sm font-semibold">{asideTitle}</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Guía</p>
+        <h2 id="status-guia" className="mt-0.5 text-sm font-semibold">{asideTitle}</h2>
         <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {asideItems.map((item) => (
             <li key={item.label}>

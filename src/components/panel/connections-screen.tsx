@@ -53,7 +53,8 @@ export function ConnectionsScreen({
 
       <div className="mt-3 space-y-3">
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="para-conectar">
-            <h2 id="para-conectar" className="text-sm font-semibold">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Requisitos</p>
+            <h2 id="para-conectar" className="mt-0.5 text-sm font-semibold">
               Para poder conectar
             </h2>
             <p className="mt-1 text-xs leading-5 text-muted">
@@ -98,7 +99,8 @@ export function ConnectionsScreen({
           </section>
 
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="plataforma">
-            <h2 id="plataforma" className="text-sm font-semibold">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Local</p>
+            <h2 id="plataforma" className="mt-0.5 text-sm font-semibold">
               Plataforma COMPRUKI
             </h2>
             <p className="mt-1 text-xs leading-5 text-muted">
@@ -128,7 +130,8 @@ export function ConnectionsScreen({
           </section>
 
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="consultas-bloqueadas">
-            <h2 id="consultas-bloqueadas" className="text-sm font-semibold">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Bloqueadas</p>
+            <h2 id="consultas-bloqueadas" className="mt-0.5 text-sm font-semibold">
               Consultas bloqueadas
             </h2>
             <p className="mt-1 text-xs leading-5 text-muted">
@@ -178,7 +181,8 @@ export function ConnectionsScreen({
 
       <div className="mt-3 grid items-start gap-3 lg:grid-cols-2">
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="conexion-anuncio">
-            <h2 id="conexion-anuncio" className="text-sm font-semibold">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Aviso</p>
+            <h2 id="conexion-anuncio" className="mt-0.5 text-sm font-semibold">
               Qué anuncia el servidor
             </h2>
             <p className="mt-1 text-xs leading-5 text-muted">
@@ -202,7 +206,8 @@ export function ConnectionsScreen({
           </section>
 
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="conexion-consulta">
-            <h2 id="conexion-consulta" className="text-sm font-semibold">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Prueba</p>
+            <h2 id="conexion-consulta" className="mt-0.5 text-sm font-semibold">
               Saludo al servidor
             </h2>
             <p className="mt-1 text-xs leading-5 text-muted">
@@ -230,7 +235,8 @@ export function ConnectionsScreen({
           </section>
 
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 lg:col-span-2" aria-labelledby="donde-anotar">
-            <h2 id="donde-anotar" className="text-sm font-semibold">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Número</p>
+            <h2 id="donde-anotar" className="mt-0.5 text-sm font-semibold">
               Dónde se anota el número
             </h2>
             <p className="mt-1 text-xs leading-5 text-muted">
