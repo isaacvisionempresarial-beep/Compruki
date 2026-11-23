@@ -162,7 +162,10 @@ export function ConfirmationScreen({
           )}
           {order.status === "pendiente_confirmacion" && token ? (
             <details className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
-              <summary className="cursor-pointer text-sm font-semibold" title="Abrirlo no cobra. El total guardado no cambia.">Aviso para la tienda y cancelar</summary>
+              <summary className="cursor-pointer" title="Abrirlo no cobra. El total guardado no cambia.">
+                <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cuidado</span>
+                <span className="mt-0.5 block text-sm font-semibold text-ink">Aviso para la tienda y cancelar</span>
+              </summary>
               <div className="mt-2 space-y-2">
                 <CustomerBuyerNote orderId={order.id} token={token} note={order.buyerNote} />
                 <CustomerCancel order={order} token={token} />
@@ -581,7 +584,8 @@ function CustomerBuyerNote({ orderId, token, note }: { orderId: string; token: s
     <form action={action} className="rounded-[10px] border border-line bg-canvas px-3 py-2">
       <input type="hidden" name="orderId" value={orderId} />
       <input type="hidden" name="token" value={token} />
-      <label className="block text-sm font-semibold" htmlFor="buyer-note">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Aviso</p>
+      <label className="mt-0.5 block text-sm font-semibold" htmlFor="buyer-note">
         Aviso para la tienda
         <textarea
           id="buyer-note"
@@ -631,7 +635,8 @@ function CustomerCancel({ order, token }: { order: CustomerOrder; token: string 
     <form action={action} className="rounded-[10px] border border-line bg-canvas px-3 py-2">
       <input type="hidden" name="orderId" value={order.id} />
       <input type="hidden" name="token" value={token} />
-      <label className="block text-sm font-semibold" htmlFor="cancel-reason">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cancelar</p>
+      <label className="mt-0.5 block text-sm font-semibold" htmlFor="cancel-reason">
         Cancelar este pedido
         <textarea
           id="cancel-reason"

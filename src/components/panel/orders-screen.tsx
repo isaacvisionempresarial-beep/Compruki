@@ -906,6 +906,7 @@ function ReasonAction({
     <form action={action} className="basis-full grid gap-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
       <input type="hidden" name="orderId" value={order.id} />
       <input type="hidden" name="intent" value={item.id} />
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Motivo</p>
       <label className="text-sm font-semibold" htmlFor={`motivo-${order.id}-${item.id}`}>
         Motivo para el cliente
         <textarea
@@ -1311,6 +1312,7 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
       className="mt-3 grid gap-3 rounded-[10px] border border-line bg-canvas px-3 py-2"
     >
       <input type="hidden" name="orderId" value={order.id} />
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Dinero</p>
       {showShipping ? (
         <label className="text-sm font-semibold" htmlFor={`flete-${order.id}`}>
           Flete real del envío
@@ -1426,13 +1428,19 @@ function AddProductForm({ order, products }: { order: StoreOrder; products: Orde
   const preview = canAdd && chosen ? order.total + chosen.price * qty : null;
 
   if (products.length === 0) {
-    return <p className="mt-3 text-sm text-muted">No hay productos publicados y disponibles para agregar. No cobra. El total guardado no cambia.</p>;
+    return (
+      <div className="mt-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+        <p className="mt-0.5 text-sm text-muted">No hay productos publicados y disponibles para agregar. No cobra. El total guardado no cambia.</p>
+      </div>
+    );
   }
 
   return (
     <form action={addAction} className="mt-3 grid gap-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
       <input type="hidden" name="orderId" value={order.id} />
       <input type="hidden" name="variant" value={nextVariant} />
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Alta</p>
       <label className="text-sm font-semibold" htmlFor={`agregar-${order.id}`}>
         Agregar producto
         <select
@@ -1721,6 +1729,7 @@ function ClosedDepartmentForm({ order }: { order: StoreOrder }) {
   return (
     <form action={departmentAction} className="mt-3 grid gap-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
       <input type="hidden" name="orderId" value={order.id} />
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cerrado</p>
       <label className="text-sm font-semibold" htmlFor={`departamento-cerrado-${order.id}`}>
         Departamento
         <input
@@ -1932,6 +1941,7 @@ function ReturnReasonForm({ order }: { order: StoreOrder }) {
   return (
     <form action={reasonAction} className="grid gap-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
       <input type="hidden" name="orderId" value={order.id} />
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Devolución</p>
       <label className="text-sm font-semibold" htmlFor={`motivo-devolucion-${order.id}`}>
         Motivo de la devolución
         <textarea
@@ -1986,6 +1996,7 @@ function IncidenceReasonForm({ order }: { order: StoreOrder }) {
   return (
     <form action={reasonAction} className="grid gap-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
       <input type="hidden" name="orderId" value={order.id} />
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Incidencia</p>
       <label className="text-sm font-semibold" htmlFor={`motivo-incidencia-${order.id}`}>
         Motivo de la incidencia
         <textarea
@@ -2000,7 +2011,7 @@ function IncidenceReasonForm({ order }: { order: StoreOrder }) {
         />
         <span className="mt-1 block font-normal leading-5 text-muted">
           Lo ve en su pedido y en el mensaje. Vacío o sin un cambio: el botón queda bloqueado. Sin este motivo no se
-          resuelve. Anotarlo no la           resuelve ni sale en el texto para Dropi. El total guardado no cambia.
+          resuelve. Anotarlo no la resuelve ni sale en el texto para Dropi. El total guardado no cambia.
         </span>
       </label>
       <MotivoMessagePreview order={order} next={next} canSave={canSave} />

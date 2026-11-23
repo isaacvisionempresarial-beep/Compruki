@@ -65,7 +65,8 @@ export function CentralRouterPanel({
         </div>
       ) : (
         <div className="elevate-1 mt-3 space-y-3 rounded-[14px] border border-line bg-card px-4 py-3">
-          <p className="text-sm">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Resultado</p>
+          <p className="mt-0.5 text-sm">
             <span className="font-semibold">Pedido:</span> {route.intent}
           </p>
           <p className="text-xs font-bold tracking-[0.06em] text-muted uppercase">

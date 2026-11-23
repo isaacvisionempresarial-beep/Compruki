@@ -565,8 +565,8 @@ function CampaignLink({
 
   if (compact) {
     return (
-      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-        <span className="font-semibold text-muted">Campaña</span>
+      <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Campaña</span>
         <a href={path} target="_blank" rel="noreferrer" title="Abrirla no cobra ni cambia el precio ni la publicación." className="inline-flex h-8 items-center rounded-[10px] border border-line bg-canvas px-2.5 text-xs font-semibold text-ink hover:bg-subtle">
           Abrir
         </a>
@@ -579,46 +579,48 @@ function CampaignLink({
         >
           {copied === "ok" ? "Copiado" : "Copiar enlace"}
         </button>
-        {copied === "ok" ? <span className="text-accent-strong">No cambia el precio ni crea la campaña.</span> : null}
-        {product.available ? null : <span className="text-warning">Se abre, pero no se puede pedir.</span>}
+        {copied === "ok" ? <span className="text-xs text-accent-strong">No cambia el precio ni crea la campaña.</span> : null}
+        {product.available ? null : <span className="text-xs text-warning">Se abre, pero no se puede pedir.</span>}
         {copied === "fail" ? (
-          <span role="alert" className="text-danger">
+          <span role="alert" className="text-xs text-danger">
             No se pudo copiar. No cobra.
           </span>
         ) : null}
-      </div>
+      </nav>
     );
   }
 
   return (
     <div className="mt-1">
-      <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">Enlace de campaña</p>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Campaña</p>
+      <p className="mt-0.5 text-sm font-semibold">Enlace de campaña</p>
       <p className="mt-1 text-xs leading-5 break-all text-muted" title={path}>
         {path}
       </p>
       {product.available ? null : (
         <p className="text-xs leading-5 text-warning">La página se abre, pero ahora no se puede pedir.</p>
       )}
-      <div className="mt-1 flex flex-wrap gap-2">
+      <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
         <a
           href={path}
           target="_blank"
           rel="noreferrer"
           title="Abrirla no cobra ni cambia el precio ni la publicación."
-          className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas"
+          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
         >
           Abrir página
         </a>
         <button
           type="button"
-          className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas"
+          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
           aria-label={`Copiar enlace de ${product.title}`}
           title="Copiarlo no cobra ni cambia el precio ni la publicación."
           onClick={copy}
         >
           {copied === "ok" ? "Enlace copiado" : "Copiar enlace"}
         </button>
-      </div>
+      </nav>
       {copied === "ok" ? (
         <p role="status" className="mt-1 text-xs leading-5 text-accent-strong">
           Pégalo en el anuncio. No crea la campaña, no cambia el precio publicado y no es gasto.
