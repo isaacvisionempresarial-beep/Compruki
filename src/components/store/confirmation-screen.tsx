@@ -82,7 +82,8 @@ export function ConfirmationScreen({
         </p>
       </section>
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="siguiente-paso">
-        <h2 id="siguiente-paso" className="text-sm font-semibold">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Ahora</p>
+        <h2 id="siguiente-paso" className="mt-0.5 text-sm font-semibold">
           Siguiente paso
         </h2>
         <p className="mt-1 text-sm leading-5 text-ink">{nextStepCopy(order)}</p>

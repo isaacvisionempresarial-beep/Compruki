@@ -15,7 +15,8 @@ export function CentralRouterPanel({
 }) {
   return (
     <section className="mt-4" aria-labelledby="central">
-      <h2 id="central" className="text-base font-bold">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Enrutar</p>
+      <h2 id="central" className="mt-0.5 text-base font-bold">
         COMPRUKI Central (sin OpenAI)
       </h2>
       <p className="mt-1 text-sm text-muted">

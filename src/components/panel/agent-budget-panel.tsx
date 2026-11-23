@@ -32,7 +32,8 @@ export function AgentBudgetPanel({
 
   return (
     <section className="mt-6" aria-labelledby="presupuesto-ia">
-      <h2 id="presupuesto-ia" className="text-base font-bold">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tope</p>
+      <h2 id="presupuesto-ia" className="mt-0.5 text-base font-bold">
         Presupuesto y activación (P0-IA)
       </h2>
       <p className="mt-1 text-sm text-muted">

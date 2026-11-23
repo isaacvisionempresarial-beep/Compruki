@@ -67,7 +67,8 @@ export default function ConditionsPage() {
       </section>
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="en-corto">
-        <h2 id="en-corto" className="text-sm font-semibold">En corto</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Resumen</p>
+        <h2 id="en-corto" className="mt-0.5 text-sm font-semibold">En corto</h2>
         <ul className="mt-3 grid gap-3 sm:grid-cols-3">
           <li>
             <span className="font-semibold text-sm">Nadie cobra aquí</span>
@@ -103,7 +104,8 @@ export default function ConditionsPage() {
       </section>
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="condiciones-lista">
-          <h2 id="condiciones-lista" className="text-sm font-semibold">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Detalle</p>
+          <h2 id="condiciones-lista" className="mt-0.5 text-sm font-semibold">
             Lo que aceptas
           </h2>
           <dl className="mt-2 space-y-2 text-sm leading-5">

@@ -30,7 +30,8 @@ export default async function SettingsPage() {
       </p>
 
       <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="cuenta">
-        <h2 id="cuenta" className="text-sm font-semibold">Cuenta</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sesión</p>
+        <h2 id="cuenta" className="mt-0.5 text-sm font-semibold">Cuenta</h2>
         <dl className="mt-3 grid gap-3 sm:grid-cols-2">
           <div>
             <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda</dt>
@@ -56,7 +57,8 @@ export default async function SettingsPage() {
       </section>
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="alcance">
-        <h2 id="alcance" className="text-sm font-semibold">Qué puede esta sesión</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Permisos</p>
+        <h2 id="alcance" className="mt-0.5 text-sm font-semibold">Qué puede esta sesión</h2>
         <p className="mt-1 text-sm text-muted">
           Esta sesión solo abre {access.tenantName}. Pedidos, catálogo y agentes salen de esa tienda. Un identificador de otra tienda no se lee ni se escribe. En la tienda pública, consultas, cambios del cliente y pedidos seguidos se detienen un rato: no abren ni crean otro. Verlo no cobra ni cambia pedidos.
         </p>
@@ -68,7 +70,8 @@ export default async function SettingsPage() {
       </section>
 
       <section className="elevate-1 mt-4 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="backup">
-        <h2 id="backup" className="text-sm font-semibold">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Copia</p>
+        <h2 id="backup" className="mt-0.5 text-sm font-semibold">
           Respaldo de esta tienda
         </h2>
         <p className="mt-1 text-sm text-muted">
@@ -90,7 +93,8 @@ export default async function SettingsPage() {
       </section>
 
       <section className="elevate-1 mt-4 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="readiness">
-        <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Entorno</p>
+        <div className="mt-0.5 flex flex-wrap items-center justify-between gap-2">
           <h2 id="readiness" className="text-sm font-semibold">
             Readiness del entorno
           </h2>

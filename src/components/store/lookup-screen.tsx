@@ -26,7 +26,8 @@ export function LookupScreen() {
       </section>
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="que-necesitas">
-        <h2 id="que-necesitas" className="text-sm font-semibold">Qué necesitas</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Datos</p>
+        <h2 id="que-necesitas" className="mt-0.5 text-sm font-semibold">Qué necesitas</h2>
         <ul className="mt-3 grid gap-3 sm:grid-cols-2">
           <li>
             <span className="font-semibold text-sm">Número</span>
@@ -56,7 +57,9 @@ export function LookupScreen() {
         <p className="mt-2 text-xs leading-5 text-muted">Leerlas no registra pedido ni cobra.</p>
       </section>
 
-      <form action={formAction} className="elevate-1 mt-3 max-w-xl space-y-2 rounded-[14px] border border-line bg-card px-3 py-2">
+      <form action={formAction} className="elevate-1 mt-3 max-w-xl space-y-2 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="consulta-pedido">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</p>
+          <h2 id="consulta-pedido" className="mt-0.5 text-sm font-semibold">Número y celular</h2>
           <div>
             <label htmlFor="number" className="mb-1 block text-sm font-semibold">
               Número del pedido

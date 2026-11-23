@@ -30,7 +30,8 @@ export function ContentCreatorPanel({
 }) {
   return (
     <section className="mt-6" aria-labelledby="creador">
-      <h2 id="creador" className="text-base font-bold">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Borradores</p>
+      <h2 id="creador" className="mt-0.5 text-base font-bold">
         Creador de contenido (plantillas)
       </h2>
       <p className="mt-1 text-sm text-muted">

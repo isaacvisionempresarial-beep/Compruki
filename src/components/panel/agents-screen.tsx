@@ -117,7 +117,8 @@ export function AgentsScreen({
       <p className="mt-6 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Agentes</p>
 
       <section className="mt-3" aria-labelledby="explorador">
-        <h2 id="explorador" className="text-base font-bold">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Buscar</p>
+        <h2 id="explorador" className="mt-0.5 text-base font-bold">
           Explorador de productos (catálogo local)
         </h2>
         <p className="mt-1 text-sm text-muted">
@@ -233,7 +234,8 @@ export function AgentsScreen({
       />
 
       <section className="mt-6" aria-labelledby="analista">
-        <h2 id="analista" className="text-base font-bold">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Margen</p>
+        <h2 id="analista" className="mt-0.5 text-base font-bold">
           Analista de rentabilidad (sin OpenAI)
         </h2>
         <p className="mt-1 text-sm text-muted">
