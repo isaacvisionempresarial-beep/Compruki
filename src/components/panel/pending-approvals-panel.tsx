@@ -38,7 +38,7 @@ export function PendingApprovalsPanel({
           {items.map((item) => (
             <li key={`${item.kind}-${item.id}`} className="elevate-1 rounded-[14px] border border-line bg-card px-4 py-2.5 text-sm">
               <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                <span className="rounded-[8px] border border-line px-1.5 py-0.5 text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
+                <span className="rounded-[8px] border border-line px-1.5 py-0.5 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
                   {item.kind}
                 </span>
                 {item.href ? (

@@ -205,7 +205,7 @@ export function AgentsScreen({
                       {product.externalRef ? ` · ref ${product.externalRef}` : ""}
                     </p>
                   </div>
-                  <span className="shrink-0 rounded-[10px] border border-line px-2 py-1 text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
+                  <span className="shrink-0 rounded-[10px] border border-line px-2 py-1 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
                     local
                   </span>
                 </div>
@@ -316,7 +316,7 @@ export function AgentsScreen({
         <div className="mt-2 overflow-x-auto rounded-[14px] border border-line bg-card">
           <table className="min-w-full text-left text-sm">
             <caption className="sr-only">Margen estimado por producto</caption>
-            <thead className="border-b border-line text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
+            <thead className="border-b border-line text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
               <tr>
                 <th className="px-3 py-2">Producto</th>
                 <th className="px-3 py-2">Precio ficha</th>
@@ -379,7 +379,7 @@ export function AgentsScreen({
               <p className="text-sm font-semibold">
                 <span className="text-muted">{role.id} · </span>
                 {role.name}
-                <span className="ml-2 text-[10px] font-bold tracking-[0.06em] text-muted uppercase">{role.priority}</span>
+                <span className="ml-2 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{role.priority}</span>
               </p>
               <p className="mt-0.5 text-sm text-muted">{role.job}</p>
             </li>

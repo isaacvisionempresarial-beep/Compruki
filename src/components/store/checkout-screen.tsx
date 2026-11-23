@@ -312,8 +312,9 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
 
             {handoff ? (
               <details className="mt-3">
-                <summary className="cursor-pointer text-sm font-semibold text-muted" title="Abrirla no confirma el pedido ni cobra.">
-                  Vista previa del texto de entrega
+                <summary className="cursor-pointer" title="Abrirla no confirma el pedido ni cobra.">
+                  <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
+                  <span className="mt-0.5 block text-sm font-semibold text-muted">Vista previa del texto de entrega</span>
                 </summary>
                 <p className="mt-1 text-xs leading-5 text-muted">Abrirla no confirma el pedido ni cobra.</p>
                 <p className="mt-2 text-sm leading-5 text-ink">

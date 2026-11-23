@@ -248,7 +248,7 @@ export function SyncScreen({
 
 function SyncHead() {
   return (
-    <div className={cx("hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.04em] text-muted uppercase md:grid", syncGrid)}>
+    <div className={cx("hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.08em] text-muted uppercase md:grid", syncGrid)}>
       <span>Pedido</span>
       <span>Cliente</span>
       <span>Estado</span>
@@ -276,11 +276,11 @@ function SyncRow({ order, note, number, cta = "Anotar número" }: { order: Store
           {note ? <span className="mt-1.5 block text-xs font-semibold leading-5 text-warning">{note}</span> : null}
         </span>
         <span className="md:pt-0.5">
-          <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">Estado</span>
+          <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">Estado</span>
           <StatusPill status={order.status} />
         </span>
         <span className="md:pt-0.5">
-          <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">Número</span>
+          <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">Número</span>
           {written ? <span className="font-semibold">{written}</span> : <span className="font-semibold text-warning">Sin anotar</span>}
         </span>
         <span className="font-semibold text-primary md:pt-0.5">{cta}</span>

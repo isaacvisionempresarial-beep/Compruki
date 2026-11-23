@@ -158,7 +158,7 @@ export function ProfitabilityScreen({
               <div className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">
                 <div
                   className={cx(
-                    "hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.04em] text-muted uppercase md:grid",
+                    "hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.08em] text-muted uppercase md:grid",
                     resultGrid,
                   )}
                 >
@@ -304,7 +304,7 @@ function figureValue(units: number, missing: number, amount: number) {
 function ResultFigure({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
     <div className="md:pt-0.5 md:text-right">
-      <p className="mb-1 text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:sr-only">{label}</p>
+      <p className="mb-1 text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:sr-only">{label}</p>
       <p className="text-base font-extrabold tabular-nums">{value}</p>
       <p className="mt-1 text-xs leading-5 text-muted">{detail}</p>
     </div>

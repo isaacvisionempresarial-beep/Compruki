@@ -211,14 +211,14 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
                       <div className="flex flex-wrap items-center gap-1.5">
                         <p
                           className={cx(
-                            "inline-flex rounded-[8px] px-2 py-0.5 text-[10px] font-bold tracking-[0.04em] uppercase",
+                            "inline-flex rounded-[8px] px-2 py-0.5 text-[10px] font-bold tracking-[0.08em] uppercase",
                             product.available ? "bg-accent-tint text-accent-strong" : "bg-coral-tint text-coral-strong",
                           )}
                         >
                           {product.available ? "Disponible" : "No disponible"}
                         </p>
                         {product.category ? (
-                          <span className="truncate text-[10px] font-semibold tracking-[0.04em] text-muted uppercase">
+                          <span className="truncate text-[10px] font-semibold tracking-[0.08em] text-muted uppercase">
                             {product.category}
                           </span>
                         ) : null}

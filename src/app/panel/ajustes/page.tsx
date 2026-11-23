@@ -99,7 +99,7 @@ export default async function SettingsPage() {
             Readiness del entorno
           </h2>
           <span
-            className={`rounded-[10px] border px-2 py-1 text-[10px] font-bold tracking-[0.06em] uppercase ${
+            className={`rounded-[10px] border px-2 py-1 text-[10px] font-bold tracking-[0.08em] uppercase ${
               health.ok ? "border-line text-ink" : "border-line text-coral"
             }`}
           >

@@ -210,7 +210,7 @@ export function Dashboard({
           <ul className="mt-2 space-y-1.5">
             {agentPendingSummary.preview.map((item) => (
               <li key={`${item.kind}-${item.id}`} className="text-sm">
-                <span className="mr-2 rounded-[8px] border border-line px-1.5 py-0.5 text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
+                <span className="mr-2 rounded-[8px] border border-line px-1.5 py-0.5 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
                   {item.kind}
                 </span>
                 <Link href={item.href} title="Abrirlo no cobra ni cambia el total guardado." className="font-semibold text-accent-strong">
@@ -264,7 +264,7 @@ export function Dashboard({
         <ul className="mt-2 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {storeCards.map((card) => (
             <li key={card.label} className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
-              <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">{card.label}</p>
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{card.label}</p>
               <p className="mt-1 text-lg leading-5 font-extrabold tracking-tight tabular-nums">{formatCop(card.amount)}</p>
               <p className="mt-0.5 text-xs text-muted">
                 {card.count} {card.count === 1 ? "pedido" : "pedidos"} · {card.hint}
@@ -406,7 +406,7 @@ export function Dashboard({
           <div className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">
             <div
               className={cx(
-                "hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.04em] text-muted uppercase md:grid",
+                "hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.08em] text-muted uppercase md:grid",
                 homeProductGrid,
               )}
             >
@@ -536,7 +536,7 @@ export function Dashboard({
                       <span className="mt-0.5 block truncate text-xs text-muted" title={meta}>
                         {meta}
                       </span>
-                      <span className="mt-0.5 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase">{row.queueTitle}</span>
+                      <span className="mt-0.5 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{row.queueTitle}</span>
                       <span className="block truncate text-sm font-semibold text-warning" title={row.note}>
                         {row.note}
                       </span>
@@ -563,7 +563,7 @@ export function Dashboard({
                     </span>
                     <span className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
                       <span className="text-right">
-                        <span className="block text-[10px] font-bold tracking-[0.06em] text-muted uppercase">Total guardado</span>
+                        <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Total guardado</span>
                         <span className="text-sm font-semibold tabular-nums whitespace-nowrap">{formatCop(order.total)}</span>
                       </span>
                       <span className="inline-flex flex-wrap items-center gap-1.5">
@@ -587,7 +587,7 @@ export function Dashboard({
 function HomeProductFigure({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
     <div className="md:pt-0.5 md:text-right">
-      <p className="mb-1 text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:sr-only">{label}</p>
+      <p className="mb-1 text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:sr-only">{label}</p>
       <p className="text-base font-extrabold tabular-nums">{value}</p>
       <p className="mt-1 text-xs leading-5 text-muted">{detail}</p>
     </div>

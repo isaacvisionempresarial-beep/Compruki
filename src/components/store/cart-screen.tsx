@@ -124,7 +124,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
             <div className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">
             <div
               className={cx(
-                "hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.04em] text-muted uppercase md:grid",
+                "hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.08em] text-muted uppercase md:grid",
                 cartGrid,
               )}
             >
@@ -206,7 +206,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                         ) : null}
                       </div>
                       <div className="md:pt-0.5">
-                        <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">
+                        <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">
                           Cantidad
                         </span>
                         {payableLine && product ? (
@@ -225,7 +225,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                         )}
                       </div>
                       <div className="md:pt-0.5 md:text-right">
-                        <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">
+                        <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">
                           Total al recibir
                         </span>
                         <p className="text-base font-extrabold tabular-nums">
@@ -233,7 +233,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                         </p>
                       </div>
                       <div className="md:pt-0.5">
-                        <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">
+                        <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">
                           Quitar
                         </span>
                         <button

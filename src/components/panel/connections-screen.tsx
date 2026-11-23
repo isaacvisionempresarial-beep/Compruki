@@ -108,23 +108,26 @@ export function ConnectionsScreen({
             </p>
             <ul className="mt-3 grid gap-2 sm:grid-cols-2 text-sm">
               <li className="rounded-[10px] border border-line px-3 py-2">
-                <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">Readiness</p>
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Listo</p>
                 <p className="mt-0.5 font-semibold">{healthOk ? "OK · /api/health" : "Incompleto"}</p>
               </li>
               <li className="rounded-[10px] border border-line px-3 py-2">
-                <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">Tenant piloto</p>
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tenant piloto</p>
                 <p className="mt-0.5 font-semibold">{tenantPilotOk ? "tienda-piloto" : "No responde"}</p>
               </li>
               <li className="rounded-[10px] border border-line px-3 py-2">
-                <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">OpenAI</p>
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">OpenAI</p>
                 <p className="mt-0.5 font-semibold text-warning">No conectado</p>
               </li>
               <li className="rounded-[10px] border border-line px-3 py-2">
-                <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">Agentes P0-IA</p>
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Agentes P0-IA</p>
                 <p className="mt-0.5 font-semibold">Modo determinista</p>
-                <Link href="/panel/agentes" title="Abrirlo no cobra ni cambia pedidos." className="mt-2 inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
-                  Abrir centro de agentes
-                </Link>
+                <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                  <Link href="/panel/agentes" title="Abrirlo no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+                    Abrir centro de agentes
+                  </Link>
+                </nav>
               </li>
             </ul>
           </section>
@@ -140,7 +143,7 @@ export function ConnectionsScreen({
             <div className="mt-3 overflow-hidden rounded-[10px] border border-line">
               <div
                 className={cx(
-                  "hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.04em] text-muted uppercase md:grid",
+                  "hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.08em] text-muted uppercase md:grid",
                   capabilityGrid,
                 )}
               >
@@ -154,19 +157,19 @@ export function ConnectionsScreen({
                   return (
                     <li key={item.id} className={cx("grid items-start gap-2 px-3 py-2 text-sm md:gap-4", capabilityGrid)}>
                       <span>
-                        <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">
+                        <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">
                           Consulta
                         </span>
                         <span className="font-semibold">{item.label}</span>
                       </span>
                       <span>
-                        <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">
+                        <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">
                           Estado
                         </span>
                         <span className="font-semibold text-warning">Bloqueada</span>
                       </span>
                       <span className="text-muted">
-                        <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">
+                        <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">
                           Detalle
                         </span>
                         {answer.detail}

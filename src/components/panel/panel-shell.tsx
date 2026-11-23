@@ -276,7 +276,7 @@ function Sidebar({
 
       <div className="m-2 rounded-[14px] border border-white/10 bg-white/5 px-3 py-2">
         <p className="text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Estado</p>
-        <p className="mt-1 inline-flex items-center gap-2 text-[10px] font-bold tracking-[0.06em] text-coral uppercase">
+        <p className="mt-1 inline-flex items-center gap-2 text-[10px] font-bold tracking-[0.08em] text-coral uppercase">
           <span className="h-2 w-2 rounded-full bg-coral" aria-hidden="true" />
           Dropi no está conectado
         </p>

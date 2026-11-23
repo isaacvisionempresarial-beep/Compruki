@@ -95,7 +95,7 @@ function AgentConfigForm({
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{role.id}</p>
           <h3 className="mt-0.5 text-sm font-semibold">{role.name}</h3>
         </div>
-        <span className="shrink-0 rounded-[10px] border border-line px-2 py-1 text-[10px] font-bold tracking-[0.06em] text-muted uppercase">
+        <span className="shrink-0 rounded-[10px] border border-line px-2 py-1 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
           {enabled ? "Activo" : "Apagado"}
         </span>
       </div>

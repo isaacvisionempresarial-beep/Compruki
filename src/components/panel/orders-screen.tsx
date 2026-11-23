@@ -301,7 +301,7 @@ export function OrdersScreen({
                 <div className="elevate-1 mt-2 overflow-hidden rounded-[14px] border border-line bg-card">
                   <div
                     className={cx(
-                      "hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.04em] text-muted uppercase md:grid",
+                      "hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.08em] text-muted uppercase md:grid",
                       queueGrid,
                     )}
                   >
@@ -330,7 +330,7 @@ export function OrdersScreen({
                             </span>
                           </span>
                           <span className="leading-5">
-                            <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">
+                            <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">
                               Siguiente paso
                             </span>
                             <span className="font-semibold text-warning">{row.note}</span>
@@ -400,7 +400,7 @@ export function OrdersScreen({
             </p>
           ) : (
         <div className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">
-          <div className={cx("hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.04em] text-muted uppercase md:grid", orderGrid)}>
+          <div className={cx("hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.08em] text-muted uppercase md:grid", orderGrid)}>
             <span>Pedido</span>
             <span>Cliente</span>
             <span className="text-right">Total guardado</span>
@@ -436,11 +436,11 @@ export function OrdersScreen({
                     {hold ? <span className="mt-2 block text-sm leading-5 text-warning">{hold}</span> : null}
                   </span>
                   <span className="text-sm font-semibold tabular-nums md:pt-0.5 md:text-right">
-                    <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">Total guardado</span>
+                    <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">Total guardado</span>
                     {formatCop(order.total)}
                   </span>
                   <span className="md:pt-0.5">
-                    <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">Estado</span>
+                    <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">Estado</span>
                     <span className="inline-flex flex-wrap items-center gap-1.5">
                       <StatusPill status={order.status} />
                       {order.collected ? <CollectedPill /> : null}
@@ -845,7 +845,7 @@ export function OrderEditor({
             {storedUtilityCaveat(order) ? (
               <p className="border-b border-line px-3 py-2 text-xs leading-5 text-warning">{storedUtilityCaveat(order)}</p>
             ) : null}
-            <div className={cx("hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.04em] text-muted uppercase md:grid", historyGrid)}>
+            <div className={cx("hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.08em] text-muted uppercase md:grid", historyGrid)}>
               <span>Fecha</span>
               <span>Quién</span>
               <span>Cambio</span>
@@ -854,15 +854,15 @@ export function OrderEditor({
               {order.history.map((event) => (
                 <li key={event.id} className={cx("grid items-start gap-1 px-3 py-2 md:gap-4", historyGrid)}>
                   <span>
-                    <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">Fecha</span>
+                    <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">Fecha</span>
                     {formatDay(event.at.slice(0, 10))}
                   </span>
                   <span>
-                    <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">Quién</span>
+                    <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">Quién</span>
                     {event.actorName}
                   </span>
                   <span className="text-muted">
-                    <span className="mb-1 block text-[10px] font-bold tracking-[0.06em] text-muted uppercase md:hidden">Cambio</span>
+                    <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">Cambio</span>
                     {event.summary}
                   </span>
                 </li>
