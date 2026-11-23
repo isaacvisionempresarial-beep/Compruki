@@ -566,7 +566,7 @@ function CampaignLink({
   if (compact) {
     return (
       <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Campaña</span>
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
         <a href={path} target="_blank" rel="noreferrer" title="Abrirla no cobra ni cambia el precio ni la publicación." className="inline-flex h-8 items-center rounded-[10px] border border-line bg-canvas px-2.5 text-xs font-semibold text-ink hover:bg-subtle">
           Abrir
         </a>

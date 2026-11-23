@@ -203,9 +203,12 @@ export function Dashboard({
                 {canApproveCatalog ? "" : ". Puedes rechazar. Aprobar un borrador o una corrida lo guarda el propietario."}
               </p>
             </div>
-            <Link href="/panel/agentes#pendientes-humanos" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
-              Abrir bandeja
-            </Link>
+            <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+              <Link href="/panel/agentes#pendientes-humanos" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+                Abrir bandeja
+              </Link>
+            </nav>
           </div>
           <ul className="mt-2 space-y-1.5">
             {agentPendingSummary.preview.map((item) => (

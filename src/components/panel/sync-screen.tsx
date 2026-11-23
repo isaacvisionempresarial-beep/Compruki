@@ -109,7 +109,10 @@ export function SyncScreen({
         {noticeState.error ? <p className="mt-2 text-sm leading-5 text-warning">{noticeState.error}</p> : null}
         {noticeState.message ? <p className="mt-2 text-sm leading-5 text-ink">{noticeState.message}</p> : null}
         {jobs.length === 0 ? (
-          <p className="mt-2 text-sm text-muted">Todavía no hay pedidos en la cola.</p>
+          <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm text-muted">Todavía no hay pedidos en la cola.</p>
+          </div>
         ) : (
           <ul className="mt-2 divide-y divide-line text-sm">
             {blockedJobs.map((job) => (

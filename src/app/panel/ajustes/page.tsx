@@ -5,7 +5,7 @@ import { requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
   title: "Configuración",
-  description: "Cuenta, tenant y readiness del piloto. Dropi no está conectado.",
+  description: "Cuenta, tienda piloto y estado del entorno. Dropi no está conectado.",
 };
 
 export const dynamic = "force-dynamic";
@@ -18,7 +18,7 @@ export default async function SettingsPage() {
     { key: "supabaseUrl", label: "Supabase URL" },
     { key: "supabaseAnon", label: "Clave anon / publishable" },
     { key: "serviceRole", label: "Service role" },
-    { key: "tenantPilot", label: "Tenant tienda-piloto" },
+    { key: "tenantPilot", label: "Tienda piloto" },
   ];
 
   return (
@@ -26,7 +26,7 @@ export default async function SettingsPage() {
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sistema</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Configuración</h1>
       <p className="mt-1 text-sm text-muted">
-        Datos de tu cuenta y del tenant activo. Verlos no cobra ni cambia pedidos. Dropi no está conectado.
+        Datos de tu cuenta y de la tienda activa. Verlos no cobra ni cambia pedidos. Dropi no está conectado.
       </p>
 
       <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="cuenta">
@@ -78,8 +78,8 @@ export default async function SettingsPage() {
           Copia de los pedidos y las fichas guardados en {access.tenantName}. El total guardado y el margen van en columnas distintas. No incluye el enlace secreto del cliente. Descargarla no cobra, no cambia pedidos y no envía nada a Dropi.
         </p>
         {access.role === "owner" ? (
-          <nav aria-label="Descargas" className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Descargar</span>
+          <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
             <a href="/panel/respaldo/pedidos" title="Descargarla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
               Pedidos
             </a>
@@ -96,7 +96,7 @@ export default async function SettingsPage() {
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Entorno</p>
         <div className="mt-0.5 flex flex-wrap items-center justify-between gap-2">
           <h2 id="readiness" className="text-sm font-semibold">
-            Readiness del entorno
+            Preparación del entorno
           </h2>
           <span
             className={`rounded-[10px] border px-2 py-1 text-[10px] font-bold tracking-[0.08em] uppercase ${

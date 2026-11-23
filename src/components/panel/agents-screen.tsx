@@ -139,6 +139,7 @@ export function AgentsScreen({
           action={searchExplorerAction}
           className="elevate-1 mt-3 grid gap-2 rounded-[14px] border border-line bg-card px-4 py-3 sm:grid-cols-[1fr_12rem_auto]"
         >
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase sm:col-span-3">Filtro</p>
           {creator.selectedSku ? <input type="hidden" name="sku" value={creator.selectedSku} /> : null}
           <label className="block">
             <span className="mb-1 block text-sm font-semibold">Buscar</span>
@@ -181,7 +182,7 @@ export function AgentsScreen({
         </form>
 
         <p className="mt-2 text-sm text-muted">
-          Shortlist: {explorer.results.length} producto{explorer.results.length === 1 ? "" : "s"}
+          Selección: {explorer.results.length} producto{explorer.results.length === 1 ? "" : "s"}
           {explorer.query ? ` · «${explorer.query}»` : ""}
           {explorer.category ? ` · ${explorer.category}` : ""}
         </p>
@@ -199,7 +200,8 @@ export function AgentsScreen({
               <li key={product.sku} className="elevate-1 rounded-[14px] border border-line bg-card px-4 py-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="text-sm font-semibold">{product.title}</h3>
+                    <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Ficha</p>
+                    <h3 className="mt-0.5 text-sm font-semibold">{product.title}</h3>
                     <p className="mt-0.5 text-xs text-muted">
                       {product.sku}
                       {product.externalRef ? ` · ref ${product.externalRef}` : ""}

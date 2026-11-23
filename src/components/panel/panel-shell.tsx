@@ -281,7 +281,7 @@ function Sidebar({
           Dropi no está conectado
         </p>
         <p className="mt-1 text-xs leading-4 text-on-dark-muted">Navegar no cobra ni cambia pedidos.</p>
-        <p className="mt-2 text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Tenant</p>
+        <p className="mt-2 text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Tienda</p>
         <p className="mt-0.5 text-sm font-semibold">{storeName}</p>
         <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
           <span className="text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Herramientas</span>

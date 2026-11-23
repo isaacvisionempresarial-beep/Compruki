@@ -35,6 +35,7 @@ export function CentralRouterPanel({
         action={routeCentralAction}
         className="elevate-1 mt-3 grid gap-2 rounded-[14px] border border-line bg-card px-4 py-3 sm:grid-cols-[1fr_auto]"
       >
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase sm:col-span-2">Consulta</p>
         <label className="block">
           <span className="mb-1 block text-sm font-semibold">Intención o SKU</span>
           <input

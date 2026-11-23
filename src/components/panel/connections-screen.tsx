@@ -112,7 +112,7 @@ export function ConnectionsScreen({
                 <p className="mt-0.5 font-semibold">{healthOk ? "OK · /api/health" : "Incompleto"}</p>
               </li>
               <li className="rounded-[10px] border border-line px-3 py-2">
-                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tenant piloto</p>
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda piloto</p>
                 <p className="mt-0.5 font-semibold">{tenantPilotOk ? "tienda-piloto" : "No responde"}</p>
               </li>
               <li className="rounded-[10px] border border-line px-3 py-2">
@@ -245,13 +245,16 @@ export function ConnectionsScreen({
             <p className="mt-1 text-xs leading-5 text-muted">
               Dropi no está conectado. Los pedidos a crear a mano están en Sincronización; esta pantalla no los envía. No cobra. El total guardado no cambia.
             </p>
-            <Link
-              href="/panel/sincronizacion"
-              title="Abrirla no cobra. El total guardado no cambia."
-              className="mt-3 inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
-            >
-              Abrir sincronización
-            </Link>
+            <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+              <Link
+                href="/panel/sincronizacion"
+                title="Abrirla no cobra. El total guardado no cambia."
+                className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+              >
+                Abrir sincronización
+              </Link>
+            </nav>
           </section>
       </div>
     </div>

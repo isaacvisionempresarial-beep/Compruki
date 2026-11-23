@@ -51,9 +51,12 @@ export default async function SyncOrderPage({ params }: { params: Promise<{ numb
           <DropiHandoff order={order} />
         </>
       ) : (
-        <p className="elevate-1 mt-3 max-w-2xl rounded-[14px] border border-line bg-card px-3 py-2 text-sm leading-5 text-ink">
-          Este pedido sigue pendiente. El número de Dropi se anota después de confirmarlo. Confírmalo en Pedidos.
-        </p>
+        <div className="elevate-1 mt-3 max-w-2xl rounded-[14px] border border-line bg-card px-3 py-2">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Aviso</p>
+          <p className="mt-0.5 text-sm leading-5 text-ink">
+            Este pedido sigue pendiente. El número de Dropi se anota después de confirmarlo. Confírmalo en Pedidos.
+          </p>
+        </div>
       )}
     </div>
   );

@@ -395,9 +395,10 @@ export function OrdersScreen({
           </div>
           </div>
           {visible.length === 0 ? (
-            <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-              {emptyListMessage(query, status, span)}
-            </p>
+            <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+              <p className="mt-0.5 text-sm text-muted">{emptyListMessage(query, status, span)}</p>
+            </div>
           ) : (
         <div className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">
           <div className={cx("hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.08em] text-muted uppercase md:grid", orderGrid)}>

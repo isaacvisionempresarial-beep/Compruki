@@ -53,6 +53,7 @@ export function ContentCreatorPanel({
         action={generateContentDraftsAction}
         className="elevate-1 mt-3 grid gap-2 rounded-[14px] border border-line bg-card px-4 py-3 sm:grid-cols-[1fr_auto]"
       >
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase sm:col-span-2">Generar</p>
         {preserveQuery ? <input type="hidden" name="q" value={preserveQuery} /> : null}
         {preserveCategory ? <input type="hidden" name="categoria" value={preserveCategory} /> : null}
         <label className="block">
@@ -132,10 +133,13 @@ export function ContentCreatorPanel({
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Guardados</p>
         <h3 className="mt-0.5 text-sm font-semibold">Borradores guardados</h3>
         {saved.length === 0 ? (
-          <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-4 py-3 text-sm text-muted">
-            Aún no hay borradores guardados. Si falla al guardar, ejecuta{" "}
-            <span className="font-semibold">005_content_drafts.sql</span>.
-          </p>
+          <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-4 py-3">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm text-muted">
+              Aún no hay borradores guardados. Si falla al guardar, ejecuta{" "}
+              <span className="font-semibold">005_content_drafts.sql</span>.
+            </p>
+          </div>
         ) : (
           <ul className="mt-2 space-y-2">
             {saved.map((item) => (

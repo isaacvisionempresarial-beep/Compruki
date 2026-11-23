@@ -53,10 +53,10 @@ export function StatusPage({
       </section>
 
       <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3">
-        <div className="flex flex-wrap items-center gap-2">
+        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
           {actions.map((action) => <ActionControl key={action.label} action={action} />)}
-        </div>
+        </nav>
       </div>
     </div>
   );
