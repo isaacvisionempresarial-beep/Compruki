@@ -59,9 +59,10 @@ export function CentralRouterPanel({
       </form>
 
       {!route ? (
-        <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3 text-sm text-muted">
-          Escribe una intención para ver el paquete coordinado.
-        </p>
+        <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+          <p className="mt-0.5 text-sm text-muted">Escribe una intención para ver el paquete coordinado.</p>
+        </div>
       ) : (
         <div className="elevate-1 mt-3 space-y-3 rounded-[14px] border border-line bg-card px-4 py-3">
           <p className="text-sm">
@@ -78,7 +79,8 @@ export function CentralRouterPanel({
 
           {route.pending.length > 0 ? (
             <div>
-              <p className="text-sm font-semibold">Aprobaciones pendientes</p>
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pendiente</p>
+              <p className="mt-0.5 text-sm font-semibold">Aprobaciones pendientes</p>
               <ul className="mt-1 space-y-1 text-sm">
                 {route.pending.map((item) => (
                   <li key={item.id}>

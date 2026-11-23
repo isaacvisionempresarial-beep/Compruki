@@ -382,15 +382,16 @@ export function Dashboard({
       </section>
 
       <section className="mt-5" aria-labelledby="por-producto">
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <div>
-            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Productos</p>
-            <h2 id="por-producto" className="mt-0.5 text-base font-bold">Por producto ({productResults.length})</h2>
-            <p className="mt-0.5 text-xs text-muted">Mismo período y la misma fecha que las cifras de arriba.</p>
-          </div>
-          <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
-            Ver el detalle en Rentabilidad
-          </Link>
+        <div>
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Productos</p>
+          <h2 id="por-producto" className="mt-0.5 text-base font-bold">Por producto ({productResults.length})</h2>
+          <p className="mt-0.5 text-xs text-muted">Mismo período y la misma fecha que las cifras de arriba.</p>
+          <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+              Ver el detalle en Rentabilidad
+            </Link>
+          </nav>
         </div>
         {productResults.length === 0 ? (
           <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">

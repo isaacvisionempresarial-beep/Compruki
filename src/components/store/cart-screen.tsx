@@ -107,7 +107,8 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
 
         {rows.length === 0 ? (
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3">
-            <p className="text-sm leading-5 text-muted">El carrito está vacío. Vacío no registra pedido ni cobra.</p>
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm leading-5 text-muted">El carrito está vacío. Vacío no registra pedido ni cobra.</p>
             <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
               <Link href="/tienda" title="Verlos no cambia los precios publicados ni crea un pedido." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">

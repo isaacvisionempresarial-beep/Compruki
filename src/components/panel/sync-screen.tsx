@@ -187,7 +187,8 @@ export function SyncScreen({
         const visible = group.rows.filter((order) => matchesSync(order, query));
         return (
           <section key={group.id} className="mt-3" aria-labelledby={group.id}>
-            <h3 id={group.id} className="text-sm font-semibold">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Grupo</p>
+            <h3 id={group.id} className="mt-0.5 text-sm font-semibold">
               {group.title} ({group.rows.length})
             </h3>
             <p className="mt-0.5 text-xs leading-5 text-muted">{group.hint}</p>

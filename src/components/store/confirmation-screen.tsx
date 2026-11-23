@@ -355,8 +355,9 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
           </Field>
         </div>
       </div>
-      <p className="text-sm font-semibold">Pago contra entrega</p>
-      <p className="text-xs leading-5 text-muted">Guardar la entrega no cobra. El total guardado no cambia. Pagas al recibir.</p>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pago</p>
+      <p className="mt-0.5 text-sm font-semibold">Pago contra entrega</p>
+      <p className="mt-0.5 text-xs leading-5 text-muted">Guardar la entrega no cobra. El total guardado no cambia. Pagas al recibir.</p>
       {previewText ? (
         <details>
           <summary className="cursor-pointer text-sm font-semibold text-muted" title="Abrirla no cobra. El total guardado no cambia.">Vista previa al guardar</summary>

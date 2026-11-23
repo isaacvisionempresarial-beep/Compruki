@@ -756,7 +756,8 @@ function SkuCostApply({
   const outsideLabel = groups.outside.length === 1 ? "1 pedido que sigue fuera" : `${groups.outside.length} pedidos que siguen fuera`;
   return (
     <div className="mt-3 rounded-[10px] border border-line bg-card px-3 py-2">
-      <p className="text-sm font-semibold">Costo de hoy en los pedidos</p>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedidos</p>
+      <p className="mt-0.5 text-sm font-semibold">Costo de hoy en los pedidos</p>
       <p className="mt-1 text-sm leading-5 text-muted">
         {canManageCommerce
           ? "Cada botón copia un grupo. El de los que ya cuentan no toca a los que siguen fuera. No usa lo que está escrito y todavía no guardaste. El precio de cada pedido no cambia. El total guardado no cambia. No es dinero cobrado."
@@ -1522,7 +1523,8 @@ export function ProductEditor({
 
             {product && product.history.length > 0 ? (
               <section aria-labelledby="historial-titulo" className="elevate-1 rounded-[14px] border border-line bg-card p-3">
-                <h3 id="historial-titulo" className="text-sm font-semibold">
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Registro</p>
+                <h3 id="historial-titulo" className="mt-0.5 text-sm font-semibold">
                   Historial de la ficha
                 </h3>
                 <p className="mt-0.5 text-xs leading-5 text-muted">

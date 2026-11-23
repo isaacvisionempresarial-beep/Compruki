@@ -517,7 +517,8 @@ function ProductQuestion({ product }: { product: PublicProduct }) {
 
   return (
     <section aria-labelledby="pregunta-producto">
-      <h3 id="pregunta-producto" className="text-sm font-semibold">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pregunta</p>
+      <h3 id="pregunta-producto" className="mt-0.5 text-sm font-semibold">
         Pregunta sobre este producto
       </h3>
       <p className="mt-1 text-xs leading-5 text-muted">Solo responde con lo de esta ficha. No se envía a la tienda, no registra pedido y no cobra.</p>

@@ -27,9 +27,12 @@ export function PendingApprovalsPanel({
       </p>
 
       {items.length === 0 ? (
-        <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3 text-sm text-muted">
-          No hay pendientes humanos ahora. Al guardar un borrador del Creador entra aquí para revisión.
-        </p>
+        <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+          <p className="mt-0.5 text-sm text-muted">
+            No hay pendientes humanos ahora. Al guardar un borrador del Creador entra aquí para revisión.
+          </p>
+        </div>
       ) : (
         <ul className="mt-3 space-y-2">
           {items.map((item) => (

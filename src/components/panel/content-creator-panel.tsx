@@ -85,9 +85,10 @@ export function ContentCreatorPanel({
       </form>
 
       {!selectedSku ? (
-        <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3 text-sm text-muted">
-          Elige un producto para ver hechos y borradores plantilla.
-        </p>
+        <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+          <p className="mt-0.5 text-sm text-muted">Elige un producto para ver hechos y borradores plantilla.</p>
+        </div>
       ) : !facts ? (
         <p role="alert" className="mt-3 rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
           No encontré ese SKU en el catálogo local.
@@ -95,7 +96,8 @@ export function ContentCreatorPanel({
       ) : (
         <>
           <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
-            <h3 className="text-sm font-semibold">Hechos verificables · {facts.sku}</h3>
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Hechos</p>
+            <h3 className="mt-0.5 text-sm font-semibold">Hechos verificables · {facts.sku}</h3>
             <ul className="mt-2 space-y-1 text-sm text-muted">
               <li>
                 {facts.title}
@@ -127,7 +129,8 @@ export function ContentCreatorPanel({
       )}
 
       <div className="mt-4">
-        <h3 className="text-sm font-semibold">Borradores guardados</h3>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Guardados</p>
+        <h3 className="mt-0.5 text-sm font-semibold">Borradores guardados</h3>
         {saved.length === 0 ? (
           <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-4 py-3 text-sm text-muted">
             Aún no hay borradores guardados. Si falla al guardar, ejecuta{" "}

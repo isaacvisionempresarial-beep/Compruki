@@ -11,7 +11,7 @@ export default function PanelNotFound() {
   return (
     <StatusPage
       wide
-      eyebrow="Panel"
+      eyebrow="Tienda"
       title="No está en este panel"
       body="El pedido o el producto no aparece con esa dirección. No se anotó ni se borró nada. No cobra ni cambia pedidos. Dropi no está conectado."
       actions={[

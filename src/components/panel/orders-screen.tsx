@@ -292,7 +292,8 @@ export function OrdersScreen({
           <div className="mt-2">
             {work.map((queue) => (
               <section key={queue.id} className="mt-3 first:mt-0" aria-labelledby={queue.id}>
-                <h3 id={queue.id} className="text-sm font-semibold">
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Paso</p>
+                <h3 id={queue.id} className="mt-0.5 text-sm font-semibold">
                   {queue.title} ({queue.rows.length})
                 </h3>
                 <p className="mt-0.5 text-xs leading-5 text-muted">{queue.hint} No cobra.</p>

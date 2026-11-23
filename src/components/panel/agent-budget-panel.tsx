@@ -43,7 +43,8 @@ export function AgentBudgetPanel({
       </p>
 
       <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
-        <h3 className="text-sm font-semibold">Uso en {monthSpend.periodLabel}</h3>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Uso</p>
+        <h3 className="mt-0.5 text-sm font-semibold">Uso en {monthSpend.periodLabel}</h3>
         <dl className="mt-2 grid gap-3 sm:grid-cols-2">
           <div>
             <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Corridas</dt>

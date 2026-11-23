@@ -187,9 +187,12 @@ export function AgentsScreen({
         </p>
 
         {explorer.results.length === 0 ? (
-          <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3 text-sm text-muted">
-            No hay coincidencias en el catálogo local. Buscar no cobra ni cambia el catálogo.
-          </p>
+          <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm text-muted">
+              No hay coincidencias en el catálogo local. Buscar no cobra ni cambia el catálogo.
+            </p>
+          </div>
         ) : (
           <ul className="mt-3 grid gap-2 md:grid-cols-2">
             {explorer.results.map((product) => (
@@ -283,7 +286,8 @@ export function AgentsScreen({
         </form>
 
         <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
-          <h3 className="text-sm font-semibold">Pedidos acumulados</h3>
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Acumulado</p>
+          <h3 className="mt-0.5 text-sm font-semibold">Pedidos acumulados</h3>
           <p className="mt-1 text-xs leading-5 text-muted">
             El total de líneas suma lo guardado en cada línea, de todos los pedidos. No es dinero cobrado. El margen
             estimado no es utilidad realizada.
@@ -361,7 +365,8 @@ export function AgentsScreen({
       <p className="mt-6 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Después</p>
 
       <section className="mt-3" aria-labelledby="mas-adelante">
-        <h2 id="mas-adelante" className="text-base font-bold">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Lista</p>
+        <h2 id="mas-adelante" className="mt-0.5 text-base font-bold">
           Más adelante (P1 / P2)
         </h2>
         <p className="mt-1 text-sm text-muted">Todavía no se usan. Verlos no cobra ni cambia pedidos.</p>
@@ -382,7 +387,8 @@ export function AgentsScreen({
       <p className="mt-6 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Historial</p>
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="corridas">
-        <h2 id="corridas" className="text-base font-bold">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Registro</p>
+        <h2 id="corridas" className="mt-0.5 text-base font-bold">
           Corridas recientes
         </h2>
         <p className="mt-1 text-sm text-muted">
@@ -399,10 +405,13 @@ export function AgentsScreen({
           </a>
         </nav>
         {view.recentRuns.length === 0 ? (
-          <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3 text-sm text-muted">
-            Todavía no hay corridas. Usa Enrutar, Buscar, Generar borradores o Calcular para dejar el
-            primer registro (sin OpenAI).
-          </p>
+          <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm text-muted">
+              Todavía no hay corridas. Usa Enrutar, Buscar, Generar borradores o Calcular para dejar el
+              primer registro (sin OpenAI).
+            </p>
+          </div>
         ) : (
           <ul className="mt-3 space-y-2">
             {view.recentRuns.map((run) => (
