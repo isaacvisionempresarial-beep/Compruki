@@ -28,12 +28,30 @@ export function ConnectionsScreen({
     <div className="mx-auto max-w-[1600px] pb-8">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Conexión</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Dropi</h1>
-      <p className="mt-0.5 text-sm text-muted">
+      <p className="mt-1 max-w-2xl text-sm leading-5 text-muted">
         Dropi no está conectado. Nada aquí consulta la cuenta; falta autorización oficial. El total guardado no cambia.
       </p>
 
-      <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_14rem]">
-        <div className="order-2 min-w-0 xl:order-1 space-y-3">
+      <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="conexion-resumen">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
+        <h2 id="conexion-resumen" className="mt-0.5 text-sm font-semibold text-warning">Dropi no está conectado</h2>
+        <dl className="mt-3 grid gap-3 sm:grid-cols-3">
+          <div>
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Servidor</dt>
+            <dd className="mt-0.5 text-sm font-semibold">mcp.dropi.co</dd>
+          </div>
+          <div>
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Qué consulta</dt>
+            <dd className="mt-0.5 text-sm text-muted">Solo el saludo. No pide órdenes ni productos.</dd>
+          </div>
+          <div>
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Qué no hace</dt>
+            <dd className="mt-0.5 text-sm text-muted">No crea pedidos, no cambia el total guardado ni marca la tienda como conectada.</dd>
+          </div>
+        </dl>
+      </section>
+
+      <div className="mt-3 space-y-3">
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="para-conectar">
             <h2 id="para-conectar" className="text-sm font-semibold">
               Para poder conectar
@@ -156,30 +174,9 @@ export function ConnectionsScreen({
               </ul>
             </div>
           </section>
-        </div>
+      </div>
 
-        <aside className="order-1 grid content-start gap-3 xl:sticky xl:top-[3.75rem] xl:order-2">
-          <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="conexion-resumen">
-            <h2 id="conexion-resumen" className="text-sm font-semibold">
-              Estado
-            </h2>
-            <p className="mt-2 text-sm font-extrabold text-warning">Dropi no está conectado</p>
-            <dl className="mt-2 space-y-2 text-xs leading-5">
-              <div>
-                <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Servidor</dt>
-                <dd className="mt-0.5 font-semibold text-sm">mcp.dropi.co</dd>
-              </div>
-              <div>
-                <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Qué consulta</dt>
-                <dd className="mt-0.5 text-muted">Solo el saludo. No pide órdenes ni productos.</dd>
-              </div>
-              <div>
-                <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Qué no hace</dt>
-                <dd className="mt-0.5 text-muted">No crea pedidos, no cambia el total guardado ni marca la tienda como conectada.</dd>
-              </div>
-            </dl>
-          </section>
-
+      <div className="mt-3 grid items-start gap-3 lg:grid-cols-2">
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="conexion-anuncio">
             <h2 id="conexion-anuncio" className="text-sm font-semibold">
               Qué anuncia el servidor
@@ -232,7 +229,7 @@ export function ConnectionsScreen({
             )}
           </section>
 
-          <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="donde-anotar">
+          <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 lg:col-span-2" aria-labelledby="donde-anotar">
             <h2 id="donde-anotar" className="text-sm font-semibold">
               Dónde se anota el número
             </h2>
@@ -247,7 +244,6 @@ export function ConnectionsScreen({
               Abrir sincronización
             </Link>
           </section>
-        </aside>
       </div>
     </div>
   );

@@ -29,42 +29,43 @@ export default async function SettingsPage() {
         Datos de tu cuenta y del tenant activo. Verlos no cobra ni cambia pedidos. Dropi no está conectado.
       </p>
 
-      <dl className="elevate-1 mt-4 space-y-3 rounded-[14px] border border-line bg-card px-4 py-3">
-        <div>
-          <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda</dt>
-          <dd className="mt-0.5 text-sm font-semibold">{access.tenantName}</dd>
-        </div>
-        <div>
-          <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Slug</dt>
-          <dd className="mt-0.5 text-sm font-semibold">{access.tenantSlug}</dd>
-        </div>
-        <div>
-          <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Correo</dt>
-          <dd className="mt-0.5 text-sm font-semibold">{access.email || "Sin correo"}</dd>
-        </div>
-        <div>
-          <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Rol</dt>
-          <dd className="mt-0.5 text-sm font-semibold">{access.roleLabel}</dd>
-        </div>
-        <div>
-          <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Nombre en historial</dt>
-          <dd className="mt-0.5 text-sm font-semibold">{access.actorName}</dd>
-        </div>
-        <div>
-          <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Aislamiento</dt>
-          <dd className="mt-0.5 text-sm text-muted">
-            Esta sesión solo abre {access.tenantName}. Pedidos, catálogo y agentes salen de esa tienda. Un identificador de otra tienda no se lee ni se escribe. En la tienda pública, consultas, cambios del cliente y pedidos seguidos se detienen un rato: no abren ni crean otro. Verlo no cobra ni cambia pedidos.
-          </dd>
-        </div>
-        <div>
-          <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Qué puede esta sesión</dt>
-          <dd className="mt-0.5 text-sm text-muted">
-            {access.role === "owner"
-              ? "Puedes cambiar precios, publicación, alta y eliminación del catálogo; anotar el flete, el costo y la marca de cobro; y aprobar borradores y presupuestos. Nada de eso cobra en el sitio."
-              : "Puedes editar textos, fotos y disponibilidad, y seguir pedidos: estado, entrega, talla o tamaño y aviso. Precio, flete, costo, marca de cobro, alta, eliminación, aprobar borradores y presupuestos los guarda el propietario. Nada de eso cobra en el sitio."}
-          </dd>
-        </div>
-      </dl>
+      <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="cuenta">
+        <h2 id="cuenta" className="text-sm font-semibold">Cuenta</h2>
+        <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+          <div>
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda</dt>
+            <dd className="mt-0.5 text-sm font-semibold">{access.tenantName}</dd>
+          </div>
+          <div>
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Slug</dt>
+            <dd className="mt-0.5 text-sm font-semibold">{access.tenantSlug}</dd>
+          </div>
+          <div>
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Correo</dt>
+            <dd className="mt-0.5 text-sm font-semibold">{access.email || "Sin correo"}</dd>
+          </div>
+          <div>
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Rol</dt>
+            <dd className="mt-0.5 text-sm font-semibold">{access.roleLabel}</dd>
+          </div>
+          <div className="sm:col-span-2">
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Nombre en historial</dt>
+            <dd className="mt-0.5 text-sm font-semibold">{access.actorName}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="alcance">
+        <h2 id="alcance" className="text-sm font-semibold">Qué puede esta sesión</h2>
+        <p className="mt-1 text-sm text-muted">
+          Esta sesión solo abre {access.tenantName}. Pedidos, catálogo y agentes salen de esa tienda. Un identificador de otra tienda no se lee ni se escribe. En la tienda pública, consultas, cambios del cliente y pedidos seguidos se detienen un rato: no abren ni crean otro. Verlo no cobra ni cambia pedidos.
+        </p>
+        <p className="mt-2 text-sm text-muted">
+          {access.role === "owner"
+            ? "Puedes cambiar precios, publicación, alta y eliminación del catálogo; anotar el flete, el costo y la marca de cobro; y aprobar borradores y presupuestos. Nada de eso cobra en el sitio."
+            : "Puedes editar textos, fotos y disponibilidad, y seguir pedidos: estado, entrega, talla o tamaño y aviso. Precio, flete, costo, marca de cobro, alta, eliminación, aprobar borradores y presupuestos los guarda el propietario. Nada de eso cobra en el sitio."}
+        </p>
+      </section>
 
       <section className="elevate-1 mt-4 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="backup">
         <h2 id="backup" className="text-sm font-semibold">
@@ -121,20 +122,21 @@ export default async function SettingsPage() {
         </ul>
       </section>
 
-      <div className="mt-4 flex flex-wrap gap-3 text-sm font-semibold">
-        <Link href="/ingresar?modo=nueva-clave" title="Abrirla no cobra ni cambia pedidos." className="text-accent-strong">
+      <nav aria-label="Herramientas" className="mt-4 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <Link href="/ingresar?modo=nueva-clave" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Cambiar contraseña
         </Link>
-        <Link href="/tienda" title="Abrirla no cobra ni cambia pedidos." className="text-accent-strong">
+        <Link href="/tienda" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Abrir tienda
         </Link>
-        <Link href="/panel/agentes" title="Abrirlo no cobra ni cambia pedidos." className="text-accent-strong">
+        <Link href="/panel/agentes" title="Abrirlo no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Centro de agentes
         </Link>
-        <a href="/api/health" title="Verla no cobra ni cambia pedidos." className="text-accent-strong">
+        <a href="/api/health" title="Verla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Ver /api/health
         </a>
-      </div>
+      </nav>
     </div>
   );
 }

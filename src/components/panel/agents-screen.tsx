@@ -62,7 +62,8 @@ export function AgentsScreen({
           : "Puedes usar las herramientas y rechazar borradores. Aprobar y el presupuesto los guarda el propietario. Usar el centro no cobra ni cambia pedidos."}
       </p>
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="elevate-1 mt-4 flex flex-wrap items-center gap-2 rounded-[14px] border border-line bg-card px-3 py-3">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</span>
         <StatusChip label="OpenAI" ok={view.status.openaiConnected} />
         <StatusChip label="Dropi" ok={view.status.dropiConnected} />
         <StatusChip label="Checkout independiente" ok={view.status.checkoutIndependent} positive />
