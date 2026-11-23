@@ -93,15 +93,18 @@ function DropiCopy({ order }: { order: StoreOrder }) {
         />
         <span className="mt-1 block font-normal leading-5 text-muted">{dropiCopyHint(order)}</span>
       </label>
-      <button
-        type="button"
-        title="Copiar no cobra. El total guardado no cambia."
-        className="inline-flex h-10 items-center justify-center justify-self-start rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
-        aria-label={`Copiar datos de ${order.number}`}
-        onClick={copy}
-      >
-        {copied === "ok" ? "Datos copiados" : "Copiar datos"}
-      </button>
+      <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <button
+          type="button"
+          title="Copiar no cobra. El total guardado no cambia."
+          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+          aria-label={`Copiar datos de ${order.number}`}
+          onClick={copy}
+        >
+          {copied === "ok" ? "Datos copiados" : "Copiar datos"}
+        </button>
+      </nav>
       {copied === "ok" ? (
         <p role="status" className="text-sm text-accent-strong">
           Listo para pegarlo en Dropi. Copiar no cobra. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.

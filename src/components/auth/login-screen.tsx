@@ -97,7 +97,7 @@ function LoginForm({
 
   return (
     <>
-      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sesión</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Iniciar sesión</h1>
       <p className="mt-1 text-sm text-muted">Correo de tu comercio. Escribirlo no cobra ni cambia pedidos. Dropi no está conectado.</p>
 
@@ -230,7 +230,7 @@ function RecoveryForm({ onBack, linkError }: { onBack: () => void; linkError?: b
 
   return (
     <>
-      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sesión</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Recuperar acceso</h1>
       <p className="mt-1 text-sm text-muted">
         Te enviamos un enlace. Al abrirlo volverás aquí para elegir la nueva contraseña. Pedir el enlace no cobra ni cambia pedidos. Dropi no está conectado.
@@ -308,7 +308,7 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
 
   return (
     <>
-      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sesión</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Nueva contraseña</h1>
       <p className="mt-1 text-sm text-muted">
         Si viniste del correo de recuperación, basta la clave nueva. Si no, escribe también la actual (por ejemplo{" "}

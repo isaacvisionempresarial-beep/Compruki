@@ -698,14 +698,17 @@ function CatalogDriftSheet({ text }: { text: string }) {
             className="mt-1 min-h-32 w-full rounded-[10px] border border-line bg-canvas px-3 py-2 text-sm leading-5 font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
           />
         </label>
-        <button
-          type="button"
-          title="Copiar no cobra ni cambia el total guardado."
-          className="mt-2 inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
-          onClick={copy}
-        >
-          {copied === "ok" ? "Fichas copiadas" : "Copiar fichas"}
-        </button>
+        <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <button
+            type="button"
+            title="Copiar no cobra ni cambia el total guardado."
+            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+            onClick={copy}
+          >
+            {copied === "ok" ? "Fichas copiadas" : "Copiar fichas"}
+          </button>
+        </nav>
         {copied === "ok" ? (
           <p role="status" className="mt-2 text-sm text-accent-strong">
             Listo para pegarlo a mano. Copiar no cobra ni reescribe los pedidos. El total guardado no cambia.

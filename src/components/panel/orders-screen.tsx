@@ -1039,14 +1039,17 @@ function DispatchSheet({ orders, moved }: { orders: StoreOrder[]; moved: boolean
               className="mt-1 min-h-32 w-full rounded-[10px] border border-line bg-canvas px-3 py-2 text-sm leading-5 font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
             />
           </label>
-          <button
-            type="button"
-            title="Copiar no crea el pedido en Dropi ni cambia el total guardado."
-            className="mt-2 inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
-            onClick={copy}
-          >
-            {copied === "ok" ? "Hoja copiada" : "Copiar hoja"}
-          </button>
+          <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <button
+              type="button"
+              title="Copiar no crea el pedido en Dropi ni cambia el total guardado."
+              className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+              onClick={copy}
+            >
+              {copied === "ok" ? "Hoja copiada" : "Copiar hoja"}
+            </button>
+          </nav>
           {copied === "ok" ? (
             <p role="status" className="mt-2 text-sm text-accent-strong">
               Lista para pegarla a mano. Copiar no cobra. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
@@ -2108,10 +2111,11 @@ function CustomerNote({ order }: { order: StoreOrder }) {
           Sale del estado del pedido. Lo envías tú. Copiarlo o abrir WhatsApp no lo envía, no cobra y el total guardado no cambia.
         </span>
       </label>
-      <div className="flex flex-wrap gap-2">
+      <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
         <button
           type="button"
-          className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
+          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
           aria-label={`Copiar mensaje de ${order.number}`}
           title="Copiarlo no cobra. El total guardado no cambia."
           onClick={copy}
@@ -2124,12 +2128,12 @@ function CustomerNote({ order }: { order: StoreOrder }) {
             target="_blank"
             rel="noreferrer"
             title="Abrirlo no envía el mensaje ni cobra. El total guardado no cambia."
-            className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
+            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
           >
             Abrir en WhatsApp
           </a>
         ) : null}
-      </div>
+      </nav>
       {copied === "ok" ? (
         <p role="status" className="text-sm text-accent-strong">
           Listo para pegarlo. Desde aquí no se envía ni cambia el total guardado.

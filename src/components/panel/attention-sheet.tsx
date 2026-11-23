@@ -42,7 +42,8 @@ export function AttentionSheet({
 
   return (
     <section className="mt-3" aria-labelledby="hoja-atender-titulo">
-      <h3 id="hoja-atender-titulo" className="text-sm font-semibold">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Copia</p>
+      <h3 id="hoja-atender-titulo" className="mt-0.5 text-sm font-semibold">
         Por atender para copiar
       </h3>
       <p className="mt-0.5 text-xs leading-5 text-muted">
@@ -60,14 +61,17 @@ export function AttentionSheet({
             className="mt-1 min-h-32 w-full rounded-[10px] border border-line bg-canvas px-3 py-2 text-sm leading-5 font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
           />
         </label>
-        <button
-          type="button"
-          title="Copiar no envía el mensaje ni cambia el total guardado. No crea el pedido en Dropi."
-          className="mt-2 inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
-          onClick={copy}
-        >
-          {copied === "ok" ? "Cola copiada" : "Copiar cola"}
-        </button>
+        <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <button
+            type="button"
+            title="Copiar no envía el mensaje ni cambia el total guardado. No crea el pedido en Dropi."
+            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+            onClick={copy}
+          >
+            {copied === "ok" ? "Cola copiada" : "Copiar cola"}
+          </button>
+        </nav>
         {copied === "ok" ? (
           <p role="status" className="mt-2 text-sm text-accent-strong">
             Lista para pegarla a mano. Copiar no cobra ni envía el mensaje. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
