@@ -153,17 +153,17 @@ export function Dashboard({
               : "Primero las cifras del período. El flete, el costo, el cobro y los precios los guarda el propietario. Verlas no cobra ni cambia pedidos. Dropi no está conectado."}
           </p>
         </div>
-        <Link
-          href="/panel/pedidos"
-          title="Abrirlos no cobra ni cambia el total guardado."
-          className="inline-flex h-11 shrink-0 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft"
-        >
-          Atender pedidos
-        </Link>
       </header>
 
       <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
         <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <Link
+          href="/panel/pedidos"
+          title="Abrirlos no cobra ni cambia el total guardado."
+          className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft"
+        >
+          Atender pedidos
+        </Link>
         <Link
           href={agentPendingCount > 0 ? "/panel/agentes#pendientes-humanos" : "/panel/agentes"}
           title="Abrirlo no cobra ni cambia pedidos."

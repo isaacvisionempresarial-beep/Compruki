@@ -592,7 +592,7 @@ export function OrderEditor({
         <h2 id="pedido-acciones" className="mt-0.5 text-sm font-semibold">Acciones</h2>
         {actions.length > 0 || prepareDropiError(order) || resolveBlocked || confirmBlocked ? (
           <>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <FormTools className="mt-2">
             {actions.map((item) =>
               needsCustomerReason(item.id) ? (
                 <ReasonAction
@@ -611,7 +611,7 @@ export function OrderEditor({
                     type="submit"
                     title="No cambia el total guardado ni cobra en esta pantalla."
                     disabled={pending || (moneyStatusAction(item.id) && !canManageOrderMoney)}
-                    className={`inline-flex h-10 items-center justify-center rounded-[10px] px-3 text-sm font-semibold ${
+                    className={`inline-flex h-9 items-center justify-center rounded-[10px] px-3 text-sm font-semibold ${
                       pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
                     } ${buttonTone[item.tone]}`}
                   >
@@ -620,7 +620,7 @@ export function OrderEditor({
                 </form>
               ),
             )}
-          </div>
+          </FormTools>
           <p className="mt-2 text-xs leading-5 text-muted">
             Estas acciones no cambian el total guardado ni el precio de las líneas. No cobran en esta pantalla.
             {actions.some((item) => item.id === "entregar")
@@ -636,13 +636,13 @@ export function OrderEditor({
                 <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Bloqueo</span>
                 <span className="mt-0.5 block text-sm font-semibold text-muted">Acciones bloqueadas y mensaje al cliente</span>
               </summary>
-              <div className="mt-2 flex flex-wrap gap-2">
+              <FormTools className="mt-2">
                 {confirmBlocked ? (
                   <button
                     type="button"
                     disabled
                     title="Sigue bloqueado. No cobra ni cambia el total guardado."
-                    className="inline-flex h-10 cursor-not-allowed items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-muted"
+                    className="inline-flex h-9 cursor-not-allowed items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-muted"
                   >
                     Confirmar pedido
                   </button>
@@ -652,7 +652,7 @@ export function OrderEditor({
                     type="button"
                     disabled
                     title="Sigue bloqueado. No cobra ni cambia el total guardado."
-                    className="inline-flex h-10 cursor-not-allowed items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-muted"
+                    className="inline-flex h-9 cursor-not-allowed items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-muted"
                   >
                     Pasar a preparación
                   </button>
@@ -662,12 +662,12 @@ export function OrderEditor({
                     type="button"
                     disabled
                     title="Sigue bloqueado. No cobra ni cambia el total guardado."
-                    className="inline-flex h-10 cursor-not-allowed items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-muted"
+                    className="inline-flex h-9 cursor-not-allowed items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-muted"
                   >
                     Resolver incidencia
                   </button>
                 ) : null}
-              </div>
+              </FormTools>
               {confirmBlocked ? (
                 <p className="mt-3 max-w-xl text-sm leading-5 text-ink">
                   «Confirmar pedido» sigue bloqueado. {confirmBlocked} Confirmar no cambia el total guardado. Si más adelante anotas esa elección y usas
@@ -942,16 +942,18 @@ function ReasonAction({
           {error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        title="No cambia el total guardado ni cobra en esta pantalla."
-        disabled={pending || !canApply}
-        className={`inline-flex h-10 w-full items-center justify-center rounded-[10px] px-3 text-sm font-semibold ${
-          pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
-        } ${buttonTone[item.tone]}`}
-      >
-        {item.label}
-      </button>
+      <FormTools>
+        <button
+          type="submit"
+          title="No cambia el total guardado ni cobra en esta pantalla."
+          disabled={pending || !canApply}
+          className={`inline-flex h-9 items-center justify-center rounded-[10px] px-3 text-sm font-semibold ${
+            pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+          } ${buttonTone[item.tone]}`}
+        >
+          {item.label}
+        </button>
+      </FormTools>
     </form>
   );
 }
@@ -2243,9 +2245,9 @@ function CustomerNotice({ order }: { order: StoreOrder }) {
 const freightInput =
   "mt-1 h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none";
 
-function FormTools({ children }: { children: ReactNode }) {
+function FormTools({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+    <nav aria-label="Herramientas" className={`flex flex-wrap items-center gap-2${className ? ` ${className}` : ""}`}>
       <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
       {children}
     </nav>

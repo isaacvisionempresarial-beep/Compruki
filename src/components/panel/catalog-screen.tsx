@@ -1622,16 +1622,19 @@ export function ProductEditor({
                 guardar.
               </p>
             )}
-            <button
-              type="submit"
-              title="Guardarlo no cobra. Los pedidos ya anotados siguen con sus cifras."
-              disabled={pending || !canSave}
-              className={`inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft sm:w-auto sm:min-w-56 ${
-                pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
-              }`}
-            >
-              {pending ? "Guardando…" : "Guardar producto"}
-            </button>
+            <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+              <button
+                type="submit"
+                title="Guardarlo no cobra. Los pedidos ya anotados siguen con sus cifras."
+                disabled={pending || !canSave}
+                className={`inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft sm:min-w-56 ${
+                  pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
+                }`}
+              >
+                {pending ? "Guardando…" : "Guardar producto"}
+              </button>
+            </nav>
           </div>
       </form>
     </div>
