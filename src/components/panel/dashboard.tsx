@@ -142,40 +142,46 @@ export function Dashboard({
 
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+      <header className="flex flex-col gap-4 border-b border-line pb-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Resumen</p>
-          <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">
-            Hola {greetingName}, tu tienda está en modo venta
-          </h1>
-          <p className="mt-1 text-sm text-muted">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel principal</p>
+          <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Hola {greetingName}</h1>
+          <p className="mt-1 text-sm font-semibold">Tu tienda está en modo venta</p>
+          <p className="mt-1 max-w-2xl text-sm leading-5 text-muted">
             {canManageOrderMoney
-              ? "Cifras y pendientes de los pedidos de la tienda. Verlas no cobra ni cambia pedidos. Dropi no está conectado."
-              : "Cifras de la tienda. El flete, el costo, el cobro y los precios los guarda el propietario. Verlas no cobra ni cambia pedidos. Dropi no está conectado."}
+              ? "Primero las cifras del período. Después, la cola por atender. Verlas no cobra ni cambia pedidos. Dropi no está conectado."
+              : "Primero las cifras del período. El flete, el costo, el cobro y los precios los guarda el propietario. Verlas no cobra ni cambia pedidos. Dropi no está conectado."}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Link
-            href={agentPendingCount > 0 ? "/panel/agentes#pendientes-humanos" : "/panel/agentes"}
-            title="Abrirlo no cobra ni cambia pedidos."
-            className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle"
-          >
-            Centro de agentes
-            {agentPendingCount > 0 ? (
-              <span className="ml-2 rounded-[8px] bg-coral/15 px-2 py-0.5 text-xs font-bold text-coral">
-                {agentPendingCount}
-              </span>
-            ) : null}
-          </Link>
-          <Link
-            href="/panel/agentes?intent=margen%20LAM-MES-01"
-            title="Abrirlo no cobra ni cambia pedidos."
-            className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-accent-strong hover:bg-subtle"
-          >
-            Probar Central
-          </Link>
-        </div>
+        <Link
+          href="/panel/pedidos"
+          title="Abrirlos no cobra ni cambia el total guardado."
+          className="inline-flex h-11 shrink-0 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft"
+        >
+          Atender pedidos
+        </Link>
       </header>
+
+      <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <Link
+          href={agentPendingCount > 0 ? "/panel/agentes#pendientes-humanos" : "/panel/agentes"}
+          title="Abrirlo no cobra ni cambia pedidos."
+          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
+        >
+          Centro de agentes
+          {agentPendingCount > 0 ? (
+            <span className="ml-2 rounded-[8px] bg-coral/15 px-2 py-0.5 text-xs font-bold text-coral">{agentPendingCount}</span>
+          ) : null}
+        </Link>
+        <Link
+          href="/panel/agentes?intent=margen%20LAM-MES-01"
+          title="Abrirlo no cobra ni cambia pedidos."
+          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-accent-strong hover:bg-subtle"
+        >
+          Probar Central
+        </Link>
+      </nav>
 
       {agentPendingSummary && agentPendingSummary.total > 0 ? (
         <section
@@ -216,38 +222,44 @@ export function Dashboard({
         </section>
       ) : null}
 
-      <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
-      <div className="order-2 min-w-0 xl:order-1">
-      <section aria-labelledby="tienda-titulo">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="min-w-0">
-            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda pública</p>
-            <h2 id="tienda-titulo" className="mt-0.5 text-base font-bold leading-7">
-              Pedidos de la tienda
-            </h2>
-            <p className="mt-0.5 text-xs text-muted">
-              Cifras de {closePhrase(storePeriod, basis)}. Verlas no cobra ni cambia pedidos.
-              {basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
+      <section className="mt-5" aria-labelledby="tienda-titulo">
+        <div className="min-w-0">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda pública</p>
+          <h2 id="tienda-titulo" className="mt-0.5 text-base font-bold leading-7">Pedidos de la tienda</h2>
+          <p className="mt-0.5 max-w-2xl text-xs leading-5 text-muted">
+            Cifras de {closePhrase(storePeriod, basis)}. Pedidos reales de este período. Verlas no cobra ni cambia pedidos.
+            {basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
+          </p>
+        </div>
+        <div className="elevate-1 mt-3 grid items-stretch gap-4 rounded-[14px] border border-line bg-card px-3 py-3 sm:grid-cols-2 sm:gap-x-6">
+          <div className="flex min-w-0 flex-col">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Fecha</p>
+            <p className="mt-0.5 text-xs leading-5 text-muted">
+              Creados mira cuándo entró el pedido. Movidos incluye uno viejo si cambió en el período. Elegir no cobra.
             </p>
+            <div className="mt-3 sm:mt-auto sm:pt-3">
+              <CloseBasisControl basis={basis} onChange={setBasis} name="base-tienda" wide />
+            </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-            <CloseBasisControl basis={basis} onChange={setBasis} name="base-tienda" />
-            <PeriodControl
-              period={storePeriod}
-              onChange={setStorePeriod}
-              name="periodo-tienda"
-              legend="Período de los pedidos de la tienda"
-            />
-            <Link
-              href="/panel/pedidos"
-              title="Abrirlos no cobra ni cambia el total guardado."
-              className="inline-flex h-10 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft"
-            >
-              Atender pedidos
-            </Link>
+          <div className="flex min-w-0 flex-col">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Período</p>
+            <p className="mt-0.5 text-xs leading-5 text-muted">
+              Solo cambia las cifras de esta sección. No recorta la cola Por atender ni cobra.
+            </p>
+            <div className="mt-3 sm:mt-auto sm:pt-3">
+              <PeriodControl
+                period={storePeriod}
+                onChange={setStorePeriod}
+                name="periodo-tienda"
+                legend="Período de los pedidos de la tienda"
+                wide
+              />
+            </div>
           </div>
         </div>
-        <ul className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <h3 className="mt-4 text-sm font-semibold">Totales guardados</h3>
+        <p className="mt-0.5 text-xs leading-5 text-muted">Lo que suma el pedido guardado. No es dinero cobrado en el sitio.</p>
+        <ul className="mt-2 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {storeCards.map((card) => (
             <li key={card.label} className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
               <p className="text-[10px] font-bold tracking-[0.06em] text-muted uppercase">{card.label}</p>
@@ -269,7 +281,11 @@ export function Dashboard({
             </li>
           ))}
         </ul>
-        <dl className="mt-3 grid gap-3 sm:grid-cols-3">
+        <h3 className="mt-4 text-sm font-semibold">La cuenta</h3>
+        <p className="mt-0.5 text-xs leading-5 text-muted">
+          Estimado es el margen de pedidos confirmados. Utilidad es lo entregado y marcado como cobrado. Ninguna es dinero cobrado en el sitio ni el total guardado del pedido.
+        </p>
+        <dl className="mt-2 grid gap-3 sm:grid-cols-3">
           <div className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
             <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Margen estimado</dt>
             <dd className="mt-1 text-base font-extrabold tabular-nums">{formatCop(storeSummary.estimatedMargin.amount)}</dd>
@@ -324,10 +340,57 @@ export function Dashboard({
           </div>
         </dl>
         {periodShift ? <p className="mt-3 text-sm leading-5">{periodShift}</p> : null}
-        <h3 className="mt-3 text-sm font-semibold">Por producto ({productResults.length})</h3>
-        <p className="mt-0.5 text-xs text-muted">
-          Mismo período y la misma fecha · detalle en Rentabilidad
+      </section>
+
+      <section className="mt-5" aria-labelledby="entradas">
+        <h2 id="entradas" className="text-sm font-semibold">Dónde se trabaja</h2>
+        <p className="mt-0.5 text-xs leading-5 text-muted">
+          Todos los pedidos de la tienda. Estas entradas no cambian con el período. Abrirlas no cobra ni cambia pedidos. Dropi no está conectado: el número se anota en{" "}
+          <Link href="/panel/sincronizacion" title="Abrirla no cobra. El total guardado no cambia." className="font-semibold text-accent-strong">
+            Sincronización
+          </Link>
+          .
         </p>
+        <ul className="mt-2 grid gap-3 sm:grid-cols-2">
+          <li>
+            <Link href="/panel/pedidos" title="Abrirlos no cobra ni cambia el total guardado." className="elevate-1 block rounded-[14px] border border-line bg-card px-3 py-3 hover:bg-canvas">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedidos</span>
+              <span className="mt-1 block text-sm font-bold">
+                {orderWork.yours} {orderWork.yours === 1 ? "pedido por atender" : "pedidos por atender"}
+              </span>
+              <span className="mt-0.5 block text-xs leading-5 text-muted">
+                {canManageOrderMoney
+                  ? "Cola «Por atender»: un pedido, un siguiente paso. No se recorta por período."
+                  : orderWork.ownerMoney > 0
+                    ? `${orderWork.ownerMoney === 1 ? "1 pedido con flete, costo o recaudo lo guarda el propietario." : `${orderWork.ownerMoney} pedidos con flete, costo o recaudo los guarda el propietario.`} Tú sigues estado, entrega, talla y aviso.`
+                    : "Este número es lo que puedes hacer: estado, entrega, talla y aviso. No se recorta por período."}
+              </span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/panel/sincronizacion" title="Abrirla no cobra. El total guardado no cambia." className="elevate-1 block rounded-[14px] border border-line bg-card px-3 py-3 hover:bg-canvas">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sincronización</span>
+              <span className="mt-1 block text-sm font-bold">
+                {syncWorkCount} {syncWorkCount === 1 ? "pedido sin número de Dropi" : "pedidos sin número de Dropi"}
+              </span>
+              <span className="mt-0.5 block text-xs leading-5 text-muted">
+                Anotar el número lo concilia a mano. No se envía a Dropi y el total guardado no cambia.
+              </span>
+            </Link>
+          </li>
+        </ul>
+      </section>
+
+      <section className="mt-5" aria-labelledby="por-producto">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 id="por-producto" className="text-sm font-semibold">Por producto ({productResults.length})</h2>
+            <p className="mt-0.5 text-xs text-muted">Mismo período y la misma fecha que las cifras de arriba.</p>
+          </div>
+          <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="text-sm font-semibold text-accent-strong">
+            Ver el detalle en Rentabilidad
+          </Link>
+        </div>
         {productResults.length === 0 ? (
           <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
             {productRows.length > 0
@@ -412,14 +475,14 @@ export function Dashboard({
           </div>
         )}
         <CloseSheet orders={storeInPeriod} rest={storeOrders.filter((order) => !storeInPeriod.some((shown) => shown.number === order.number))} period={storePeriod} basis={basis} guides={sizeGuides} priceGuides={priceGuides} costGuides={costGuides} fieldId="cierre-tienda" />
-        <div className="mt-3">
-          <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="text-sm font-semibold text-accent-strong">
-            Ver el detalle en Rentabilidad
-          </Link>
-        </div>
-        <h3 className="mt-3 text-sm font-semibold">Por atender ({waiting.length})</h3>
-        <p className="mt-0.5 text-xs text-muted">
-          La misma cola que Pedidos. No se recorta por período. Buscar solo cambia esta lista.
+      </section>
+
+      <section className="mt-5" aria-labelledby="por-atender">
+        <h2 id="por-atender" className="text-sm font-semibold">Por atender ({waiting.length})</h2>
+        <p className="mt-0.5 text-xs leading-5 text-muted">
+          {canManageOrderMoney
+            ? "La misma cola que Pedidos. No se recorta por período. Buscar solo cambia esta lista. Copiarla no cobra ni envía el mensaje."
+            : "La misma cola que Pedidos. El flete y el costo los guarda el propietario. No se recorta por período. Buscar solo cambia esta lista. Copiarla no cobra ni envía el mensaje."}
         </p>
         {waiting.length === 0 ? (
           <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
@@ -508,80 +571,6 @@ export function Dashboard({
         )}
         <AttentionSheet orders={storeOrders} guides={sizeGuides} priceGuides={priceGuides} costGuides={costGuides} canManageOrderMoney={canManageOrderMoney} />
       </section>
-
-
-      <section className="mt-5" aria-labelledby="entradas">
-        <h3 id="entradas" className="text-sm font-semibold">
-          Dónde se trabaja
-        </h3>
-        <p className="mt-0.5 text-xs text-muted">
-          Todos los pedidos de la tienda · buscar no cambia estas cifras. Abrirlas no cobra ni cambia pedidos.
-        </p>
-        <ul className="mt-2 grid gap-3 sm:grid-cols-2">
-          <li>
-            <Link href="/panel/pedidos" title="Abrirlos no cobra ni cambia el total guardado." className="elevate-1 block rounded-[14px] border border-line bg-card px-3 py-2 hover:bg-canvas">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedidos</span>
-              <span className="mt-1 block text-sm font-bold">
-                {orderWork.yours} {orderWork.yours === 1 ? "pedido por atender" : "pedidos por atender"}
-              </span>
-              <span className="mt-0.5 block text-xs leading-5 text-muted">
-                {canManageOrderMoney
-                  ? "Cola «Por atender»: un pedido, un siguiente paso."
-                  : orderWork.ownerMoney > 0
-                    ? `${orderWork.ownerMoney === 1 ? "1 pedido con flete, costo o recaudo lo guarda el propietario." : `${orderWork.ownerMoney} pedidos con flete, costo o recaudo los guarda el propietario.`} Tú sigues estado, entrega, talla y aviso.`
-                    : "Este número es lo que puedes hacer: estado, entrega, talla y aviso."}
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link href="/panel/sincronizacion" title="Abrirla no cobra. El total guardado no cambia." className="elevate-1 block rounded-[14px] border border-line bg-card px-3 py-2 hover:bg-canvas">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sincronización</span>
-              <span className="mt-1 block text-sm font-bold">
-                {syncWorkCount} {syncWorkCount === 1 ? "pedido sin número de Dropi" : "pedidos sin número de Dropi"}
-              </span>
-              <span className="mt-0.5 block text-xs leading-5 text-muted">
-                Anotar el número lo concilia a mano. No se envía a Dropi y el total guardado no cambia.
-              </span>
-            </Link>
-          </li>
-        </ul>
-      </section>
-
-      </div>
-
-        <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3.75rem] xl:order-2">
-          <h2 className="text-sm font-semibold">Cómo se lee</h2>
-          <ul className="mt-2 space-y-2 text-xs leading-5">
-            <li>
-              <span className="font-semibold text-sm">Cifras</span>
-              <span className="mt-0.5 block text-muted">
-                Pedidos reales de la tienda en el período elegido.
-              </span>
-            </li>
-            <li>
-              <span className="font-semibold text-sm">Siguiente paso</span>
-              <span className="mt-0.5 block text-muted">
-                {canManageOrderMoney
-                  ? "La misma cola que Pedidos. No se recorta por período. Copiarla no cobra ni envía el mensaje."
-                  : "La misma cola que Pedidos. El flete y el costo los guarda el propietario. Copiarla no cobra ni envía el mensaje."}
-              </span>
-            </li>
-            <li>
-              <span className="font-semibold text-sm">Estimado vs utilidad</span>
-              <span className="mt-0.5 block text-muted">
-                Estimado = margen de pedidos confirmados. Utilidad = entregado y marcado como cobrado. Ninguna es dinero cobrado en el sitio ni el total guardado del pedido.
-              </span>
-            </li>
-          </ul>
-          <p className="mt-3 text-xs leading-5 text-muted">
-            Leerlas no cobra ni cambia pedidos. Dropi no está conectado. El número se anota en{" "}
-            <Link href="/panel/sincronizacion" title="Abrirla no cobra. El total guardado no cambia." className="font-semibold text-accent-strong">
-              Sincronización
-            </Link>
-            .
-          </p>
-        </aside>
-      </div>
     </div>
   );
 }
