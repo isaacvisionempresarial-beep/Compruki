@@ -491,12 +491,15 @@ export function OrderEditor({
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
       {!canManageOrderMoney ? (
-        <p className="mb-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-          Solo el propietario anota el flete, el recaudo, copia el costo de la ficha, cambia cantidades o productos y
-          marca o quita el cobro. Puedes seguir el estado, la entrega, la talla o el tamaño y el aviso al cliente.
-        </p>
+        <section className="elevate-1 mb-3 rounded-[14px] border border-line bg-card px-3 py-3">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Alcance</p>
+          <p className="mt-1 text-sm text-muted">
+            Solo el propietario anota el flete, el recaudo, copia el costo de la ficha, cambia cantidades o productos y
+            marca o quita el cobro. Puedes seguir el estado, la entrega, la talla o el tamaño y el aviso al cliente.
+          </p>
+        </section>
       ) : null}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
         <div className="min-w-0">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedidos</p>
           <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">{order.number}</h1>
@@ -504,14 +507,17 @@ export function OrderEditor({
             {formatDay(order.createdAt.slice(0, 10))} · {order.customerName} · {order.city}
             {order.department ? ` · ${order.department}` : ""}. Abrirlo no cobra. El total guardado no cambia.
           </p>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <StatusPill status={order.status} />
+            {order.collected ? <CollectedPill /> : null}
+          </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatusPill status={order.status} />
-          {order.collected ? <CollectedPill /> : null}
+        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
           <Link
             href="/panel/pedidos"
             title="Volver no cobra ni cambia el total guardado."
-            className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
+            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
           >
             Volver
           </Link>
@@ -519,16 +525,17 @@ export function OrderEditor({
             <Link
               href={syncFocusHref(order.number)}
               title="Abrirla no cobra. El total guardado no cambia."
-              className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
+              className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
             >
               Sincronización
             </Link>
           ) : null}
-        </div>
+        </nav>
       </div>
 
 <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-resumen">
-        <h2 id="pedido-resumen" className="text-sm font-semibold">Estado</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Situación</p>
+        <h2 id="pedido-resumen" className="mt-0.5 text-sm font-semibold">Estado</h2>
         <p className="mt-2 text-sm font-extrabold tabular-nums">Total guardado {formatCop(order.total)}</p>
         <p className={cx("mt-1 text-xs leading-5", collectedWithoutCost(order) ? "text-warning" : "text-muted")}>
           {moneyNote(order, margin)}
@@ -577,7 +584,8 @@ export function OrderEditor({
       </section>
 
 <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-acciones">
-        <h2 id="pedido-acciones" className="text-sm font-semibold">Acciones</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Siguiente</p>
+        <h2 id="pedido-acciones" className="mt-0.5 text-sm font-semibold">Acciones</h2>
         {actions.length > 0 || prepareDropiError(order) || resolveBlocked || confirmBlocked ? (
           <>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -717,7 +725,8 @@ export function OrderEditor({
 
       <div className="mt-3 grid items-start gap-3 lg:grid-cols-2">
 <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-productos">
-        <h2 id="pedido-productos" className="text-sm font-semibold">Productos</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Líneas</p>
+        <h2 id="pedido-productos" className="mt-0.5 text-sm font-semibold">Productos</h2>
         {canEditLines(order) ? (
           <>
             <LinesForm order={order} products={products} canManageOrderMoney={canManageOrderMoney} />
@@ -750,7 +759,8 @@ export function OrderEditor({
       </section>
 
 <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-entrega">
-        <h2 id="pedido-entrega" className="text-sm font-semibold">Entrega</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Destino</p>
+        <h2 id="pedido-entrega" className="mt-0.5 text-sm font-semibold">Entrega</h2>
         <p className="mt-2 text-sm text-muted">
           {order.phone}
           {order.document ? ` · Cédula ${order.document}` : ""}
@@ -785,7 +795,8 @@ export function OrderEditor({
       </div>
 
 <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-dropi">
-        <h2 id="pedido-dropi" className="text-sm font-semibold">Sincronización</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Dropi</p>
+        <h2 id="pedido-dropi" className="mt-0.5 text-sm font-semibold">Sincronización</h2>
         {canNoteDropiNumber(order) ? (
           <>
           <p className="mt-1.5 text-xs leading-5 text-ink">
@@ -810,7 +821,8 @@ export function OrderEditor({
       </section>
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-avisos">
-        <h2 id="pedido-avisos" className="text-sm font-semibold">Avisos y motivos</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Notas</p>
+        <h2 id="pedido-avisos" className="mt-0.5 text-sm font-semibold">Avisos y motivos</h2>
         <div className="mt-2 grid gap-3 xl:grid-cols-2">
           <InternalNoteForm order={order} />
           <IncidenceReasonForm order={order} />
@@ -820,7 +832,8 @@ export function OrderEditor({
       </section>
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-historial">
-        <h2 id="pedido-historial" className="text-sm font-semibold">Historial</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Registro</p>
+        <h2 id="pedido-historial" className="mt-0.5 text-sm font-semibold">Historial</h2>
         {order.history.length > 0 ? (
           <div className="mt-2 overflow-hidden rounded-[10px] border border-line">
             {storedUtilityCaveat(order) ? (

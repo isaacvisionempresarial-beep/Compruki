@@ -257,7 +257,8 @@ export function Dashboard({
             </div>
           </div>
         </div>
-        <h3 className="mt-4 text-sm font-semibold">Totales guardados</h3>
+        <p className="mt-4 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Totales</p>
+        <h3 className="mt-0.5 text-sm font-semibold">Totales guardados</h3>
         <p className="mt-0.5 text-xs leading-5 text-muted">Lo que suma el pedido guardado. No es dinero cobrado en el sitio.</p>
         <ul className="mt-2 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {storeCards.map((card) => (
@@ -281,7 +282,8 @@ export function Dashboard({
             </li>
           ))}
         </ul>
-        <h3 className="mt-4 text-sm font-semibold">La cuenta</h3>
+        <p className="mt-4 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cuenta</p>
+        <h3 className="mt-0.5 text-sm font-semibold">La cuenta</h3>
         <p className="mt-0.5 text-xs leading-5 text-muted">
           Estimado es el margen de pedidos confirmados. Utilidad es lo entregado y marcado como cobrado. Ninguna es dinero cobrado en el sitio ni el total guardado del pedido.
         </p>
@@ -343,7 +345,8 @@ export function Dashboard({
       </section>
 
       <section className="mt-5" aria-labelledby="entradas">
-        <h2 id="entradas" className="text-sm font-semibold">Dónde se trabaja</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Entradas</p>
+        <h2 id="entradas" className="mt-0.5 text-base font-bold">Dónde se trabaja</h2>
         <p className="mt-0.5 text-xs leading-5 text-muted">
           Todos los pedidos de la tienda. Estas entradas no cambian con el período. Abrirlas no cobra ni cambia pedidos. Dropi no está conectado: el número se anota en Sincronización.
         </p>
@@ -380,7 +383,8 @@ export function Dashboard({
       <section className="mt-5" aria-labelledby="por-producto">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
-            <h2 id="por-producto" className="text-sm font-semibold">Por producto ({productResults.length})</h2>
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Productos</p>
+            <h2 id="por-producto" className="mt-0.5 text-base font-bold">Por producto ({productResults.length})</h2>
             <p className="mt-0.5 text-xs text-muted">Mismo período y la misma fecha que las cifras de arriba.</p>
           </div>
           <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
@@ -474,7 +478,8 @@ export function Dashboard({
       </section>
 
       <section className="mt-5" aria-labelledby="por-atender">
-        <h2 id="por-atender" className="text-sm font-semibold">Por atender ({waiting.length})</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cola</p>
+        <h2 id="por-atender" className="mt-0.5 text-base font-bold">Por atender ({waiting.length})</h2>
         <p className="mt-0.5 text-xs leading-5 text-muted">
           {canManageOrderMoney
             ? "La misma cola que Pedidos. No se recorta por período. Buscar solo cambia esta lista. Copiarla no cobra ni envía el mensaje."

@@ -95,7 +95,8 @@ export function SyncScreen({
       <p className="mt-2 text-xs leading-5 text-muted">Verlas no cobra ni cambia pedidos.</p>
 
       <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="cola-dropi">
-        <h2 id="cola-dropi" className="text-sm font-semibold">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cola</p>
+        <h2 id="cola-dropi" className="mt-0.5 text-base font-bold">
           Cola de envío ({blockedJobs.length} bloqueados · {noticeJobs.length} avisos · {reconciledJobs.length} conciliados)
         </h2>
         <p className="mt-0.5 text-xs leading-5 text-muted">
@@ -176,7 +177,9 @@ export function SyncScreen({
         ) : null}
       </section>
 
-      <h2 className="mt-5 text-sm font-semibold">Dónde anotar el número</h2>
+      <section className="mt-5" aria-labelledby="sync-donde">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Anotar</p>
+      <h2 id="sync-donde" className="mt-0.5 text-base font-bold">Dónde anotar el número</h2>
       <p className="mt-0.5 max-w-2xl text-xs leading-5 text-muted">
         Confirmados en adelante. Los pendientes se confirman en Pedidos. Aquí se copia la entrega y se anota el número a mano. El total guardado no cambia.
       </p>
@@ -184,9 +187,9 @@ export function SyncScreen({
         const visible = group.rows.filter((order) => matchesSync(order, query));
         return (
           <section key={group.id} className="mt-3" aria-labelledby={group.id}>
-            <h2 id={group.id} className="text-sm font-semibold">
+            <h3 id={group.id} className="text-sm font-semibold">
               {group.title} ({group.rows.length})
-            </h2>
+            </h3>
             <p className="mt-0.5 text-xs leading-5 text-muted">{group.hint}</p>
             {visible.length === 0 ? (
               <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
@@ -205,9 +208,11 @@ export function SyncScreen({
           </section>
         );
       })}
+      </section>
 
       <section className="mt-5" aria-labelledby="sync-anotados">
-        <h2 id="sync-anotados" className="text-sm font-semibold">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Anotados</p>
+        <h2 id="sync-anotados" className="mt-0.5 text-base font-bold">
           Número ya anotado ({noted.length})
         </h2>
         <p className="mt-0.5 text-xs leading-5 text-muted">
