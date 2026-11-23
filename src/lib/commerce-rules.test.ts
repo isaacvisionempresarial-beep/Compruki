@@ -28,6 +28,7 @@ import {
   storedSkuLines,
   priceDrift,
   priceDriftNote,
+  orderPriceStayNote,
   resultDriftNote,
   attentionQueues,
   attentionSheetText,
@@ -497,9 +498,30 @@ describe("precio de la ficha", () => {
     expect(movedSheet).toContain("guardó $80.000");
     expect(movedSheet).toContain("no reescribe el total guardado");
     expect(movedSheet).toContain("Copiarlos no reescribe el total.");
+    expect(movedSheet).toContain("No hay botón para reescribir ese precio");
+    expect(movedSheet).toContain("Este pedido sigue fuera: el margen estimado y la utilidad no lo usan.");
+    expect(movedSheet).not.toContain("ya cuenta");
     expect(movedSheet).not.toContain("3001234567");
     expect(movedSheet).not.toContain("Calle 10");
+    const countedPrice = order({
+      status: "confirmado",
+      number: "P-2112",
+      providerRef: "DP-2112",
+      customerNotifiedAt: "2026-11-20T16:00:00.000Z",
+      id: "abababab-abab-4bab-8bab-abababababab",
+    });
+    const countedSheet = attentionSheetText([countedPrice], [], true, [{ sku: "SKU-1", price: 90_000 }]);
+    expect(countedSheet).toContain("Siguiente paso: Preparar.");
+    expect(countedSheet).toContain("No hay botón para reescribir ese precio");
+    expect(countedSheet).toContain("Este pedido ya cuenta: el margen estimado y la utilidad siguen con el precio guardado.");
+    expect(countedSheet).not.toContain("3001234567");
+    expect(countedSheet).not.toContain("Calle 10");
+    expect(orderPriceStayNote(current, [{ sku: "SKU-1", price: 80_000 }])).toBe("");
+    expect(orderPriceStayNote(current, [{ sku: "SKU-1", price: 90_000 }])).toContain("ya cuenta");
+    expect(orderPriceStayNote(pending, [{ sku: "SKU-1", price: 90_000 }])).toContain("sigue fuera");
+    expect(orderPriceStayNote(pending, [{ sku: "SKU-1", price: 90_000 }])).not.toContain("ya cuenta");
     const closeMoved = closeSheetText([pending], "hoy", "creados", [], [{ sku: "SKU-1", price: 90_000 }]);
+    expect(closeMoved).toContain("No hay botón para reescribir ese precio");
     expect(closeMoved).toContain("El cierre sigue con el total guardado");
     expect(closeMoved).toContain("P-2031. La ficha de Faja hoy está en $90.000");
     expect(closeMoved).toContain("guardó $80.000");

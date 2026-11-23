@@ -10,7 +10,7 @@ import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
 import { STATUS_LABEL, type Period } from "@/lib/demo-data";
 import { cx } from "@/lib/cx";
 import { formatCop, formatDay } from "@/lib/format";
-import { accountHoldNote, attentionCostAside, attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, costDrift, costDriftNote, ordersInSpan, priceDrift, priceDriftNote, resultDriftNote, resultsByProduct, samePhoneMatches, orderCostCopyNote, outsideCostCopyNote, periodCostShiftNote, skuCostPreviewNote, storedSkuLines, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import { accountHoldNote, attentionCostAside, attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, costDrift, costDriftNote, ordersInSpan, priceDrift, orderPriceStayNote, resultDriftNote, resultsByProduct, samePhoneMatches, orderCostCopyNote, outsideCostCopyNote, periodCostShiftNote, skuCostPreviewNote, storedSkuLines, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
 
 function outsideCopyNote(all: StoreOrder[], sku: string, guides: CostGuide[]) {
   const guide = guides.find((item) => item.sku === sku);
@@ -105,6 +105,7 @@ export function Dashboard({
         row.order.department ?? "",
         row.order.campaignEntry ? "campaña" : "",
         priceDrift(row.order, priceGuides).length > 0 ? "la ficha cambió" : "",
+        orderPriceStayNote(row.order, priceGuides),
         costDriftNote(costDrift(row.order, costGuides)),
         orderCostCopyNote(row.order, costGuides),
         attentionCostAside(row.note, row.order, costGuides, canManageOrderMoney),
@@ -433,7 +434,7 @@ export function Dashboard({
               const phoneCount = samePhoneMatches(order, storeOrders).length;
               const place = [order.city, order.department].filter(Boolean).join(" · ");
               const products = order.lines.map((line) => `${line.quantity} × ${lineName(line)}`).join(", ");
-              const driftNote = priceDriftNote(priceDrift(order, priceGuides));
+              const driftNote = orderPriceStayNote(order, priceGuides);
               const costNote = costDriftNote(costDrift(order, costGuides));
               const copyNote = orderCostCopyNote(order, costGuides);
               const costAside = attentionCostAside(row.note, order, costGuides, canManageOrderMoney);

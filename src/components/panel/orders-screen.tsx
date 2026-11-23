@@ -63,7 +63,7 @@ import {
   costDrift,
   costDriftNote,
   priceDrift,
-  priceDriftNote,
+  orderPriceStayNote,
   payableTotalLabel,
   syncFocusHref,
   readyToConfirm,
@@ -314,6 +314,9 @@ export function OrdersScreen({
                                 {attentionCostAside(row.note, row.order, costGuides, canManageOrderMoney)}
                               </span>
                             ) : null}
+                            {orderPriceStayNote(row.order, priceGuides) ? (
+                              <span className="mt-1 block text-xs leading-5 text-warning">{orderPriceStayNote(row.order, priceGuides)}</span>
+                            ) : null}
                           </span>
                           <span className="font-semibold text-primary md:pt-0.5">{row.cta}</span>
                         </a>
@@ -371,7 +374,7 @@ export function OrdersScreen({
           <ul className="divide-y divide-line">
           {visible.map((order) => {
             const notes = rowWarnings(order, sizeGuides, canManageOrderMoney);
-            const drift = priceDriftNote(priceDrift(order, priceGuides));
+            const drift = orderPriceStayNote(order, priceGuides);
             const costNote = costDriftNote(costDrift(order, costGuides));
             const copyNote = orderCostCopyNote(order, costGuides);
             const hold = drift || costNote ? accountHoldNote(order.status) : "";
@@ -478,6 +481,7 @@ export function OrderEditor({
   const margin = orderMargin(order);
   const costNote = costDriftNote(costDrift(order, costGuides));
   const copyNote = orderCostCopyNote(order, costGuides);
+  const priceStay = orderPriceStayNote(order, priceGuides);
   const actions = actionsFor(order, sizeGuides);
   const sizeConfirmError = confirmSizeError(order, sizeGuides);
   const confirmBlocked = order.status === "pendiente_confirmacion" ? sizeConfirmError : null;
@@ -547,11 +551,7 @@ export function OrderEditor({
             </p>
           </>
         )}
-        {priceDrift(order, priceGuides).map((drift) => (
-          <p key={drift.sku} className="mt-2 text-sm leading-5 text-warning">
-            La ficha de {drift.title} hoy está en {formatCop(drift.current)}. Este pedido guardó {formatCop(drift.stored)} cada uno. Cambiar la ficha no reescribe el total guardado. No es dinero cobrado.
-          </p>
-        ))}
+        {priceStay ? <p className="mt-2 text-sm leading-5 text-warning">{priceStay}</p> : null}
         <p className="mt-2 text-sm font-extrabold tabular-nums">
           {payableTotalLabel(order.status)} {formatCop(order.total)}
         </p>
@@ -601,6 +601,7 @@ export function OrderEditor({
         <p className={cx("mt-1 text-xs leading-5", collectedWithoutCost(order) ? "text-warning" : "text-muted")}>
           {moneyNote(order, margin)}
         </p>
+        {priceStay ? <p className="mt-2 text-sm leading-5 text-warning">{priceStay}</p> : null}
         {costNote ? <p className="mt-2 text-sm leading-5 text-warning">{costNote}</p> : null}
         {copyNote ? <p className="mt-1 text-sm leading-5">{copyNote}</p> : null}
         {priceDrift(order, priceGuides).length > 0 || costNote ? (
@@ -954,7 +955,7 @@ function StatusFilter({
 
 function matchesOrder(order: StoreOrder, query: string, guides: SizeGuide[], priceGuides: PriceGuide[] = [], costGuides: CostGuide[] = []) {
   if (!query) return true;
-  return [priceDriftNote(priceDrift(order, priceGuides)), costDriftNote(costDrift(order, costGuides)), orderCostCopyNote(order, costGuides), priceDrift(order, priceGuides).length > 0 || costDrift(order, costGuides).length > 0 ? accountHoldNote(order.status) : "", order.number, order.customerName, order.city, order.department ?? "", order.phone, order.document ?? "", order.address, order.reference, order.providerRef ?? "", order.internalNote ?? "", order.customerReason ?? "", order.buyerNote ?? "", order.customerNotifiedAt ? "avisé" : "", order.campaignEntry ? "campaña" : "", awaitsDropiNumber(order) || needsClosedDropiNumber(order) || needsIncidenceDropiNumber(order) ? "dropi" : "", needsDepartment(order) || needsClosedDepartment(order) ? "departamento" : "", missingSizeNote(order, guides), catalogCostQueueNote(order), collectedWithoutCost(order) ? "utilidad" : "", needsCustomerNotice(order) ? "avisar aviso" : "", needsIncidenceReason(order) ? "motivo incidencia" : "", needsReturnReason(order) ? "motivo devolución" : "", needsReturnFreight(order) ? "flete devolución" : "", readyToConfirm(order, guides) ? "confirmar" : "", readyToPrepare(order) ? "preparación preparar" : "", readyToDispatch(order) ? "despacho preparación" : "", ...order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""])].some(
+  return [orderPriceStayNote(order, priceGuides), costDriftNote(costDrift(order, costGuides)), orderCostCopyNote(order, costGuides), priceDrift(order, priceGuides).length > 0 || costDrift(order, costGuides).length > 0 ? accountHoldNote(order.status) : "", order.number, order.customerName, order.city, order.department ?? "", order.phone, order.document ?? "", order.address, order.reference, order.providerRef ?? "", order.internalNote ?? "", order.customerReason ?? "", order.buyerNote ?? "", order.customerNotifiedAt ? "avisé" : "", order.campaignEntry ? "campaña" : "", awaitsDropiNumber(order) || needsClosedDropiNumber(order) || needsIncidenceDropiNumber(order) ? "dropi" : "", needsDepartment(order) || needsClosedDepartment(order) ? "departamento" : "", missingSizeNote(order, guides), catalogCostQueueNote(order), collectedWithoutCost(order) ? "utilidad" : "", needsCustomerNotice(order) ? "avisar aviso" : "", needsIncidenceReason(order) ? "motivo incidencia" : "", needsReturnReason(order) ? "motivo devolución" : "", needsReturnFreight(order) ? "flete devolución" : "", readyToConfirm(order, guides) ? "confirmar" : "", readyToPrepare(order) ? "preparación preparar" : "", readyToDispatch(order) ? "despacho preparación" : "", ...order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""])].some(
     (value) => value.toLocaleLowerCase("es").includes(query),
   );
 }

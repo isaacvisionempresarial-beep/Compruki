@@ -1121,6 +1121,19 @@ export function priceDriftNote(drifts: Array<{ title: string; stored: number; cu
   return `La ficha cambió en ${drifts.map((drift) => drift.title).join(", ")}. Este pedido conserva el precio guardado. Cambiar la ficha no reescribe el total guardado. No es dinero cobrado.`;
 }
 
+export function orderPriceStayNote(order: StoreOrder, guides: PriceGuide[]) {
+  const note = priceDriftNote(priceDrift(order, guides));
+  if (!note) return "";
+  const scope = skuCostScope(order.status);
+  if (scope === "fuera") {
+    return `${note} No hay botón para reescribir ese precio. Este pedido sigue fuera: el margen estimado y la utilidad no lo usan.`;
+  }
+  if (scope === "cuentan") {
+    return `${note} No hay botón para reescribir ese precio. Este pedido ya cuenta: el margen estimado y la utilidad siguen con el precio guardado.`;
+  }
+  return `${note} No hay botón para reescribir ese precio.`;
+}
+
 export function costDrift(order: Pick<StoreOrder, "lines">, guides: CostGuide[]) {
   const drifts: Array<{ sku: string; title: string; fields: Array<{ label: string; stored: number; current: number }> }> = [];
   for (const line of order.lines) {
@@ -1714,12 +1727,12 @@ export function closeSheetText(
     return `${order.number}. ${note}${extra}`;
   };
   const drifted = orders.flatMap((order) => {
-    const note = priceDriftNote(priceDrift(order, priceGuides));
+    const note = orderPriceStayNote(order, priceGuides);
     return note ? [driftLine(order, note)] : [];
   });
   if (drifted.length > 0) {
     lines.push(
-      "En estos pedidos la ficha de hoy no es el precio guardado. El cierre sigue con el total guardado. Cambiar la ficha no lo reescribe. No es dinero cobrado.",
+      "En estos pedidos la ficha de hoy no es el precio guardado. No hay botón para reescribir ese precio. El cierre sigue con el total guardado. Cambiar la ficha no lo reescribe. No es dinero cobrado.",
       ...drifted,
     );
   }
@@ -2075,7 +2088,7 @@ export function attentionSheetText(
     lines.push("Si el paso es anotar el número o el despacho, va el texto para Dropi, con celular y dirección. Copiarlo no crea el pedido.");
   }
   if (queues.some((queue) => queue.rows.some((row) => priceDrift(row.order, priceGuides).length > 0))) {
-    lines.push("Si la ficha de hoy no es el precio guardado, van los dos montos en ese pedido. Copiarlos no reescribe el total.");
+    lines.push("Si la ficha de hoy no es el precio guardado, van los dos montos en ese pedido. No hay botón para reescribir el precio. Copiarlos no reescribe el total.");
   }
   if (queues.some((queue) => queue.rows.some((row) => costDrift(row.order, costGuides).length > 0))) {
     lines.push("Si la ficha de hoy no es el costo guardado, van las dos cifras en ese pedido. Copiarlas no reescribe lo guardado ni el total.");
@@ -2115,7 +2128,7 @@ export function attentionSheetText(
           lines.push("Texto para Dropi. Copiarlo no crea el pedido:");
           lines.push(dropiHandoffText(row.order));
         }
-        const drift = priceDriftNote(priceDrift(row.order, priceGuides));
+        const drift = orderPriceStayNote(row.order, priceGuides);
         if (drift) lines.push(drift);
         const costNote = costDriftNote(costDrift(row.order, costGuides));
         if (costNote) lines.push(costNote);
