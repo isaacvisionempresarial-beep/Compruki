@@ -22,7 +22,7 @@ export default async function SettingsPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-[720px] pb-8">
+    <div className="mx-auto max-w-[1600px] pb-8">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Configuración</h1>
       <p className="mt-1 text-sm text-muted">
@@ -75,14 +75,15 @@ export default async function SettingsPage() {
           Copia de los pedidos y las fichas guardados en {access.tenantName}. El total guardado y el margen van en columnas distintas. No incluye el enlace secreto del cliente. Descargarla no cobra, no cambia pedidos y no envía nada a Dropi.
         </p>
         {access.role === "owner" ? (
-          <div className="mt-3 flex flex-wrap gap-3 text-sm font-semibold">
-            <a href="/panel/respaldo/pedidos" title="Descargarla no cobra ni cambia pedidos." className="text-accent-strong">
-              Descargar pedidos
+          <nav aria-label="Descargas" className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Descargar</span>
+            <a href="/panel/respaldo/pedidos" title="Descargarla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+              Pedidos
             </a>
-            <a href="/panel/respaldo/catalogo" title="Descargarla no cobra ni cambia pedidos." className="text-accent-strong">
-              Descargar fichas
+            <a href="/panel/respaldo/catalogo" title="Descargarla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+              Fichas
             </a>
-          </div>
+          </nav>
         ) : (
           <p className="mt-3 text-sm text-muted">La descarga la hace el propietario. Ver esta nota no cobra ni cambia pedidos.</p>
         )}
@@ -104,22 +105,22 @@ export default async function SettingsPage() {
         <p className="mt-1 text-sm text-muted">
           Misma señal que <span className="font-semibold">GET /api/health</span>. No expone secretos. Verla no cobra ni cambia pedidos.
         </p>
-        <ul className="mt-3 space-y-1.5 text-sm">
+        <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {checkLabels.map((item) => (
-            <li key={item.key} className="flex items-center justify-between gap-3">
-              <span className="text-muted">{item.label}</span>
-              <span className="font-semibold">{health.checks[item.key] ? "OK" : "Falta"}</span>
-            </li>
+            <div key={item.key}>
+              <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{item.label}</dt>
+              <dd className="mt-0.5 text-sm font-semibold">{health.checks[item.key] ? "OK" : "Falta"}</dd>
+            </div>
           ))}
-          <li className="flex items-center justify-between gap-3">
-            <span className="text-muted">OpenAI</span>
-            <span className="font-semibold">No</span>
-          </li>
-          <li className="flex items-center justify-between gap-3">
-            <span className="text-muted">Dropi</span>
-            <span className="font-semibold">No</span>
-          </li>
-        </ul>
+          <div>
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">OpenAI</dt>
+            <dd className="mt-0.5 text-sm font-semibold">No</dd>
+          </div>
+          <div>
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Dropi</dt>
+            <dd className="mt-0.5 text-sm font-semibold">No</dd>
+          </div>
+        </dl>
       </section>
 
       <nav aria-label="Herramientas" className="mt-4 flex flex-wrap items-center gap-2">

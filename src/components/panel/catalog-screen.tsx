@@ -1130,17 +1130,17 @@ export function ProductEditor({
         <p className="mt-3 text-xs leading-5 text-muted">Dropi no está conectado. Las fotos se suben aquí. Subirlas no cobra ni cambia el precio ni la publicación.</p>
       </section>
 
-      <form action={formAction} className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">
+      <form action={formAction} className="mt-3 space-y-3">
           {product ? <input type="hidden" name="id" value={product.id} /> : null}
           {product ? <input type="hidden" name="previousSku" value={product.sku} /> : null}
-          <div className="border-b border-line px-3 py-2">
-            <div className="flex flex-wrap items-center gap-3">
+          <div className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Marcas</p>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
               <ProductMarks product={{ published, available: !unavailable }} />
             </div>
             {product ? <CampaignLink product={product} compact /> : null}
           </div>
-          <div className="space-y-3 px-3 py-2">
-            <div className="rounded-[14px] border border-dashed border-line bg-subtle p-3">
+            <div className="elevate-1 rounded-[14px] border border-line bg-card p-3">
               <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Medios</p>
               <p className="mt-0.5 text-sm font-semibold">Fotos y video</p>
               <p className="mt-1 text-xs leading-5 text-muted">
@@ -1271,8 +1271,7 @@ export function ProductEditor({
                 </p>
               ) : null}
             </div>
-            <div className="space-y-2">
-            <div className="rounded-[14px] border border-line bg-canvas p-3">
+            <div className="elevate-1 rounded-[14px] border border-line bg-card p-3">
               <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cifras</p>
               <p className="mt-0.5 text-sm font-semibold">Cifras y estado</p>
               <p className="mt-1 text-xs leading-5 text-muted">
@@ -1363,11 +1362,9 @@ export function ProductEditor({
                 </label>
               </fieldset>
             </div>
-            </div>
-          </div>
 
-          <div className="grid gap-3 px-3 pb-3">
-            <div className="rounded-[14px] border border-line p-3">
+          <div className="contents">
+            <div className="elevate-1 rounded-[14px] border border-line bg-card p-3">
               <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Identidad</p>
               <p className="mt-0.5 text-sm font-semibold">Nombre y referencia</p>
               <div className="mt-3 grid gap-3 lg:grid-cols-2">
@@ -1426,8 +1423,9 @@ export function ProductEditor({
               </div>
             </div>
 
-            <div className="grid gap-3 xl:grid-cols-2">
-              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase xl:col-span-2">Texto</p>
+            <div className="elevate-1 rounded-[14px] border border-line bg-card p-3">
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Texto</p>
+              <div className="mt-3 grid gap-3 xl:grid-cols-2">
               <Field label="Descripción" htmlFor="description" hint="La ve el comprador en la ficha. No es el precio ni la publicación.">
                 <textarea
                   id="description"
@@ -1456,7 +1454,8 @@ export function ProductEditor({
                   onChange={(event) => setHighlights(event.target.value)}
                 />
               </Field>
-            </div>
+              </div>
+              <div className="mt-3">
             <Field
               label="Respuestas para el comprador"
               htmlFor="answers"
@@ -1473,8 +1472,10 @@ export function ProductEditor({
                 onChange={(event) => setAnswers(event.target.value)}
               />
             </Field>
+              </div>
+            </div>
 
-            <div className="rounded-[14px] border border-line p-3">
+            <div className="elevate-1 rounded-[14px] border border-line bg-card p-3">
               <p className="mb-3 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Elección</p>
               <Field
                 label="Tallas o tamaños"
@@ -1515,7 +1516,7 @@ export function ProductEditor({
             ) : null}
 
             {product && product.history.length > 0 ? (
-              <section aria-labelledby="historial-titulo" className="rounded-[14px] border border-line p-3">
+              <section aria-labelledby="historial-titulo" className="elevate-1 rounded-[14px] border border-line bg-card p-3">
                 <h3 id="historial-titulo" className="text-sm font-semibold">
                   Historial de la ficha
                 </h3>
@@ -1564,7 +1565,7 @@ export function ProductEditor({
             ) : null}
           </div>
 
-          <div className="border-t border-line px-3 py-2">
+          <div className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3">
             {canSave && margin !== null ? (
               <p className="mb-2 text-sm leading-5 text-ink">
                 {canManageCommerce

@@ -96,13 +96,14 @@ export function CentralRouterPanel({
           ) : null}
 
           {route.suggestedLinks.length > 0 ? (
-            <div className="flex flex-wrap gap-3 text-sm font-semibold">
+            <nav aria-label="Siguiente" className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Siguiente</span>
               {route.suggestedLinks.map((link) => (
-                <Link key={link.href + link.label} href={link.href} title="Abrirlo no cobra ni cambia pedidos." className="text-accent-strong">
+                <Link key={link.href + link.label} href={link.href} title="Abrirlo no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
                   {link.label}
                 </Link>
               ))}
-            </div>
+            </nav>
           ) : null}
         </div>
       )}
