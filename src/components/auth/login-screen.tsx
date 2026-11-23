@@ -3,7 +3,6 @@
 import { useState, type ReactNode } from "react";
 import { useActionState } from "react";
 import { Wordmark } from "@/components/brand/wordmark";
-import { Icon } from "@/components/icons";
 import {
   requestPasswordReset,
   signIn,
@@ -35,25 +34,25 @@ export function LoginScreen({
     <div className="min-h-dvh lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(420px,0.95fr)]">
       <section className="brand-panel hidden flex-col px-8 py-8 text-on-dark lg:flex lg:px-12" aria-label="Presentación">
         <Wordmark onDark />
-        <div className="mt-8 max-w-md">
+        <div className="mt-8 max-w-lg">
           <p className="text-3xl font-semibold tracking-tight text-balance">«Tu negocio, en modo venta.»</p>
           <p className="mt-2 text-sm leading-5 text-on-dark-muted">
-            Pedidos, sincronización, catálogo y rentabilidad, cada uno en su sitio. Leer esto no cobra ni cambia pedidos. Dropi no está conectado.
+            El panel está en tres bloques. Leer esto no cobra ni cambia pedidos. Dropi no está conectado.
           </p>
-          <ul className="mt-4 space-y-2">
-            {[
-              "Publica solo lo que ya revisaste.",
-              "Cada pedido tiene un estado claro.",
-              "El margen estimado no se presenta como dinero cobrado.",
-            ].map((item) => (
-              <li key={item} className="flex gap-2.5 text-sm leading-5 text-[#E7EAF2]">
-                <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-accent text-primary">
-                  <Icon name="check" className="h-3 w-3" />
-                </span>
-                {item}
-              </li>
-            ))}
-          </ul>
+          <dl className="mt-4 grid gap-3">
+            <div>
+              <dt className="text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Tienda</dt>
+              <dd className="mt-0.5 text-sm leading-5 text-[#E7EAF2]">Panel, pedidos, catálogo y rentabilidad. El margen estimado no se presenta como dinero cobrado.</dd>
+            </div>
+            <div>
+              <dt className="text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Operación</dt>
+              <dd className="mt-0.5 text-sm leading-5 text-[#E7EAF2]">Sincronización y conexiones. Cada pedido tiene un estado claro. Dropi no está conectado.</dd>
+            </div>
+            <div>
+              <dt className="text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Sistema</dt>
+              <dd className="mt-0.5 text-sm leading-5 text-[#E7EAF2]">Centro de agentes y configuración. Publica solo lo que ya revisaste.</dd>
+            </div>
+          </dl>
         </div>
         <p className="mt-auto pt-8 text-xs text-on-dark-muted">Identidad provisional para el prototipo · Colombia</p>
       </section>
@@ -64,7 +63,7 @@ export function LoginScreen({
             <Wordmark />
             <p className="mt-2 text-lg font-semibold tracking-tight">«Tu negocio, en modo venta.»</p>
             <p className="mt-1 text-sm leading-5 text-muted">
-              Pedidos, sincronización, catálogo y rentabilidad. Leer esto no cobra ni cambia pedidos. Dropi no está conectado.
+              Tienda, operación y sistema. Leer esto no cobra ni cambia pedidos. Dropi no está conectado.
             </p>
           </div>
 
@@ -186,14 +185,15 @@ function LoginForm({
           </div>
         </Field>
 
-        <div className="flex flex-wrap justify-end gap-x-3 gap-y-1">
-          <a href="/ingresar?modo=nueva-clave" title="Abrirla no cobra ni cambia pedidos." className="text-sm font-semibold text-accent-strong">
+        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <a href="/ingresar?modo=nueva-clave" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
             Cambiar contraseña
           </a>
-          <button type="button" title="Abrirlo no envía el enlace ni cobra." className="text-sm font-semibold text-accent-strong" onClick={onRecover}>
+          <button type="button" title="Abrirlo no envía el enlace ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle" onClick={onRecover}>
             Olvidé mi acceso
           </button>
-        </div>
+        </nav>
 
         {state.error ? (
           <p id="login-error" role="alert" className="rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
@@ -280,15 +280,16 @@ function RecoveryForm({ onBack, linkError }: { onBack: () => void; linkError?: b
         </button>
       </form>
 
-      <div className="mt-3 flex flex-col gap-2">
-        <a href="/ingresar?modo=nueva-clave" title="Abrirla no guarda la contraseña ni cobra." className="text-sm font-semibold text-accent-strong">
+      <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <a href="/ingresar?modo=nueva-clave" title="Abrirla no guarda la contraseña ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Ya puedo cambiar la contraseña aquí
         </a>
-        <button type="button" title="Volver no envía el enlace ni cobra." className="text-sm font-semibold text-accent-strong" onClick={onBack}>
+        <button type="button" title="Volver no envía el enlace ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle" onClick={onBack}>
           Volver a iniciar sesión
         </button>
-        <p className="text-xs leading-5 text-muted">Volver no envía el enlace ni cobra.</p>
-      </div>
+      </nav>
+      <p className="mt-2 text-xs leading-5 text-muted">Volver no envía el enlace ni cobra.</p>
     </>
   );
 }
@@ -403,10 +404,13 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
         </button>
       </form>
 
-      <button type="button" title="Volver no guarda la contraseña ni cobra." className="mt-3 text-sm font-semibold text-accent-strong" onClick={onBack}>
-        Volver a iniciar sesión
-      </button>
-      <p className="mt-1 text-xs leading-5 text-muted">Volver no guarda la contraseña ni cobra.</p>
+      <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <button type="button" title="Volver no guarda la contraseña ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle" onClick={onBack}>
+          Volver a iniciar sesión
+        </button>
+      </nav>
+      <p className="mt-2 text-xs leading-5 text-muted">Volver no guarda la contraseña ni cobra.</p>
     </>
   );
 }

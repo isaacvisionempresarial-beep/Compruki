@@ -26,16 +26,21 @@ export function ProductEditorPage({
 
   if (!product && !canManageCommerce) {
     return (
-      <div className="mx-auto max-w-[720px] pb-8">
-        <p className="text-xs text-muted">
-          <Link href="/panel/catalogo" title="Volver no cobra ni cambia el precio ni la publicación." className="font-semibold text-accent-strong">
-            Catálogo
-          </Link>
-        </p>
+      <div className="mx-auto max-w-[1600px] pb-8">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Catálogo</p>
         <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Nuevo producto</h1>
-        <p className="mt-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-          Solo el propietario puede crear productos. Puedes editar textos, fotos y disponibilidad de los que ya están. No cobra ni cambia pedidos.
-        </p>
+        <section className="elevate-1 mt-5 max-w-2xl rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="alta-bloqueada">
+          <h2 id="alta-bloqueada" className="text-sm font-semibold">Alta</h2>
+          <p className="mt-1 text-sm text-muted">
+            Solo el propietario puede crear productos. Puedes editar textos, fotos y disponibilidad de los que ya están. No cobra ni cambia pedidos.
+          </p>
+          <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <Link href="/panel/catalogo" title="Volver no cobra ni cambia el precio ni la publicación." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+              Volver al catálogo
+            </Link>
+          </nav>
+        </section>
       </div>
     );
   }
