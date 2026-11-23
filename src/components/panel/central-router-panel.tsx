@@ -70,7 +70,7 @@ export function CentralRouterPanel({
           <p className="mt-0.5 text-sm">
             <span className="font-semibold">Pedido:</span> {route.intent}
           </p>
-          <p className="text-xs font-bold tracking-[0.08em] text-muted uppercase">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
             OpenAI: no · Agentes: {route.agents.join(", ")}
           </p>
           <ul className="space-y-1.5 text-sm text-muted">

@@ -312,14 +312,15 @@ function CatalogProductRow({
               ) : null}
             </div>
 
-            <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+            <nav aria-label="Herramientas" className="flex shrink-0 flex-wrap items-center gap-1.5">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
               {product.published ? (
                 <a
                   href={campaignPath(product.sku)}
                   title="Visitarla no cobra ni cambia el precio ni la publicación."
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex h-8 items-center justify-center rounded-[10px] border border-line bg-card px-2.5 text-xs font-semibold hover:bg-canvas"
+                  className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas"
                 >
                   Visitar
                 </a>
@@ -327,12 +328,12 @@ function CatalogProductRow({
               <Link
                 href={`/panel/catalogo/${product.sku}`}
                 title="Abrirla no cobra ni cambia el precio ni la publicación."
-                className="inline-flex h-8 items-center justify-center rounded-[10px] border border-line bg-card px-2.5 text-xs font-semibold hover:bg-canvas"
+                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas"
               >
                 {canManageCommerce ? "Editar" : "Editar textos"}
               </Link>
               <CatalogRowLifecycle product={product} hasOrders={hasOrders} canManageCommerce={canManageCommerce} />
-            </div>
+            </nav>
           </div>
 
           <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs tabular-nums">
@@ -406,7 +407,7 @@ function CatalogRowLifecycle({
           type="submit"
           disabled={deactivatePending}
           title="No se puede pedir. No cambia el precio ni la publicación."
-          className={`inline-flex h-8 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas ${
+          className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas ${
             deactivatePending ? "cursor-wait opacity-70" : ""
           }`}
         >
@@ -426,7 +427,7 @@ function CatalogRowLifecycle({
             type="submit"
             title="Quita el producto del catálogo. No cobra ni confirma un pedido."
             disabled={deletePending}
-            className={`inline-flex h-8 items-center justify-center rounded-[10px] bg-danger px-3 text-sm font-semibold text-on-dark ${
+            className={`inline-flex h-9 items-center justify-center rounded-[10px] bg-danger px-3 text-sm font-semibold text-on-dark ${
               deletePending ? "cursor-wait opacity-70" : ""
             }`}
           >
@@ -435,7 +436,7 @@ function CatalogRowLifecycle({
           <button
             type="button"
             title="No lo quita ni cobra."
-            className="inline-flex h-8 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
+            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
             onClick={() => setConfirmDelete(false)}
           >
             No
@@ -449,7 +450,7 @@ function CatalogRowLifecycle({
       <button
         type="button"
         title="Todavía no elimina. No cobra."
-        className="inline-flex h-8 items-center justify-center rounded-[10px] border border-danger bg-card px-3 text-sm font-semibold text-danger hover:bg-danger-tint"
+        className="inline-flex h-9 items-center justify-center rounded-[10px] border border-danger bg-card px-3 text-sm font-semibold text-danger hover:bg-danger-tint"
         onClick={() => setConfirmDelete(true)}
       >
         Eliminar
@@ -468,7 +469,7 @@ function CatalogRowLifecycle({
         type="submit"
         disabled={deactivatePending}
         title="Hay pedidos con este producto; no se puede eliminar. Desactivar no cambia el precio ni la publicación."
-        className={`inline-flex h-8 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas ${
+        className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas ${
           deactivatePending ? "cursor-wait opacity-70" : ""
         }`}
       >
@@ -567,12 +568,12 @@ function CampaignLink({
     return (
       <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
         <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-        <a href={path} target="_blank" rel="noreferrer" title="Abrirla no cobra ni cambia el precio ni la publicación." className="inline-flex h-8 items-center rounded-[10px] border border-line bg-canvas px-2.5 text-xs font-semibold text-ink hover:bg-subtle">
+        <a href={path} target="_blank" rel="noreferrer" title="Abrirla no cobra ni cambia el precio ni la publicación." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Abrir
         </a>
         <button
           type="button"
-          className="inline-flex h-8 items-center rounded-[10px] border border-line bg-canvas px-2.5 text-xs font-semibold text-ink hover:bg-subtle"
+          className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
           aria-label={`Copiar enlace de ${product.title}`}
           title="Copiarlo no cobra ni cambia el precio ni la publicación."
           onClick={copy}
@@ -802,12 +803,13 @@ function SkuCostApply({
         </p>
       ) : null}
       {canManageCommerce ? (
-        <div className="mt-2 flex flex-wrap gap-2">
+        <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
           <button
             type="button"
             title="No toca a los que siguen fuera. El precio y el total guardado no cambian."
             disabled={pending || dirty || groups.counted.length === 0}
-            className={`inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold ${
+            className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold ${
               pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
             }`}
             onClick={() => {
@@ -823,7 +825,7 @@ function SkuCostApply({
             type="button"
             title="No los mete al margen ni a la utilidad. El precio y el total guardado no cambian."
             disabled={pending || dirty || groups.outside.length === 0}
-            className={`inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold ${
+            className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold ${
               pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
             }`}
             onClick={() => {
@@ -835,7 +837,7 @@ function SkuCostApply({
           >
             {pending ? "…" : `Usarlas en ${outsideLabel}`}
           </button>
-        </div>
+        </nav>
       ) : null}
     </div>
   );
@@ -1160,15 +1162,18 @@ export function ProductEditor({
                 uso. No viene de Dropi.
               </p>
               {savedImages.length === 0 && pendingPreviews.length === 0 ? (
-                <p className="mt-2 text-sm leading-5">
-                  {published && !unavailable
-                    ? "Todavía no hay fotos. Agrega una o varias para verlas aquí y en la tienda. El producto ya está publicado. Guardarlas no cambia el precio ni la publicación."
-                    : published
-                      ? "Todavía no hay fotos. Agrega una o varias para verlas aquí. En la tienda no se puede pedir mientras esté no disponible. Guardarlas no cambia el precio ni la publicación."
-                      : canManageCommerce
-                        ? "Todavía no hay fotos. Agrega una o varias para verlas aquí. Siguen ocultas hasta que publiques. El precio no cambia."
-                        : "Todavía no hay fotos. Agrega una o varias para verlas aquí. Siguen ocultas: la publicación la cambia el propietario. El precio no cambia."}
-                </p>
+                <div className="mt-2">
+                  <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+                  <p className="mt-0.5 text-sm leading-5 text-muted">
+                    {published && !unavailable
+                      ? "Todavía no hay fotos. Agrega una o varias para verlas aquí y en la tienda. El producto ya está publicado. Guardarlas no cambia el precio ni la publicación."
+                      : published
+                        ? "Todavía no hay fotos. Agrega una o varias para verlas aquí. En la tienda no se puede pedir mientras esté no disponible. Guardarlas no cambia el precio ni la publicación."
+                        : canManageCommerce
+                          ? "Todavía no hay fotos. Agrega una o varias para verlas aquí. Siguen ocultas hasta que publiques. El precio no cambia."
+                          : "Todavía no hay fotos. Agrega una o varias para verlas aquí. Siguen ocultas: la publicación la cambia el propietario. El precio no cambia."}
+                  </p>
+                </div>
               ) : (
                 <div className="mt-3">
                   <PhotoCarousel
@@ -1231,14 +1236,17 @@ export function ProductEditor({
                 onChange={onPickImages}
               />
               <input ref={imagesRef} name="images" type="file" multiple className="hidden" tabIndex={-1} aria-hidden="true" />
-              <button
-                type="button"
-                title="Elegirlas no las publica solas. El precio no cambia."
-                className="mt-3 inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold hover:bg-canvas"
-                onClick={() => imagePickerRef.current?.click()}
-              >
-                Agregar fotos
-              </button>
+              <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                <button
+                  type="button"
+                  title="Elegirlas no las publica solas. El precio no cambia."
+                  className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas"
+                  onClick={() => imagePickerRef.current?.click()}
+                >
+                  Agregar fotos
+                </button>
+              </nav>
               <p className="mt-1 text-xs leading-5 text-muted">{mediaPickNote("fotos")}</p>
               <div className="mt-3 border-t border-line pt-2.5">
                 <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Clip</p>
@@ -1248,20 +1256,26 @@ export function ProductEditor({
                 ) : savedVideo && !clearVideo ? (
                   <video src={`/panel/video/${product?.sku}`} controls title="Verlo no cambia el precio ni la publicación." className="mt-3 max-h-[32rem] w-full rounded-[10px] bg-card" />
                 ) : (
-                  <p className="mt-2 text-sm leading-5">
-                    Todavía no hay video. Agregarlo no cambia el precio ni la publicación.
-                  </p>
+                  <div className="mt-2">
+                    <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+                    <p className="mt-0.5 text-sm leading-5 text-muted">
+                      Todavía no hay video. Agregarlo no cambia el precio ni la publicación.
+                    </p>
+                  </div>
                 )}
                 <input ref={videoPickerRef} type="file" accept="video/mp4,.mp4" title="Elegirlo no lo publica solo. El precio no cambia." className="sr-only" onChange={onPickVideo} />
                 <input ref={videoRef} name="video" type="file" accept="video/mp4,.mp4" className="hidden" tabIndex={-1} aria-hidden="true" />
-                <button
-                  type="button"
-                  title="Elegirlo no lo publica solo. El precio no cambia."
-                  className="mt-3 inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold hover:bg-canvas"
-                  onClick={() => videoPickerRef.current?.click()}
-                >
-                  {savedVideo || videoPreview ? "Cambiar video" : "Agregar video"}
-                </button>
+                <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                  <button
+                    type="button"
+                    title="Elegirlo no lo publica solo. El precio no cambia."
+                    className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas"
+                    onClick={() => videoPickerRef.current?.click()}
+                  >
+                    {savedVideo || videoPreview ? "Cambiar video" : "Agregar video"}
+                  </button>
+                </nav>
                 <p className="mt-1 text-xs leading-5 text-muted">{mediaPickNote("video")}</p>
                 {savedVideo ? (
                   <label className="mt-2 flex items-start gap-3 text-sm leading-5">
@@ -1727,7 +1741,8 @@ export function ProductDangerZone({
         </p>
       ) : null}
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
         {canDelete && canManageCommerce ? (
           confirmDelete ? (
             <form action={deleteAction} className="flex flex-wrap items-center gap-2">
@@ -1737,7 +1752,7 @@ export function ProductDangerZone({
                 type="submit"
                 title="Eliminarlo quita la ficha. No cobra."
                 disabled={deletePending}
-                className={`inline-flex h-10 items-center justify-center rounded-[10px] bg-danger px-3 text-sm font-semibold text-on-dark ${
+                className={`inline-flex h-9 items-center justify-center rounded-[10px] bg-danger px-3 text-sm font-semibold text-on-dark ${
                   deletePending ? "cursor-wait opacity-70" : ""
                 }`}
               >
@@ -1746,7 +1761,7 @@ export function ProductDangerZone({
               <button
                 type="button"
                 title="Cancelar no elimina el producto ni cobra."
-                className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
+                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
                 onClick={() => setConfirmDelete(false)}
               >
                 Cancelar
@@ -1756,7 +1771,7 @@ export function ProductDangerZone({
             <button
               type="button"
               title="Todavía no elimina. No cobra."
-              className="inline-flex h-10 items-center justify-center rounded-[10px] border border-danger bg-card px-3 text-sm font-semibold text-danger"
+              className="inline-flex h-9 items-center justify-center rounded-[10px] border border-danger bg-card px-3 text-sm font-semibold text-danger"
               onClick={() => setConfirmDelete(true)}
             >
               Eliminar producto
@@ -1764,28 +1779,28 @@ export function ProductDangerZone({
           )
         ) : product.available ? (
           <>
-            <p className="mt-2 max-w-2xl text-xs leading-5 text-muted">
+            <p className="max-w-2xl text-xs leading-5 text-muted">
               Marcarlo como no disponible no cambia el precio ni la publicación. No cobra.
               {product.published ? " Sigue publicado, pero no se puede pedir." : " Sigue sin publicar."}
             </p>
             <form action={deactivateAction}>
-            <input type="hidden" name="id" value={product.id} />
-            <button
-              type="submit"
-              title="No cambia el precio ni la publicación. No cobra."
-              disabled={deactivatePending}
-              className={`inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
-                deactivatePending ? "cursor-wait opacity-70" : ""
-              }`}
-            >
-              {deactivatePending ? "Guardando…" : "Marcar como no disponible"}
-            </button>
-          </form>
+              <input type="hidden" name="id" value={product.id} />
+              <button
+                type="submit"
+                title="No cambia el precio ni la publicación. No cobra."
+                disabled={deactivatePending}
+                className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
+                  deactivatePending ? "cursor-wait opacity-70" : ""
+                }`}
+              >
+                {deactivatePending ? "Guardando…" : "Marcar como no disponible"}
+              </button>
+            </form>
           </>
         ) : (
           <p className="text-sm font-semibold text-muted">Ya está marcado como no disponible. No cambia el precio ni la publicación. No cobra.</p>
         )}
-      </div>
+      </nav>
     </section>
   );
 }

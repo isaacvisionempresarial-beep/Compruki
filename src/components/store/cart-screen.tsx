@@ -236,14 +236,17 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                         <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">
                           Quitar
                         </span>
-                        <button
-                          type="button"
-                          title="Quitarla no registra pedido ni cobra."
-                          className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
-                          onClick={() => cart.remove(line.sku, line.variant)}
-                        >
-                          Quitar
-                        </button>
+                        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+                          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                          <button
+                            type="button"
+                            title="Quitarla no registra pedido ni cobra."
+                            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
+                            onClick={() => cart.remove(line.sku, line.variant)}
+                          >
+                            Quitar
+                          </button>
+                        </nav>
                         <p className="mt-1 text-xs leading-5 text-muted">No registra pedido ni cobra.</p>
                       </div>
                     </div>
