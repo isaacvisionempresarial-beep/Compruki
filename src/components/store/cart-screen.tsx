@@ -116,7 +116,11 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
             </nav>
           </section>
         ) : (
-          <div className="elevate-1 overflow-hidden rounded-[14px] border border-line bg-card">
+          <section aria-labelledby="carrito-lineas">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Líneas</p>
+            <h2 id="carrito-lineas" className="mt-0.5 text-base font-bold">En este carrito</h2>
+            <p className="mt-0.5 text-xs leading-5 text-muted">Cambiar la cantidad o quitar no registra pedido ni cobra.</p>
+            <div className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">
             <div
               className={cx(
                 "hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.04em] text-muted uppercase md:grid",
@@ -246,8 +250,10 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                 );
               })}
             </ul>
-          </div>
-        )}      </div>
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   );
 }

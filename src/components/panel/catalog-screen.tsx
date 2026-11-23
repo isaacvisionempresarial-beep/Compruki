@@ -159,7 +159,8 @@ export function CatalogScreen({
       </nav>
 
       <section className="mt-5" aria-labelledby="fichas-titulo">
-        <h2 id="fichas-titulo" className="text-base font-bold">Fichas</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Inventario</p>
+        <h2 id="fichas-titulo" className="mt-0.5 text-base font-bold">Fichas</h2>
         <p className="mt-0.5 max-w-2xl text-xs leading-5 text-muted">
           {canManageCommerce
             ? "Cada ficha guarda precio, costo, publicación y fotos. Se edita en su página."
@@ -678,7 +679,8 @@ function CatalogDriftSheet({ text }: { text: string }) {
 
   return (
     <section className="mt-3" aria-labelledby="catalogo-fichas-distintas-titulo">
-      <h2 id="catalogo-fichas-distintas-titulo" className="text-sm font-semibold">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Copia</p>
+      <h2 id="catalogo-fichas-distintas-titulo" className="mt-0.5 text-base font-bold">
         Fichas para copiar
       </h2>
       <p className="mt-0.5 text-xs leading-5 text-muted">
@@ -1066,29 +1068,27 @@ export function ProductEditor({
 
   return (
     <div ref={panelRef} className="scroll-mt-16">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
         <div className="min-w-0">
-          <p className="text-xs text-muted">
-            <Link href="/panel/catalogo" title="Volver no cobra ni cambia el precio ni la publicación." className="font-semibold text-accent-strong">
-              Catálogo
-            </Link>
-            <span aria-hidden="true"> / </span>
-            {product ? product.sku : "Nuevo"}
-          </p>
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Catálogo</p>
           <h1 id="ficha-titulo" className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">
             {product ? product.title : "Nuevo producto"}
           </h1>
           <p className="mt-0.5 text-xs text-muted">
+            {product ? `SKU ${product.sku}. ` : "Nuevo. "}
             Margen estimado de la ficha · no es dinero cobrado de pedidos
           </p>
         </div>
-        <Link
-          href="/panel/catalogo"
-          title="Volver no cobra ni cambia el precio ni la publicación."
-          className="inline-flex h-10 shrink-0 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
-        >
-          Volver al catálogo
-        </Link>
+        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <Link
+            href="/panel/catalogo"
+            title="Volver no cobra ni cambia el precio ni la publicación."
+            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
+          >
+            Volver al catálogo
+          </Link>
+        </nav>
       </div>
 
       <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="ficha-resumen">
@@ -1679,7 +1679,8 @@ export function ProductDangerZone({
 
   return (
     <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="peligro-titulo">
-      <h2 id="peligro-titulo" className="text-sm font-semibold">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cuidado</p>
+      <h2 id="peligro-titulo" className="mt-0.5 text-sm font-semibold">
         Eliminar o desactivar
       </h2>
       {canDelete && canManageCommerce ? (

@@ -96,7 +96,8 @@ export function ProfitabilityScreen({
       </p>
 
       <section className="mt-5" aria-labelledby="resultados-reales">
-        <h2 id="resultados-reales" className="text-base font-bold">Qué dejaron los pedidos</h2>
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cuenta</p>
+        <h2 id="resultados-reales" className="mt-0.5 text-base font-bold">Qué dejaron los pedidos</h2>
         <p className="mt-0.5 max-w-2xl text-xs leading-5 text-muted">
           Cifras de {closePhrase(storePeriod, basis)}. Entran confirmados y devoluciones. Devuelto es el total guardado, no el margen. La muestra no entra. Verlas no cobra ni cambia pedidos.
           {basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
@@ -127,7 +128,8 @@ export function ProfitabilityScreen({
             </div>
           </div>
         </div>
-        <h3 className="mt-4 text-sm font-semibold">La cuenta por producto</h3>
+        <p className="mt-4 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Productos</p>
+        <h3 className="mt-0.5 text-sm font-semibold">La cuenta por producto</h3>
         <p className="mt-0.5 max-w-2xl text-xs leading-5 text-muted">
           Estimado es el margen de confirmados. Utilidad es lo entregado y marcado como cobrado. Ninguna es dinero cobrado en el sitio ni el total guardado del pedido. Si la ficha de hoy es otra, el producto muestra las dos cifras y las cuentas siguen con lo guardado. Los pedidos van bajo «Ver pedidos».{" "}
           {canManageOrderMoney ? "El precio de la ficha se cambia en Catálogo." : "El precio de la ficha lo cambia el propietario en Catálogo."}
