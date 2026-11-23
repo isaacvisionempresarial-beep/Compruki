@@ -84,12 +84,15 @@ export function SyncScreen({
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Dropi, a mano</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Sincronización</h1>
       <p className="mt-1 max-w-2xl text-sm leading-5 text-muted">
-        Copia la entrega y anota el número a mano. Ver esta lista no cobra. Dropi no está conectado: no se envía desde aquí y el total guardado no cambia. El estado de la cuenta está en{" "}
-        <Link href="/panel/conexiones" title="Verlas no cobra ni cambia pedidos." className="font-semibold text-accent-strong">
-          Conexiones
-        </Link>
-        .
+        Copia la entrega y anota el número a mano. Ver esta lista no cobra. Dropi no está conectado: no se envía desde aquí y el total guardado no cambia. El estado de la cuenta está en Conexiones.
       </p>
+      <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <Link href="/panel/conexiones" title="Verlas no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+          Abrir conexiones
+        </Link>
+      </nav>
+      <p className="mt-2 text-xs leading-5 text-muted">Verlas no cobra ni cambia pedidos.</p>
 
       <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="cola-dropi">
         <h2 id="cola-dropi" className="text-sm font-semibold">

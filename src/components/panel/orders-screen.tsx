@@ -207,14 +207,18 @@ export function OrdersScreen({
         </div>
       </div>
       <p className="mt-2 text-xs leading-5 text-muted">
-        Dropi no está conectado. El número se anota en{" "}
-        <Link href="/panel/sincronizacion" title="Abrirla no cobra. El total guardado no cambia." className="font-semibold text-accent-strong">
-          Sincronización
-        </Link>
-        .
+        Dropi no está conectado. El número se anota en Sincronización. Abrirla no cobra. El total guardado no cambia.
       </p>
+      <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <Link href="/panel/sincronizacion" title="Abrirla no cobra. El total guardado no cambia." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+          Abrir sincronización
+        </Link>
+      </nav>
 
-      <h2 className="mt-5 text-sm font-semibold">Cifras del período</h2>
+      <section className="mt-5" aria-labelledby="cifras-periodo">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cuenta</p>
+      <h2 id="cifras-periodo" className="mt-0.5 text-base font-bold">Cifras del período</h2>
       <p className="mt-0.5 text-xs leading-5 text-muted">
         Siguen el período de arriba. Buscar o filtrar por estado solo cambia la lista de abajo. No cobra ni cambia el total guardado.
       </p>
@@ -268,8 +272,10 @@ export function OrdersScreen({
       </dl>
       {periodShift ? <p className="mt-3 text-sm leading-5">{periodShift}</p> : null}
       <CloseSheet orders={spanOrders} rest={orders.filter((order) => !spanOrders.some((shown) => shown.number === order.number))} period={span} basis={basis} guides={sizeGuides} priceGuides={priceGuides} costGuides={costGuides} fieldId="cierre-pedidos" />
+      </section>
       <section className="mt-5" aria-labelledby="por-atender">
-        <h2 id="por-atender" className="text-sm font-semibold">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cola</p>
+        <h2 id="por-atender" className="mt-0.5 text-base font-bold">
           Por atender
         </h2>
         <p className="mt-0.5 text-xs leading-5 text-muted">
@@ -357,13 +363,17 @@ export function OrdersScreen({
       ) : (
         <>
           <DispatchSheet orders={spanOrders} moved={span !== "todo" && basis === "movidos"} />
-          <h2 className="mt-3 text-sm font-semibold">
+          <section className="mt-5" aria-labelledby="lista-pedidos">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Lista</p>
+          <h2 id="lista-pedidos" className="mt-0.5 text-base font-bold">
             {span === "todo" ? "Todos los pedidos" : basis === "movidos" ? `Movidos ${spanPhrase(span)}` : `Creados ${spanPhrase(span)}`}
           </h2>
           <p className="mt-0.5 text-xs leading-5 text-muted">
             Buscar o filtrar solo cambia esta lista. En cada pedido se abre la ficha. No cobra ni cambia el total guardado.
           </p>
-          <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Filtrar por estado">
+          <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
+          <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Filtrar por estado">
             <StatusFilter
               label="Todos"
               count={searched.length}
@@ -379,6 +389,7 @@ export function OrdersScreen({
                 onSelect={() => setStatus(item)}
               />
             ))}
+          </div>
           </div>
           {visible.length === 0 ? (
             <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
@@ -440,6 +451,7 @@ export function OrdersScreen({
           </ul>
         </div>
           )}
+          </section>
         </>
       )}
     </div>
@@ -775,15 +787,21 @@ export function OrderEditor({
 <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-dropi">
         <h2 id="pedido-dropi" className="text-sm font-semibold">Sincronización</h2>
         {canNoteDropiNumber(order) ? (
+          <>
           <p className="mt-1.5 text-xs leading-5 text-ink">
             {order.providerRef
               ? `Número: ${order.providerRef}. `
               : "Falta el número de Dropi. "}
-            No se envía desde aquí.{" "}
-            <Link href={syncFocusHref(order.number)} title="Abrirla no cobra. El total guardado no cambia." className="font-semibold text-accent-strong">
-              Abrir
-            </Link>
+            No se envía desde aquí.
           </p>
+          <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <Link href={syncFocusHref(order.number)} title="Abrirla no cobra. El total guardado no cambia." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+              Abrir sincronización
+            </Link>
+          </nav>
+          <p className="mt-2 text-xs leading-5 text-muted">Abrirla no cobra. El total guardado no cambia.</p>
+          </>
         ) : (
           <p className="mt-1.5 text-xs leading-5 text-muted">
             El número se anota después de confirmar. Dropi no está conectado.
@@ -982,7 +1000,8 @@ function DispatchSheet({ orders, moved }: { orders: StoreOrder[]; moved: boolean
 
   return (
     <section className="mt-5" aria-labelledby="hoja-despacho-titulo">
-      <h2 id="hoja-despacho-titulo" className="text-sm font-semibold">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Despacho</p>
+      <h2 id="hoja-despacho-titulo" className="mt-0.5 text-base font-bold">
         Hoja para copiar ({rows.length})
       </h2>
       <p className="mt-0.5 text-xs leading-5 text-muted">

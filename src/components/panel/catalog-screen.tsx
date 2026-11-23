@@ -164,12 +164,14 @@ export function CatalogScreen({
           {canManageCommerce
             ? "Cada ficha guarda precio, costo, publicación y fotos. Se edita en su página."
             : "Textos, fotos y disponibilidad se editan en su página. Precio, publicación y alta los guarda el propietario."}{" "}
-          Lo publicado se ve en la tienda. Copiar el enlace no cambia el precio ni crea una campaña. Lo vendido está en{" "}
-          <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="font-semibold text-accent-strong">
-            Rentabilidad
-          </Link>
-          . Leer esto no cobra ni cambia el precio ni la publicación.
+          Lo publicado se ve en la tienda. Copiar el enlace no cambia el precio ni crea una campaña. Lo vendido está en Rentabilidad. Leer esto no cobra ni cambia el precio ni la publicación.
         </p>
+        <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+            Ver rentabilidad
+          </Link>
+        </nav>
         <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Lista</p>
           <p className="mt-0.5 text-xs leading-5 text-muted">Filtrar no cobra ni cambia el precio ni la publicación.</p>
@@ -560,12 +562,12 @@ function CampaignLink({
     return (
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
         <span className="font-semibold text-muted">Campaña</span>
-        <a href={path} target="_blank" rel="noreferrer" title="Abrirla no cobra ni cambia el precio ni la publicación." className="font-semibold text-accent-strong underline-offset-2 hover:underline">
+        <a href={path} target="_blank" rel="noreferrer" title="Abrirla no cobra ni cambia el precio ni la publicación." className="inline-flex h-8 items-center rounded-[10px] border border-line bg-canvas px-2.5 text-xs font-semibold text-ink hover:bg-subtle">
           Abrir
         </a>
         <button
           type="button"
-          className="font-semibold text-accent-strong underline-offset-2 hover:underline"
+          className="inline-flex h-8 items-center rounded-[10px] border border-line bg-canvas px-2.5 text-xs font-semibold text-ink hover:bg-subtle"
           aria-label={`Copiar enlace de ${product.title}`}
           title="Copiarlo no cobra ni cambia el precio ni la publicación."
           onClick={copy}

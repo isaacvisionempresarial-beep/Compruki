@@ -345,11 +345,7 @@ export function Dashboard({
       <section className="mt-5" aria-labelledby="entradas">
         <h2 id="entradas" className="text-sm font-semibold">Dónde se trabaja</h2>
         <p className="mt-0.5 text-xs leading-5 text-muted">
-          Todos los pedidos de la tienda. Estas entradas no cambian con el período. Abrirlas no cobra ni cambia pedidos. Dropi no está conectado: el número se anota en{" "}
-          <Link href="/panel/sincronizacion" title="Abrirla no cobra. El total guardado no cambia." className="font-semibold text-accent-strong">
-            Sincronización
-          </Link>
-          .
+          Todos los pedidos de la tienda. Estas entradas no cambian con el período. Abrirlas no cobra ni cambia pedidos. Dropi no está conectado: el número se anota en Sincronización.
         </p>
         <ul className="mt-2 grid gap-3 sm:grid-cols-2">
           <li>
