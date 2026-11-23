@@ -589,7 +589,7 @@ export function OrderEditor({
 
 <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-acciones">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Siguiente</p>
-        <h2 id="pedido-acciones" className="mt-0.5 text-sm font-semibold">Acciones</h2>
+        <h2 id="pedido-acciones" className="mt-0.5 text-sm font-semibold">Herramientas del pedido</h2>
         {actions.length > 0 || prepareDropiError(order) || resolveBlocked || confirmBlocked ? (
           <>
           <FormTools className="mt-2">

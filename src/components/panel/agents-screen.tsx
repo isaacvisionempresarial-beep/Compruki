@@ -169,16 +169,17 @@ export function AgentsScreen({
               ))}
             </select>
           </label>
-          <div className="flex items-end">
+          <nav aria-label="Herramientas" className="flex flex-wrap items-end gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
             <button
               type="submit"
               title="Buscar no cobra ni cambia el catálogo."
               disabled={!ag02}
-              className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
+              className="inline-flex h-9 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55 sm:w-auto"
             >
               Buscar
             </button>
-          </div>
+          </nav>
         </form>
 
         <p className="mt-2 text-sm text-muted">
@@ -279,16 +280,17 @@ export function AgentsScreen({
               className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
             />
           </label>
-          <div className="flex items-end">
+          <nav aria-label="Herramientas" className="flex flex-wrap items-end gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
             <button
               type="submit"
               title="Calcular no cobra ni cambia pedidos."
               disabled={!ag04}
-              className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55 sm:w-auto"
+              className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
             >
               Calcular
             </button>
-          </div>
+          </nav>
         </form>
 
         <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">

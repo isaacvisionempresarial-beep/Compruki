@@ -78,14 +78,17 @@ export function ConnectionsScreen({
                 </p>
               </li>
             </ul>
-            <button
-              type="button"
-              disabled
-              title="Sigue bloqueado: Dropi no registró esta aplicación. No pide la contraseña ni cobra."
-              className="mt-3 inline-flex h-10 w-full cursor-not-allowed items-center justify-center rounded-[10px] border border-line bg-canvas px-4 text-sm font-semibold text-muted"
-            >
-              Conectar cuenta
-            </button>
+            <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+              <button
+                type="button"
+                disabled
+                title="Sigue bloqueado: Dropi no registró esta aplicación. No pide la contraseña ni cobra."
+                className="inline-flex h-9 cursor-not-allowed items-center justify-center rounded-[10px] border border-line bg-canvas px-4 text-sm font-semibold text-muted"
+              >
+                Conectar cuenta
+              </button>
+            </nav>
             <p className="mt-2 text-xs leading-5 text-muted">{connection.detail}</p>
             {jobs.length > 0 ? (
               <ul className="mt-2 space-y-1 text-xs leading-5 text-muted">

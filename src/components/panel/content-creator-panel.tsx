@@ -73,16 +73,17 @@ export function ContentCreatorPanel({
             ))}
           </select>
         </label>
-        <div className="flex items-end gap-2">
+        <nav aria-label="Herramientas" className="flex flex-wrap items-end gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
           <button
             type="submit"
             title="Generar no cobra ni publica."
             disabled={!enabled}
-            className="inline-flex h-10 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
+            className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
           >
             Generar borradores
           </button>
-        </div>
+        </nav>
       </form>
 
       {!selectedSku ? (

@@ -47,16 +47,17 @@ export function CentralRouterPanel({
             className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
           />
         </label>
-        <div className="flex items-end">
+        <nav aria-label="Herramientas" className="flex flex-wrap items-end gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
           <button
             type="submit"
             title="Enrutar no cobra ni cambia pedidos."
             disabled={!enabled}
-            className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55 sm:w-auto"
+            className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
           >
             Enrutar
           </button>
-        </div>
+        </nav>
       </form>
 
       {!route ? (
