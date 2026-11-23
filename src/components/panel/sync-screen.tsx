@@ -124,16 +124,19 @@ export function SyncScreen({
                 {tableReady ? (
                   <form action={noticeAction}>
                     <input type="hidden" name="orderId" value={job.orderId} />
-                    <button
-                      type="submit"
-                      title="Registrar el aviso no lo envía a Dropi, no avisa al cliente y no cobra."
-                      disabled={noticePending}
-                      className={`inline-flex h-9 shrink-0 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-canvas ${
-                        noticePending ? "cursor-wait opacity-70" : ""
-                      }`}
-                    >
-                      {noticePending ? "Anotando…" : "Dejar aviso"}
-                    </button>
+                    <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+                      <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                      <button
+                        type="submit"
+                        title="Registrar el aviso no lo envía a Dropi, no avisa al cliente y no cobra."
+                        disabled={noticePending}
+                        className={`inline-flex h-9 shrink-0 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-canvas ${
+                          noticePending ? "cursor-wait opacity-70" : ""
+                        }`}
+                      >
+                        {noticePending ? "Anotando…" : "Dejar aviso"}
+                      </button>
+                    </nav>
                   </form>
                 ) : null}
               </li>
@@ -160,16 +163,19 @@ export function SyncScreen({
                 {canEnqueue ? (
                   <form action={queueAction}>
                     <input type="hidden" name="orderId" value={order.id} />
-                    <button
-                      type="submit"
-                      title="Dejarlo en cola no lo envía a Dropi ni cobra. El total guardado no cambia."
-                      disabled={queuePending}
-                      className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-canvas ${
-                        queuePending ? "cursor-wait opacity-70" : ""
-                      }`}
-                    >
-                      {queuePending ? "Dejando…" : "Dejar en cola"}
-                    </button>
+                    <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+                      <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                      <button
+                        type="submit"
+                        title="Dejarlo en cola no lo envía a Dropi ni cobra. El total guardado no cambia."
+                        disabled={queuePending}
+                        className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-canvas ${
+                          queuePending ? "cursor-wait opacity-70" : ""
+                        }`}
+                      >
+                        {queuePending ? "Dejando…" : "Dejar en cola"}
+                      </button>
+                    </nav>
                   </form>
                 ) : (
                   <span className="text-xs text-muted">Lo deja el propietario.</span>

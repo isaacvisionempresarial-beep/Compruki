@@ -159,14 +159,17 @@ function AgentConfigForm({
             Solo el propietario puede cambiar esta configuración. No cobra ni cambia pedidos.
           </p>
         ) : null}
-        <button
-          type="submit"
-          title="Guardarlo no cobra ni cambia pedidos."
-          disabled={pending || !canEdit}
-          className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-55"
-        >
-          {pending ? "Guardando…" : "Guardar"}
-        </button>
+        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <button
+            type="submit"
+            title="Guardarlo no cobra ni cambia pedidos."
+            disabled={pending || !canEdit}
+            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-55"
+          >
+            {pending ? "Guardando…" : "Guardar"}
+          </button>
+        </nav>
       </form>
       {state.error ? (
         <p role="alert" className="mt-2 text-sm font-medium text-danger">

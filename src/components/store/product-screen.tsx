@@ -328,14 +328,17 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                   : "Pedir · pagas al recibir"}
               </button>
               <p className="text-xs leading-5 text-muted">Pedirlo lleva al pago. No confirma el pedido ni cobra.</p>
-              <button
-                type="submit"
-                disabled={!canBuy}
-                title="Agregarlo no registra pedido ni cobra."
-                className="flex h-10 w-full items-center justify-center sm:w-auto sm:min-w-56 rounded-[10px] border border-line bg-canvas text-sm font-semibold text-ink transition-colors enabled:hover:border-accent enabled:hover:bg-accent-tint disabled:cursor-not-allowed disabled:opacity-55"
-              >
-                Agregar al carrito
-              </button>
+              <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                <button
+                  type="submit"
+                  disabled={!canBuy}
+                  title="Agregarlo no registra pedido ni cobra."
+                  className="inline-flex h-9 w-full items-center justify-center sm:w-auto sm:min-w-56 rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink transition-colors enabled:hover:border-accent enabled:hover:bg-accent-tint disabled:cursor-not-allowed disabled:opacity-55"
+                >
+                  Agregar al carrito
+                </button>
+              </nav>
               <p className="text-xs leading-5 text-muted">Agregarlo no registra pedido ni cobra.</p>
               {added ? (
                 <p className="text-sm text-accent-strong" role="status">
@@ -368,7 +371,8 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
             {slides.length === 0 ? (
               <div className="grid min-h-36 place-items-center rounded-[14px] border border-line bg-subtle px-4 text-center">
                 <div>
-                  <p className="text-sm font-semibold text-muted">Sin foto en la ficha</p>
+                  <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+                  <p className="mt-0.5 text-sm font-semibold text-muted">Sin foto en la ficha</p>
                   <p className="mt-1 text-xs text-muted">El precio publicado no cambia. La ficha muestra solo lo revisado en el catálogo.</p>
                 </div>
               </div>
@@ -544,14 +548,17 @@ function ProductQuestion({ product }: { product: PublicProduct }) {
             className="mt-1.5 h-10 w-full rounded-[10px] border border-line bg-canvas px-3 text-sm font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
           />
         </label>
-        <button
-          type="submit"
-          disabled={!canAsk}
-          title="Preguntar no se envía a la tienda ni cobra."
-          className="inline-flex h-10 w-full items-center justify-center sm:w-auto sm:min-w-56 rounded-[10px] border border-line bg-card px-4 text-sm font-semibold hover:bg-subtle disabled:cursor-not-allowed disabled:opacity-55"
-        >
-          Preguntar
-        </button>
+        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <button
+            type="submit"
+            disabled={!canAsk}
+            title="Preguntar no se envía a la tienda ni cobra."
+            className="inline-flex h-9 w-full items-center justify-center sm:w-auto sm:min-w-56 rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle disabled:cursor-not-allowed disabled:opacity-55"
+          >
+            Preguntar
+          </button>
+        </nav>
       </form>
       {reply ? (
         <p role="status" className="mt-3 text-xs leading-5 whitespace-pre-line text-ink">

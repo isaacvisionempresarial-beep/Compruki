@@ -209,14 +209,17 @@ function DraftCard({ sku, draft, enabled }: { sku: string; draft: ContentDraft; 
         <input type="hidden" name="title" value={draft.title} />
         <input type="hidden" name="body" value={draft.body} />
         <input type="hidden" name="cta" value={draft.cta} />
-        <button
-          type="submit"
-          title="Guardarlo no publica ni cobra."
-          disabled={pending || !enabled}
-          className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-55"
-        >
-          {pending ? "Guardando…" : "Guardar borrador"}
-        </button>
+        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <button
+            type="submit"
+            title="Guardarlo no publica ni cobra."
+            disabled={pending || !enabled}
+            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-55"
+          >
+            {pending ? "Guardando…" : "Guardar borrador"}
+          </button>
+        </nav>
       </form>
       {state.error ? (
         <p role="alert" className="mt-2 text-sm font-medium text-danger">

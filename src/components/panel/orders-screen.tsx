@@ -725,7 +725,10 @@ export function OrderEditor({
           ) : null}
           </>
         ) : (
-          <p className="mt-2 text-sm text-muted">No hay una acción disponible en este estado. No cobra. El total guardado no cambia.</p>
+          <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm text-muted">No hay una acción disponible en este estado. No cobra. El total guardado no cambia.</p>
+          </div>
         )}
       </section>
 
@@ -1668,14 +1671,17 @@ function LinesForm({
                   />
                 </label>
                 {canManageOrderMoney && lines.length > 1 ? (
-                  <button
-                    type="button"
-                    title="Quitarla de esta lista no guarda sola. No es dinero cobrado."
-                    className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
-                    onClick={() => setLines((current) => current.filter((_, position) => position !== index))}
-                  >
-                    Quitar
-                  </button>
+                  <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                    <button
+                      type="button"
+                      title="Quitarla de esta lista no guarda sola. No es dinero cobrado."
+                      className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
+                      onClick={() => setLines((current) => current.filter((_, position) => position !== index))}
+                    >
+                      Quitar
+                    </button>
+                  </nav>
                 ) : null}
               </div>
             </li>
