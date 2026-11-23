@@ -43,6 +43,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-2">
             {productPage ? (
               <nav className="hidden items-center gap-3 text-sm font-semibold md:flex" aria-label="En esta ficha">
+                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Ficha</span>
                 {showBenefits ? (
                   <a href="#lo-especial" title="Ir ahí no cambia el precio publicado ni crea un pedido." className="text-muted hover:text-accent-strong">
                     Beneficios

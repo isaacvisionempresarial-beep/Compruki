@@ -1139,9 +1139,10 @@ export function ProductEditor({
             </div>
             {product ? <CampaignLink product={product} compact /> : null}
           </div>
-          <div className="grid gap-3 px-3 py-2 xl:grid-cols-[minmax(280px,0.9fr)_minmax(0,1.1fr)] xl:items-start">
+          <div className="space-y-3 px-3 py-2">
             <div className="rounded-[14px] border border-dashed border-line bg-subtle p-3">
-              <p className="text-sm font-semibold">Fotos y video</p>
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Medios</p>
+              <p className="mt-0.5 text-sm font-semibold">Fotos y video</p>
               <p className="mt-1 text-xs leading-5 text-muted">
                 Hasta {MAX_PRODUCT_IMAGES} fotos (1,5 MB) y 1 video MP4 (8 MB). Completas, sin recorte. Con derechos de
                 uso. No viene de Dropi.
@@ -1175,7 +1176,7 @@ export function ProductEditor({
                     photoTitle="Verla no cambia el precio ni la publicación."
                     moveTitle="Pasarla no cambia el precio ni la publicación."
                     brokenNote="El precio de la ficha no cambia."
-                    frameClassName="h-[min(28rem,56vh)] w-full"
+                    frameClassName="h-[min(28rem,56vh)] w-full max-w-xl"
                     singleClassName="max-h-[28rem] w-full object-contain"
                     roundedClassName="rounded-[10px]"
                     index={shownPhoto}
@@ -1272,7 +1273,8 @@ export function ProductEditor({
             </div>
             <div className="space-y-2">
             <div className="rounded-[14px] border border-line bg-canvas p-3">
-              <p className="text-sm font-semibold">Cifras y estado</p>
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cifras</p>
+              <p className="mt-0.5 text-sm font-semibold">Cifras y estado</p>
               <p className="mt-1 text-xs leading-5 text-muted">
                 {canManageCommerce
                   ? "El precio, el costo y el margen son de esta ficha. Publicar y poder pedirlo son dos decisiones distintas."
@@ -1366,7 +1368,8 @@ export function ProductEditor({
 
           <div className="grid gap-3 px-3 pb-3">
             <div className="rounded-[14px] border border-line p-3">
-              <p className="text-sm font-semibold">Identidad</p>
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Identidad</p>
+              <p className="mt-0.5 text-sm font-semibold">Nombre y referencia</p>
               <div className="mt-3 grid gap-3 lg:grid-cols-2">
             <div className="lg:col-span-2">
             <Field label="Nombre" htmlFor="title" hint="Lo ve el comprador en la ficha. No es el precio ni la publicación.">
@@ -1424,6 +1427,7 @@ export function ProductEditor({
             </div>
 
             <div className="grid gap-3 xl:grid-cols-2">
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase xl:col-span-2">Texto</p>
               <Field label="Descripción" htmlFor="description" hint="La ve el comprador en la ficha. No es el precio ni la publicación.">
                 <textarea
                   id="description"
@@ -1471,6 +1475,7 @@ export function ProductEditor({
             </Field>
 
             <div className="rounded-[14px] border border-line p-3">
+              <p className="mb-3 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Elección</p>
               <Field
                 label="Tallas o tamaños"
                 htmlFor="variants"
