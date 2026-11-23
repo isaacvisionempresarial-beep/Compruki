@@ -33,14 +33,15 @@ export default async function SyncOrderPage({ params }: { params: Promise<{ numb
         </div>
         <StatusPill status={order.status} />
       </div>
-      <div className="mt-3 flex flex-wrap gap-3 text-sm font-semibold">
-        <Link href="/panel/sincronizacion" title="Volver no cobra. El total guardado no cambia." className="text-accent-strong">
+      <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <Link href="/panel/sincronizacion" title="Volver no cobra. El total guardado no cambia." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Volver a sincronización
         </Link>
-        <Link href={orderFocusHref(order.number)} title="Abrirlo no cobra ni cambia el total guardado." className="text-accent-strong">
+        <Link href={orderFocusHref(order.number)} title="Abrirlo no cobra ni cambia el total guardado." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Abrir el pedido
         </Link>
-      </div>
+      </nav>
       {canNoteDropiNumber(order) ? (
         <>
           <p className="mt-3 max-w-2xl text-sm leading-5 text-muted">

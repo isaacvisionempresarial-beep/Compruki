@@ -504,85 +504,18 @@ export function OrderEditor({
             Volver
           </Link>
           {canNoteDropiNumber(order) ? (
-            <Link href={syncFocusHref(order.number)} title="Abrirla no cobra. El total guardado no cambia." className="text-sm font-semibold text-accent-strong">
+            <Link
+              href={syncFocusHref(order.number)}
+              title="Abrirla no cobra. El total guardado no cambia."
+              className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
+            >
               Sincronización
             </Link>
           ) : null}
         </div>
       </div>
 
-      <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_14rem]">
-      <div className="order-2 grid gap-3 xl:order-1">
-      <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-productos">
-        <h2 id="pedido-productos" className="text-sm font-semibold">Productos</h2>
-        {canEditLines(order) ? (
-          <>
-            <LinesForm order={order} products={products} canManageOrderMoney={canManageOrderMoney} />
-            {canManageOrderMoney ? (
-              <AddProductForm order={order} products={products} />
-            ) : (
-              <p className="mt-3 text-sm text-muted">Solo el propietario agrega productos a este pedido. No cobra. No es dinero cobrado.</p>
-            )}
-          </>
-        ) : (
-          <>
-            <ul className="mt-3 space-y-1 text-sm">
-              {order.lines.map((line) => (
-                <li key={`${line.sku}:${line.variant ?? ""}`}>
-                  {line.quantity} × {lineName(line)} · precio guardado {formatCop(line.unitPrice * line.quantity)}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-2 text-xs leading-5 text-muted">
-              Es el precio guardado en este pedido. Cambiar la ficha después no lo reescribe. No es dinero cobrado.
-            </p>
-          </>
-        )}
-        {priceStay ? <p className="mt-2 text-sm leading-5 text-warning">{priceStay}</p> : null}
-        <p className="mt-2 text-sm font-extrabold tabular-nums">
-          {payableTotalLabel(order.status)} {formatCop(order.total)}
-        </p>
-        <CatalogCostForm order={order} guides={costGuides} canManageOrderMoney={canManageOrderMoney} />
-        <FreightForm order={order} canManageOrderMoney={canManageOrderMoney} />
-      </section>
-
-      <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-entrega">
-        <h2 id="pedido-entrega" className="text-sm font-semibold">Entrega</h2>
-        <p className="mt-2 text-sm text-muted">
-          {order.phone}
-          {order.document ? ` · Cédula ${order.document}` : ""}
-          {" · "}
-          {order.address}
-          {order.reference ? ` · ${order.reference}` : ""}
-        </p>
-        {phoneMatches.length > 0 ? (
-          <div className="mt-3">
-            <p className="text-sm font-semibold">Este celular también está en</p>
-            <ul className="mt-1 space-y-1">
-              {phoneMatches.map((item) => (
-                <li key={item.id}>
-                  <a href={orderFocusHref(item.number)} title="Abrirlo no cobra ni cambia el total guardado." className="text-sm font-semibold underline-offset-2 hover:underline">
-                    {item.number}
-                  </a>
-                  <span className="text-sm text-muted"> · {STATUS_LABEL[item.status]}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-        {order.buyerNote ? (
-          <p className="mt-3 text-sm leading-5">
-            <span className="font-semibold">Aviso del cliente. </span>
-            {order.buyerNote}
-          </p>
-        ) : null}
-        {canEditDelivery(order) ? <DeliveryForm order={order} /> : null}
-        {needsClosedDepartment(order) ? <ClosedDepartmentForm order={order} /> : null}
-      </section>
-      </div>
-
-      <aside className="order-1 grid content-start gap-3 xl:sticky xl:top-[3.75rem] xl:order-2">
-      <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-resumen">
+<section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-resumen">
         <h2 id="pedido-resumen" className="text-sm font-semibold">Estado</h2>
         <p className="mt-2 text-sm font-extrabold tabular-nums">Total guardado {formatCop(order.total)}</p>
         <p className={cx("mt-1 text-xs leading-5", collectedWithoutCost(order) ? "text-warning" : "text-muted")}>
@@ -631,30 +564,11 @@ export function OrderEditor({
         ) : null}
       </section>
 
-      <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-dropi">
-        <h2 id="pedido-dropi" className="text-sm font-semibold">Sincronización</h2>
-        {canNoteDropiNumber(order) ? (
-          <p className="mt-1.5 text-xs leading-5 text-ink">
-            {order.providerRef
-              ? `Número: ${order.providerRef}. `
-              : "Falta el número de Dropi. "}
-            No se envía desde aquí.{" "}
-            <Link href={syncFocusHref(order.number)} title="Abrirla no cobra. El total guardado no cambia." className="font-semibold text-accent-strong">
-              Abrir
-            </Link>
-          </p>
-        ) : (
-          <p className="mt-1.5 text-xs leading-5 text-muted">
-            El número se anota después de confirmar. Dropi no está conectado.
-          </p>
-        )}
-      </section>
-
-      <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-acciones">
+<section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-acciones">
         <h2 id="pedido-acciones" className="text-sm font-semibold">Acciones</h2>
         {actions.length > 0 || prepareDropiError(order) || resolveBlocked || confirmBlocked ? (
           <>
-          <div className="mt-3 flex flex-col gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             {actions.map((item) =>
               needsCustomerReason(item.id) ? (
                 <ReasonAction
@@ -673,7 +587,7 @@ export function OrderEditor({
                     type="submit"
                     title="No cambia el total guardado ni cobra en esta pantalla."
                     disabled={pending || (moneyStatusAction(item.id) && !canManageOrderMoney)}
-                    className={`inline-flex h-10 w-full items-center justify-center rounded-[10px] px-3 text-sm font-semibold ${
+                    className={`inline-flex h-10 items-center justify-center rounded-[10px] px-3 text-sm font-semibold ${
                       pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
                     } ${buttonTone[item.tone]}`}
                   >
@@ -788,8 +702,94 @@ export function OrderEditor({
           <p className="mt-2 text-sm text-muted">No hay una acción disponible en este estado. No cobra. El total guardado no cambia.</p>
         )}
       </section>
-      </aside>
+
+      <div className="mt-3 grid items-start gap-3 lg:grid-cols-2">
+<section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-productos">
+        <h2 id="pedido-productos" className="text-sm font-semibold">Productos</h2>
+        {canEditLines(order) ? (
+          <>
+            <LinesForm order={order} products={products} canManageOrderMoney={canManageOrderMoney} />
+            {canManageOrderMoney ? (
+              <AddProductForm order={order} products={products} />
+            ) : (
+              <p className="mt-3 text-sm text-muted">Solo el propietario agrega productos a este pedido. No cobra. No es dinero cobrado.</p>
+            )}
+          </>
+        ) : (
+          <>
+            <ul className="mt-3 space-y-1 text-sm">
+              {order.lines.map((line) => (
+                <li key={`${line.sku}:${line.variant ?? ""}`}>
+                  {line.quantity} × {lineName(line)} · precio guardado {formatCop(line.unitPrice * line.quantity)}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 text-xs leading-5 text-muted">
+              Es el precio guardado en este pedido. Cambiar la ficha después no lo reescribe. No es dinero cobrado.
+            </p>
+          </>
+        )}
+        {priceStay ? <p className="mt-2 text-sm leading-5 text-warning">{priceStay}</p> : null}
+        <p className="mt-2 text-sm font-extrabold tabular-nums">
+          {payableTotalLabel(order.status)} {formatCop(order.total)}
+        </p>
+        <CatalogCostForm order={order} guides={costGuides} canManageOrderMoney={canManageOrderMoney} />
+        <FreightForm order={order} canManageOrderMoney={canManageOrderMoney} />
+      </section>
+
+<section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-entrega">
+        <h2 id="pedido-entrega" className="text-sm font-semibold">Entrega</h2>
+        <p className="mt-2 text-sm text-muted">
+          {order.phone}
+          {order.document ? ` · Cédula ${order.document}` : ""}
+          {" · "}
+          {order.address}
+          {order.reference ? ` · ${order.reference}` : ""}
+        </p>
+        {phoneMatches.length > 0 ? (
+          <div className="mt-3">
+            <p className="text-sm font-semibold">Este celular también está en</p>
+            <ul className="mt-1 space-y-1">
+              {phoneMatches.map((item) => (
+                <li key={item.id}>
+                  <a href={orderFocusHref(item.number)} title="Abrirlo no cobra ni cambia el total guardado." className="text-sm font-semibold underline-offset-2 hover:underline">
+                    {item.number}
+                  </a>
+                  <span className="text-sm text-muted"> · {STATUS_LABEL[item.status]}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+        {order.buyerNote ? (
+          <p className="mt-3 text-sm leading-5">
+            <span className="font-semibold">Aviso del cliente. </span>
+            {order.buyerNote}
+          </p>
+        ) : null}
+        {canEditDelivery(order) ? <DeliveryForm order={order} /> : null}
+        {needsClosedDepartment(order) ? <ClosedDepartmentForm order={order} /> : null}
+      </section>
       </div>
+
+<section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-dropi">
+        <h2 id="pedido-dropi" className="text-sm font-semibold">Sincronización</h2>
+        {canNoteDropiNumber(order) ? (
+          <p className="mt-1.5 text-xs leading-5 text-ink">
+            {order.providerRef
+              ? `Número: ${order.providerRef}. `
+              : "Falta el número de Dropi. "}
+            No se envía desde aquí.{" "}
+            <Link href={syncFocusHref(order.number)} title="Abrirla no cobra. El total guardado no cambia." className="font-semibold text-accent-strong">
+              Abrir
+            </Link>
+          </p>
+        ) : (
+          <p className="mt-1.5 text-xs leading-5 text-muted">
+            El número se anota después de confirmar. Dropi no está conectado.
+          </p>
+        )}
+      </section>
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-avisos">
         <h2 id="pedido-avisos" className="text-sm font-semibold">Avisos y motivos</h2>

@@ -13,22 +13,12 @@ export function DropiHandoff({ order }: { order: StoreOrder }) {
   const written = normalizeProviderRef(order.providerRef ?? "");
 
   return (
-    <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_14rem]">
-      <section className="elevate-1 order-2 rounded-[14px] border border-line bg-card px-3 py-2 xl:order-1" aria-labelledby="sync-datos">
-        <h2 id="sync-datos" className="text-sm font-semibold">
-          Datos para Dropi
+    <div className="mt-5 space-y-3">
+      <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="sync-numero-estado">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
+        <h2 id="sync-numero-estado" className="mt-0.5 text-sm font-semibold">
+          Número anotado
         </h2>
-        <p className="mt-1 text-xs leading-5 text-muted">
-          Dropi no está conectado. Se copian a mano; desde aquí no se crea el pedido ni cobra. El total guardado no cambia.
-        </p>
-        <DropiCopy order={order} />
-      </section>
-
-      <aside className="order-1 grid content-start gap-3 xl:sticky xl:top-[3.75rem] xl:order-2">
-        <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="sync-numero-estado">
-          <h2 id="sync-numero-estado" className="text-sm font-semibold">
-            Número anotado
-          </h2>
           {written ? (
             <p className="mt-2 text-sm font-extrabold">{written}</p>
           ) : (
@@ -39,6 +29,17 @@ export function DropiHandoff({ order }: { order: StoreOrder }) {
               ? "Quedó escrito a mano. Dropi no está conectado: no es una guía y no se envió desde aquí."
               : "Dropi no está conectado. Todavía no hay un número anotado en este pedido."}
           </p>
+      </section>
+
+      <div className="grid items-start gap-3 lg:grid-cols-2">
+        <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="sync-datos">
+          <h2 id="sync-datos" className="text-sm font-semibold">
+            Datos para Dropi
+          </h2>
+          <p className="mt-1 text-xs leading-5 text-muted">
+            Dropi no está conectado. Se copian a mano; desde aquí no se crea el pedido ni cobra. El total guardado no cambia.
+          </p>
+          <DropiCopy order={order} />
         </section>
         <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="sync-anotar">
           <h2 id="sync-anotar" className="text-sm font-semibold">
@@ -46,7 +47,7 @@ export function DropiHandoff({ order }: { order: StoreOrder }) {
           </h2>
           <DropiRefForm order={order} />
         </section>
-      </aside>
+      </div>
     </div>
   );
 }
