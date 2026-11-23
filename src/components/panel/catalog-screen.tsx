@@ -1089,8 +1089,48 @@ export function ProductEditor({
         </Link>
       </div>
 
-      <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_14rem]">
-        <form action={formAction} className="elevate-1 order-2 overflow-hidden rounded-[14px] border border-line bg-card xl:order-1">
+      <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="ficha-resumen">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
+        <h2 id="ficha-resumen" className="mt-0.5 text-sm font-semibold">Resumen de la ficha</h2>
+        <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div>
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Margen</dt>
+            <dd className={cx("mt-0.5 text-lg font-extrabold tabular-nums", margin !== null && margin < 0 ? "text-warning" : "text-accent-strong")}>
+              {margin === null ? "—" : formatCop(margin)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Precio</dt>
+            <dd className="mt-0.5 text-sm font-semibold tabular-nums">{price === null ? "—" : formatCop(price)}</dd>
+          </div>
+          <div>
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Costo</dt>
+            <dd className="mt-0.5 text-sm font-semibold tabular-nums">{cost === null ? "—" : formatCop(cost)}</dd>
+          </div>
+          <div>
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Envío</dt>
+            <dd className="mt-0.5 text-sm font-semibold tabular-nums">{shipping === null ? "—" : formatCop(shipping)}</dd>
+          </div>
+          <div>
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Comisiones</dt>
+            <dd className="mt-0.5 text-sm font-semibold tabular-nums">{commissions === null ? "—" : formatCop(commissions)}</dd>
+          </div>
+        </dl>
+        <p className="mt-2 text-xs leading-5 text-muted">Precio − costo − envío − comisiones. Es el margen de la ficha, no dinero cobrado.</p>
+        <dl className="mt-3 grid gap-3 border-t border-line pt-3 sm:grid-cols-2">
+          <div>
+            <dt className="text-sm font-semibold">{published ? "Publicado" : "Sin publicar"}</dt>
+            <dd className="mt-0.5 text-xs leading-5 text-muted">{published ? "Se ve si está disponible." : "Oculto en la tienda."}</dd>
+          </div>
+          <div>
+            <dt className="text-sm font-semibold">{unavailable ? "No disponible" : "Disponible"}</dt>
+            <dd className="mt-0.5 text-xs leading-5 text-muted">{unavailable ? "Se abre, pero no se pide." : "Se puede agregar al carrito."}</dd>
+          </div>
+        </dl>
+        <p className="mt-3 text-xs leading-5 text-muted">Dropi no está conectado. Las fotos se suben aquí. Subirlas no cobra ni cambia el precio ni la publicación.</p>
+      </section>
+
+      <form action={formAction} className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">
           {product ? <input type="hidden" name="id" value={product.id} /> : null}
           {product ? <input type="hidden" name="previousSku" value={product.sku} /> : null}
           <div className="border-b border-line px-3 py-2">
@@ -1550,57 +1590,7 @@ export function ProductEditor({
               {pending ? "Guardando…" : "Guardar producto"}
             </button>
           </div>
-        </form>
-
-        <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3.75rem] xl:order-2">
-          <h2 className="text-sm font-semibold">Resumen de la ficha</h2>
-          <div className="mt-3 flex items-baseline justify-between gap-2">
-            <p className="text-xs text-muted">Margen</p>
-            <p
-              className={cx(
-                "text-lg font-extrabold tabular-nums",
-                margin !== null && margin < 0 ? "text-warning" : "text-accent-strong",
-              )}
-            >
-              {margin === null ? "—" : formatCop(margin)}
-            </p>
-          </div>
-          <p className="mt-1.5 text-xs leading-5 text-muted">Precio − costo − envío − comisiones. Es el margen de la ficha, no dinero cobrado.</p>
-          <dl className="mt-2 space-y-1.5 border-t border-line pt-2 text-xs">
-            <div className="flex justify-between gap-2">
-              <dt className="text-muted">Precio</dt>
-              <dd className="tabular-nums">{price === null ? "—" : formatCop(price)}</dd>
-            </div>
-            <div className="flex justify-between gap-2">
-              <dt className="text-muted">Costo</dt>
-              <dd className="tabular-nums">{cost === null ? "—" : formatCop(cost)}</dd>
-            </div>
-            <div className="flex justify-between gap-2">
-              <dt className="text-muted">Envío</dt>
-              <dd className="tabular-nums">{shipping === null ? "—" : formatCop(shipping)}</dd>
-            </div>
-            <div className="flex justify-between gap-2">
-              <dt className="text-muted">Comisiones</dt>
-              <dd className="tabular-nums">{commissions === null ? "—" : formatCop(commissions)}</dd>
-            </div>
-          </dl>
-          <ul className="mt-2 space-y-2 border-t border-line pt-2 text-xs leading-5">
-            <li>
-              <span className="font-semibold text-sm">{published ? "Publicado" : "Sin publicar"}</span>
-              <span className="mt-0.5 block text-muted">
-                {published ? "Se ve si está disponible." : "Oculto en la tienda."}
-              </span>
-            </li>
-            <li>
-              <span className="font-semibold text-sm">{unavailable ? "No disponible" : "Disponible"}</span>
-              <span className="mt-0.5 block text-muted">
-                {unavailable ? "Se abre, pero no se pide." : "Se puede agregar al carrito."}
-              </span>
-            </li>
-          </ul>
-          <p className="mt-3 text-xs leading-5 text-muted">Dropi no está conectado. Las fotos se suben aquí. Subirlas no cobra ni cambia el precio ni la publicación.</p>
-        </aside>
-      </div>
+      </form>
     </div>
   );
 }

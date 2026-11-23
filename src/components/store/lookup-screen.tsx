@@ -25,8 +25,38 @@ export function LookupScreen() {
         </p>
       </section>
 
-      <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
-        <form action={formAction} className="elevate-1 order-2 space-y-2 rounded-[14px] border border-line bg-card px-3 py-2 xl:order-1">
+      <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="que-necesitas">
+        <h2 id="que-necesitas" className="text-sm font-semibold">Qué necesitas</h2>
+        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+          <li>
+            <span className="font-semibold text-sm">Número</span>
+            <span className="mt-0.5 block text-xs leading-5 text-muted">Empieza por P- y los dígitos al confirmar.</span>
+          </li>
+          <li>
+            <span className="font-semibold text-sm">Celular</span>
+            <span className="mt-0.5 block text-xs leading-5 text-muted">10 dígitos, empieza por 3. Debe coincidir.</span>
+          </li>
+        </ul>
+        <p className="mt-3 text-xs leading-5 text-muted">
+          Solo estado en la tienda. Si sigue en curso, pagas al recibir y nadie cobra aquí. Si está cancelado, devuelto o en incidencia, ya no se paga al recibir. Anotar el cobro, el flete o el recaudo no es dinero cobrado aquí. Consultar no cambia el total guardado. Dropi no está conectado. Sin guía ni fecha exacta.
+        </p>
+        <p className="mt-2 text-xs leading-5 text-muted">
+          Corregir la entrega, la talla o un aviso no cobra aquí. El total guardado no cambia. Agregar o quitar un producto sí puede cambiar ese total, y tampoco es dinero cobrado.
+        </p>
+        <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <Link
+            href="/tienda/condiciones"
+            title="Leerlas no registra pedido ni cobra."
+            className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
+          >
+            Condiciones
+          </Link>
+        </nav>
+        <p className="mt-2 text-xs leading-5 text-muted">Leerlas no registra pedido ni cobra.</p>
+      </section>
+
+      <form action={formAction} className="elevate-1 mt-3 max-w-xl space-y-2 rounded-[14px] border border-line bg-card px-3 py-2">
           <div>
             <label htmlFor="number" className="mb-1 block text-sm font-semibold">
               Número del pedido
@@ -85,35 +115,6 @@ export function LookupScreen() {
             {pending ? "Buscando…" : "Ver el pedido · no cobra"}
           </button>
         </form>
-
-        <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3rem] xl:order-2">
-          <h2 className="text-sm font-semibold">Qué necesitas</h2>
-          <ul className="mt-2 space-y-2 text-xs leading-5">
-            <li>
-              <span className="font-semibold text-sm">Número</span>
-              <span className="mt-0.5 block text-muted">Empieza por P- y los dígitos al confirmar.</span>
-            </li>
-            <li>
-              <span className="font-semibold text-sm">Celular</span>
-              <span className="mt-0.5 block text-muted">10 dígitos, empieza por 3. Debe coincidir.</span>
-            </li>
-          </ul>
-          <p className="mt-3 text-xs leading-5 text-muted">
-            Solo estado en la tienda. Si sigue en curso, pagas al recibir y nadie cobra aquí. Si está cancelado, devuelto o en incidencia, ya no se paga al recibir. Anotar el cobro, el flete o el recaudo no es dinero cobrado aquí. Consultar no cambia el total guardado. Dropi no está conectado. Sin guía ni fecha exacta.
-          </p>
-          <p className="mt-2 text-xs leading-5 text-muted">
-            Corregir la entrega, la talla o un aviso no cobra aquí. El total guardado no cambia. Agregar o quitar un producto sí puede cambiar ese total, y tampoco es dinero cobrado.
-          </p>
-          <Link
-            href="/tienda/condiciones"
-            title="Leerlas no registra pedido ni cobra."
-            className="mt-3 inline-flex w-full justify-center text-xs font-semibold text-accent-strong"
-          >
-            Condiciones
-          </Link>
-          <p className="mt-2 text-xs leading-5 text-muted">Leerlas no registra pedido ni cobra.</p>
-        </aside>
-      </div>
     </div>
   );
 }

@@ -95,7 +95,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
         </p>
       </section>
 
-      <form action={formAction} className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_15rem]">
+      <form action={formAction} className="mt-3 space-y-3">
         <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
         <input type="hidden" name="lines" value={JSON.stringify(payload)} />
         <input
@@ -104,7 +104,50 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
           value={JSON.stringify(payload.filter((line) => campaignSkus.includes(line.sku)).map((line) => line.sku))}
         />
 
-        <div className="order-2 space-y-2 xl:order-1">
+        <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="pago-resumen">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
+          <h2 id="pago-resumen" className="mt-0.5 text-sm font-semibold">Resumen</h2>
+          <ul className="mt-2 space-y-2">
+            {payable.map(({ line, product }) => (
+              <li key={`${line.sku}:${line.variant}`} className="text-xs">
+                <LinePhotos sku={line.sku} title={product?.title ?? line.sku} images={product?.images ?? []} />
+                <div className={`flex items-start gap-2 ${(product?.images.length ?? 0) > 1 ? "mt-2" : ""}`}>
+                  <ProductThumb sku={line.sku} show={product?.images.length === 1} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold leading-5">
+                      {lineName({
+                        title: product?.title ?? line.sku,
+                        variant: line.variant,
+                        sizeKind: line.sizeKind ?? product?.sizeKind ?? undefined,
+                      })}
+                    </span>
+                    <span className="mt-0.5 block text-muted">
+                      {line.quantity} × {formatCop(product?.price ?? 0)}
+                    </span>
+                  </span>
+                  <span className="text-sm font-semibold tabular-nums">{formatCop((product?.price ?? 0) * line.quantity)}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 flex items-baseline justify-between gap-2 border-t border-line pt-3">
+            <span className="text-xs text-muted">Total al recibir</span>
+            <span className="text-lg font-extrabold tabular-nums">{formatCop(total)}</span>
+          </p>
+          <p className="mt-2 text-xs leading-5 text-muted">Pagas al recibir. Envío aparte. Nadie cobra aquí.</p>
+          <p className="mt-1.5 text-xs leading-5 text-muted">
+            Confirmar registra en la tienda y no cobra. Dropi no está conectado: no crea el pedido ahí.
+          </p>
+          <p className="mt-2 text-sm leading-5 text-muted">
+            <Link href="/tienda/carrito" title="Volver no confirma el pedido ni cobra." className="font-semibold text-accent-strong">
+              Volver al carrito
+            </Link>
+            <span className="mt-1 block text-xs">Volver no confirma el pedido ni cobra.</span>
+          </p>
+
+        </section>
+
+        <div className="space-y-2">
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="entrega-titulo">
             <h2 id="entrega-titulo" className="text-sm font-semibold">
               Quién recibe
@@ -278,55 +321,13 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
               type="submit"
               title="Confirmar deja el pedido pendiente. Si ya existe o el celular ya tiene 3, no crea otro. Nadie cobra aquí."
               disabled={pending || !canConfirm}
-              className={`mt-3 inline-flex h-10 w-full scroll-mb-24 items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark ${
+              className={`mt-3 inline-flex h-10 w-full scroll-mb-24 sm:w-auto sm:min-w-56 items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark ${
                 pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
               }`}
             >
               {pending ? "Registrando…" : `Confirmar · pagas ${formatCop(total)} al recibir`}
             </button>
-          </section>
-        </div>
-
-        <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3rem] xl:order-2">
-          <h2 className="text-sm font-semibold">Resumen</h2>
-          <ul className="mt-2 space-y-2">
-            {payable.map(({ line, product }) => (
-              <li key={`${line.sku}:${line.variant}`} className="text-xs">
-                <LinePhotos sku={line.sku} title={product?.title ?? line.sku} images={product?.images ?? []} />
-                <div className={`flex items-start gap-2 ${(product?.images.length ?? 0) > 1 ? "mt-2" : ""}`}>
-                  <ProductThumb sku={line.sku} show={product?.images.length === 1} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-semibold leading-5">
-                      {lineName({
-                        title: product?.title ?? line.sku,
-                        variant: line.variant,
-                        sizeKind: line.sizeKind ?? product?.sizeKind ?? undefined,
-                      })}
-                    </span>
-                    <span className="mt-0.5 block text-muted">
-                      {line.quantity} × {formatCop(product?.price ?? 0)}
-                    </span>
-                  </span>
-                  <span className="text-sm font-semibold tabular-nums">{formatCop((product?.price ?? 0) * line.quantity)}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-3 flex items-baseline justify-between gap-2 border-t border-line pt-3">
-            <span className="text-xs text-muted">Total al recibir</span>
-            <span className="text-lg font-extrabold tabular-nums">{formatCop(total)}</span>
-          </p>
-          <p className="mt-2 text-xs leading-5 text-muted">Pagas al recibir. Envío aparte. Nadie cobra aquí.</p>
-          <p className="mt-1.5 text-xs leading-5 text-muted">
-            Confirmar registra en la tienda y no cobra. Dropi no está conectado: no crea el pedido ahí.
-          </p>
-          <p className="mt-2 text-sm leading-5 text-muted">
-            <Link href="/tienda/carrito" title="Volver no confirma el pedido ni cobra." className="font-semibold text-accent-strong">
-              Volver al carrito
-            </Link>
-            <span className="mt-1 block text-xs">Volver no confirma el pedido ni cobra.</span>
-          </p>
-        </aside>
+          </section>        </div>
       </form>
     </div>
   );

@@ -89,8 +89,50 @@ export function ConfirmationScreen({
         <p className="mt-1 text-xs leading-5 text-muted">{deliveryFollowUp(order.status)}</p>
       </section>
 
-      <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_15rem]">
-        <div className="order-2 space-y-2 xl:order-1">
+      <div className="mt-3 space-y-3">
+        <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="pedido-resumen-tienda">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
+          <h2 id="pedido-resumen-tienda" className="mt-0.5 text-sm font-semibold">Resumen</h2>
+          <ul className="mt-2 space-y-2">
+            {order.lines.map((line) => {
+              const photos = photosOf(images, line.sku);
+              return (
+                <li key={`${line.sku}:${line.variant ?? ""}`} className="text-xs">
+                  <LinePhotos sku={line.sku} title={line.title} images={photos} />
+                  <div className={`flex items-start gap-2 ${photos.length > 1 ? "mt-2" : ""}`}>
+                    <ProductThumb sku={line.sku} show={photos.length === 1} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold leading-5">{lineName(line)}</span>
+                      <span className="mt-0.5 block text-muted">
+                        {line.quantity} × {formatCop(line.unitPrice)}
+                      </span>
+                    </span>
+                    <span className="text-sm font-semibold tabular-nums">{formatCop(line.unitPrice * line.quantity)}</span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="mt-3 flex items-baseline justify-between gap-2 border-t border-line pt-3">
+            <p className="text-xs text-muted">{payableTotalLabel(order.status)}</p>
+            <p className="text-lg font-extrabold tabular-nums">{formatCop(order.total)}</p>
+          </div>
+          <p className="mt-2 text-xs leading-5 text-muted">
+            {customerPayLine(order.status, order.collected)}
+            Dropi no está conectado. Sin guía ni fecha exacta.
+          </p>
+          <Link
+            href="/tienda"
+            title="Volver no cobra. El total guardado no cambia."
+            className="mt-3 inline-flex h-10 sm:w-auto sm:min-w-56 items-center justify-center rounded-[10px] bg-primary text-sm font-semibold text-on-dark"
+          >
+            Volver a la tienda
+          </Link>
+          <p className="mt-2 text-xs leading-5 text-muted">Volver no cobra. El total guardado no cambia.</p>
+
+        </section>
+
+        <div className="space-y-2">
           <OrderProgress order={order} sizes={sizes} />
           {order.status === "pendiente_confirmacion" && token ? (
             <CustomerDelivery order={order} token={token} />
@@ -133,48 +175,7 @@ export function ConfirmationScreen({
           <Link href="/tienda/condiciones" title="Leerlas no cobra. El total guardado no cambia." className="inline-flex text-sm font-semibold text-accent-strong">
             Condiciones de la compra
           </Link>
-          <p className="text-xs leading-5 text-muted">Leerlas no cobra. El total guardado no cambia.</p>
-        </div>
-
-        <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3rem] xl:order-2">
-          <h2 className="text-sm font-semibold">Resumen</h2>
-          <ul className="mt-2 space-y-2">
-            {order.lines.map((line) => {
-              const photos = photosOf(images, line.sku);
-              return (
-                <li key={`${line.sku}:${line.variant ?? ""}`} className="text-xs">
-                  <LinePhotos sku={line.sku} title={line.title} images={photos} />
-                  <div className={`flex items-start gap-2 ${photos.length > 1 ? "mt-2" : ""}`}>
-                    <ProductThumb sku={line.sku} show={photos.length === 1} />
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold leading-5">{lineName(line)}</span>
-                      <span className="mt-0.5 block text-muted">
-                        {line.quantity} × {formatCop(line.unitPrice)}
-                      </span>
-                    </span>
-                    <span className="text-sm font-semibold tabular-nums">{formatCop(line.unitPrice * line.quantity)}</span>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="mt-3 flex items-baseline justify-between gap-2 border-t border-line pt-3">
-            <p className="text-xs text-muted">{payableTotalLabel(order.status)}</p>
-            <p className="text-lg font-extrabold tabular-nums">{formatCop(order.total)}</p>
-          </div>
-          <p className="mt-2 text-xs leading-5 text-muted">
-            {customerPayLine(order.status, order.collected)}
-            Dropi no está conectado. Sin guía ni fecha exacta.
-          </p>
-          <Link
-            href="/tienda"
-            title="Volver no cobra. El total guardado no cambia."
-            className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary text-sm font-semibold text-on-dark"
-          >
-            Volver a la tienda
-          </Link>
-          <p className="mt-2 text-xs leading-5 text-muted">Volver no cobra. El total guardado no cambia.</p>
-        </aside>
+          <p className="text-xs leading-5 text-muted">Leerlas no cobra. El total guardado no cambia.</p>        </div>
       </div>
     </div>
   );

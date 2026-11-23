@@ -66,8 +66,43 @@ export default function ConditionsPage() {
         </p>
       </section>
 
-      <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
-        <section className="elevate-1 order-2 rounded-[14px] border border-line bg-card px-3 py-2 xl:order-1" aria-labelledby="condiciones-lista">
+      <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="en-corto">
+        <h2 id="en-corto" className="text-sm font-semibold">En corto</h2>
+        <ul className="mt-3 grid gap-3 sm:grid-cols-3">
+          <li>
+            <span className="font-semibold text-sm">Nadie cobra aquí</span>
+            <span className="mt-0.5 block text-xs leading-5 text-muted">Pagas al recibir el precio publicado, en efectivo. Confirmar no cobra.</span>
+          </li>
+          <li>
+            <span className="font-semibold text-sm">Envío aparte</span>
+            <span className="mt-0.5 block text-xs leading-5 text-muted">Se acuerda antes de despachar. No se cobra aquí.</span>
+          </li>
+          <li>
+            <span className="font-semibold text-sm">Dropi</span>
+            <span className="mt-0.5 block text-xs leading-5 text-muted">No está conectado. Consulta con número y celular.</span>
+          </li>
+        </ul>
+        <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <Link
+            href="/tienda"
+            title="Volver no registra pedido ni cobra."
+            className="inline-flex h-9 items-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark"
+          >
+            Volver a la tienda
+          </Link>
+          <Link
+            href="/tienda/consultar"
+            title="Consultar no cobra ni cambia el total guardado."
+            className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
+          >
+            Consultar pedido
+          </Link>
+        </nav>
+        <p className="mt-2 text-xs leading-5 text-muted">Volver no registra pedido ni cobra. Consultar no cobra ni cambia el total guardado.</p>
+      </section>
+
+      <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="condiciones-lista">
           <h2 id="condiciones-lista" className="text-sm font-semibold">
             Lo que aceptas
           </h2>
@@ -80,37 +115,6 @@ export default function ConditionsPage() {
             ))}
           </dl>
         </section>
-
-        <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3rem] xl:order-2">
-          <h2 className="text-sm font-semibold">En corto</h2>
-          <ul className="mt-2 space-y-2 text-xs leading-5">
-            <li>
-              <span className="font-semibold text-sm">Nadie cobra aquí</span>
-              <span className="mt-0.5 block text-muted">Pagas al recibir el precio publicado, en efectivo. Confirmar no cobra.</span>
-            </li>
-            <li>
-              <span className="font-semibold text-sm">Envío aparte</span>
-              <span className="mt-0.5 block text-muted">Se acuerda antes de despachar. No se cobra aquí.</span>
-            </li>
-            <li>
-              <span className="font-semibold text-sm">Dropi</span>
-              <span className="mt-0.5 block text-muted">No está conectado. Consulta con número y celular.</span>
-            </li>
-          </ul>
-          <Link
-            href="/tienda"
-            title="Volver no registra pedido ni cobra."
-            className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary text-sm font-semibold text-on-dark"
-          >
-            Volver a la tienda
-          </Link>
-          <p className="mt-2 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>
-          <Link href="/tienda/consultar" title="Consultar no cobra ni cambia el total guardado." className="mt-2 inline-flex w-full justify-center text-xs font-semibold text-accent-strong">
-            Consultar pedido
-          </Link>
-          <p className="mt-2 text-xs leading-5 text-muted">Consultar no cobra ni cambia el total guardado.</p>
-        </aside>
-      </div>
     </div>
   );
 }

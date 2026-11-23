@@ -18,7 +18,6 @@ export function StatusPage({
   asideTitle = "Qué puedes hacer",
   asideItems,
   showBrand = false,
-  wide = false,
 }: {
   eyebrow: string;
   title: string;
@@ -27,10 +26,8 @@ export function StatusPage({
   asideTitle?: string;
   asideItems: Array<{ label: string; text: string }>;
   showBrand?: boolean;
-  /** Panel chrome sticky offset (~3.75rem); tienda/root use ~3rem. */
   wide?: boolean;
 }) {
-  const stickyTop = wide ? "xl:top-[3.75rem]" : "xl:top-[3rem]";
   return (
     <div className={showBrand ? "mx-auto max-w-6xl px-4 py-4" : undefined}>
       {showBrand ? (
@@ -42,23 +39,20 @@ export function StatusPage({
       <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">{title}</h1>
       <p className="mt-1.5 max-w-2xl text-sm leading-5 text-muted">{body}</p>
 
-      <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
-        <div className="order-2 min-w-0 xl:order-1">
-          <div className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
-            <div className="flex flex-wrap gap-2">{actions.map((action) => <ActionControl key={action.label} action={action} />)}</div>
-          </div>
-        </div>
-        <aside className={`elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky ${stickyTop} xl:order-2`}>
-          <h2 className="text-sm font-semibold">{asideTitle}</h2>
-          <ul className="mt-2 space-y-2 text-xs leading-5">
-            {asideItems.map((item) => (
-              <li key={item.label}>
-                <span className="font-semibold text-sm">{item.label}</span>
-                <span className="mt-0.5 block text-muted">{item.text}</span>
-              </li>
-            ))}
-          </ul>
-        </aside>
+      <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="status-guia">
+        <h2 id="status-guia" className="text-sm font-semibold">{asideTitle}</h2>
+        <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {asideItems.map((item) => (
+            <li key={item.label}>
+              <span className="font-semibold text-sm">{item.label}</span>
+              <span className="mt-0.5 block text-xs leading-5 text-muted">{item.text}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
+        <div className="flex flex-wrap gap-2">{actions.map((action) => <ActionControl key={action.label} action={action} />)}</div>
       </div>
     </div>
   );

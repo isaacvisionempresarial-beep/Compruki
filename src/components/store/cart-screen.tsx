@@ -51,8 +51,60 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
           Todavía no es un pedido. Dropi no está conectado.
         </p>
       </section>
-      <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_15rem]">
-        <div className="order-2 min-w-0 xl:order-1">
+      <div className="mt-3 space-y-3">
+      <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="carrito-resumen">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
+            <h2 id="carrito-resumen" className="mt-0.5 text-sm font-semibold">Resumen</h2>
+            <div className="mt-2 flex items-baseline justify-between gap-2">
+              <p className="text-xs text-muted">Total al recibir</p>
+              <p className="text-lg font-extrabold tabular-nums">{formatCop(total)}</p>
+            </div>
+            <p className="mt-2 text-xs leading-5 text-muted">
+              {rows.length === 0
+                ? "Cuando agregues productos, el total al recibir aparece aquí."
+                : "Pagas al recibir. Envío aparte. Todavía no es dinero cobrado."}
+            </p>
+            <p className="mt-1.5 text-xs leading-5 text-muted">
+              El pedido se crea al confirmar en el pago y no cobra. Dropi no está conectado.
+            </p>
+            {canContinue ? (
+              <>
+                <Link
+                  href="/tienda/pagar"
+                  title="Continuar no confirma el pedido ni cobra."
+                  className="mt-3 inline-flex h-10 sm:w-auto sm:min-w-56 items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark"
+                >
+                  Continuar · pagas al recibir
+                </Link>
+                <p className="mt-2 text-xs leading-5 text-muted">Continuar no confirma el pedido ni cobra.</p>
+              </>
+            ) : rows.length > 0 ? (
+              <div className="mt-3">
+                <p
+                  className="inline-flex h-10 sm:w-auto sm:min-w-56 cursor-not-allowed items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark opacity-55"
+                  aria-disabled="true"
+                  title="Continuar no confirma el pedido ni cobra."
+                >
+                  Continuar · pagas al recibir
+                </p>
+                <p className="mt-2 text-sm leading-5 text-coral-strong">{blockedHint}</p>
+                <p className="mt-2 text-xs leading-5 text-muted">Continuar no confirma el pedido ni cobra.</p>
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/tienda"
+                  title="Verlos no cambia los precios publicados ni crea un pedido."
+                  className="mt-3 inline-flex h-10 sm:w-auto sm:min-w-56 items-center justify-center rounded-[10px] bg-primary text-sm font-semibold text-on-dark"
+                >
+                  Ver productos
+                </Link>
+                <p className="mt-2 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>
+              </>
+            )}
+
+      </section>
+
         {rows.length === 0 ? (
           <p className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 text-sm leading-5 text-muted">
             El carrito está vacío. Vacío no registra pedido ni cobra.{" "}
@@ -192,60 +244,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
               })}
             </ul>
           </div>
-        )}
-        </div>
-
-          <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3rem] xl:order-2">
-            <h2 className="text-sm font-semibold">Resumen</h2>
-            <div className="mt-2 flex items-baseline justify-between gap-2">
-              <p className="text-xs text-muted">Total al recibir</p>
-              <p className="text-lg font-extrabold tabular-nums">{formatCop(total)}</p>
-            </div>
-            <p className="mt-2 text-xs leading-5 text-muted">
-              {rows.length === 0
-                ? "Cuando agregues productos, el total al recibir aparece aquí."
-                : "Pagas al recibir. Envío aparte. Todavía no es dinero cobrado."}
-            </p>
-            <p className="mt-1.5 text-xs leading-5 text-muted">
-              El pedido se crea al confirmar en el pago y no cobra. Dropi no está conectado.
-            </p>
-            {canContinue ? (
-              <>
-                <Link
-                  href="/tienda/pagar"
-                  title="Continuar no confirma el pedido ni cobra."
-                  className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark"
-                >
-                  Continuar · pagas al recibir
-                </Link>
-                <p className="mt-2 text-xs leading-5 text-muted">Continuar no confirma el pedido ni cobra.</p>
-              </>
-            ) : rows.length > 0 ? (
-              <div className="mt-3">
-                <p
-                  className="inline-flex h-10 w-full cursor-not-allowed items-center justify-center rounded-[10px] bg-accent text-sm font-extrabold text-primary-dark opacity-55"
-                  aria-disabled="true"
-                  title="Continuar no confirma el pedido ni cobra."
-                >
-                  Continuar · pagas al recibir
-                </p>
-                <p className="mt-2 text-sm leading-5 text-coral-strong">{blockedHint}</p>
-                <p className="mt-2 text-xs leading-5 text-muted">Continuar no confirma el pedido ni cobra.</p>
-              </div>
-            ) : (
-              <>
-                <Link
-                  href="/tienda"
-                  title="Verlos no cambia los precios publicados ni crea un pedido."
-                  className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary text-sm font-semibold text-on-dark"
-                >
-                  Ver productos
-                </Link>
-                <p className="mt-2 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>
-              </>
-            )}
-          </aside>
-        </div>
+        )}      </div>
     </div>
   );
 }

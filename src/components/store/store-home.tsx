@@ -57,8 +57,43 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
         </p>
       </section>
 
-      <div className="mt-3 grid items-start gap-3 xl:grid-cols-[minmax(0,1fr)_13.5rem]">
-        <div className="order-2 min-w-0 xl:order-1">
+      <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="como-pedir">
+        <h2 id="como-pedir" className="text-sm font-semibold">Cómo pedir</h2>
+        <ul className="mt-3 grid gap-3 sm:grid-cols-3">
+          <li>
+            <span className="font-semibold text-sm">Elige</span>
+            <span className="mt-0.5 block text-xs leading-5 text-muted">Entra a la ficha, elige talla o tamaño y agrega al carrito. No registra pedido ni cobra.</span>
+          </li>
+          <li>
+            <span className="font-semibold text-sm">Pagas al recibir</span>
+            <span className="mt-0.5 block text-xs leading-5 text-muted">El pedido queda pendiente. Nadie cobra aquí.</span>
+          </li>
+          <li>
+            <span className="font-semibold text-sm">Dropi</span>
+            <span className="mt-0.5 block text-xs leading-5 text-muted">No está conectado. Consulta el estado con número y celular.</span>
+          </li>
+        </ul>
+        <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <Link
+            href="/tienda/consultar"
+            title="Consultar no cobra ni cambia el total guardado."
+            className="inline-flex h-9 items-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft"
+          >
+            Consultar pedido
+          </Link>
+          <Link
+            href="/tienda/condiciones"
+            title="Leerlas no registra pedido ni cobra."
+            className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
+          >
+            Condiciones
+          </Link>
+        </nav>
+        <p className="mt-2 text-xs leading-5 text-muted">Consultar no cobra ni cambia el total guardado. Leerlas no registra pedido ni cobra.</p>
+      </section>
+
+      <div className="mt-3 min-w-0">
           <label className="block">
             <span className="sr-only">Buscar producto</span>
             <input
@@ -199,41 +234,6 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
               ))}
             </ul>
           )}
-        </div>
-
-        <aside className="elevate-1 order-1 rounded-[14px] border border-line bg-card px-3 py-2 xl:sticky xl:top-[3rem] xl:order-2">
-          <h2 className="text-sm font-semibold">Cómo pedir</h2>
-          <ul className="mt-2 space-y-2 text-xs leading-5">
-            <li>
-              <span className="font-semibold text-sm">Elige</span>
-              <span className="mt-0.5 block text-muted">Entra a la ficha, elige talla o tamaño y agrega al carrito. No registra pedido ni cobra.</span>
-            </li>
-            <li>
-              <span className="font-semibold text-sm">Pagas al recibir</span>
-              <span className="mt-0.5 block text-muted">El pedido queda pendiente. Nadie cobra aquí.</span>
-            </li>
-            <li>
-              <span className="font-semibold text-sm">Dropi</span>
-              <span className="mt-0.5 block text-muted">No está conectado. Consulta el estado con número y celular.</span>
-            </li>
-          </ul>
-          <Link
-            href="/tienda/consultar"
-            title="Consultar no cobra ni cambia el total guardado."
-            className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary text-sm font-semibold text-on-dark transition-colors hover:bg-primary-soft"
-          >
-            Consultar pedido
-          </Link>
-          <p className="mt-2 text-xs leading-5 text-muted">Consultar no cobra ni cambia el total guardado.</p>
-          <Link
-            href="/tienda/condiciones"
-            title="Leerlas no registra pedido ni cobra."
-            className="mt-2 inline-flex w-full justify-center text-xs font-semibold text-accent-strong"
-          >
-            Condiciones
-          </Link>
-          <p className="mt-2 text-xs leading-5 text-muted">Leerlas no registra pedido ni cobra.</p>
-        </aside>
       </div>
     </div>
   );
