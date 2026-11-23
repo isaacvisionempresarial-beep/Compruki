@@ -143,20 +143,24 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
 
           {visible.length === 0 ? (
             <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
-              <p className="text-sm leading-5 text-muted">{storeEmptyMessage(products.length, category, query)}</p>
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+              <p className="mt-0.5 text-sm leading-5 text-muted">{storeEmptyMessage(products.length, category, query)}</p>
               {products.length > 0 && (category !== "todas" || query.trim()) ? (
                 <>
-                <button
-                  type="button"
-                  title="Verlos no cambia los precios publicados ni crea un pedido."
-                  className="mt-3 inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-4 text-sm font-semibold"
-                  onClick={() => {
-                    setCategory("todas");
-                    setQuery("");
-                  }}
-                >
-                  Ver todos los productos
-                </button>
+                <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                  <button
+                    type="button"
+                    title="Verlos no cambia los precios publicados ni crea un pedido."
+                    className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+                    onClick={() => {
+                      setCategory("todas");
+                      setQuery("");
+                    }}
+                  >
+                    Ver todos los productos
+                  </button>
+                </nav>
                 <p className="mt-2 text-xs leading-5 text-muted">Verlos no cambia los precios publicados ni crea un pedido.</p>
                 </>
               ) : null}

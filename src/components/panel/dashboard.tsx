@@ -394,11 +394,14 @@ export function Dashboard({
           </nav>
         </div>
         {productResults.length === 0 ? (
-          <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-            {productRows.length > 0
-              ? "Ningún producto coincide con la búsqueda."
-              : `En este período no hay pedidos confirmados ni devueltos.${widerStorePeriod ? ` En ${closePhrase(widerStorePeriod, basis)} sí hay.` : ""}`}
-          </p>
+          <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm text-muted">
+              {productRows.length > 0
+                ? "Ningún producto coincide con la búsqueda."
+                : `En este período no hay pedidos confirmados ni devueltos.${widerStorePeriod ? ` En ${closePhrase(widerStorePeriod, basis)} sí hay.` : ""}`}
+            </p>
+          </div>
         ) : (
           <div className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">
             <div
@@ -488,11 +491,14 @@ export function Dashboard({
             : "La misma cola que Pedidos. El flete y el costo los guarda el propietario. No se recorta por período. Buscar solo cambia esta lista. Copiarla no cobra ni envía el mensaje."}
         </p>
         {waiting.length === 0 ? (
-          <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-            {attention.length === 0
-              ? "No hay pedidos esperando un dato o una acción."
-              : "Ningún pedido de la cola coincide con la búsqueda."}
-          </p>
+          <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm text-muted">
+              {attention.length === 0
+                ? "No hay pedidos esperando un dato o una acción."
+                : "Ningún pedido de la cola coincide con la búsqueda."}
+            </p>
+          </div>
         ) : (
           <ul className="elevate-1 mt-3 divide-y divide-line overflow-hidden rounded-[14px] border border-line bg-card">
             {waiting.map((row) => {

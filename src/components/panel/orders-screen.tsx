@@ -285,9 +285,10 @@ export function OrdersScreen({
             : " Si puedes hacer algo, ese es el paso. El flete, el costo y el cobro quedan después y los guarda el propietario."}
         </p>
         {work.length === 0 ? (
-          <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-            No hay pedidos esperando un dato o una acción.
-          </p>
+          <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm text-muted">No hay pedidos esperando un dato o una acción.</p>
+          </div>
         ) : (
           <div className="mt-2">
             {work.map((queue) => (
@@ -358,9 +359,10 @@ export function OrdersScreen({
         <AttentionSheet orders={orders} guides={sizeGuides} priceGuides={priceGuides} costGuides={costGuides} canManageOrderMoney={canManageOrderMoney} />
       </section>
       {orders.length === 0 ? (
-        <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-          Todavía no entra ningún pedido de la tienda. No cobra.
-        </p>
+        <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+          <p className="mt-0.5 text-sm text-muted">Todavía no entra ningún pedido de la tienda. No cobra.</p>
+        </div>
       ) : (
         <>
           <DispatchSheet orders={spanOrders} moved={span !== "todo" && basis === "movidos"} />
@@ -771,7 +773,8 @@ export function OrderEditor({
         </p>
         {phoneMatches.length > 0 ? (
           <div className="mt-3">
-            <p className="text-sm font-semibold">Este celular también está en</p>
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">También</p>
+            <p className="mt-0.5 text-sm font-semibold">Este celular también está en</p>
             <ul className="mt-1 space-y-1">
               {phoneMatches.map((item) => (
                 <li key={item.id}>
@@ -865,7 +868,10 @@ export function OrderEditor({
             </ol>
           </div>
         ) : (
-          <p className="mt-2 text-sm text-muted">Todavía no hay movimientos anotados. Verlos no cobra ni cambia el total guardado.</p>
+          <div className="mt-2 rounded-[10px] border border-line bg-canvas px-3 py-2">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm text-muted">Todavía no hay movimientos anotados. Verlos no cobra ni cambia el total guardado.</p>
+          </div>
         )}
       </section>
     </div>
@@ -1024,9 +1030,12 @@ function DispatchSheet({ orders, moved }: { orders: StoreOrder[]; moved: boolean
           : "Confirmados, en preparación o en despacho de este período. Copiarla no crea el pedido en Dropi ni cambia el total guardado."}
       </p>
       {rows.length === 0 ? (
-        <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-          En este período no hay pedidos en curso para copiar. Los pendientes siguen en Por atender.
-        </p>
+        <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+          <p className="mt-0.5 text-sm text-muted">
+            En este período no hay pedidos en curso para copiar. Los pendientes siguen en Por atender.
+          </p>
+        </div>
       ) : (
         <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
           <label className="text-sm font-semibold" htmlFor="hoja-despacho">
@@ -1164,7 +1173,8 @@ function CatalogCostForm({
       className="mt-3 grid gap-2 rounded-[10px] border border-line bg-canvas px-3 py-2"
     >
       <input type="hidden" name="orderId" value={order.id} />
-      <p className="text-sm font-semibold">{replacing ? "Costo de la ficha de hoy" : "Costo de la ficha"}</p>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cifras</p>
+      <p className="mt-0.5 text-sm font-semibold">{replacing ? "Costo de la ficha de hoy" : "Costo de la ficha"}</p>
       <ul className="space-y-1 text-sm leading-5">
         {costDrift(order, guides).map((drift) => (
           <li key={`hoy:${drift.sku}`}>
@@ -1585,8 +1595,9 @@ function LinesForm({
           })),
         )}
       />
-      <p className="text-sm font-semibold">Productos del pedido</p>
-      <ul className="grid gap-3">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Líneas</p>
+      <p className="mt-0.5 text-sm font-semibold">Productos del pedido</p>
+      <ul className="mt-2 grid gap-3">
         {lines.map((line, index) => {
           const product = products.find((item) => item.sku === line.sku);
           const sized = Boolean(product?.sizeKind && product.variants.length > 0);
@@ -1810,7 +1821,8 @@ function DeliveryForm({ order }: { order: StoreOrder }) {
   return (
     <form action={deliveryAction} className="mt-3 grid gap-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
       <input type="hidden" name="orderId" value={order.id} />
-      <p className="text-sm font-semibold">Corregir entrega</p>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Corrección</p>
+      <p className="mt-0.5 text-sm font-semibold">Corregir entrega</p>
       <label className="text-sm font-semibold" htmlFor={`entrega-nombre-${order.id}`}>
         Nombre de quien recibe
         <input id={`entrega-nombre-${order.id}`} name="customerName" title="Escribirlo no cobra. El total guardado no cambia." value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" className={freightInput} />
@@ -2026,6 +2038,7 @@ function InternalNoteForm({ order }: { order: StoreOrder }) {
   return (
     <form action={noteAction} className="grid gap-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
       <input type="hidden" name="orderId" value={order.id} />
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Interna</p>
       <label className="text-sm font-semibold" htmlFor={`nota-${order.id}`}>
         Nota interna
         <textarea
@@ -2098,6 +2111,7 @@ function CustomerNote({ order }: { order: StoreOrder }) {
 
   return (
     <div className="grid gap-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cliente</p>
       <label className="text-sm font-semibold" htmlFor={`mensaje-${order.id}`}>
         Mensaje para el cliente
         <textarea

@@ -209,17 +209,21 @@ export function CatalogScreen({
 
           {visible.length === 0 ? (
             <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
-              <p className="text-sm leading-5 text-muted">
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+              <p className="mt-0.5 text-sm leading-5 text-muted">
                 {catalogEmptyMessage(products.length, searched.length, filter, query, canManageCommerce)}
               </p>
               {products.length === 0 && canManageCommerce ? (
-                <Link
-                  href="/panel/catalogo/nuevo"
-                  title="Crearlo no cobra ni confirma un pedido."
-                  className="mt-3 inline-flex h-10 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark"
-                >
-                  Nuevo producto
-                </Link>
+                <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                  <Link
+                    href="/panel/catalogo/nuevo"
+                    title="Crearlo no cobra ni confirma un pedido."
+                    className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+                  >
+                    Nuevo producto
+                  </Link>
+                </nav>
               ) : null}
             </div>
           ) : (
@@ -1235,7 +1239,8 @@ export function ProductEditor({
               </button>
               <p className="mt-1 text-xs leading-5 text-muted">{mediaPickNote("fotos")}</p>
               <div className="mt-3 border-t border-line pt-2.5">
-                <p className="text-sm font-semibold">Video</p>
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Clip</p>
+                <p className="mt-0.5 text-sm font-semibold">Video</p>
                 {videoPreview ? (
                   <video src={videoPreview} controls title="Verlo no cambia el precio ni la publicación." className="mt-3 max-h-[32rem] w-full rounded-[10px] bg-card" />
                 ) : savedVideo && !clearVideo ? (

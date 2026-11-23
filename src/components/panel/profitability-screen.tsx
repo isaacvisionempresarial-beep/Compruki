@@ -142,14 +142,18 @@ export function ProfitabilityScreen({
         </nav>
         {periodShift ? <p className="mt-3 text-sm leading-5">{periodShift}</p> : null}
             {results.length === 0 ? (
-              <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-                En este período no hay pedidos confirmados ni devueltos.
-                {wider ? ` En ${closePhrase(wider, basis)} sí hay.` : ""}
-              </p>
+              <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+                <p className="mt-0.5 text-sm text-muted">
+                  En este período no hay pedidos confirmados ni devueltos.
+                  {wider ? ` En ${closePhrase(wider, basis)} sí hay.` : ""}
+                </p>
+              </div>
             ) : visible.length === 0 ? (
-              <p className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-                Ningún producto coincide con la búsqueda.
-              </p>
+              <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+                <p className="mt-0.5 text-sm text-muted">Ningún producto coincide con la búsqueda.</p>
+              </div>
             ) : (
               <div className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">
                 <div

@@ -193,9 +193,12 @@ export function SyncScreen({
             </h3>
             <p className="mt-0.5 text-xs leading-5 text-muted">{group.hint}</p>
             {visible.length === 0 ? (
-              <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-                {query && group.rows.length > 0 ? "Ningún pedido de esta lista coincide con la búsqueda. Buscar no cobra ni cambia el total guardado." : group.empty}
-              </p>
+              <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+                <p className="mt-0.5 text-sm text-muted">
+                  {query && group.rows.length > 0 ? "Ningún pedido de esta lista coincide con la búsqueda. Buscar no cobra ni cambia el total guardado." : group.empty}
+                </p>
+              </div>
             ) : (
               <div className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">
                 <SyncHead />
@@ -220,9 +223,12 @@ export function SyncScreen({
           Ábrelos para copiar datos o corregirlo. El total guardado no cambia.
         </p>
         {noted.filter((order) => matchesSync(order, query)).length === 0 ? (
-          <p className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2 text-sm text-muted">
-            {query && noted.length > 0 ? "Ningún pedido de esta lista coincide con la búsqueda." : "Todavía no hay un número anotado."}
-          </p>
+          <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm text-muted">
+              {query && noted.length > 0 ? "Ningún pedido de esta lista coincide con la búsqueda." : "Todavía no hay un número anotado."}
+            </p>
+          </div>
         ) : (
           <div className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">
             <SyncHead />
