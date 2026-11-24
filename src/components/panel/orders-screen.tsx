@@ -634,7 +634,7 @@ export function OrderEditor({
             <details className="mt-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
               <summary className="cursor-pointer" title="Abrirlo no cobra ni cambia el total guardado.">
                 <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Bloqueo</span>
-                <span className="mt-0.5 block text-sm font-semibold text-muted">Acciones bloqueadas y mensaje al cliente</span>
+                <span className="mt-0.5 block text-sm font-semibold text-muted">Herramientas bloqueadas y mensaje al cliente</span>
               </summary>
               <FormTools className="mt-2">
                 {confirmBlocked ? (

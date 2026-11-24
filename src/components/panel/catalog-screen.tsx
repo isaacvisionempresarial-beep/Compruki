@@ -404,49 +404,52 @@ function CatalogRowLifecycle({
       return <span className="text-xs font-semibold text-muted">{deactivateState.message ?? "Inactivo"}</span>;
     }
     return (
-      <form action={deactivateAction}>
-        <input type="hidden" name="id" value={product.id} />
-        <button
-          type="submit"
-          disabled={deactivatePending}
-          title="No se puede pedir. No cambia el precio ni la publicación."
-          className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas ${
-            deactivatePending ? "cursor-wait opacity-70" : ""
-          }`}
-        >
-          {deactivatePending ? "…" : "Desactivar"}
-        </button>
-        {deactivateState.error ? <span className="ml-2 text-xs font-semibold text-danger">{deactivateState.error}</span> : null}
-      </form>
+      <>
+        <form action={deactivateAction} className="contents">
+          <input type="hidden" name="id" value={product.id} />
+          <button
+            type="submit"
+            disabled={deactivatePending}
+            title="No se puede pedir. No cambia el precio ni la publicación."
+            className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas ${
+              deactivatePending ? "cursor-wait opacity-70" : ""
+            }`}
+          >
+            {deactivatePending ? "…" : "Desactivar"}
+          </button>
+        </form>
+        {deactivateState.error ? <span className="text-xs font-semibold text-danger">{deactivateState.error}</span> : null}
+      </>
     );
   }
 
   if (!hasOrders) {
     if (confirmDelete) {
       return (
-        <form action={deleteAction} className="flex flex-wrap items-center gap-2">
-          <input type="hidden" name="id" value={product.id} />
-          <button
-            type="submit"
-            title="Quita el producto del catálogo. No cobra ni confirma un pedido."
-            disabled={deletePending}
-            className={`inline-flex h-9 items-center justify-center rounded-[10px] bg-danger px-3 text-sm font-semibold text-on-dark ${
-              deletePending ? "cursor-wait opacity-70" : ""
-            }`}
-          >
-            {deletePending ? "…" : "Confirmar"}
-          </button>
-          <button
-            type="button"
-            title="No lo quita ni cobra."
-            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
-            onClick={() => setConfirmDelete(false)}
-          >
-            No
-          </button>
-          <p className="w-full text-xs leading-5 text-muted">Quita el producto del catálogo. No cobra ni confirma un pedido.</p>
+        <>
+          <form action={deleteAction} className="contents">
+            <input type="hidden" name="id" value={product.id} />
+            <button
+              type="submit"
+              title="Quita el producto del catálogo. No cobra ni confirma un pedido."
+              disabled={deletePending}
+              className={`inline-flex h-9 items-center justify-center rounded-[10px] bg-danger px-3 text-sm font-semibold text-on-dark ${
+                deletePending ? "cursor-wait opacity-70" : ""
+              }`}
+            >
+              {deletePending ? "…" : "Confirmar"}
+            </button>
+            <button
+              type="button"
+              title="No lo quita ni cobra."
+              className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
+              onClick={() => setConfirmDelete(false)}
+            >
+              No
+            </button>
+          </form>
           {deleteState.error ? <span className="text-xs font-semibold text-danger">{deleteState.error}</span> : null}
-        </form>
+        </>
       );
     }
     return (
@@ -466,22 +469,22 @@ function CatalogRowLifecycle({
   }
 
   return (
-    <form action={deactivateAction}>
-      <input type="hidden" name="id" value={product.id} />
-      <button
-        type="submit"
-        disabled={deactivatePending}
-        title="Hay pedidos con este producto; no se puede eliminar. Desactivar no cambia el precio ni la publicación."
-        className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas ${
-          deactivatePending ? "cursor-wait opacity-70" : ""
-        }`}
-      >
-        {deactivatePending ? "…" : "Desactivar"}
-      </button>
-      {deactivateState.error ? (
-        <span className="ml-2 text-xs font-semibold text-danger">{deactivateState.error}</span>
-      ) : null}
-    </form>
+    <>
+      <form action={deactivateAction} className="contents">
+        <input type="hidden" name="id" value={product.id} />
+        <button
+          type="submit"
+          disabled={deactivatePending}
+          title="Hay pedidos con este producto; no se puede eliminar. Desactivar no cambia el precio ni la publicación."
+          className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas ${
+            deactivatePending ? "cursor-wait opacity-70" : ""
+          }`}
+        >
+          {deactivatePending ? "…" : "Desactivar"}
+        </button>
+      </form>
+      {deactivateState.error ? <span className="text-xs font-semibold text-danger">{deactivateState.error}</span> : null}
+    </>
   );
 }
 
@@ -1747,13 +1750,28 @@ export function ProductDangerZone({
         </p>
       ) : null}
 
+      {canDelete && canManageCommerce && confirmDelete ? (
+        <p className="mt-2 text-sm font-semibold text-danger">¿Eliminar {product.title}?</p>
+      ) : null}
+      {!canDelete || !canManageCommerce ? (
+        product.available ? (
+          <p className="mt-2 max-w-2xl text-xs leading-5 text-muted">
+            Marcarlo como no disponible no cambia el precio ni la publicación. No cobra.
+            {product.published ? " Sigue publicado, pero no se puede pedir." : " Sigue sin publicar."}
+          </p>
+        ) : (
+          <p className="mt-2 text-sm font-semibold text-muted">
+            Ya está marcado como no disponible. No cambia el precio ni la publicación. No cobra.
+          </p>
+        )
+      ) : null}
+
       <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
         <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
         {canDelete && canManageCommerce ? (
           confirmDelete ? (
-            <form action={deleteAction} className="flex flex-wrap items-center gap-2">
+            <form action={deleteAction} className="contents">
               <input type="hidden" name="id" value={product.id} />
-              <p className="text-sm font-semibold text-danger">¿Eliminar {product.title}?</p>
               <button
                 type="submit"
                 title="Eliminarlo quita la ficha. No cobra."
@@ -1784,28 +1802,20 @@ export function ProductDangerZone({
             </button>
           )
         ) : product.available ? (
-          <>
-            <p className="max-w-2xl text-xs leading-5 text-muted">
-              Marcarlo como no disponible no cambia el precio ni la publicación. No cobra.
-              {product.published ? " Sigue publicado, pero no se puede pedir." : " Sigue sin publicar."}
-            </p>
-            <form action={deactivateAction}>
-              <input type="hidden" name="id" value={product.id} />
-              <button
-                type="submit"
-                title="No cambia el precio ni la publicación. No cobra."
-                disabled={deactivatePending}
-                className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
-                  deactivatePending ? "cursor-wait opacity-70" : ""
-                }`}
-              >
-                {deactivatePending ? "Guardando…" : "Marcar como no disponible"}
-              </button>
-            </form>
-          </>
-        ) : (
-          <p className="text-sm font-semibold text-muted">Ya está marcado como no disponible. No cambia el precio ni la publicación. No cobra.</p>
-        )}
+          <form action={deactivateAction} className="contents">
+            <input type="hidden" name="id" value={product.id} />
+            <button
+              type="submit"
+              title="No cambia el precio ni la publicación. No cobra."
+              disabled={deactivatePending}
+              className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
+                deactivatePending ? "cursor-wait opacity-70" : ""
+              }`}
+            >
+              {deactivatePending ? "Guardando…" : "Marcar como no disponible"}
+            </button>
+          </form>
+        ) : null}
       </nav>
     </section>
   );

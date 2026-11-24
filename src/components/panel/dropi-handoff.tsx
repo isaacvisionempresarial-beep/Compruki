@@ -19,16 +19,22 @@ export function DropiHandoff({ order }: { order: StoreOrder }) {
         <h2 id="sync-numero-estado" className="mt-0.5 text-sm font-semibold">
           Número anotado
         </h2>
-          {written ? (
+        {written ? (
+          <>
             <p className="mt-2 text-sm font-extrabold">{written}</p>
-          ) : (
-            <p className="mt-2 text-sm font-extrabold text-warning">Sin anotar</p>
-          )}
-          <p className="mt-1 text-xs leading-5 text-muted">
-            {written
-              ? "Quedó escrito a mano. Dropi no está conectado: no es una guía y no se envió desde aquí."
-              : "Dropi no está conectado. Todavía no hay un número anotado en este pedido."}
-          </p>
+            <p className="mt-1 text-xs leading-5 text-muted">
+              Quedó escrito a mano. Dropi no está conectado: no es una guía y no se envió desde aquí.
+            </p>
+          </>
+        ) : (
+          <div className="mt-2">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm font-extrabold text-warning">Sin anotar</p>
+            <p className="mt-1 text-xs leading-5 text-muted">
+              Dropi no está conectado. Todavía no hay un número anotado en este pedido.
+            </p>
+          </div>
+        )}
       </section>
 
       <div className="grid items-start gap-3 lg:grid-cols-2">
