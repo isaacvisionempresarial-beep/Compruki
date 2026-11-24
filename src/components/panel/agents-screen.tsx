@@ -52,11 +52,9 @@ export function AgentsScreen({
 }) {
   const p0 = view.roles.filter((role) => role.priority === "P0-IA");
   const ag05 = view.roles.find((role) => role.id === "AG-05");
-  const budgetRoles = [
-    ...p0,
-    ...(ag05 ? [ag05] : []),
-  ];
-  const later = view.roles.filter((role) => role.priority !== "P0-IA" && role.id !== "AG-05");
+  const ag06 = view.roles.find((role) => role.id === "AG-06");
+  const budgetRoles = [...p0, ...(ag05 ? [ag05] : []), ...(ag06 ? [ag06] : [])];
+  const later = view.roles.filter((role) => role.priority !== "P0-IA" && role.id !== "AG-05" && role.id !== "AG-06");
   usePanelSectionHash(["pendientes-humanos", "corridas"]);
   const ag01 = agentIsOn(view, "AG-01");
   const ag02 = agentIsOn(view, "AG-02");
@@ -419,16 +417,33 @@ export function AgentsScreen({
         canEdit={canApproveCatalog}
       />
 
-      {ag05 ? (
-        <section className="elevate-1 mt-4 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="ag05-lite">
+      {ag05 || ag06 ? (
+        <section className="elevate-1 mt-4 space-y-3 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="en-uso-lite">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">En uso</p>
-          <h2 id="ag05-lite" className="mt-0.5 text-base font-bold">
-            {ag05.id} · {ag05.name}
+          <h2 id="en-uso-lite" className="sr-only">
+            Roles lite activos
           </h2>
-          <p className="mt-1 text-sm text-muted">
-            Lite activo: responde con la ficha; si no alcanza, deriva a Pendientes humanos con borrador sugerido
-            (OpenAI o plantilla). Apágalo en Presupuesto y activación. Verlo no cobra ni cambia pedidos.
-          </p>
+          {ag05 ? (
+            <div>
+              <h3 className="text-sm font-bold">
+                {ag05.id} · {ag05.name}
+              </h3>
+              <p className="mt-1 text-sm text-muted">
+                Responde con la ficha; si no alcanza, deriva a Pendientes humanos con borrador sugerido (OpenAI o
+                plantilla). Verlo no cobra ni cambia pedidos.
+              </p>
+            </div>
+          ) : null}
+          {ag06 ? (
+            <div>
+              <h3 className="text-sm font-bold">
+                {ag06.id} · {ag06.name}
+              </h3>
+              <p className="mt-1 text-sm text-muted">
+                Lite: «Leer pedido» en el detalle resume el estado (OpenAI o cifras). No cambia el pedido ni cobra.
+              </p>
+            </div>
+          ) : null}
         </section>
       ) : null}
 

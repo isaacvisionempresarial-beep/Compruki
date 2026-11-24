@@ -48,8 +48,8 @@ export const AGENT_ROLES: AgentRoleDefinition[] = [
   {
     id: "AG-06",
     name: "Gestor de Pedidos",
-    job: "Consultar estado, detectar anomalías y preparar envíos con confirmación.",
-    tools: ["get_order_status", "prepare_order_submission", "submit_approved_order"],
+    job: "Lectura de estado y anomalías del pedido con datos locales; envíos con confirmación humana más adelante.",
+    tools: ["get_order_status", "draft_order_reading", "prepare_order_submission", "submit_approved_order"],
     priority: "P1",
   },
   {

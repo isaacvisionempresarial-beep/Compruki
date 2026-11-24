@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useMemo, useState, type ReactNode } from "react";
 import { AttentionSheet } from "@/components/panel/attention-sheet";
 import { CloseSheet } from "@/components/panel/close-sheet";
+import { OrderReadingPanel } from "@/components/panel/order-reading-panel";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
+import type { OrderReading } from "@/server/agent-order-reading";
 import { parsePesos, sizeChoiceLabel, variantFits } from "@/lib/catalog";
 import { blockedDropiAnswer } from "@/lib/dropi-provider";
 import { cx } from "@/lib/cx";
@@ -486,6 +488,9 @@ export function OrderEditor({
   priceGuides = [],
   costGuides,
   canManageOrderMoney = false,
+  orderReading = null,
+  orderReadingEnabled = true,
+  orderReadingError = null,
 }: {
   order: StoreOrder;
   orders: StoreOrder[];
@@ -494,6 +499,9 @@ export function OrderEditor({
   priceGuides?: PriceGuide[];
   costGuides: CostGuide[];
   canManageOrderMoney?: boolean;
+  orderReading?: OrderReading | null;
+  orderReadingEnabled?: boolean;
+  orderReadingError?: string | null;
 }) {
   const [state, action, pending] = useActionState(updateOrderAction, initialState);
   const margin = orderMargin(order);
@@ -623,6 +631,13 @@ export function OrderEditor({
           <p role="alert" className="mt-2 text-xs font-semibold text-danger">{state.error}</p>
         ) : null}
       </section>
+
+      <OrderReadingPanel
+        orderNumber={order.number}
+        reading={orderReading}
+        enabled={orderReadingEnabled}
+        policyError={orderReadingError}
+      />
 
 <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-herramientas">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</p>
