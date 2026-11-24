@@ -8,7 +8,7 @@ import { variantFits } from "@/lib/catalog";
 import { LinePhotos, ProductThumb } from "@/components/store/product-thumb";
 import { useCart } from "@/components/store/cart-state";
 import { formatCop } from "@/lib/format";
-import { dropiHandoffText, lineName, normalizePhone, orderTotal, validateCheckout } from "@/lib/store-order";
+import { customerDeliveryPreviewText, lineName, normalizePhone, orderTotal, validateCheckout } from "@/lib/store-order";
 import { placeOrderAction, type PlaceOrderState } from "@/server/store-actions";
 
 const initialState: PlaceOrderState = { error: null };
@@ -50,7 +50,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
   });
   const canConfirm = !checkoutError;
   const handoff = canConfirm
-    ? dropiHandoffText({
+    ? customerDeliveryPreviewText({
         number: "sin número",
         customerName: customerName.trim(),
         phone: normalizePhone(phone),
@@ -102,8 +102,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Carrito</p>
         <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">Datos de entrega</h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Pago contra entrega. Al confirmar queda pendiente. Nadie cobra aquí. Pagas {formatCop(total)} al recibir. Dropi no está
-          conectado.
+          Pago contra entrega. Al confirmar queda pendiente. Nadie cobra aquí. Pagas {formatCop(total)} al recibir.
         </p>
       </section>
 
@@ -148,7 +147,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
           </p>
           <p className="mt-2 text-xs leading-5 text-muted">Pagas al recibir. Envío aparte. Nadie cobra aquí.</p>
           <p className="mt-1.5 text-xs leading-5 text-muted">
-            Confirmar registra en la tienda y no cobra. Dropi no está conectado: no crea el pedido ahí.
+            Confirmar registra en la tienda y no cobra. El envío se acuerda aparte.
           </p>
           <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
             <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>

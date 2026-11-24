@@ -4,7 +4,7 @@ import { listPublicProducts } from "@/server/catalog-store";
 
 export const metadata: Metadata = {
   title: "Tienda",
-  description: "Productos publicados de la tienda piloto. Pagas al recibir. El envío se acuerda aparte. Dropi no está conectado.",
+  description: "Productos publicados de la tienda piloto. Pagas al recibir. El envío se acuerda aparte.",
 };
 export const dynamic = "force-dynamic";
 

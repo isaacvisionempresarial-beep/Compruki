@@ -5,7 +5,7 @@ import { listPublicProducts } from "@/server/catalog-store";
 export const metadata: Metadata = {
   title: "Confirmar pedido",
   description:
-    "Datos de entrega y pago contra entrega. El pedido queda pendiente de confirmación. Nadie cobra en COMPRUKI. Dropi no está conectado.",
+    "Datos de entrega y pago contra entrega. El pedido queda pendiente de confirmación. Nadie cobra en COMPRUKI.",
 };
 export const dynamic = "force-dynamic";
 

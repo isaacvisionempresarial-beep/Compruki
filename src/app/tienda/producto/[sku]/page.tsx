@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ sku: stri
       .find(Boolean) ||
     "Pagas al recibir. El pedido queda pendiente de confirmación.";
   const availability = product.available ? "Disponible" : "No disponible";
-  const description = `${product.title}. Precio publicado ${formatCop(product.price)}. Pagas al recibir. ${availability}. ${blurb} El envío se confirma aparte. Nadie cobra aquí. Dropi no está conectado.`.slice(
+  const description = `${product.title}. Precio publicado ${formatCop(product.price)}. Pagas al recibir. ${availability}. ${blurb} El envío se confirma aparte. Nadie cobra aquí.`.slice(
     0,
     300,
   );

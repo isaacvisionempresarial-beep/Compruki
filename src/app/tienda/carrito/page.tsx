@@ -5,7 +5,7 @@ import { listPublicProducts } from "@/server/catalog-store";
 export const metadata: Metadata = {
   title: "Carrito",
   description:
-    "Revisa los productos antes de pedir. El total es de los precios publicados. El envío se confirma aparte. Dropi no está conectado.",
+    "Revisa los productos antes de pedir. El total es de los precios publicados. El envío se confirma aparte.",
 };
 export const dynamic = "force-dynamic";
 

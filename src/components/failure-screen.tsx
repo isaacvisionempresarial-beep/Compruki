@@ -29,7 +29,7 @@ export function FailureScreen({
       asideItems={[
         { label: "Pedidos", text: "Esta falla no confirma, no cancela y no cambia el total guardado." },
         { label: "Cobro", text: "Nadie cobra en el sitio. Reintentar tampoco." },
-        { label: "Dropi", text: "No está conectado. Desde aquí no se crea un pedido en Dropi." },
+        { label: "Envío", text: "No se inventa guía ni fecha. El envío se acuerda aparte." },
       ]}
     />
   );

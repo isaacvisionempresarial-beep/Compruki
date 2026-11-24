@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     id: "/tienda",
     name: "COMPRUKI",
     short_name: "COMPRUKI",
-    description: "Tu negocio, en modo venta. Pagas al recibir. Dropi no está conectado.",
+    description: "Tu negocio, en modo venta. Pagas al recibir. El envío se acuerda aparte.",
     start_url: "/tienda",
     scope: "/",
     display: "standalone",

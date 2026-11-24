@@ -53,7 +53,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
           Pagas al recibir
         </h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Tienda piloto · Colombia. Elige y deja el pedido. El envío se acuerda aparte. Los precios son los publicados. Nadie cobra aquí. Dropi no está conectado.
+          Tienda piloto · Colombia. Elige y deja el pedido. El envío se acuerda aparte. Los precios son los publicados. Nadie cobra aquí.
         </p>
       </section>
 
@@ -70,8 +70,8 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
             <span className="mt-0.5 block text-xs leading-5 text-muted">El pedido queda pendiente. Nadie cobra aquí.</span>
           </li>
           <li>
-            <span className="font-semibold text-sm">Dropi</span>
-            <span className="mt-0.5 block text-xs leading-5 text-muted">No está conectado. Consulta el estado con número y celular.</span>
+            <span className="font-semibold text-sm">Consulta</span>
+            <span className="mt-0.5 block text-xs leading-5 text-muted">Sigue el estado con el número del pedido y el celular de la entrega.</span>
           </li>
         </ul>
         <nav aria-label="Consulta" className="mt-3 flex flex-wrap items-center gap-2">

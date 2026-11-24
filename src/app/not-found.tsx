@@ -4,7 +4,7 @@ import { StatusPage } from "@/components/status-page";
 export const metadata: Metadata = {
   title: "No encontrada",
   description:
-    "Esta página no existe en COMPRUKI. Puedes abrir la tienda o entrar al panel. Dropi no está conectado.",
+    "Esta página no existe en COMPRUKI. Puedes abrir la tienda o entrar al panel.",
 };
 
 export default function NotFound() {
@@ -14,7 +14,7 @@ export default function NotFound() {
         showBrand
         eyebrow="COMPRUKI"
         title="Esta página no está"
-        body="La dirección no corresponde a una pantalla de la tienda ni del panel. No se creó ni se borró nada. El carrito de este navegador no cambia. No cobra. Dropi no está conectado."
+        body="La dirección no corresponde a una pantalla de la tienda ni del panel. No se creó ni se borró nada. El carrito de este navegador no cambia. No cobra."
         actions={[
           { href: "/tienda", label: "Ir a la tienda", title: "Abrirla no registra pedido ni cobra.", primary: true },
           { href: "/ingresar", label: "Entrar al panel", title: "Abrirlo no cobra ni cambia pedidos." },
@@ -29,8 +29,8 @@ export default function NotFound() {
             text: "Tienda, operación y sistema: pedidos, catálogo, rentabilidad, sincronización y agentes.",
           },
           {
-            label: "Dropi",
-            text: "No está conectado. Desde aquí no se crea un pedido en Dropi.",
+            label: "Pedido",
+            text: "Confirmar o consultar no cobra. El envío se acuerda aparte. Sin guía inventada.",
           },
         ]}
       />

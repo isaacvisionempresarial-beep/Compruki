@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return {
     title: order ? `Pedido ${order.number}` : "No encontrado",
     description:
-      "Consulta el estado con el número del pedido y el celular de la entrega. Dropi no está conectado. Sin guía ni fecha exacta.",
+      "Consulta el estado con el número del pedido y el celular de la entrega. Sin guía ni fecha exacta.",
   };
 }
 

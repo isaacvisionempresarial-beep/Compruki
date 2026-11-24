@@ -9,7 +9,7 @@ export function OfflineScreen() {
         showBrand
         eyebrow="Sin red"
         title="No hay conexión"
-        body="Sin internet no cargan pantallas nuevas. No cobra. Dropi no está conectado ni se sincroniza. El carrito de este navegador puede seguir aquí; no se confirma ni se envía un pedido."
+        body="Sin internet no cargan pantallas nuevas. No cobra. El carrito de este navegador puede seguir aquí; no se confirma ni se envía un pedido."
         actions={[
           { label: "Intentar de nuevo", title: "Reintentar no cobra ni registra un pedido.", primary: true, onClick: () => window.location.reload() },
           { href: "/tienda", label: "Ir a la tienda", title: "Abrirla no registra pedido ni cobra." },
@@ -21,8 +21,8 @@ export function OfflineScreen() {
             text: "Lo que ya está en este navegador no se borra solo por quedarte sin red.",
           },
           {
-            label: "Dropi",
-            text: "No está conectado. Sin guía, fecha ni sync. No se inventa un estado.",
+            label: "Pedido",
+            text: "Sin red no se confirma ni se consulta un estado nuevo. No se inventa una guía ni una fecha.",
           },
           {
             label: "Cuando vuelva la red",

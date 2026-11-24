@@ -294,13 +294,28 @@ export async function getPublicProduct(sku: string) {
   return product ? toPublicProduct(product) : null;
 }
 
+/** Quita nombres de plataformas de proveedor del copy que ve el comprador. */
+function scrubPublicCopy(value: string) {
+  return value
+    .replace(/\bNo viene de Dropi\.?/gi, "")
+    .replace(/\bDropi no está conectado\.?/gi, "")
+    .replace(/\b(?:texto para |número de |número ya anotado en )?Dropi\b/gi, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\s+([.,;:!?])/g, "$1")
+    .replace(/\(\s*\)/g, "")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/\.\s*\./g, ".")
+    .trim();
+}
+
 function toPublicProduct(product: CatalogProduct): PublicProduct {
   return {
     id: product.id,
     title: product.title,
-    description: product.description,
-    highlights: product.highlights.trim(),
-    answers: product.answers.trim(),
+    description: scrubPublicCopy(product.description),
+    highlights: scrubPublicCopy(product.highlights),
+    answers: scrubPublicCopy(product.answers),
     sku: product.sku,
     category: product.category.trim(),
     price: product.price,

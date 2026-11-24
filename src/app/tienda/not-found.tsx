@@ -4,7 +4,7 @@ import { StatusPage } from "@/components/status-page";
 export const metadata: Metadata = {
   title: "No encontrado",
   description:
-    "Ese producto o pedido no está en la tienda. Puedes volver al catálogo o consultar con número y celular. Dropi no está conectado.",
+    "Ese producto o pedido no está en la tienda. Puedes volver al catálogo o consultar con número y celular.",
 };
 
 export default function StoreNotFound() {
@@ -12,7 +12,7 @@ export default function StoreNotFound() {
     <StatusPage
       eyebrow="Tienda"
       title="No encontramos eso"
-      body="El producto o el pedido no está publicado aquí, o el enlace ya no sirve. El carrito de este navegador no cambia. No cobra. Dropi no está conectado."
+      body="El producto o el pedido no está publicado aquí, o el enlace ya no sirve. El carrito de este navegador no cambia. No cobra."
       actions={[
         { href: "/tienda", label: "Ver productos", title: "Verlos no cambia los precios publicados ni crea un pedido.", primary: true },
         { href: "/tienda/consultar", label: "Consultar un pedido", title: "Consultar no cobra ni cambia el total guardado." },
@@ -25,7 +25,7 @@ export default function StoreNotFound() {
         },
         {
           label: "Pedidos",
-          text: "Se abren con el número y el celular de la entrega. Dropi no está conectado. Sin guía.",
+          text: "Se abren con el número y el celular de la entrega. Sin guía ni fecha exacta.",
         },
         {
           label: "Pago",

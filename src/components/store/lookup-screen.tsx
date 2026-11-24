@@ -21,7 +21,7 @@ export function LookupScreen() {
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedido</p>
         <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">Consultar pedido</h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Seguimiento. Número del pedido y celular de la entrega. Varios intentos seguidos se detienen un rato y no abren el pedido. Consultar no cobra ni cambia el total guardado. Dropi no está conectado.
+          Seguimiento. Número del pedido y celular de la entrega. Varios intentos seguidos se detienen un rato y no abren el pedido. Consultar no cobra ni cambia el total guardado.
         </p>
       </section>
 
@@ -39,7 +39,7 @@ export function LookupScreen() {
           </li>
         </ul>
         <p className="mt-3 text-xs leading-5 text-muted">
-          Solo estado en la tienda. Si sigue en curso, pagas al recibir y nadie cobra aquí. Si está cancelado, devuelto o en incidencia, ya no se paga al recibir. Anotar el cobro, el flete o el recaudo no es dinero cobrado aquí. Consultar no cambia el total guardado. Dropi no está conectado. Sin guía ni fecha exacta.
+          Solo estado en la tienda. Si sigue en curso, pagas al recibir y nadie cobra aquí. Si está cancelado, devuelto o en incidencia, ya no se paga al recibir. Anotar el cobro, el flete o el recaudo no es dinero cobrado aquí. Consultar no cambia el total guardado. Sin guía ni fecha exacta.
         </p>
         <p className="mt-2 text-xs leading-5 text-muted">
           Corregir la entrega, la talla o un aviso no cobra aquí. El total guardado no cambia. Agregar o quitar un producto sí puede cambiar ese total, y tampoco es dinero cobrado.

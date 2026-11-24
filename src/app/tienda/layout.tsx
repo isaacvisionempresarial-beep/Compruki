@@ -3,7 +3,7 @@ import { CartProvider } from "@/components/store/cart-state";
 import { StoreShell } from "@/components/store/store-shell";
 
 const storeDescription =
-  "Tienda piloto en Colombia. Pagas al recibir. El pedido queda pendiente de confirmación. Dropi no está conectado.";
+  "Tienda piloto en Colombia. Pagas al recibir. El pedido queda pendiente de confirmación. El envío se acuerda aparte.";
 
 export const metadata: Metadata = {
   title: {
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
   openGraph: {
     title: "Tienda · COMPRUKI",
-    description: "Pagas al recibir. El pedido queda pendiente de confirmación. Dropi no está conectado.",
+    description: "Pagas al recibir. El pedido queda pendiente de confirmación. El envío se acuerda aparte.",
     locale: "es_CO",
     type: "website",
     url: "/tienda",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Tienda · COMPRUKI",
-    description: "Pagas al recibir. El pedido queda pendiente de confirmación. Dropi no está conectado.",
+    description: "Pagas al recibir. El pedido queda pendiente de confirmación. El envío se acuerda aparte.",
   },
 };
 

@@ -14,7 +14,7 @@ import {
   customerSizeHoldNote,
   customerStatusNote,
   customerSteps,
-  dropiHandoffText,
+  customerDeliveryPreviewText,
   lineName,
   payableTotalLabel,
   validateBuyerNote,
@@ -120,7 +120,7 @@ export function ConfirmationScreen({
           </div>
           <p className="mt-2 text-xs leading-5 text-muted">
             {customerPayLine(order.status, order.collected)}
-            Dropi no está conectado. Sin guía ni fecha exacta.
+            Sin guía ni fecha exacta.
           </p>
           <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
             <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
@@ -302,7 +302,7 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
   const canSave = Boolean(draft) && !unchanged;
   const previewText =
     canSave && draft
-      ? dropiHandoffText({
+      ? customerDeliveryPreviewText({
           number: order.number,
           customerName: draft.customerName,
           phone: draft.phone,

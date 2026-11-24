@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 const conditionsDescription =
-  "Condiciones de la compra: pedido pendiente, pago contra entrega, envío sin guía prometida y consulta por número y celular. Dropi no está conectado.";
+  "Condiciones de la compra: pedido pendiente, pago contra entrega, envío sin guía prometida y consulta por número y celular.";
 
 export const metadata: Metadata = {
   title: "Condiciones",
@@ -35,11 +35,11 @@ const points = [
   },
   {
     label: "El envío",
-    text: "No está incluido y se acuerda antes de despachar. No hay guía ni fecha prometida. Acordarlo no cobra y el total guardado no cambia. Dropi no está conectado.",
+    text: "No está incluido y se acuerda antes de despachar. No hay guía ni fecha prometida. Acordarlo no cobra y el total guardado no cambia.",
   },
   {
     label: "Tus datos",
-    text: "Nombre, celular, cédula si la escribes, departamento, ciudad, dirección y referencia. Sirven para preparar este pedido. Sin departamento, el texto para Dropi no lo lleva y la tienda puede confirmar igual. Mientras sigue pendiente, puedes corregirlos. Corregirlos no cobra y el total guardado no cambia.",
+    text: "Nombre, celular, cédula si la escribes, departamento, ciudad, dirección y referencia. Sirven para preparar este pedido. Sin departamento, la tienda puede confirmar igual. Mientras sigue pendiente, puedes corregirlos. Corregirlos no cobra y el total guardado no cambia.",
   },
   {
     label: "El estado",
@@ -62,7 +62,7 @@ export default function ConditionsPage() {
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedido</p>
         <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">Condiciones de la compra</h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Tienda piloto · Colombia. Lo que aceptas al dejar el pedido. Leerlas no registra pedido ni cobra. Dropi no está conectado. La identidad de la tienda sigue en prueba.
+          Tienda piloto · Colombia. Lo que aceptas al dejar el pedido. Leerlas no registra pedido ni cobra. La identidad de la tienda sigue en prueba.
         </p>
       </section>
 
@@ -79,8 +79,8 @@ export default function ConditionsPage() {
             <span className="mt-0.5 block text-xs leading-5 text-muted">Se acuerda antes de despachar. No se cobra aquí.</span>
           </li>
           <li>
-            <span className="font-semibold text-sm">Dropi</span>
-            <span className="mt-0.5 block text-xs leading-5 text-muted">No está conectado. Consulta con número y celular.</span>
+            <span className="font-semibold text-sm">Consulta</span>
+            <span className="mt-0.5 block text-xs leading-5 text-muted">Sigue el estado con el número del pedido y el celular de la entrega.</span>
           </li>
         </ul>
         <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">

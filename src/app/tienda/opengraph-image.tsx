@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { ShareImage } from "@/components/brand/share-image";
 
-export const alt = "Tienda COMPRUKI · Pagas al recibir. Dropi no está conectado.";
+export const alt = "Tienda COMPRUKI · Pagas al recibir. El envío se acuerda aparte.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

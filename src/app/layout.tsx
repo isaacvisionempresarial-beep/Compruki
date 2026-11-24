@@ -17,20 +17,20 @@ export const metadata: Metadata = {
     default: "COMPRUKI",
     template: "%s · COMPRUKI",
   },
-  description: "Tu negocio, en modo venta. Panel para catálogo, pedidos y margen. Dropi no está conectado.",
+  description: "Tu negocio, en modo venta. Panel para catálogo, pedidos y margen. Pagas al recibir.",
   applicationName: "COMPRUKI",
   appleWebApp: { capable: true, title: "COMPRUKI", statusBarStyle: "default" },
   robots: { index: false, follow: false, nocache: true },
   openGraph: {
     title: "COMPRUKI",
-    description: "Tu negocio, en modo venta. Panel para catálogo, pedidos y margen. Dropi no está conectado.",
+    description: "Tu negocio, en modo venta. Panel para catálogo, pedidos y margen. Pagas al recibir.",
     locale: "es_CO",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "COMPRUKI",
-    description: "Tu negocio, en modo venta. Dropi no está conectado.",
+    description: "Tu negocio, en modo venta. Pagas al recibir.",
   },
 };
 

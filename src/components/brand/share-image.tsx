@@ -39,7 +39,7 @@ export function ShareImage({
         <div style={{ fontSize: 28, lineHeight: 1.35, color: "#59657a", maxWidth: 900 }}>{subtitle}</div>
       </div>
 
-      <div style={{ fontSize: 22, fontWeight: 600, color: "#59657a" }}>Dropi no está conectado</div>
+      <div style={{ fontSize: 22, fontWeight: 600, color: "#59657a" }}>Pagas al recibir · Envío aparte</div>
     </div>
   );
 }

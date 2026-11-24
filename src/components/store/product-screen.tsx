@@ -209,7 +209,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Precio publicado</p>
             <p className="mt-0.5 text-lg font-extrabold tracking-tight tabular-nums">{formatCop(product.price)}</p>
             <p className="mt-1 text-xs leading-5 text-muted">
-              Pagas al recibir. Envío aparte. No es dinero cobrado. Dropi no está conectado.
+              Pagas al recibir. Envío aparte. No es dinero cobrado.
             </p>
           </div>
 
@@ -377,7 +377,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               </li>
               <li>
                 <span className="font-semibold">Información clara</span>
-                <span className="mt-0.5 block text-xs text-muted">Solo lo escrito en esta ficha. Dropi no está conectado.</span>
+                <span className="mt-0.5 block text-xs text-muted">Solo lo escrito en esta ficha.</span>
               </li>
             </ul>
           </div>
@@ -465,7 +465,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               ["Envío", "No incluido. Se acuerda con la dirección. Sin fecha prometida. No se cobra aquí."],
               ["Pago", "Pagas al recibir el precio publicado. Nadie cobra aquí. El pedido queda pendiente de confirmación."],
               ["Cambios", "Se acuerdan con la tienda. No se inventa una política aquí. No cambia el precio publicado ni crea un pedido."],
-              ["Dropi", "No está conectado. Esta ficha no crea pedido en Dropi."],
+              ["Seguimiento", "Consulta el pedido con número y celular. Sin guía ni fecha prometida en esta ficha."],
             ].map(([label, value]) => (
               <div key={label} className="rounded-[14px] border border-line bg-card px-3 py-2">
                 <dt className="text-sm font-bold text-ink">{label}</dt>

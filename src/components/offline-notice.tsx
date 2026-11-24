@@ -19,7 +19,7 @@ function getServerSnapshot() {
   return false;
 }
 
-/** Aviso corto cuando el navegador pierde red. No implica sincronización con Dropi. */
+/** Aviso corto cuando el navegador pierde red. */
 export function OfflineNotice() {
   const offline = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
@@ -30,7 +30,7 @@ export function OfflineNotice() {
       role="status"
       className="border-b border-line bg-warning-tint px-4 py-1.5 text-center text-xs leading-5 text-warning"
     >
-      Sin conexión. No cobra. Dropi no está conectado ni se sincroniza. El carrito de este navegador puede seguir aquí.
+      Sin conexión. No cobra. El carrito de este navegador puede seguir aquí; no se confirma ni se envía un pedido.
     </div>
   );
 }

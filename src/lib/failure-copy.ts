@@ -10,7 +10,7 @@ const COPY: Record<FailureScope, { eyebrow: string; title: string; body: string;
   tienda: {
     eyebrow: "Tienda",
     title: "No se pudo abrir esta pantalla",
-    body: "La tienda no cargó esta vez. El carrito de este navegador no cambia. No se registró un pedido y nadie cobra. Dropi no está conectado.",
+    body: "La tienda no cargó esta vez. El carrito de este navegador no cambia. No se registró un pedido y nadie cobra.",
     retryTitle: "Reintentar no registra pedido ni cobra.",
     links: [
       { href: "/tienda", label: "Ver productos", title: "Verlos no cambia los precios publicados ni crea un pedido." },
@@ -30,7 +30,7 @@ const COPY: Record<FailureScope, { eyebrow: string; title: string; body: string;
   app: {
     eyebrow: "COMPRUKI",
     title: "No se pudo abrir",
-    body: "Esta pantalla no cargó. No se creó ni se cambió un pedido. Nadie cobra. Dropi no está conectado.",
+    body: "Esta pantalla no cargó. No se creó ni se cambió un pedido. Nadie cobra.",
     retryTitle: "Reintentar no crea un pedido ni cobra.",
     links: [
       { href: "/tienda", label: "Ir a la tienda", title: "Abrirla no registra pedido ni cobra." },

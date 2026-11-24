@@ -53,7 +53,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
         <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">Carrito</h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
           Precios publicados de la ficha. Se guarda en este navegador. Abrirlo no cobra. Pagas al recibir. Envío aparte.
-          Todavía no es un pedido. Dropi no está conectado.
+          Todavía no es un pedido. Confirmarlo es el siguiente paso.
         </p>
       </section>
       <div className="mt-3 space-y-3">
@@ -70,7 +70,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                 : "Pagas al recibir. Envío aparte. Todavía no es dinero cobrado."}
             </p>
             <p className="mt-1.5 text-xs leading-5 text-muted">
-              El pedido se crea al confirmar en el pago y no cobra. Dropi no está conectado.
+              El pedido se crea al confirmar en el pago y no cobra.
             </p>
             {canContinue ? (
               <>
