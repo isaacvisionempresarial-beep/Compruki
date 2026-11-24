@@ -47,7 +47,7 @@ export function AttentionSheet({
         Por atender para copiar
       </h3>
       <p className="mt-0.5 text-xs leading-5 text-muted">
-        La misma cola, sin recorte de fecha. Si el paso es avisar, trae el mensaje. Si es anotar el número o el despacho, trae el texto para Dropi, con celular y dirección. Si la ficha de hoy no es el precio guardado, van los dos montos. Si el paso es usar las cifras de hoy, copiar esta lista no las guarda. Copiarla no cobra, no envía el mensaje, no reescribe el precio y no crea el pedido.
+        La misma cola, sin recorte de fecha. Si el paso es avisar, trae el mensaje. Si es anotar el número o el despacho, trae el texto para Dropi, con celular y dirección. Si la ficha de hoy no es el precio guardado, van los dos montos. Si el paso es usar las cifras de hoy, copiar esta lista no las guarda. Copiarla no envía el mensaje, no reescribe el precio y no crea el pedido.
       </p>
       <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
         <label className="text-sm font-semibold" htmlFor="hoja-atender">
@@ -74,7 +74,7 @@ export function AttentionSheet({
         </nav>
         {copied === "ok" ? (
           <p role="status" className="mt-2 text-sm text-accent-strong">
-            Lista para pegarla a mano. Copiar no cobra ni envía el mensaje. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
+            Lista para pegarla a mano. No envía el mensaje. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
           </p>
         ) : null}
         {copied === "fail" ? (

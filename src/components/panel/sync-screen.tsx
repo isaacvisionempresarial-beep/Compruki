@@ -88,15 +88,14 @@ export function SyncScreen({
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Operación</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Sincronización</h1>
       <p className="mt-1 max-w-2xl text-sm leading-5 text-muted">
-        Copia la entrega y anota el número a mano. Ver esta lista no cobra. Dropi no está conectado: no se envía desde aquí y el total guardado no cambia. El estado de la cuenta está en Conexiones.
+        Copia la entrega y anota el número a mano. Dropi no está conectado: no se envía desde aquí y el total guardado no cambia. El estado de la cuenta está en Conexiones.
       </p>
       <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
         <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-        <Link href="/panel/conexiones" title="Verlas no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+        <Link href="/panel/conexiones" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Abrir conexiones
         </Link>
-      </nav>
-      <p className="mt-2 text-xs leading-5 text-muted">Verlas no cobra ni cambia pedidos.</p>
+      </nav>
 
       <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="cola-dropi">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cola</p>
@@ -132,7 +131,7 @@ export function SyncScreen({
                       <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Línea</span>
                       <button
                         type="submit"
-                        title="Registrar el aviso no lo envía a Dropi, no avisa al cliente y no cobra."
+                        title="No lo envía a Dropi ni avisa al cliente."
                         disabled={noticePending}
                         className={`inline-flex h-9 shrink-0 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-canvas ${
                           noticePending ? "cursor-wait opacity-70" : ""
@@ -209,7 +208,7 @@ export function SyncScreen({
               <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
                 <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
                 <p className="mt-0.5 text-sm text-muted">
-                  {query && group.rows.length > 0 ? "Ningún pedido de esta lista coincide con la búsqueda. Buscar no cobra ni cambia el total guardado." : group.empty}
+                  {query && group.rows.length > 0 ? "Ningún pedido de esta lista coincide con la búsqueda." : group.empty}
                 </p>
               </div>
             ) : (
@@ -275,7 +274,7 @@ function SyncRow({ order, note, number, cta = "Anotar número" }: { order: Store
   const written = number?.trim() ?? "";
   return (
     <li>
-      <Link href={syncFocusHref(order.number)} title="Abrirla no cobra. El total guardado no cambia." className={cx("grid items-start gap-3 px-3 py-2 text-sm hover:bg-canvas md:gap-4", syncGrid)}>
+      <Link href={syncFocusHref(order.number)} className={cx("grid items-start gap-3 px-3 py-2 text-sm hover:bg-canvas md:gap-4", syncGrid)}>
         <span>
           <span className="text-sm font-bold">{order.number}</span>
           <span className="mt-0.5 block text-xs text-muted">{formatDay(order.createdAt.slice(0, 10))}</span>

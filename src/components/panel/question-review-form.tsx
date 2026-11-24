@@ -74,7 +74,7 @@ export function QuestionReviewForm({
           type="submit"
           name="decision"
           value="approve"
-          title="Anotarla escribe en Respuestas. El precio y la publicación no cambian. No cobra."
+          title="Anotarla escribe en Respuestas. El precio y la publicación no cambian."
           disabled={pending || !canApproveCatalog || answer.trim().length < 4}
           className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
         >

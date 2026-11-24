@@ -36,7 +36,7 @@ export function ContentCreatorPanel({
       </h2>
       <p className="mt-1 text-sm text-muted">
         AG-03: si OpenAI responde, arma borradores con el modelo; si no, usa plantilla. Solo hechos del catálogo.
-        Generar o guardar deja corrida en el historial. Generar no cobra en la tienda ni publica. Guardar no cambia el
+        Generar o guardar deja corrida en el historial. Generar no publica. Guardar no cambia el
         precio de la ficha.{" "}
         {canTurnOn
           ? "El borrador espera tu aprobación para escribirse en el catálogo."
@@ -61,7 +61,6 @@ export function ContentCreatorPanel({
           <span className="mb-1 block text-sm font-semibold">Producto</span>
           <select
             name="sku"
-            title="Elegirlo no genera ni publica. No cobra."
             defaultValue={selectedSku}
             disabled={!enabled}
             className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
@@ -78,7 +77,7 @@ export function ContentCreatorPanel({
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
           <button
             type="submit"
-            title="Generar no cobra ni publica."
+            title="Generar no publica."
             disabled={!enabled}
             className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
           >

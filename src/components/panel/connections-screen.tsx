@@ -117,7 +117,7 @@ export function ConnectionsScreen({
               Plataforma COMPRUKI
             </h2>
             <p className="mt-1 text-xs leading-5 text-muted">
-              Estado local del piloto. Ver este estado no cobra ni cambia pedidos. El checkout no depende de Dropi ni de OpenAI.
+              Estado local del piloto. El checkout no depende de Dropi ni de OpenAI.
             </p>
             <ul className="mt-3 grid gap-2 sm:grid-cols-2 text-sm">
               <li className="rounded-[10px] border border-line px-3 py-2">
@@ -152,7 +152,7 @@ export function ConnectionsScreen({
                       <button
                         type="submit"
                         disabled={openaiPending}
-                        title="Probar no cobra ni cambia pedidos. No envía datos de la tienda."
+                        title="No envía datos de la tienda."
                         className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-60"
                       >
                         {openaiPending ? "Probando…" : "Probar OpenAI"}
@@ -176,7 +176,7 @@ export function ConnectionsScreen({
                 <p className="mt-0.5 font-semibold">Modo determinista</p>
                 <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
                   <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-                  <Link href="/panel/agentes" title="Abrirlo no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+                  <Link href="/panel/agentes" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
                     Abrir centro de agentes
                   </Link>
                 </nav>
@@ -241,14 +241,14 @@ export function ConnectionsScreen({
               Qué anuncia el servidor
             </h2>
             <p className="mt-1 text-xs leading-5 text-muted">
-              Lee el aviso público de autorización. No abre el ingreso, no pide la contraseña y no cobra. El total guardado no cambia.
+              Lee el aviso público de autorización. No abre el ingreso ni pide la contraseña. El total guardado no cambia.
             </p>
             <form action={inspect} className="contents">
               <nav aria-label="Consulta" className="mt-3 flex flex-wrap items-center gap-2">
                 <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
                 <button
                   type="submit"
-                  title="Consultarlo no autoriza la cuenta, no pide la contraseña y no cobra."
+                  title="No autoriza la cuenta ni pide la contraseña."
                   disabled={inspecting}
                   className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-canvas ${
                     inspecting ? "cursor-wait opacity-70" : ""
@@ -278,14 +278,13 @@ export function ConnectionsScreen({
               Saludo al servidor
             </h2>
             <p className="mt-1 text-xs leading-5 text-muted">
-              Opcional. Solo prueba el saludo; no autoriza la cuenta. Probarlo no cobra ni cambia pedidos. El total guardado no cambia.
+              Opcional. Solo prueba el saludo; no autoriza la cuenta. El total guardado no cambia.
             </p>
             <form action={action} className="contents">
               <nav aria-label="Consulta" className="mt-3 flex flex-wrap items-center gap-2">
                 <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
                 <button
                   type="submit"
-                  title="Probarlo no cobra ni cambia pedidos."
                   disabled={pending}
                   className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-canvas ${
                     pending ? "cursor-wait opacity-70" : ""
@@ -303,7 +302,7 @@ export function ConnectionsScreen({
               <div className="mt-3">
                 <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
                 <p className="mt-0.5 text-sm leading-5 text-muted">
-                  Todavía no hay un saludo en esta visita. Probarlo no cobra ni cambia pedidos.
+                  Todavía no hay un saludo en esta visita.
                 </p>
               </div>
             )}
@@ -321,7 +320,6 @@ export function ConnectionsScreen({
               <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
               <Link
                 href={syncSectionHref("sync-crear")}
-                title="Abrirla no cobra. El total guardado no cambia."
                 className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
               >
                 Abrir sincronización

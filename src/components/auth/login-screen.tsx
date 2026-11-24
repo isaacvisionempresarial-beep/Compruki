@@ -141,7 +141,6 @@ function LoginForm({
         <Field label="Correo" htmlFor="email">
           <input
             id="email"
-            title="Escribirlo no cobra ni cambia pedidos."
             name="email"
             type="email"
             autoComplete="username"
@@ -205,7 +204,6 @@ function LoginForm({
           <Link
             href="/ingresar?modo=nueva-clave"
             target="_self"
-            title="Abrirla no cobra ni cambia pedidos."
             className="font-semibold text-accent-strong hover:underline"
           >
             Cambiar contraseña

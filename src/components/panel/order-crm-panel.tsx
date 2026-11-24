@@ -46,7 +46,7 @@ export function OrderCrmPanel({
             name="note"
             required
             maxLength={400}
-            title="Escribirla no envía ni cobra."
+            title="Escribirla no envía."
             placeholder="Ej. Confirmar dirección / avisar estado"
             className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none"
           />
@@ -55,14 +55,13 @@ export function OrderCrmPanel({
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
           <button
             type="submit"
-            title="Guardarlo no envía WhatsApp ni cobra."
+            title="Guardarlo no envía WhatsApp."
             className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft"
           >
             Crear seguimiento
           </button>
           <Link
             href="/panel/clientes"
-            title="Abrirlo no cobra ni cambia pedidos."
             className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
           >
             Ver clientes

@@ -36,7 +36,7 @@ export default async function SettingsPage() {
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sistema</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Configuración</h1>
       <p className="mt-1 text-sm text-muted">
-        Datos de tu cuenta y de la tienda activa. Verlos no cobra ni cambia pedidos. Dropi no está conectado.
+        Datos de tu cuenta y de la tienda activa. Dropi no está conectado.
       </p>
 
       <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="cuenta">
@@ -70,7 +70,7 @@ export default async function SettingsPage() {
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Permisos</p>
         <h2 id="alcance" className="mt-0.5 text-sm font-semibold">Qué puede esta sesión</h2>
         <p className="mt-1 text-sm text-muted">
-          Esta sesión solo abre {access.tenantName}. Pedidos, catálogo y agentes salen de esa tienda. Un identificador de otra tienda no se lee ni se escribe. En la tienda pública, consultas, cambios del cliente y pedidos seguidos se detienen un rato: no abren ni crean otro. Verlo no cobra ni cambia pedidos.
+          Esta sesión solo abre {access.tenantName}. Pedidos, catálogo y agentes salen de esa tienda. Un identificador de otra tienda no se lee ni se escribe. En la tienda pública, consultas, cambios del cliente y pedidos seguidos se detienen un rato: no abren ni crean otro.
         </p>
         <p className="mt-2 text-sm text-muted">
           {access.role === "owner"
@@ -85,20 +85,20 @@ export default async function SettingsPage() {
           Respaldo de esta tienda
         </h2>
         <p className="mt-1 text-sm text-muted">
-          Copia de los pedidos y las fichas guardados en {access.tenantName}. El total guardado y el margen van en columnas distintas. No incluye el enlace secreto del cliente. Descargarla no cobra, no cambia pedidos y no envía nada a Dropi.
+          Copia de los pedidos y las fichas guardados en {access.tenantName}. El total guardado y el margen van en columnas distintas. No incluye el enlace secreto del cliente.No envía nada a Dropi.
         </p>
         {access.role === "owner" ? (
           <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
             <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-            <a href="/panel/respaldo/pedidos" title="Descargarla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+            <a href="/panel/respaldo/pedidos" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
               Pedidos
             </a>
-            <a href="/panel/respaldo/catalogo" title="Descargarla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+            <a href="/panel/respaldo/catalogo" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
               Fichas
             </a>
           </nav>
         ) : (
-          <p className="mt-3 text-sm text-muted">La descarga la hace el propietario. Ver esta nota no cobra ni cambia pedidos.</p>
+          <p className="mt-3 text-sm text-muted">La descarga la hace el propietario.</p>
         )}
       </section>
 
@@ -117,7 +117,7 @@ export default async function SettingsPage() {
           </span>
         </div>
         <p className="mt-1 text-sm text-muted">
-          Misma señal que <span className="font-semibold">GET /api/health</span>. No expone secretos. Verla no cobra ni cambia pedidos.
+          Misma señal que <span className="font-semibold">GET /api/health</span>. No expone secretos.
         </p>
         <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {checkLabels.map((item) => (
@@ -161,19 +161,19 @@ export default async function SettingsPage() {
 
       <nav aria-label="Herramientas" className="mt-4 flex flex-wrap items-center gap-2">
         <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-        <Link href="/ingresar?modo=nueva-clave" target="_self" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+        <Link href="/ingresar?modo=nueva-clave" target="_self" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Cambiar contraseña
         </Link>
-        <Link href="/tienda" target="_self" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+        <Link href="/tienda" target="_self" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Abrir tienda
         </Link>
-        <Link href="/panel/agentes" target="_self" title="Abrirlo no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+        <Link href="/panel/agentes" target="_self" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Centro de agentes
         </Link>
-        <Link href="/panel/agentes#saas" target="_self" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+        <Link href="/panel/agentes#saas" target="_self" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Guía de alta (AG-10)
         </Link>
-        <a href="/api/health" target="_self" title="Verla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+        <a href="/api/health" target="_self" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Ver /api/health
         </a>
       </nav>

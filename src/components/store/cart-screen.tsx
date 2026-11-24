@@ -52,7 +52,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
         <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Este navegador</p>
         <h1 className="store-display mt-2 text-[1.75rem] leading-tight font-extrabold tracking-[-0.03em]">Carrito</h1>
         <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
-          Precios publicados. Se guarda aquí. Abrirlo no cobra. Pagas al recibir · Envío aparte. Todavía no es un pedido.
+          Precios publicados. Se guarda aquí. Pagas al recibir · Envío aparte. Todavía no es un pedido.
         </p>
       </section>
       <div className="mt-3 space-y-3">

@@ -234,7 +234,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                         {sizeLabelCap}:{" "}
                         <span className="font-semibold text-muted">{variant || "elige uno"}</span>
                       </span>
-                      <span className="text-[11px] font-normal text-muted">El precio no cambia. Elegirlo no cobra.</span>
+                      <span className="text-[11px] font-normal text-muted">El precio no cambia.</span>
                     </span>
                   </legend>
                   <div className="mt-2 flex flex-wrap gap-1.5">

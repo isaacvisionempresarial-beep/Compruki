@@ -91,22 +91,22 @@ export function ProfitabilityScreen({
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Rentabilidad</h1>
       <p className="mt-1 max-w-2xl text-sm leading-5 text-muted">
         {canManageOrderMoney
-          ? "Resultados. Lo que dejaron los pedidos. No es el margen del precio actual. Verla no cobra ni cambia los pedidos. Dropi no está conectado."
-          : "Resultados. Lo que dejaron los pedidos. No es el margen del precio actual. Esta página solo lee. El flete, el costo y el cobro los guarda el propietario. Verla no cobra ni cambia los pedidos. Dropi no está conectado."}
+          ? "Resultados. Lo que dejaron los pedidos. No es el margen del precio actual. Dropi no está conectado."
+          : "Resultados. Lo que dejaron los pedidos. No es el margen del precio actual. Esta página solo lee. El flete, el costo y el cobro los guarda el propietario. Dropi no está conectado."}
       </p>
 
       <section className="mt-5" aria-labelledby="resultados-reales">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cuenta</p>
         <h2 id="resultados-reales" className="mt-0.5 text-base font-bold">Qué dejaron los pedidos</h2>
         <p className="mt-0.5 max-w-2xl text-xs leading-5 text-muted">
-          Cifras de {closePhrase(storePeriod, basis)}. Entran confirmados y devoluciones. Devuelto es el total guardado, no el margen. La muestra no entra. Verlas no cobra ni cambia pedidos.
+          Cifras de {closePhrase(storePeriod, basis)}. Entran confirmados y devoluciones. Devuelto es el total guardado, no el margen. La muestra no entra.
           {basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
         </p>
         <div className="elevate-1 mt-3 grid items-stretch gap-4 rounded-[14px] border border-line bg-card px-3 py-3 sm:grid-cols-2 sm:gap-x-6">
           <div className="flex min-w-0 flex-col">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Fecha</p>
             <p className="mt-0.5 text-xs leading-5 text-muted">
-              Creados mira cuándo entró el pedido. Movidos incluye uno viejo si cambió en el período. Elegir no cobra.
+              Creados mira cuándo entró el pedido. Movidos incluye uno viejo si cambió en el período.
             </p>
             <div className="mt-3 sm:mt-auto sm:pt-3">
               <CloseBasisControl basis={basis} onChange={setBasis} name="base-resultados" wide />
@@ -136,7 +136,7 @@ export function ProfitabilityScreen({
         </p>
         <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-          <Link href="/panel/catalogo" title="Abrirlo no cobra ni cambia el precio ni la publicación." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+          <Link href="/panel/catalogo" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
             Abrir catálogo
           </Link>
         </nav>
@@ -198,14 +198,14 @@ export function ProfitabilityScreen({
                         ) : null}
                         {row.sources.length > 0 ? (
                           <details className="mt-3">
-                            <summary className="cursor-pointer" title="Verlos no cobra ni cambia el total guardado.">
+                            <summary className="cursor-pointer">
                               <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Fuentes</span>
                               <span className="mt-0.5 block text-sm font-semibold text-accent-strong">Ver pedidos ({row.sources.length})</span>
                             </summary>
                             <ul className="mt-2 space-y-1 text-sm leading-5">
                               {row.sources.map((source) => (
                                 <li key={source.number}>
-                                  <a href={orderFocusHref(source.number)} title="Abrirlo no cobra ni cambia el total guardado." className="font-semibold text-accent-strong">
+                                  <a href={orderFocusHref(source.number)} className="font-semibold text-accent-strong">
                                     {source.number}
                                   </a>
                                   <span className="text-muted">
@@ -257,7 +257,7 @@ export function ProfitabilityScreen({
               fieldId="cierre-resultados"
             />
       </section>
-      <p className="mt-3 text-xs leading-5 text-muted">Cifras de COMPRUKI. Leerlas no cobra ni cambia los pedidos. Dropi no está conectado.</p>
+      <p className="mt-3 text-xs leading-5 text-muted">Cifras de COMPRUKI. Dropi no está conectado.</p>
     </div>
   );
 }

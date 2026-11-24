@@ -20,7 +20,7 @@ export function OpenProductQuestions({
       </h2>
       <p className="mt-1 text-xs leading-5 text-muted">
         Las envió un comprador desde la ficha porque la respuesta automática no alcanzó. Anotar escribe en Respuestas.
-        El precio y la publicación no cambian. No cobra.
+        El precio y la publicación no cambian.
       </p>
       <ul className="mt-2 space-y-3">
         {items.map((item) => (

@@ -38,7 +38,7 @@ export function CustomersScreen({
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Clientes</h1>
       <p className="mt-1 max-w-2xl text-sm text-muted">
         CRM lite: contactos sacados de pedidos y seguimientos manuales (AG-07). No es difusión masiva ni
-        WhatsApp automático. Crear o cerrar un seguimiento no cobra.
+        WhatsApp automático.
       </p>
 
       {!tableReady ? (
@@ -83,7 +83,7 @@ export function CustomersScreen({
             <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
             <button
               type="submit"
-              title="Priorizar no crea tareas ni cobra en la tienda."
+              title="Priorizar no crea tareas."
               disabled={!ag07Enabled}
               className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
             >
@@ -99,7 +99,7 @@ export function CustomersScreen({
               {priority.costEstimateCop > 0 ? ` · costo est. ${priority.costEstimateCop} COP` : ""}
             </p>
             {priority.suggestions.length === 0 ? (
-              <p className="mt-2 text-sm text-muted">No hay sugerencias ahora. Priorizar no cobra.</p>
+              <p className="mt-2 text-sm text-muted">No hay sugerencias ahora.</p>
             ) : (
               <ul className="mt-2 space-y-2">
                 {priority.suggestions.map((item) => (
@@ -119,7 +119,7 @@ export function CustomersScreen({
                         </span>
                         <button
                           type="submit"
-                          title="Guardarlo no envía WhatsApp ni cobra."
+                          title="Guardarlo no envía WhatsApp."
                           disabled={!tableReady}
                           className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-55"
                         >
@@ -127,7 +127,6 @@ export function CustomersScreen({
                         </button>
                         <Link
                           href={orderFocusHref(item.orderNumber)}
-                          title="Abrirlo no cobra ni cambia el total guardado."
                           className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
                         >
                           Ver pedido
@@ -150,7 +149,7 @@ export function CustomersScreen({
         {openTasks.length === 0 ? (
           <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
-            <p className="mt-0.5 text-sm text-muted">No hay seguimientos abiertos. Verlo no cobra.</p>
+            <p className="mt-0.5 text-sm text-muted">No hay seguimientos abiertos.</p>
           </div>
         ) : (
           <ul className="mt-3 space-y-2">
@@ -172,7 +171,7 @@ export function CustomersScreen({
                     <input type="hidden" name="status" value="done" />
                     <button
                       type="submit"
-                      title="Cerrarlo no envía mensaje ni cobra."
+                      title="Cerrarlo no envía mensaje."
                       className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft"
                     >
                       Hecho
@@ -183,7 +182,7 @@ export function CustomersScreen({
                     <input type="hidden" name="status" value="dismissed" />
                     <button
                       type="submit"
-                      title="Descartarlo no cobra."
+                      
                       className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
                     >
                       Descartar
@@ -192,7 +191,6 @@ export function CustomersScreen({
                   {task.orderNumber ? (
                     <Link
                       href={orderFocusHref(task.orderNumber)}
-                      title="Abrirlo no cobra ni cambia el total guardado."
                       className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
                     >
                       Ver pedido
@@ -218,7 +216,7 @@ export function CustomersScreen({
         {contacts.length === 0 ? (
           <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
-            <p className="mt-0.5 text-sm text-muted">Aún no hay pedidos con teléfono. Verlo no cobra.</p>
+            <p className="mt-0.5 text-sm text-muted">Aún no hay pedidos con teléfono.</p>
           </div>
         ) : (
           <ul className="mt-3 grid gap-2 md:grid-cols-2">
@@ -246,7 +244,7 @@ export function CustomersScreen({
                       name="note"
                       required
                       maxLength={400}
-                      title="Escribirla no envía ni cobra."
+                      title="Escribirla no envía."
                       placeholder="Ej. Confirmar talla / avisar incidencia"
                       disabled={!tableReady}
                       className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
@@ -258,7 +256,7 @@ export function CustomersScreen({
                     </span>
                     <button
                       type="submit"
-                      title="Guardarlo no envía WhatsApp ni cobra."
+                      title="Guardarlo no envía WhatsApp."
                       disabled={!tableReady}
                       className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
                     >
@@ -266,7 +264,6 @@ export function CustomersScreen({
                     </button>
                     <Link
                       href={orderFocusHref(contact.latestOrderNumber)}
-                      title="Abrirlo no cobra ni cambia el total guardado."
                       className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
                     >
                       Ver pedido

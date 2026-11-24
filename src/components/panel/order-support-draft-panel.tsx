@@ -53,7 +53,7 @@ export function OrderSupportDraftPanel({
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
           <button
             type="submit"
-            title="Generarlo no resuelve ni cobra."
+            title="Generarlo no resuelve."
             disabled={!enabled}
             className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
           >
@@ -84,7 +84,7 @@ export function OrderSupportDraftPanel({
             <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
             <button
               type="button"
-              title="Copiarlo no envía el mensaje ni cobra."
+              title="Copiarlo no envía el mensaje."
               onClick={copyNote}
               className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
             >
@@ -98,7 +98,7 @@ export function OrderSupportDraftPanel({
           ) : null}
           {copied === "fail" ? (
             <p role="alert" className="text-xs text-danger">
-              No se pudo copiar. No cobra.
+              No se pudo copiar.
             </p>
           ) : null}
         </div>

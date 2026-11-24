@@ -162,7 +162,7 @@ export function CatalogScreen({
         {canManageCommerce ? (
           <Link
             href="/panel/catalogo/nuevo"
-            title="Crearlo no cobra ni confirma un pedido."
+           
             className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
           >
             Nuevo producto
@@ -186,17 +186,16 @@ export function CatalogScreen({
           {canManageCommerce
             ? "Cada ficha guarda precio, costo, publicación y fotos. Se edita en su página."
             : "Textos, fotos y disponibilidad se editan en su página. Precio, publicación y alta los guarda el propietario."}{" "}
-          Lo publicado se ve en la tienda. Copiar el enlace no cambia el precio ni crea una campaña. Lo vendido está en Rentabilidad. Leer esto no cobra ni cambia el precio ni la publicación.
+          Lo publicado se ve en la tienda. Copiar el enlace no cambia el precio ni crea una campaña. Lo vendido está en Rentabilidad.
         </p>
         <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-          <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+          <Link href="/panel/rentabilidad" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
             Ver rentabilidad
           </Link>
         </nav>
         <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3">
-          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Lista</p>
-          <p className="mt-0.5 text-xs leading-5 text-muted">Filtrar no cobra ni cambia el precio ni la publicación.</p>
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Lista</p>
           <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Filtrar productos">
             {filters.map((item) => {
               const count = searched.filter((product) =>
@@ -209,7 +208,6 @@ export function CatalogScreen({
                   type="button"
                   role="radio"
                   aria-checked={selectedFilter}
-                  title="Filtrar no cobra ni cambia el precio ni la publicación."
                   className={cx(
                     "min-h-9 rounded-[10px] px-2.5 text-sm font-semibold",
                     selectedFilter ? "bg-primary text-on-dark" : "border border-line bg-canvas text-muted",
@@ -241,7 +239,7 @@ export function CatalogScreen({
                   <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
                   <Link
                     href="/panel/catalogo/nuevo"
-                    title="Crearlo no cobra ni confirma un pedido."
+                   
                     className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
                   >
                     Nuevo producto
@@ -313,7 +311,6 @@ function CatalogProductRow({
             <img
               src={cover ? `/panel/imagen/${product.sku}?m=${cover.id}` : `/panel/imagen/${product.sku}`}
               alt=""
-              title="Verla no cambia el precio de la ficha."
               className="h-full w-full object-contain"
             />
           ) : (
@@ -351,7 +348,7 @@ function CatalogProductRow({
               {product.published ? (
                 <a
                   href={campaignPath(product.sku)}
-                  title="Visitarla no cobra ni cambia el precio ni la publicación."
+                 
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas"
@@ -367,8 +364,8 @@ function CatalogProductRow({
                 }
                 title={
                   openQuestionCount > 0
-                    ? "Abrir las preguntas abiertas no cobra ni cambia el precio ni la publicación."
-                    : "Abrirla no cobra ni cambia el precio ni la publicación."
+                    ? ""
+                    : ""
                 }
                 className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas"
               >
@@ -536,13 +533,13 @@ function catalogEmptyMessage(total: number, searched: number, filter: FilterId, 
       ? "Todavía no hay productos en el catálogo. Crea uno a mano. No cobra. Importar desde Dropi sigue pendiente de autorización."
       : "Todavía no hay productos en el catálogo. Solo el propietario puede crear uno. No cobra. Importar desde Dropi sigue pendiente de autorización.";
   }
-  if (query && searched === 0) return "Ningún producto coincide con la búsqueda. Filtrar no cobra ni cambia el precio ni la publicación.";
-  if (filter === "diferencia") return "Ninguna ficha tiene otro precio o costo guardado. Filtrar no cobra ni cambia el precio ni la publicación.";
-  if (filter === "preguntas") return "Ninguna ficha tiene preguntas abiertas. Filtrar no cobra ni cambia el precio ni la publicación.";
-  if (filter === "tienda") return "No hay productos en tienda. Filtrar no cobra ni cambia el precio ni la publicación.";
-  if (filter === "ocultos") return "No hay borradores. Filtrar no cobra ni cambia el precio ni la publicación.";
-  if (filter === "agotados") return "No hay publicados no pedibles. Filtrar no cobra ni cambia el precio ni la publicación.";
-  return "No hay productos en este grupo. Filtrar no cobra ni cambia el precio ni la publicación.";
+  if (query && searched === 0) return "Ningún producto coincide con la búsqueda.";
+  if (filter === "diferencia") return "Ninguna ficha tiene otro precio o costo guardado.";
+  if (filter === "preguntas") return "Ninguna ficha tiene preguntas abiertas.";
+  if (filter === "tienda") return "No hay productos en tienda.";
+  if (filter === "ocultos") return "No hay borradores.";
+  if (filter === "agotados") return "No hay publicados no pedibles.";
+  return "No hay productos en este grupo.";
 }
 
 function matches(product: CatalogProduct, filter: FilterId, drifted: boolean, openQuestionCount: number) {
@@ -559,15 +556,15 @@ function driftLinkTitle(
   hold: { pending: string[]; cancel: string[]; incidence: string[]; returned: string[] },
 ) {
   if (hold.pending.includes(number) || hold.cancel.includes(number)) {
-    return "No entra al margen ni a la utilidad. Abrirlo no cobra ni cambia el total guardado.";
+    return "No entra al margen ni a la utilidad.";
   }
   if (hold.incidence.includes(number)) {
-    return "No suma como venta confirmada mientras dure. Abrirlo no cobra ni cambia el total guardado.";
+    return "No suma como venta confirmada mientras dure.";
   }
   if (hold.returned.includes(number)) {
-    return "El total guardado no entra a la utilidad. Abrirlo no cobra ni cambia el total guardado.";
+    return "El total guardado no entra a la utilidad.";
   }
-  return "Abrirlo no cobra ni cambia el total guardado.";
+  return "";
 }
 
 function CampaignLink({
@@ -618,14 +615,14 @@ function CampaignLink({
     return (
       <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
         <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-        <a href={path} target="_blank" rel="noreferrer" title="Abrirla no cobra ni cambia el precio ni la publicación." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+        <a href={path} target="_blank" rel="noreferrer" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Abrir
         </a>
         <button
           type="button"
           className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
           aria-label={`Copiar enlace de ${product.title}`}
-          title="Copiarlo no cobra ni cambia el precio ni la publicación."
+         
           onClick={copy}
         >
           {copied === "ok" ? "Copiado" : "Copiar enlace"}
@@ -634,7 +631,7 @@ function CampaignLink({
         {product.available ? null : <span className="text-xs text-warning">Se abre, pero no se puede pedir.</span>}
         {copied === "fail" ? (
           <span role="alert" className="text-xs text-danger">
-            No se pudo copiar. No cobra.
+            No se pudo copiar.
           </span>
         ) : null}
       </nav>
@@ -657,7 +654,6 @@ function CampaignLink({
           href={path}
           target="_blank"
           rel="noreferrer"
-          title="Abrirla no cobra ni cambia el precio ni la publicación."
           className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
         >
           Abrir página
@@ -666,7 +662,7 @@ function CampaignLink({
           type="button"
           className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
           aria-label={`Copiar enlace de ${product.title}`}
-          title="Copiarlo no cobra ni cambia el precio ni la publicación."
+         
           onClick={copy}
         >
           {copied === "ok" ? "Enlace copiado" : "Copiar enlace"}
@@ -748,7 +744,7 @@ function CatalogDriftSheet({ text }: { text: string }) {
           Texto de las fichas
           <textarea
             id="catalogo-fichas-distintas"
-            title="Leerlo no cobra ni cambia el total guardado."
+           
             readOnly
             rows={8}
             value={text}
@@ -759,7 +755,7 @@ function CatalogDriftSheet({ text }: { text: string }) {
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
           <button
             type="button"
-            title="Copiar no cobra ni cambia el total guardado."
+           
             className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
             onClick={copy}
           >
@@ -768,7 +764,7 @@ function CatalogDriftSheet({ text }: { text: string }) {
         </nav>
         {copied === "ok" ? (
           <p role="status" className="mt-2 text-sm text-accent-strong">
-            Listo para pegarlo a mano. Copiar no cobra ni reescribe los pedidos. El total guardado no cambia.
+            Listo para pegarlo a mano. No reescribe los pedidos. El total guardado no cambia.
           </p>
         ) : null}
         {copied === "fail" ? (
@@ -832,7 +828,6 @@ function SkuCostApply({
             <Link
               key={number}
               href={orderFocusHref(number)}
-              title="Abrirlo no cobra ni cambia el total guardado."
               className="mr-2 font-semibold text-accent-strong"
             >
               {number}
@@ -1146,13 +1141,11 @@ export function ProductEditor({
             <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
             <Link
               href="/panel/catalogo"
-              title="Volver no cobra ni cambia el precio ni la publicación."
               className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
             >
               Volver al catálogo
             </Link>
-          </nav>
-          <p className="mt-2 text-xs leading-5 text-muted">Volver no cobra ni cambia el precio ni la publicación.</p>
+          </nav>
         </div>
       </div>
 
@@ -1194,7 +1187,7 @@ export function ProductEditor({
             <dd className="mt-0.5 text-xs leading-5 text-muted">{unavailable ? "Se abre, pero no se pide." : "Se puede agregar al carrito."}</dd>
           </div>
         </dl>
-        <p className="mt-3 text-xs leading-5 text-muted">Dropi no está conectado. Las fotos se suben aquí. Subirlas no cobra ni cambia el precio ni la publicación.</p>
+        <p className="mt-3 text-xs leading-5 text-muted">Dropi no está conectado. Las fotos se suben aquí.</p>
       </section>
 
       <form action={formAction} className="mt-3 space-y-3">
@@ -1243,7 +1236,7 @@ export function ProductEditor({
                       })),
                     ]}
                     label="Fotos del producto"
-                    photoTitle="Verla no cambia el precio ni la publicación."
+                    photoTitle="Foto del producto"
                     moveTitle="Pasarla no cambia el precio ni la publicación."
                     brokenNote="El precio de la ficha no cambia."
                     frameClassName="h-[min(28rem,56vh)] w-full max-w-xl"
@@ -1305,9 +1298,9 @@ export function ProductEditor({
                 <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Clip</p>
                 <p className="mt-0.5 text-sm font-semibold">Video</p>
                 {videoPreview ? (
-                  <video src={videoPreview} controls title="Verlo no cambia el precio ni la publicación." className="mt-3 max-h-[32rem] w-full rounded-[10px] bg-card" />
+                  <video src={videoPreview} controls className="mt-3 max-h-[32rem] w-full rounded-[10px] bg-card" />
                 ) : savedVideo && !clearVideo ? (
-                  <video src={`/panel/video/${product?.sku}`} controls title="Verlo no cambia el precio ni la publicación." className="mt-3 max-h-[32rem] w-full rounded-[10px] bg-card" />
+                  <video src={`/panel/video/${product?.sku}`} controls className="mt-3 max-h-[32rem] w-full rounded-[10px] bg-card" />
                 ) : (
                   <div className="mt-2">
                     <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
@@ -1411,7 +1404,7 @@ export function ProductEditor({
                     <input
                       type="checkbox"
                       name="published"
-                      title="Marcarla no cobra. El precio de la ficha no cambia."
+                     
                       checked={published}
                       className="mt-1 h-4 w-4"
                       onChange={(event) => setPublished(event.target.checked)}
@@ -1677,7 +1670,7 @@ export function ProductEditor({
               <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
               <button
                 type="submit"
-                title="Guardarlo no cobra. Los pedidos ya anotados siguen con sus cifras."
+               
                 disabled={pending || !canSave}
                 className={`inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft sm:min-w-56 ${
                   pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
@@ -1700,8 +1693,7 @@ function AnswersBuyerPreview({ answers }: { answers: string }) {
     <div className="mt-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista comprador</p>
       <p className="mt-0.5 text-xs leading-5 text-muted">
-        Así se ve en la ficha pública. Los pares P:/R: salen como pregunta y respuesta. Verla no cobra ni cambia el
-        precio ni la publicación.
+        Así se ve en la ficha pública. Los pares P:/R: salen como pregunta y respuesta.
       </p>
       {display.prose ? (
         <p className="mt-2 text-xs leading-5 whitespace-pre-line text-ink">{display.prose}</p>

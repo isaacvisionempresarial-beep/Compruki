@@ -24,7 +24,7 @@ const COPY: Record<FailureScope, { eyebrow: string; title: string; body: string;
     retryTitle: "Reintentar no cambia pedidos ni cobra.",
     links: [
       { href: "/panel", label: "Volver al panel", title: "Abrirlo no cobra ni cambia pedidos." },
-      { href: "/panel/pedidos", label: "Ver pedidos", title: "Abrirlos no cobra ni cambia el total guardado." },
+      { href: "/panel/pedidos", label: "Ver pedidos", title: "" },
     ],
   },
   app: {

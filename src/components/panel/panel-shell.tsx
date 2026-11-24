@@ -67,14 +67,6 @@ export function usePanelQuery() {
   return useContext(PanelQueryContext);
 }
 
-function navTitle(href: string) {
-  if (href === "/panel/pedidos") return "Abrirlos no cobra ni cambia el total guardado.";
-  if (href === "/panel/sincronizacion") return "Abrirla no cobra. El total guardado no cambia.";
-  if (href === "/panel/catalogo") return "Abrirlo no cobra ni cambia el precio ni la publicación.";
-  if (href === "/panel/rentabilidad") return "Verla no cobra ni cambia los pedidos.";
-  return "Abrirlo no cobra ni cambia pedidos.";
-}
-
 const groups: Array<{ id: string; label: string; items: Array<{ id: string; label: string; icon: IconName; href: string }> }> = [
   {
     id: "tienda",
@@ -174,7 +166,7 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
 
         {open ? (
           <div className="fixed inset-0 z-40 lg:hidden">
-            <button type="button" className="absolute inset-0 bg-primary-dark/50" aria-label="Cerrar menú" title="Cerrarlo no cobra ni cambia pedidos." onClick={() => setOpen(false)} />
+            <button type="button" className="absolute inset-0 bg-primary-dark/50" aria-label="Cerrar menú" onClick={() => setOpen(false)} />
             <div
               ref={menuRef}
               id="panel-menu-movil"
@@ -197,7 +189,6 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
                 className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] border border-line bg-card lg:hidden"
                 aria-expanded={open}
                 aria-controls="panel-menu-movil"
-                title="Abrirlo no cobra ni cambia pedidos."
                 onClick={() => setOpen(true)}
               >
                 <Icon name="menu" className="h-5 w-5" />
@@ -213,7 +204,6 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Buscar pedido, SKU o producto"
-                  title="Buscar no cobra ni cambia pedidos."
                   className="h-10 w-full rounded-[10px] border border-line bg-card pr-3 pl-9 text-sm text-ink placeholder:text-muted focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
                 />
               </label>
@@ -238,7 +228,6 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
                 </span>
                 <PanelMenuLink
                   href="/ingresar?modo=nueva-clave"
-                  title="Abrirla no cobra ni cambia pedidos."
                   className="inline-flex h-9 items-center rounded-[10px] px-2 text-sm font-semibold text-accent-strong hover:bg-subtle"
                 >
                   Clave
@@ -250,7 +239,6 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
                   <button
                     type="submit"
                     aria-label="Cerrar sesión"
-                    title="Salir no cobra ni cambia pedidos."
                     className="inline-flex h-9 items-center gap-2 rounded-[10px] px-2 text-sm font-semibold text-ink hover:bg-subtle"
                   >
                     <Icon name="logout" className="h-5 w-5" />
@@ -285,7 +273,6 @@ function Sidebar({
       <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3">
         <PanelMenuLink
           href="/panel"
-          title="Ir al panel no cobra ni cambia pedidos."
           className="rounded-[10px]"
           onCloseMenu={onCloseMenu}
         >
@@ -297,7 +284,6 @@ function Sidebar({
             data-close
             className="grid h-10 w-10 place-items-center rounded-[10px] hover:bg-white/10"
             aria-label="Cerrar menú"
-            title="Cerrarlo no cobra ni cambia pedidos."
             onClick={onCloseMenu}
           >
             <Icon name="close" className="h-5 w-5" />
@@ -319,7 +305,6 @@ function Sidebar({
                   <li key={item.id}>
                     <PanelMenuLink
                       href={item.href}
-                      title={navTitle(item.href)}
                       aria-current={active ? "page" : undefined}
                       onCloseMenu={onCloseMenu}
                       className={
@@ -341,7 +326,6 @@ function Sidebar({
 
       <div
         className="shrink-0 border-t border-white/10 px-3 py-2"
-        title="Navegar no cobra ni cambia pedidos. Dropi no está conectado."
       >
         <p className="inline-flex max-w-full items-center gap-1.5 text-[10px] font-bold tracking-[0.06em] text-coral uppercase">
           <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-coral" aria-hidden="true" />
@@ -351,7 +335,6 @@ function Sidebar({
           <p className="min-w-0 flex-1 truncate text-xs font-semibold leading-4">{storeName}</p>
           <PanelMenuLink
             href="/tienda"
-            title="Abrirla no cobra ni cambia pedidos."
             className="inline-flex h-7 shrink-0 items-center rounded-[8px] border border-white/15 bg-white/5 px-2 text-[11px] font-semibold text-on-dark hover:bg-white/10"
             onCloseMenu={onCloseMenu}
           >

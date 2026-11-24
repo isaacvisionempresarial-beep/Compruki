@@ -21,8 +21,7 @@ export function CentralRouterPanel({
       </h2>
       <p className="mt-1 text-sm text-muted">
         AG-01: si OpenAI responde, interpreta la intención; si no, usa reglas. Llama a Explorador, Analista y
-        Creador (plantillas). Cada «Enrutar» deja una corrida y no escribe el catálogo ni cambia el precio.
-        Enrutar no cobra ni cambia pedidos. Sin Dropi en vivo.
+        Creador (plantillas). Cada «Enrutar» deja una corrida y no escribe el catálogo ni cambia el precio. Sin Dropi en vivo.
       </p>
       {!enabled ? (
         <p role="status" className="mt-2 text-sm font-medium text-coral">
@@ -41,7 +40,6 @@ export function CentralRouterPanel({
           <span className="mb-1 block text-sm font-semibold">Intención o SKU</span>
           <input
             name="intent"
-            title="Escribirlo no cobra ni cambia pedidos."
             defaultValue={defaultIntent}
             disabled={!enabled}
             placeholder="Ej. margen LAM-MES-01, borrador faja, buscar ropa"
@@ -52,7 +50,6 @@ export function CentralRouterPanel({
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
           <button
             type="submit"
-            title="Enrutar no cobra ni cambia pedidos."
             disabled={!enabled}
             className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
           >
@@ -91,7 +88,7 @@ export function CentralRouterPanel({
                 {route.pending.map((item) => (
                   <li key={item.id}>
                     {item.href ? (
-                      <Link href={item.href} title="Abrirlo no cobra ni cambia pedidos." className="font-semibold text-accent-strong">
+                      <Link href={item.href} className="font-semibold text-accent-strong">
                         {item.label}
                       </Link>
                     ) : (
@@ -108,7 +105,7 @@ export function CentralRouterPanel({
             <nav aria-label="Vista" className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
               {route.suggestedLinks.map((link) => (
-                <Link key={link.href + link.label} href={link.href} title="Abrirlo no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+                <Link key={link.href + link.label} href={link.href} className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
                   {link.label}
                 </Link>
               ))}

@@ -41,11 +41,10 @@ export function ProductEditorPage({
           </p>
           <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
             <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-            <Link href="/panel/catalogo" title="Volver no cobra ni cambia el precio ni la publicación." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+            <Link href="/panel/catalogo" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
               Volver al catálogo
             </Link>
-          </nav>
-          <p className="mt-2 text-xs leading-5 text-muted">Volver no cobra ni cambia el precio ni la publicación.</p>
+          </nav>
         </section>
       </div>
     );

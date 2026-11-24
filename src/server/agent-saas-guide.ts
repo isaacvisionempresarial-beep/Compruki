@@ -105,7 +105,7 @@ export function buildSaasGuideTemplate(progress: OnboardingProgress): SaasGuide 
   }
   steps.push(
     progress.openOrders > 0
-      ? `Hay ${progress.openOrders} pedido(s) abiertos: revísalos en Pedidos. Verlos no cobra.`
+      ? `Hay ${progress.openOrders} pedido(s) abiertos: revísalos en Pedidos.`
       : "El flujo de pedidos está listo. Un pedido de prueba confirma captura y seguimiento.",
   );
   if (progress.pendingApprovals > 0) {

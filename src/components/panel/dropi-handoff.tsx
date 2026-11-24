@@ -103,7 +103,7 @@ function DropiCopy({ order }: { order: StoreOrder }) {
         <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
         <button
           type="button"
-          title="Copiar no cobra. El total guardado no cambia."
+         
           className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
           aria-label={`Copiar datos de ${order.number}`}
           onClick={copy}
@@ -113,7 +113,7 @@ function DropiCopy({ order }: { order: StoreOrder }) {
       </nav>
       {copied === "ok" ? (
         <p role="status" className="text-sm text-accent-strong">
-          Listo para pegarlo en Dropi. Copiar no cobra. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
+          Listo para pegarlo en Dropi. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
         </p>
       ) : null}
       {copied === "fail" ? (
@@ -193,7 +193,7 @@ function DropiRefForm({ order }: { order: StoreOrder }) {
             type="submit"
             name="intent"
             value="quitar"
-            title="Quitarlo no cobra. El total guardado no cambia."
+           
             disabled={refPending}
             className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold disabled:cursor-wait"
           >

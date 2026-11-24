@@ -15,7 +15,7 @@ export default function PanelNotFound() {
       title="No está en este panel"
       body="El pedido o el producto no aparece con esa dirección. No se anotó ni se borró nada. No cobra ni cambia pedidos. Dropi no está conectado."
       actions={[
-        { href: "/panel/pedidos", label: "Ir a pedidos", title: "Abrirlos no cobra ni cambia el total guardado.", primary: true },
+        { href: "/panel/pedidos", label: "Ir a pedidos", title: "", primary: true },
         { href: "/panel/catalogo", label: "Ir al catálogo", title: "Abrirlo no cobra ni cambia el precio ni la publicación." },
         { href: "/panel", label: "Panel principal", title: "Abrirlo no cobra ni cambia pedidos." },
       ]}
@@ -26,7 +26,7 @@ export default function PanelNotFound() {
         },
         {
           label: "Catálogo",
-          text: "Fichas, precios y publicación de lo que se vende en la tienda. Verlas no cobra ni cambia pedidos.",
+          text: "Fichas, precios y publicación de lo que se vende en la tienda.",
         },
         {
           label: "Sincronización",

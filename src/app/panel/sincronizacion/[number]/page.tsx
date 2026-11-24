@@ -38,7 +38,7 @@ export default async function SyncOrderPage({ params }: { params: Promise<{ numb
         <Link href="/panel/sincronizacion" title="Volver no cobra. El total guardado no cambia." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Volver a sincronización
         </Link>
-        <Link href={orderFocusHref(order.number)} title="Abrirlo no cobra ni cambia el total guardado." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+        <Link href={orderFocusHref(order.number)} className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Abrir el pedido
         </Link>
       </nav>

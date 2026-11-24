@@ -56,7 +56,7 @@ export function CloseSheet({
       </h3>
       <p className="mt-0.5 text-xs leading-5 text-muted">
         Mismas cifras de {closeSpanPhrase(period, basis)}. Si la ficha de hoy no es el precio guardado, van los dos montos. Si no es el costo, el envío o las comisiones guardadas, van las dos cifras.
-        {period === "todo" ? "" : " Si un pedido que ya cuenta queda fuera de este período, el texto dice su margen."} Copiarlo no cobra, no reescribe lo guardado y no crea el pedido en Dropi.
+        {period === "todo" ? "" : " Si un pedido que ya cuenta queda fuera de este período, el texto dice su margen."} Copiarlo no reescribe lo guardado y no crea el pedido en Dropi.
         {period !== "todo" && basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
       </p>
       {drifted ? (
@@ -74,7 +74,7 @@ export function CloseSheet({
           Texto del cierre
           <textarea
             id={fieldId}
-            title="Leerlo no cobra ni cambia el total guardado."
+           
             readOnly
             rows={8}
             value={text}
@@ -85,7 +85,7 @@ export function CloseSheet({
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
           <button
             type="button"
-            title="Copiar no cobra ni cambia el total guardado. No crea el pedido en Dropi."
+            title="No crea el pedido en Dropi."
             className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
             onClick={copy}
           >
@@ -94,7 +94,7 @@ export function CloseSheet({
         </nav>
         {copied === "ok" ? (
           <p role="status" className="mt-2 text-sm text-accent-strong">
-            Listo para pegarlo a mano. Copiar no cobra. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
+            Listo para pegarlo a mano. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
           </p>
         ) : null}
         {copied === "fail" ? (

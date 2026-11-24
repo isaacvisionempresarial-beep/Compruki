@@ -71,7 +71,6 @@ export function LookupScreen() {
               autoComplete="off"
               inputMode="text"
               placeholder="P-2001"
-              title="Escribirlo no cobra ni cambia el total guardado."
               value={number}
               onChange={(event) => setNumber(event.target.value)}
               className={inputClass}
@@ -88,7 +87,6 @@ export function LookupScreen() {
               required
               inputMode="tel"
               autoComplete="tel"
-              title="Escribirlo no cobra ni cambia el total guardado."
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
               className={inputClass}
@@ -125,13 +123,11 @@ export function LookupScreen() {
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
           <Link
             href="/tienda"
-            title="Volver no cobra ni cambia el total guardado."
             className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
           >
             Volver a la tienda
           </Link>
-        </nav>
-        <p className="mt-2 text-xs leading-5 text-muted">Volver no cobra ni cambia el total guardado.</p>
+        </nav>
     </div>
   );
 }

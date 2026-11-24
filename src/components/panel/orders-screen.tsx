@@ -178,16 +178,16 @@ export function OrdersScreen({
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Pedidos recibidos</h1>
       <p className="mt-0.5 text-sm text-muted">
         {span === "todo"
-          ? "Tienda pública. Las cifras y la lista son de todos los pedidos. La cola Por atender tampoco se recorta. Abrirlos no cobra ni cambia el total guardado. Dropi no está conectado."
+          ? "Tienda pública. Las cifras y la lista son de todos los pedidos. La cola Por atender tampoco se recorta. Dropi no está conectado."
           : basis === "movidos"
             ? `Tienda pública. Las cifras y la lista son pedidos con un movimiento en ${spanPhrase(span)}, aunque se hayan creado antes. El total guardado es el del pedido, no lo cobrado ese día. La cola Por atender no se recorta. Dropi no está conectado.`
-            : `Tienda pública. Las cifras y la lista son de los creados en ${spanPhrase(span)}. La cola Por atender sigue con los que esperan, aunque sean de otro día. Cambiar el período no cobra ni cambia el total guardado. Dropi no está conectado.`}
+            : `Tienda pública. Las cifras y la lista son de los creados en ${spanPhrase(span)}. La cola Por atender sigue con los que esperan, aunque sean de otro día. Dropi no está conectado.`}
       </p>
       <div className="elevate-1 mt-3 grid items-stretch gap-4 rounded-[14px] border border-line bg-card px-3 py-3 sm:grid-cols-2 sm:gap-x-6">
         <div className="flex min-w-0 flex-col">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Período</p>
           <p className="mt-0.5 text-xs leading-5 text-muted">
-            Cambia las cifras y la lista. Por atender no se recorta. Elegir no cobra ni cambia el total guardado.
+            Cambia las cifras y la lista. Por atender no se recorta.
           </p>
           <div className="mt-3 flex flex-wrap gap-2 sm:mt-auto sm:pt-3" role="radiogroup" aria-label="Período de las cifras y la lista">
             {ORDER_SPANS.map((item) => (
@@ -207,8 +207,8 @@ export function OrdersScreen({
             {span === "todo"
               ? "Con todos los pedidos no hace falta elegir fecha. El total guardado no cambia."
               : basis === "movidos"
-                ? "Movidos mira el historial del pedido. El total guardado no es el dinero de ese día. Elegirlo no cobra."
-                : "Creados mira solo la fecha en que entró el pedido. Elegirlo no cobra ni cambia el total guardado."}
+                ? "Movidos mira el historial del pedido. El total guardado no es el dinero de ese día."
+                : "Creados mira solo la fecha en que entró el pedido."}
           </p>
           {span === "todo" ? (
             <p className="mt-3 text-sm font-semibold sm:mt-auto sm:pt-3">Todos los pedidos</p>
@@ -221,11 +221,11 @@ export function OrdersScreen({
         </div>
       </div>
       <p className="mt-2 text-xs leading-5 text-muted">
-        Dropi no está conectado. El número se anota en Sincronización. Abrirla no cobra. El total guardado no cambia.
+        Dropi no está conectado. El número se anota en Sincronización. El total guardado no cambia.
       </p>
       <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
         <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-        <Link href={syncSectionHref("sync-crear")} title="Abrirla no cobra. El total guardado no cambia." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+        <Link href={syncSectionHref("sync-crear")} className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Abrir sincronización
         </Link>
       </nav>
@@ -311,7 +311,7 @@ export function OrdersScreen({
                 <h3 id={queue.id} className="mt-0.5 text-sm font-semibold">
                   {queue.title} ({queue.rows.length})
                 </h3>
-                <p className="mt-0.5 text-xs leading-5 text-muted">{queue.hint} No cobra.</p>
+                <p className="mt-0.5 text-xs leading-5 text-muted">{queue.hint}</p>
                 <div className="elevate-1 mt-2 overflow-hidden rounded-[14px] border border-line bg-card">
                   <div
                     className={cx(
@@ -335,8 +335,8 @@ export function OrdersScreen({
                           }
                           title={
                             attentionQueueOpensSync(queue.id)
-                              ? "Abrirla no cobra. El total guardado no cambia."
-                              : "Abrirlo no cobra ni cambia el total guardado."
+                              ? " El total guardado no cambia."
+                              : ""
                           }
                           className={cx("grid items-start gap-3 px-3 py-2 text-sm hover:bg-canvas md:gap-4", queueGrid)}
                         >
@@ -383,7 +383,7 @@ export function OrdersScreen({
       {orders.length === 0 ? (
         <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
-          <p className="mt-0.5 text-sm text-muted">Todavía no entra ningún pedido de la tienda. No cobra.</p>
+          <p className="mt-0.5 text-sm text-muted">Todavía no entra ningún pedido de la tienda.</p>
         </div>
       ) : (
         <>
@@ -439,7 +439,7 @@ export function OrdersScreen({
             const hold = drift || costNote ? accountHoldNote(order.status) : "";
             return (
               <li key={order.id}>
-                <a href={orderFocusHref(order.number)} title="Abrirlo no cobra ni cambia el total guardado." className={cx("grid items-start gap-3 px-3 py-2 hover:bg-canvas md:gap-4", orderGrid)}>
+                <a href={orderFocusHref(order.number)} className={cx("grid items-start gap-3 px-3 py-2 hover:bg-canvas md:gap-4", orderGrid)}>
                   <span>
                     <span className="text-sm font-bold">{order.number}</span>
                     <span className="mt-1 block text-xs text-muted">{formatDay(order.createdAt.slice(0, 10))}</span>
@@ -554,7 +554,7 @@ export function OrderEditor({
           <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">{order.number}</h1>
           <p className="mt-1 text-xs text-muted">
             {formatDay(order.createdAt.slice(0, 10))} · {order.customerName} · {order.city}
-            {order.department ? ` · ${order.department}` : ""}. Abrirlo no cobra. El total guardado no cambia.
+            {order.department ? ` · ${order.department}` : ""}. El total guardado no cambia.
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <StatusPill status={order.status} />
@@ -566,7 +566,6 @@ export function OrderEditor({
             <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
             <Link
               href="/panel/pedidos"
-              title="Volver no cobra ni cambia el total guardado."
               className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
             >
               Volver a pedidos
@@ -574,14 +573,12 @@ export function OrderEditor({
             {canNoteDropiNumber(order) ? (
               <Link
                 href={syncFocusHref(order.number)}
-                title="Abrirla no cobra. El total guardado no cambia."
                 className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
               >
                 Sincronización
               </Link>
             ) : null}
-          </nav>
-          <p className="mt-2 text-xs leading-5 text-muted">Volver no cobra ni cambia el total guardado.</p>
+          </nav>
         </div>
       </div>
 
@@ -626,7 +623,7 @@ export function OrderEditor({
             Falta número Dropi —{" "}
             <Link
               href={orderDetailSectionHref(order.number, "pedido-dropi")}
-              title="Ir a Sincronización en este pedido no cobra. El total guardado no cambia."
+             
               className="font-semibold underline decoration-warning/40 underline-offset-2 hover:decoration-warning"
             >
               ver en este pedido
@@ -634,7 +631,6 @@ export function OrderEditor({
             {" · "}
             <Link
               href={syncFocusHref(order.number)}
-              title="Abrirla no cobra. El total guardado no cambia."
               className="font-semibold underline decoration-warning/40 underline-offset-2 hover:decoration-warning"
             >
               abrir Sincronización
@@ -736,7 +732,7 @@ export function OrderEditor({
           ) : null}
           {confirmBlocked || prepareDropiError(order) || resolveBlocked ? (
             <details className="mt-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
-              <summary className="cursor-pointer" title="Abrirlo no cobra ni cambia el total guardado.">
+              <summary className="cursor-pointer">
                 <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Bloqueo</span>
                 <span className="mt-0.5 block text-sm font-semibold text-muted">Herramientas bloqueadas y mensaje al cliente</span>
               </summary>
@@ -786,7 +782,7 @@ export function OrderEditor({
                   «Pasar a preparación» sigue bloqueado hasta anotar un número en{" "}
                   <Link
                     href={orderDetailSectionHref(order.number, "pedido-dropi")}
-                    title="Ir a Sincronización en este pedido no cobra. El total guardado no cambia."
+                   
                     className="font-semibold text-accent-strong"
                   >
                     este pedido
@@ -794,7 +790,6 @@ export function OrderEditor({
                   {" o en "}
                   <Link
                     href={syncFocusHref(order.number)}
-                    title="Abrirla no cobra. El total guardado no cambia."
                     className="font-semibold text-accent-strong"
                   >
                     Sincronización
@@ -808,7 +803,7 @@ export function OrderEditor({
               ) : null}
               {resolveBlocked ? (
                 <p className="mt-3 max-w-xl text-sm leading-5 text-ink">
-                  «Resolver incidencia» sigue bloqueado. {resolveBlocked} Resolverla no cobra y el total guardado no cambia. Si más adelante guardas un motivo y usas el
+                  «Resolver incidencia» sigue bloqueado. {resolveBlocked} El total guardado no cambia. Si más adelante guardas un motivo y usas el
                   botón, el pedido vuelve a confirmado.
                   {prepareDropiError({ ...order, status: "confirmado" })
                     ? " «Pasar a preparación» seguiría bloqueado hasta anotar un número a mano."
@@ -823,7 +818,7 @@ export function OrderEditor({
           ) : null}
           {actions.filter((item) => !needsCustomerReason(item.id)).length > 0 ? (
             <details className="mt-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
-              <summary className="cursor-pointer" title="Abrirlo no cobra ni cambia el total guardado.">
+              <summary className="cursor-pointer">
                 <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
                 <span className="mt-0.5 block text-sm font-semibold text-muted">Si más adelante… mensaje al cliente</span>
               </summary>
@@ -903,7 +898,7 @@ export function OrderEditor({
             <ul className="mt-1 space-y-1">
               {phoneMatches.map((item) => (
                 <li key={item.id}>
-                  <a href={orderFocusHref(item.number)} title="Abrirlo no cobra ni cambia el total guardado." className="text-sm font-semibold underline-offset-2 hover:underline">
+                  <a href={orderFocusHref(item.number)} className="text-sm font-semibold underline-offset-2 hover:underline">
                     {item.number}
                   </a>
                   <span className="text-sm text-muted"> · {STATUS_LABEL[item.status]}</span>
@@ -936,11 +931,11 @@ export function OrderEditor({
           </p>
           <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
             <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-            <Link href={syncFocusHref(order.number)} title="Abrirla no cobra. El total guardado no cambia." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+            <Link href={syncFocusHref(order.number)} className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
               Abrir sincronización
             </Link>
           </nav>
-          <p className="mt-2 text-xs leading-5 text-muted">Abrirla no cobra. El total guardado no cambia.</p>
+          <p className="mt-2 text-xs leading-5 text-muted"> El total guardado no cambia.</p>
           </>
         ) : (
           <p className="mt-1.5 text-xs leading-5 text-muted">
@@ -995,7 +990,7 @@ export function OrderEditor({
         ) : (
           <div className="mt-2 rounded-[10px] border border-line bg-canvas px-3 py-2">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
-            <p className="mt-0.5 text-sm text-muted">Todavía no hay movimientos anotados. Verlos no cobra ni cambia el total guardado.</p>
+            <p className="mt-0.5 text-sm text-muted">Todavía no hay movimientos anotados.</p>
           </div>
         )}
       </section>
@@ -1037,7 +1032,6 @@ function ReasonAction({
         <textarea
           id={`motivo-${order.id}-${item.id}`}
           name="customerReason"
-          title="Escribirlo no cobra. El total guardado no cambia."
           rows={3}
           maxLength={160}
           value={reason}
@@ -1094,7 +1088,6 @@ function StatusFilter({
       type="button"
       role="radio"
       aria-checked={selected}
-      title="Filtrar no cobra ni cambia el total guardado."
       className={cx(
         "min-h-9 rounded-[10px] px-2.5 text-sm font-semibold",
         selected ? "bg-primary text-on-dark" : "border border-line bg-card text-muted",
@@ -1191,7 +1184,7 @@ function DispatchSheet({ orders, moved }: { orders: StoreOrder[]; moved: boolean
           </nav>
           {copied === "ok" ? (
             <p role="status" className="mt-2 text-sm text-accent-strong">
-              Lista para pegarla a mano. Copiar no cobra. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
+              Lista para pegarla a mano. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
             </p>
           ) : null}
           {copied === "fail" ? (
@@ -1448,7 +1441,6 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
           Flete real del envío
           <input
             id={`flete-${order.id}`}
-            title="Escribirlo no cobra. El total guardado no cambia."
             name="actualShipping"
             inputMode="numeric"
             value={shipping}
@@ -1472,7 +1464,6 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
           Recaudo real
           <input
             id={`recaudo-${order.id}`}
-            title="Escribirlo no cobra. El total guardado no cambia."
             name="collectionCost"
             inputMode="numeric"
             value={collection}
@@ -1494,7 +1485,6 @@ function FreightForm({ order, canManageOrderMoney }: { order: StoreOrder; canMan
           Flete de la devolución
           <input
             id={`devolucion-${order.id}`}
-            title="Escribirlo no cobra. El total guardado no cambia."
             name="returnFreight"
             inputMode="numeric"
             value={returning}
@@ -1873,7 +1863,6 @@ function ClosedDepartmentForm({ order }: { order: StoreOrder }) {
         Departamento
         <input
           id={`departamento-cerrado-${order.id}`}
-          title="Escribirlo no cobra. El total guardado no cambia."
           name="department"
           autoComplete="address-level1"
           value={department}
@@ -1899,7 +1888,7 @@ function ClosedDepartmentForm({ order }: { order: StoreOrder }) {
       <FormTools>
         <button
           type="submit"
-          title="Anotarlo no cobra. El total guardado no cambia."
+         
           disabled={departmentPending || !canSave}
           className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
             departmentPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
@@ -1975,41 +1964,41 @@ function DeliveryForm({ order }: { order: StoreOrder }) {
       <p className="mt-0.5 text-sm font-semibold">Corregir entrega</p>
       <label className="text-sm font-semibold" htmlFor={`entrega-nombre-${order.id}`}>
         Nombre de quien recibe
-        <input id={`entrega-nombre-${order.id}`} name="customerName" title="Escribirlo no cobra. El total guardado no cambia." value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" className={freightInput} />
-        <span className="mt-1 block font-normal leading-5 text-muted">Guardarlo no cobra. El total guardado no cambia.</span>
+        <input id={`entrega-nombre-${order.id}`} name="customerName" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" className={freightInput} />
+        <span className="mt-1 block font-normal leading-5 text-muted"></span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-celular-${order.id}`}>
         Celular
-        <input id={`entrega-celular-${order.id}`} name="phone" title="Escribirlo no cobra. El total guardado no cambia." inputMode="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} className={freightInput} />
-        <span className="mt-1 block font-normal leading-5 text-muted">Guardarlo no cobra. El total guardado no cambia.</span>
+        <input id={`entrega-celular-${order.id}`} name="phone" inputMode="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} className={freightInput} />
+        <span className="mt-1 block font-normal leading-5 text-muted"></span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-cedula-${order.id}`}>
         Cédula de quien recibe
-        <input id={`entrega-cedula-${order.id}`} name="document" title="Escribirlo no cobra. El total guardado no cambia." inputMode="numeric" autoComplete="off" value={documentId} onChange={(event) => setDocumentId(event.target.value)} className={freightInput} />
+        <input id={`entrega-cedula-${order.id}`} name="document" inputMode="numeric" autoComplete="off" value={documentId} onChange={(event) => setDocumentId(event.target.value)} className={freightInput} />
         <span className="mt-1 block font-normal leading-5 text-muted">
           Opcional. De 6 a 10 dígitos, sin puntos. Vacío: se quita. Sale en el texto para Dropi y en la confirmación. No va en el mensaje de estado. El total guardado no cambia.
         </span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-departamento-${order.id}`}>
         Departamento
-        <input id={`entrega-departamento-${order.id}`} name="department" title="Escribirlo no cobra. El total guardado no cambia." autoComplete="address-level1" value={department} onChange={(event) => setDepartment(event.target.value)} className={freightInput} />
+        <input id={`entrega-departamento-${order.id}`} name="department" autoComplete="address-level1" value={department} onChange={(event) => setDepartment(event.target.value)} className={freightInput} />
         <span className="mt-1 block font-normal leading-5 text-muted">
           Opcional si el pedido entró sin él. Vacío: no se agrega. En un pedido nuevo la tienda lo pide. El total guardado no cambia.
         </span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-ciudad-${order.id}`}>
         Ciudad
-        <input id={`entrega-ciudad-${order.id}`} name="city" title="Escribirlo no cobra. El total guardado no cambia." autoComplete="address-level2" value={city} onChange={(event) => setCity(event.target.value)} className={freightInput} />
-        <span className="mt-1 block font-normal leading-5 text-muted">Guardarla no cobra. El total guardado no cambia.</span>
+        <input id={`entrega-ciudad-${order.id}`} name="city" autoComplete="address-level2" value={city} onChange={(event) => setCity(event.target.value)} className={freightInput} />
+        <span className="mt-1 block font-normal leading-5 text-muted"></span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-direccion-${order.id}`}>
         Dirección
-        <input id={`entrega-direccion-${order.id}`} name="address" title="Escribirlo no cobra. El total guardado no cambia." autoComplete="street-address" value={address} onChange={(event) => setAddress(event.target.value)} className={freightInput} />
-        <span className="mt-1 block font-normal leading-5 text-muted">Guardarla no cobra. El total guardado no cambia.</span>
+        <input id={`entrega-direccion-${order.id}`} name="address" autoComplete="street-address" value={address} onChange={(event) => setAddress(event.target.value)} className={freightInput} />
+        <span className="mt-1 block font-normal leading-5 text-muted"></span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-referencia-${order.id}`}>
         Barrio o referencia
-        <input id={`entrega-referencia-${order.id}`} name="reference" title="Escribirlo no cobra. El total guardado no cambia." autoComplete="off" value={reference} onChange={(event) => setReference(event.target.value)} className={freightInput} />
+        <input id={`entrega-referencia-${order.id}`} name="reference" autoComplete="off" value={reference} onChange={(event) => setReference(event.target.value)} className={freightInput} />
         <span className="mt-1 block font-normal leading-5 text-muted">
           Opcional. Vacío: se quita. El cliente ve estos datos en su confirmación. Guardar aquí no cambia nada en Dropi.
           El total guardado no cambia.
@@ -2031,13 +2020,12 @@ function DeliveryForm({ order }: { order: StoreOrder }) {
       <FormTools>
         <button
           type="submit"
-          title="Guardarla no cobra. El total guardado no cambia."
           disabled={deliveryPending || !canSave}
           className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
             deliveryPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
           }`}
         >
-          {deliveryPending ? "Guardando…" : "Guardar entrega · no cobra"}
+          {deliveryPending ? "Guardando…" : "Guardar entrega"}
         </button>
       </FormTools>
     </form>
@@ -2090,7 +2078,6 @@ function ReturnReasonForm({ order }: { order: StoreOrder }) {
         <textarea
           id={`motivo-devolucion-${order.id}`}
           name="customerReason"
-          title="Escribirlo no cobra. El total guardado no cambia."
           rows={3}
           maxLength={160}
           value={reason}
@@ -2111,7 +2098,6 @@ function ReturnReasonForm({ order }: { order: StoreOrder }) {
       <FormTools>
         <button
           type="submit"
-          title="Guardarlo no cobra. El total guardado no cambia."
           disabled={reasonPending || !canSave}
           className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
             reasonPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
@@ -2147,7 +2133,6 @@ function IncidenceReasonForm({ order }: { order: StoreOrder }) {
         <textarea
           id={`motivo-incidencia-${order.id}`}
           name="customerReason"
-          title="Escribirlo no cobra. El total guardado no cambia."
           rows={3}
           maxLength={160}
           value={reason}
@@ -2168,7 +2153,7 @@ function IncidenceReasonForm({ order }: { order: StoreOrder }) {
       <FormTools>
         <button
           type="submit"
-          title="Anotarlo no cobra. El total guardado no cambia."
+         
           disabled={reasonPending || !canSave}
           className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
             reasonPending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
@@ -2201,7 +2186,7 @@ function InternalNoteForm({ order }: { order: StoreOrder }) {
         Nota interna
         <textarea
           id={`nota-${order.id}`}
-          title="Escribirla no cobra. El total guardado no cambia."
+         
           name="internalNote"
           rows={3}
           maxLength={280}
@@ -2230,7 +2215,6 @@ function InternalNoteForm({ order }: { order: StoreOrder }) {
       <FormTools>
         <button
           type="submit"
-          title="Guardarla no cobra. El total guardado no cambia."
           disabled={notePending || !canSave}
           className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
             notePending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
@@ -2283,7 +2267,7 @@ function CustomerNote({ order }: { order: StoreOrder }) {
           className="mt-1 min-h-24 w-full rounded-[10px] border border-line bg-card px-3 py-2 text-sm leading-5 font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
         />
         <span className="mt-1 block font-normal leading-5 text-muted">
-          Sale del estado del pedido. Lo envías tú. Copiarlo o abrir WhatsApp no lo envía, no cobra y el total guardado no cambia.
+          Sale del estado del pedido. Lo envías tú. Copiarlo o abrir WhatsApp no lo envía; el total guardado no cambia.
         </span>
       </label>
       <nav aria-label="Consulta" className="flex flex-wrap items-center gap-2">
@@ -2292,7 +2276,7 @@ function CustomerNote({ order }: { order: StoreOrder }) {
           type="button"
           className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
           aria-label={`Copiar mensaje de ${order.number}`}
-          title="Copiarlo no cobra. El total guardado no cambia."
+         
           onClick={copy}
         >
           {copied === "ok" ? "Mensaje copiado" : "Copiar mensaje"}
@@ -2302,7 +2286,7 @@ function CustomerNote({ order }: { order: StoreOrder }) {
             href={href}
             target="_blank"
             rel="noreferrer"
-            title="Abrirlo no envía el mensaje ni cobra. El total guardado no cambia."
+            title="Abrirlo no envía el mensaje. El total guardado no cambia."
             className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
           >
             Abrir en WhatsApp
@@ -2445,7 +2429,7 @@ function SummaryCard({
           <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
             {numbers.map((number) => (
               <li key={number}>
-                <Link href={orderFocusHref(number)} title="Abrirlo no cobra ni cambia el total guardado." className="text-sm font-semibold text-accent-strong">
+                <Link href={orderFocusHref(number)} className="text-sm font-semibold text-accent-strong">
                   {number}
                 </Link>
               </li>
@@ -2466,7 +2450,7 @@ function OrderLinks({ numbers, lead }: { numbers: string[]; lead: "de" | ":" }) 
       {numbers.map((number, index) => (
         <span key={number}>
           {index === 0 ? "" : index === numbers.length - 1 ? " y " : ", "}
-          <Link href={orderFocusHref(number)} title="Abrirlo no cobra ni cambia el total guardado." className="font-semibold text-accent-strong">
+          <Link href={orderFocusHref(number)} className="font-semibold text-accent-strong">
             {number}
           </Link>
         </span>

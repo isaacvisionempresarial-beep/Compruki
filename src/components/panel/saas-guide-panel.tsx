@@ -60,7 +60,7 @@ export function SaasGuidePanel({
         <nav aria-label="Consulta" className="mt-2 flex flex-wrap items-center gap-2">
           <button
             type="submit"
-            title="Generarla no cobra ni cambia pedidos."
+            title="Generarla no cambia pedidos."
             disabled={!enabled}
             className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
           >
@@ -122,7 +122,7 @@ export function SaasGuidePanel({
           ) : null}
           {copied === "fail" ? (
             <p role="alert" className="text-xs text-danger">
-              No se pudo copiar. No cobra.
+              No se pudo copiar.
             </p>
           ) : null}
         </div>

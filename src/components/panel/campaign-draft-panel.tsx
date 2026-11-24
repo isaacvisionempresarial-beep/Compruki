@@ -74,7 +74,6 @@ export function CampaignDraftPanel({
           <span className="mb-1 block text-sm font-semibold">Producto</span>
           <select
             name="campanaSku"
-            title="Elegirlo no genera ni compra anuncios. No cobra."
             defaultValue={selectedSku}
             disabled={!enabled}
             className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
@@ -149,7 +148,7 @@ export function CampaignDraftPanel({
           ) : null}
           {copied === "fail" ? (
             <p role="alert" className="text-xs text-danger">
-              No se pudo copiar. No cobra.
+              No se pudo copiar.
             </p>
           ) : null}
         </div>

@@ -104,8 +104,8 @@ export function AgentsScreen({
       <p className="mt-1 text-sm text-muted">
         Sesión: {roleLabel}.{" "}
         {canApproveCatalog
-          ? "Puedes aprobar borradores y cambiar presupuesto. Usar el centro no cobra ni cambia pedidos."
-          : "Puedes usar las herramientas y rechazar borradores. Aprobar y el presupuesto los guarda el propietario. Usar el centro no cobra ni cambia pedidos."}
+          ? "Puedes aprobar borradores y cambiar presupuesto."
+          : "Puedes usar las herramientas y rechazar borradores. Aprobar y el presupuesto los guarda el propietario."}
       </p>
 
       <div className="elevate-1 mt-4 flex flex-wrap items-center gap-2 rounded-[14px] border border-line bg-card px-3 py-3">
@@ -129,7 +129,7 @@ export function AgentsScreen({
         <h2 id="resumen-tienda" className="mt-0.5 text-sm font-semibold">
           Resumen determinista de la tienda
         </h2>
-        <p className="mt-1 text-sm text-muted">Cifras del catálogo y pedidos locales. No pasan por un modelo. Verlas no cobra ni cambia pedidos.</p>
+        <p className="mt-1 text-sm text-muted">Cifras del catálogo y pedidos locales. No pasan por un modelo.</p>
         <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Stat label="Publicados" value={view.storeSummary.publishedProducts} />
           <Stat label="Disponibles" value={view.storeSummary.availableProducts} />
@@ -138,13 +138,13 @@ export function AgentsScreen({
         </dl>
         <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-          <Link href="/panel/catalogo" title="Abrirlo no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+          <Link href="/panel/catalogo" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
             Ir al catálogo
           </Link>
-          <Link href="/panel/pedidos" title="Abrirlos no cobra ni cambia el total guardado." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+          <Link href="/panel/pedidos" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
             Ir a pedidos
           </Link>
-          <Link href="/panel/conexiones" title="Verlas no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+          <Link href="/panel/conexiones" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
             Ver conexiones
           </Link>
         </nav>
@@ -196,7 +196,6 @@ export function AgentsScreen({
             <span className="mb-1 block text-sm font-semibold">Buscar</span>
             <input
               name="q"
-              title="Escribirlo no cobra ni cambia el catálogo."
               defaultValue={explorer.query}
               disabled={!ag02}
               placeholder="SKU, título o variante"
@@ -207,7 +206,6 @@ export function AgentsScreen({
             <span className="mb-1 block text-sm font-semibold">Categoría</span>
             <select
               name="categoria"
-              title="Filtrar no cobra ni cambia el catálogo."
               defaultValue={explorer.category}
               disabled={!ag02}
               className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
@@ -224,7 +222,6 @@ export function AgentsScreen({
             <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
             <button
               type="submit"
-              title="Buscar no cobra ni cambia el catálogo."
               disabled={!ag02}
               className="inline-flex h-9 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55 sm:w-auto"
             >
@@ -257,7 +254,7 @@ export function AgentsScreen({
           <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
             <p className="mt-0.5 text-sm text-muted">
-              No hay coincidencias en el catálogo local. Buscar no cobra ni cambia el catálogo.
+              No hay coincidencias en el catálogo local.
             </p>
           </div>
         ) : (
@@ -286,7 +283,7 @@ export function AgentsScreen({
                 </p>
                 <nav aria-label="Línea" className="mt-2 flex flex-wrap items-center gap-2">
                   <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Línea</span>
-                  <Link href={`/panel/catalogo/${encodeURIComponent(product.sku)}`} title="Abrirla no cobra ni cambia el precio ni la publicación." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+                  <Link href={`/panel/catalogo/${encodeURIComponent(product.sku)}`} className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
                     Abrir en catálogo
                   </Link>
                 </nav>
@@ -360,7 +357,6 @@ export function AgentsScreen({
             <span className="mb-1 block text-sm font-semibold">SKU (opcional)</span>
             <input
               name="marginSku"
-              title="Escribirlo no cobra ni cambia pedidos."
               disabled={!ag04}
               defaultValue={marginSku}
               placeholder="Vacío = todos los productos"
@@ -371,7 +367,6 @@ export function AgentsScreen({
             <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
             <button
               type="submit"
-              title="Calcular no cobra ni cambia pedidos."
               disabled={!ag04}
               className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
             >
@@ -487,7 +482,7 @@ export function AgentsScreen({
               </h3>
               <p className="mt-1 text-sm text-muted">
                 Responde con la ficha; si no alcanza, deriva a Pendientes humanos con borrador sugerido (OpenAI o
-                plantilla). Verlo no cobra ni cambia pedidos.
+                plantilla).
               </p>
             </div>
           ) : null}
@@ -552,7 +547,7 @@ export function AgentsScreen({
             <h2 id="mas-adelante" className="mt-0.5 text-base font-bold">
               Más adelante (P1 / P2)
             </h2>
-            <p className="mt-1 text-sm text-muted">Todavía no se usan. Verlos no cobra ni cambia pedidos.</p>
+            <p className="mt-1 text-sm text-muted">Todavía no se usan.</p>
             <ul className="mt-3 space-y-2">
               {later.map((role) => (
                 <li key={role.id} className="elevate-1 rounded-[14px] border border-line bg-card px-4 py-2.5">
@@ -579,14 +574,12 @@ export function AgentsScreen({
           Corridas recientes
         </h2>
         <p className="mt-1 text-sm text-muted">
-          Últimas 8 en pantalla, con costo estimado cuando hubo OpenAI. Verlas o bajar el CSV no cobra ni cambia
-          pedidos. El CSV trae hasta 500 del tenant. El costo estimado no es dinero cobrado.
+          Últimas 8 en pantalla, con costo estimado cuando hubo OpenAI. El CSV trae hasta 500 del tenant. El costo estimado no es dinero cobrado.
         </p>
         <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
           <a
             href="/panel/agentes/export"
-            title="Bajarlo no cobra ni cambia pedidos."
             className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
           >
             Descargar CSV

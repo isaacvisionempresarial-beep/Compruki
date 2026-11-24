@@ -38,7 +38,7 @@ export function OrderReadingPanel({
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
           <button
             type="submit"
-            title="Leer no cobra ni cambia el total guardado."
+           
             disabled={!enabled}
             className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
           >

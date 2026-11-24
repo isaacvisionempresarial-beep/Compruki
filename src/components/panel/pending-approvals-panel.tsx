@@ -28,7 +28,7 @@ export function PendingApprovalsPanel({
       <p className="mt-1 text-sm text-muted">
         Bandeja de AG-01. Solo el propietario aprueba un borrador o anota una respuesta de ficha en
         el catálogo. Un operador puede rechazar. Pedidos se atienden en Pedidos; seguimientos CRM en
-        Clientes. Revisar esta bandeja no cobra ni cambia pedidos.
+        Clientes.
       </p>
 
       {!productQuestionsReady ? (
@@ -36,13 +36,12 @@ export function PendingApprovalsPanel({
           <p className="text-[10px] font-bold tracking-[0.08em] text-coral uppercase">Falta</p>
           <p className="mt-0.5 text-sm font-medium text-coral">
             Falta la tabla product_questions. Ejecuta supabase/migrations/012_product_questions.sql. Sin ella el
-            handoff de la ficha falla y aquí no aparecen preguntas. Ver Configuración no cobra ni cambia pedidos.
+            handoff de la ficha falla y aquí no aparecen preguntas.
           </p>
           <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
             <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
             <Link
               href="/panel/ajustes"
-              title="Abrirla no cobra ni cambia pedidos."
               className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
             >
               Ver Configuración
@@ -79,7 +78,7 @@ export function PendingApprovalsPanel({
                   {item.kind}
                 </span>
                 {item.href ? (
-                  <Link href={item.href} title="Abrirlo no cobra ni cambia pedidos." className="font-semibold text-accent-strong">
+                  <Link href={item.href} className="font-semibold text-accent-strong">
                     {item.label}
                   </Link>
                 ) : (
@@ -105,7 +104,6 @@ export function PendingApprovalsPanel({
                   <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
                   <Link
                     href="/panel/clientes"
-                    title="Abrirlo no cobra ni cambia pedidos."
                     className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
                   >
                     Abrir Clientes
@@ -200,7 +198,6 @@ function DraftReviewForm({
             <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
             <button
               type="button"
-              title="Verla no cobra ni cambia pedidos."
               onClick={() => setOpen((value) => !value)}
               className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
             >
@@ -302,7 +299,7 @@ function DraftReviewForm({
           type="submit"
           name="decision"
           value="approve"
-          title="Aprobarlo escribe el texto. El precio y la publicación no cambian. No cobra."
+          title="Aprobarlo escribe el texto. El precio y la publicación no cambian."
           disabled={pending || approveDisabled || !canApproveCatalog}
           className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
         >
@@ -367,7 +364,7 @@ function ApprovalButtons({
           <input type="hidden" name="decision" value="approve" />
           <button
             type="submit"
-            title="Aprobarla no cobra ni cambia el total guardado."
+           
             disabled={pending || approveBlocked}
             className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
           >
@@ -380,7 +377,7 @@ function ApprovalButtons({
           <input type="hidden" name="decision" value="reject" />
           <button
             type="submit"
-            title="Rechazarla no cobra ni cambia pedidos."
+           
             disabled={pending}
             className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-55"
           >

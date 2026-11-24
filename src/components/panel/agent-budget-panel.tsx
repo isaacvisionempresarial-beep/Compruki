@@ -38,8 +38,7 @@ export function AgentBudgetPanel({
       </h2>
       <p className="mt-1 text-sm text-muted">
         Activación y tope mensual por rol. Solo el propietario los cambia. Si un rol está apagado o sin presupuesto,
-        Enrutar / Buscar / Generar / Calcular se cancelan. OpenAI solo se usa si hay clave y responde; si no, plantilla.
-        Verlo o guardarlo no cobra ni cambia pedidos. El costo estimado no es dinero cobrado.
+        Enrutar / Buscar / Generar / Calcular se cancelan. OpenAI solo se usa si hay clave y responde; si no, plantilla. El costo estimado no es dinero cobrado.
       </p>
 
       <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
@@ -122,7 +121,7 @@ function AgentConfigForm({
           <input
             type="checkbox"
             name="enabled"
-            title="Marcarlo no cobra ni cambia pedidos."
+           
             defaultChecked={enabled}
             disabled={!canEdit}
             className="h-4 w-4 accent-[var(--color-accent,#0d9488)] disabled:opacity-55"
@@ -133,7 +132,6 @@ function AgentConfigForm({
           <span className="mb-1 block text-sm font-semibold">Tope mensual (COP)</span>
           <input
             name="monthlyBudgetCop"
-            title="Escribirlo no cobra ni cambia pedidos. El tope no es dinero cobrado."
             type="number"
             min={0}
             step={1000}
@@ -146,7 +144,6 @@ function AgentConfigForm({
           <span className="mb-1 block text-sm font-semibold">Notas</span>
           <input
             name="notes"
-            title="Escribirlo no cobra ni cambia pedidos."
             defaultValue={notes}
             maxLength={500}
             placeholder="Ej. solo borradores, sin publicar"
@@ -163,7 +160,7 @@ function AgentConfigForm({
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
           <button
             type="submit"
-            title="Guardarlo no cobra ni cambia pedidos."
+           
             disabled={pending || !canEdit}
             className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-55"
           >

@@ -78,7 +78,7 @@ export function ConfirmationScreen({
         <p className="mt-1 text-sm text-muted">
           {repeated
             ? "Ya estaba pendiente con estos productos y esta dirección. No se creó otro. El total guardado no cambió. Nadie cobra en la tienda."
-            : `Lo dejaste el ${formatDay(order.createdAt.slice(0, 10))}. Abrirlo no cobra. El total guardado no cambia.`}
+            : `Lo dejaste el ${formatDay(order.createdAt.slice(0, 10))}. El total guardado no cambia.`}
         </p>
       </section>
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="siguiente-paso">
@@ -165,7 +165,7 @@ export function ConfirmationScreen({
           )}
           {order.status === "pendiente_confirmacion" && token ? (
             <details className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
-              <summary className="cursor-pointer" title="Abrirlo no cobra. El total guardado no cambia.">
+              <summary className="cursor-pointer">
                 <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cuidado</span>
                 <span className="mt-0.5 block text-sm font-semibold text-ink">Aviso para la tienda y cancelar</span>
               </summary>
@@ -324,15 +324,15 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
       <h2 className="mt-0.5 text-sm font-semibold">Entrega</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <Field label="Nombre de quien recibe" htmlFor="customerName" hint="Guardarlo no cobra. El total guardado no cambia.">
-            <input id="customerName" name="customerName" title="Escribirlo no cobra. El total guardado no cambia." required autoComplete="name" value={customerName} onChange={(event) => setCustomerName(event.target.value)} className={fieldClass} />
+          <Field label="Nombre de quien recibe" htmlFor="customerName" hint="">
+            <input id="customerName" name="customerName" required autoComplete="name" value={customerName} onChange={(event) => setCustomerName(event.target.value)} className={fieldClass} />
           </Field>
         </div>
         <Field label="Celular" htmlFor="phone" hint="10 dígitos, empieza por 3. El total guardado no cambia.">
-          <input id="phone" name="phone" title="Escribirlo no cobra. El total guardado no cambia." required inputMode="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} className={fieldClass} />
+          <input id="phone" name="phone" required inputMode="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} className={fieldClass} />
         </Field>
         <Field label="Cédula de quien recibe" htmlFor="document" hint="Opcional. De 6 a 10 dígitos, sin puntos. Vacío: se quita. El total guardado no cambia.">
-          <input id="document" name="document" title="Escribirlo no cobra. El total guardado no cambia." inputMode="numeric" autoComplete="off" value={documentId} onChange={(event) => setDocumentId(event.target.value)} className={fieldClass} />
+          <input id="document" name="document" inputMode="numeric" autoComplete="off" value={documentId} onChange={(event) => setDocumentId(event.target.value)} className={fieldClass} />
         </Field>
         <Field
           label="Departamento"
@@ -343,14 +343,14 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
               : "Opcional. No es la ciudad. La tienda puede confirmar sin él. El total guardado no cambia."
           }
         >
-          <input id="department" name="department" title="Escribirlo no cobra. El total guardado no cambia." autoComplete="address-level1" value={department} onChange={(event) => setDepartment(event.target.value)} className={fieldClass} />
+          <input id="department" name="department" autoComplete="address-level1" value={department} onChange={(event) => setDepartment(event.target.value)} className={fieldClass} />
         </Field>
-        <Field label="Ciudad" htmlFor="city" hint="Guardarla no cobra. El total guardado no cambia.">
-          <input id="city" name="city" title="Escribirlo no cobra. El total guardado no cambia." required autoComplete="address-level2" value={city} onChange={(event) => setCity(event.target.value)} className={fieldClass} />
+        <Field label="Ciudad" htmlFor="city" hint="">
+          <input id="city" name="city" required autoComplete="address-level2" value={city} onChange={(event) => setCity(event.target.value)} className={fieldClass} />
         </Field>
         <div className="sm:col-span-2">
-          <Field label="Dirección" htmlFor="address" hint="Guardarla no cobra. El total guardado no cambia.">
-            <input id="address" name="address" title="Escribirlo no cobra. El total guardado no cambia." required autoComplete="street-address" value={address} onChange={(event) => setAddress(event.target.value)} className={fieldClass} />
+          <Field label="Dirección" htmlFor="address" hint="">
+            <input id="address" name="address" required autoComplete="street-address" value={address} onChange={(event) => setAddress(event.target.value)} className={fieldClass} />
           </Field>
         </div>
         <div className="sm:col-span-2">
@@ -359,7 +359,7 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
             htmlFor="reference"
             hint="Opcional. Vacío: se quita. Sin un cambio válido el botón queda bloqueado. El total guardado no cambia."
           >
-            <input id="reference" name="reference" title="Escribirlo no cobra. El total guardado no cambia." autoComplete="off" value={reference} onChange={(event) => setReference(event.target.value)} className={fieldClass} />
+            <input id="reference" name="reference" autoComplete="off" value={reference} onChange={(event) => setReference(event.target.value)} className={fieldClass} />
           </Field>
         </div>
       </div>
@@ -368,11 +368,11 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
       <p className="mt-0.5 text-xs leading-5 text-muted">Guardar la entrega no cobra. El total guardado no cambia. Pagas al recibir.</p>
       {previewText ? (
         <details>
-          <summary className="cursor-pointer" title="Abrirla no cobra. El total guardado no cambia.">
+          <summary className="cursor-pointer">
             <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
             <span className="mt-0.5 block text-sm font-semibold text-muted">Vista previa al guardar</span>
           </summary>
-          <p className="mt-1 text-xs leading-5 text-muted">Abrirla no cobra. El total guardado no cambia.</p>
+          <p className="mt-1 text-xs leading-5 text-muted"> El total guardado no cambia.</p>
           <p className="mt-2 text-sm leading-5 whitespace-pre-line text-muted">{previewText}</p>
         </details>
       ) : null}
@@ -391,7 +391,7 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
             pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
           }`}
         >
-          {pending ? "Guardando…" : "Guardar entrega · no cobra"}
+          {pending ? "Guardando…" : "Guardar entrega"}
         </button>
       </nav>
     </form>
@@ -603,7 +603,6 @@ function CustomerBuyerNote({ orderId, token, note }: { orderId: string; token: s
         Aviso para la tienda
         <textarea
           id="buyer-note"
-          title="Escribirlo no cobra. El total guardado no cambia."
           name="buyerNote"
           rows={3}
           maxLength={160}
@@ -628,7 +627,6 @@ function CustomerBuyerNote({ orderId, token, note }: { orderId: string; token: s
         <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
         <button
           type="submit"
-          title="Guardarlo no cobra. El total guardado no cambia."
           disabled={pending || !canSave}
           className={`inline-flex h-9 scroll-mb-24 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold ${
             pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
@@ -658,7 +656,6 @@ function CustomerCancel({ order, token }: { order: CustomerOrder; token: string 
         <textarea
           id="cancel-reason"
           name="reason"
-          title="Escribirlo no cobra. El total guardado no cambia."
           rows={3}
           maxLength={160}
           value={reason}
