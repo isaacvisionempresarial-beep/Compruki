@@ -20,6 +20,7 @@ import { applySkuCatalogCostAction, type SkuCostState } from "@/server/store-act
 const filters = [
   { id: "todos", label: "Todos" },
   { id: "diferencia", label: "Otra cifra" },
+  { id: "preguntas", label: "Preguntas abiertas" },
   { id: "tienda", label: "En tienda" },
   { id: "agotados", label: "Publicado no pedible" },
   { id: "ocultos", label: "Borrador" },
@@ -132,8 +133,11 @@ export function CatalogScreen({
     [products, query, holds, rowDrift, openQuestionCounts],
   );
   const visible = useMemo(
-    () => searched.filter((product) => matches(product, filter, rowDrift.has(product.sku))),
-    [searched, filter, rowDrift],
+    () =>
+      searched.filter((product) =>
+        matches(product, filter, rowDrift.has(product.sku), openQuestionCounts[product.sku] ?? 0),
+      ),
+    [searched, filter, rowDrift, openQuestionCounts],
   );
 
   return (
@@ -190,7 +194,9 @@ export function CatalogScreen({
           <p className="mt-0.5 text-xs leading-5 text-muted">Filtrar no cobra ni cambia el precio ni la publicación.</p>
           <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Filtrar productos">
             {filters.map((item) => {
-              const count = searched.filter((product) => matches(product, item.id, rowDrift.has(product.sku))).length;
+              const count = searched.filter((product) =>
+                matches(product, item.id, rowDrift.has(product.sku), openQuestionCounts[product.sku] ?? 0),
+              ).length;
               const selectedFilter = filter === item.id;
               return (
                 <button
@@ -527,14 +533,16 @@ function catalogEmptyMessage(total: number, searched: number, filter: FilterId, 
   }
   if (query && searched === 0) return "Ningún producto coincide con la búsqueda. Filtrar no cobra ni cambia el precio ni la publicación.";
   if (filter === "diferencia") return "Ninguna ficha tiene otro precio o costo guardado. Filtrar no cobra ni cambia el precio ni la publicación.";
+  if (filter === "preguntas") return "Ninguna ficha tiene preguntas abiertas. Filtrar no cobra ni cambia el precio ni la publicación.";
   if (filter === "tienda") return "No hay productos en tienda. Filtrar no cobra ni cambia el precio ni la publicación.";
   if (filter === "ocultos") return "No hay borradores. Filtrar no cobra ni cambia el precio ni la publicación.";
   if (filter === "agotados") return "No hay publicados no pedibles. Filtrar no cobra ni cambia el precio ni la publicación.";
   return "No hay productos en este grupo. Filtrar no cobra ni cambia el precio ni la publicación.";
 }
 
-function matches(product: CatalogProduct, filter: FilterId, drifted: boolean) {
+function matches(product: CatalogProduct, filter: FilterId, drifted: boolean, openQuestionCount: number) {
   if (filter === "diferencia") return drifted;
+  if (filter === "preguntas") return openQuestionCount > 0;
   if (filter === "tienda") return product.published && product.available;
   if (filter === "ocultos") return !product.published;
   if (filter === "agotados") return product.published && !product.available;

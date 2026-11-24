@@ -33,4 +33,23 @@ describe("answerProductQuestion", () => {
     expect(reply).toBe("Eso no está en la ficha pública.");
     expect(productQuestionNeedsHandoff(reply)).toBe(false);
   });
+
+  it("usa la respuesta humana P/R anotada en la ficha", () => {
+    const product = {
+      ...base,
+      answers: `${base.answers}\nP: ¿Sirve para acuario marino tropical?\nR: No. Es solo decorativa de mesa.`,
+    };
+    const reply = answerProductQuestion(product, "sirve para acuario marino tropical");
+    expect(reply).toBe("No. Es solo decorativa de mesa.");
+    expect(productQuestionNeedsHandoff(reply)).toBe(false);
+  });
+
+  it("sigue con handoff si el P/R no coincide", () => {
+    const product = {
+      ...base,
+      answers: `${base.answers}\nP: ¿Incluye bombillo?\nR: No incluye bombillo.`,
+    };
+    const reply = answerProductQuestion(product, "¿Sirve para acuario marino tropical?");
+    expect(reply).toBe(PRODUCT_QUESTION_HANDOFF_REPLY);
+  });
 });

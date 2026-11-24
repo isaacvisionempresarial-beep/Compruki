@@ -44,7 +44,12 @@ export function AgentsScreen({
   roleLabel?: string;
 }) {
   const p0 = view.roles.filter((role) => role.priority === "P0-IA");
-  const later = view.roles.filter((role) => role.priority !== "P0-IA");
+  const ag05 = view.roles.find((role) => role.id === "AG-05");
+  const budgetRoles = [
+    ...p0,
+    ...(ag05 ? [ag05] : []),
+  ];
+  const later = view.roles.filter((role) => role.priority !== "P0-IA" && role.id !== "AG-05");
   const ag01 = agentIsOn(view, "AG-01");
   const ag02 = agentIsOn(view, "AG-02");
   const ag03 = agentIsOn(view, "AG-03");
@@ -360,7 +365,7 @@ export function AgentsScreen({
       </section>
 
       <AgentBudgetPanel
-        roles={p0.map((role) => ({
+        roles={budgetRoles.map((role) => ({
           id: role.id,
           name: role.name,
           job: role.job,
@@ -369,6 +374,19 @@ export function AgentsScreen({
         monthSpend={view.monthSpend}
         canEdit={canApproveCatalog}
       />
+
+      {ag05 ? (
+        <section className="elevate-1 mt-4 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="ag05-lite">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">En uso</p>
+          <h2 id="ag05-lite" className="mt-0.5 text-base font-bold">
+            {ag05.id} · {ag05.name}
+          </h2>
+          <p className="mt-1 text-sm text-muted">
+            Lite activo: responde con la ficha y deriva a Pendientes humanos si no alcanza. OpenAI no está conectado.
+            Apágalo en Presupuesto y activación. Verlo no cobra ni cambia pedidos.
+          </p>
+        </section>
+      ) : null}
 
       <p className="mt-6 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Después</p>
 

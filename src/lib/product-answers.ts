@@ -1,5 +1,6 @@
 import type { SizeKind } from "@/lib/catalog";
 import { formatCop } from "@/lib/format";
+import { normalizeProductQuestionKey } from "@/lib/product-question-key";
 
 export type AnswerableProduct = {
   description: string;
@@ -68,6 +69,9 @@ export function answerProductQuestion(product: AnswerableProduct, raw: string) {
     return "Eso no está en la ficha pública.";
   }
 
+  const stored = matchStoredQa(product.answers, raw);
+  if (stored) return stored;
+
   const lines = factLines(product);
   const matched = matchLines(question, lines);
   if (matched.length > 0 && !isBarePrice(question)) return joinLines(matched);
@@ -97,11 +101,42 @@ export function answerProductQuestion(product: AnswerableProduct, raw: string) {
   return PRODUCT_QUESTION_HANDOFF_REPLY;
 }
 
+function matchStoredQa(answers: string, raw: string) {
+  const key = normalizeProductQuestionKey(raw);
+  if (!key) return null;
+  const pairs = parseStoredQaPairs(answers);
+  const hit = pairs.find((pair) => normalizeProductQuestionKey(pair.question) === key);
+  return hit?.answer ?? null;
+}
+
+/** Pares P:/R: anotados desde Pendientes humanos (AG-05). */
+function parseStoredQaPairs(answers: string) {
+  const lines = answers.split(/\n/).map((line) => line.trim()).filter(Boolean);
+  const pairs: Array<{ question: string; answer: string }> = [];
+  for (let index = 0; index < lines.length; index += 1) {
+    const prompt = lines[index].match(/^P:\s*(.+)$/i);
+    if (!prompt) continue;
+    const next = lines[index + 1]?.match(/^R:\s*(.+)$/i);
+    if (!next) continue;
+    const question = prompt[1].trim();
+    const answer = next[1].trim();
+    if (question && answer) pairs.push({ question, answer });
+    index += 1;
+  }
+  return pairs;
+}
+
 function factLines(product: AnswerableProduct) {
   return [product.description, product.highlights, product.answers]
     .flatMap((block) => block.split(/\n/))
     .map((line) => line.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((line) => {
+      const asReply = line.match(/^R:\s*(.+)$/i);
+      if (asReply) return asReply[1].trim();
+      return line;
+    })
+    .filter((line) => line.length > 0 && !/^P:\s*/i.test(line));
 }
 
 function matchLines(question: string, lines: string[]) {
