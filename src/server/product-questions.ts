@@ -99,6 +99,31 @@ export async function listOpenProductQuestions(limit = 8): Promise<ProductQuesti
   }
 }
 
+export async function listOpenProductQuestionsForSku(sku: string, limit = 12): Promise<ProductQuestionRow[]> {
+  const normalized = sku.trim().toUpperCase();
+  if (!normalized) return [];
+  try {
+    const tenantId = await getPilotTenantId();
+    const supabase = createAdminSupabase();
+    const { data, error } = await supabase
+      .from("product_questions")
+      .select("id, product_sku, question, auto_reply, status, answered_line, resolved_by, resolved_at, created_at")
+      .eq("tenant_id", tenantId)
+      .eq("product_sku", normalized)
+      .eq("status", "open")
+      .order("created_at", { ascending: false })
+      .limit(Math.min(20, Math.max(1, limit)));
+
+    if (error) {
+      if (missingTable(error.message)) return [];
+      return [];
+    }
+    return (data ?? []).map((row) => mapRow(row as Record<string, unknown>));
+  } catch {
+    return [];
+  }
+}
+
 export async function getOpenProductQuestion(id: string): Promise<ProductQuestionRow | null> {
   try {
     const tenantId = await getPilotTenantId();

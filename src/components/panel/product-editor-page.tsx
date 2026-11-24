@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { ProductEditor, ProductDangerZone } from "@/components/panel/catalog-screen";
+import { OpenProductQuestions } from "@/components/panel/open-product-questions";
 import type { CatalogProduct } from "@/lib/catalog";
 import type { StoredSkuLine } from "@/lib/store-order";
 import { saveProductAction, type SaveProductState } from "@/server/catalog-actions";
+import type { ProductQuestionRow } from "@/server/product-questions";
 
 const initialState: SaveProductState = { error: null, productId: null, message: null };
 
@@ -15,12 +17,14 @@ export function ProductEditorPage({
   storedLines = [],
   costPreview = "",
   canManageCommerce = false,
+  openQuestions = [],
 }: {
   product: CatalogProduct | null;
   relatedOrderCount?: number;
   storedLines?: StoredSkuLine[];
   costPreview?: string;
   canManageCommerce?: boolean;
+  openQuestions?: ProductQuestionRow[];
 }) {
   const [state, formAction, pending] = useActionState(saveProductAction, initialState);
 
@@ -62,6 +66,9 @@ export function ProductEditorPage({
         <p role="status" className="mb-3 rounded-[14px] bg-accent-tint px-3 py-2 text-sm font-medium text-accent-strong">
           {state.message}
         </p>
+      ) : null}
+      {product ? (
+        <OpenProductQuestions items={openQuestions} canApproveCatalog={canManageCommerce} />
       ) : null}
       <ProductEditor
         key={`${product?.id ?? "new"}-${product?.updatedAt ?? ""}`}

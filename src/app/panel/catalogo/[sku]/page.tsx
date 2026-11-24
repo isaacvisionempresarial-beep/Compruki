@@ -5,6 +5,7 @@ import { getCatalogProduct } from "@/server/catalog-store";
 import { skuCostPreviewNote } from "@/lib/store-order";
 import { countOrdersForSku, listOrders, storedLinesForSku } from "@/server/order-store";
 import { requirePanelAccess } from "@/server/panel-auth";
+import { listOpenProductQuestionsForSku } from "@/server/product-questions";
 
 export const dynamic = "force-dynamic";
 
@@ -18,10 +19,11 @@ export default async function CatalogProductPage({ params }: { params: Promise<{
   const { sku } = await params;
   const [product, access] = await Promise.all([getCatalogProduct(sku), requirePanelAccess()]);
   if (!product) notFound();
-  const [relatedOrderCount, storedLines, orders] = await Promise.all([
+  const [relatedOrderCount, storedLines, orders, openQuestions] = await Promise.all([
     countOrdersForSku(product.sku),
     storedLinesForSku(product.sku),
     listOrders(),
+    listOpenProductQuestionsForSku(product.sku),
   ]);
   const costPreview = skuCostPreviewNote(
     orders.filter((order) => order.lines.some((line) => line.sku === product.sku)),
@@ -35,6 +37,7 @@ export default async function CatalogProductPage({ params }: { params: Promise<{
       storedLines={storedLines}
       costPreview={costPreview}
       canManageCommerce={access.role === "owner"}
+      openQuestions={openQuestions}
     />
   );
 }

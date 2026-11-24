@@ -88,6 +88,7 @@ export async function sendProductQuestionAction(
   revalidatePath("/panel");
   revalidatePath("/panel/agentes");
   revalidatePath("/panel/catalogo");
+  revalidatePath(`/panel/catalogo/${encodeURIComponent(sku)}`);
   revalidatePath(`/tienda/producto/${encodeURIComponent(sku)}`);
 
   return {

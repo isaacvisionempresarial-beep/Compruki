@@ -93,7 +93,7 @@ async function listPendingQuestionApprovals(): Promise<PendingApproval[]> {
     kind: "pregunta" as const,
     label: item.productSku,
     detail: `Pregunta de ficha · ${item.question.slice(0, 140)}`,
-    href: `/panel/catalogo?sku=${encodeURIComponent(item.productSku)}`,
+    href: `/panel/catalogo/${encodeURIComponent(item.productSku)}#preguntas-abiertas`,
     actionable: true,
     questionPreview: {
       question: item.question,

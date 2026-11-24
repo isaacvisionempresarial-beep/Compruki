@@ -75,6 +75,7 @@ async function resolveQuestion(
     revalidatePath("/panel/agentes");
     revalidatePath("/panel");
     revalidatePath("/panel/catalogo");
+    revalidatePath(`/panel/catalogo/${encodeURIComponent(open.productSku)}`);
     return { error: null, message: `Pregunta de ${open.productSku} descartada. La ficha no cambió.` };
   }
 
@@ -116,6 +117,7 @@ async function resolveQuestion(
   revalidatePath("/panel/agentes");
   revalidatePath("/panel");
   revalidatePath("/panel/catalogo");
+  revalidatePath(`/panel/catalogo/${encodeURIComponent(open.productSku)}`);
   revalidatePath(`/tienda/producto/${encodeURIComponent(open.productSku)}`);
   return {
     error: null,
