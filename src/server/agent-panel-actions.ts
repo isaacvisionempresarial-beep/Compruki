@@ -6,6 +6,7 @@ import { generateContentDrafts } from "@/server/agent-content";
 import { exploreCatalog } from "@/server/agent-explorer";
 import { agentDeniedRedirect, evaluateAgentPolicy } from "@/server/agent-policy";
 import { recordAgentRun } from "@/server/agent-runs";
+import { generateSaasGuide } from "@/server/agent-saas-guide";
 import { generateAnalystReading } from "@/server/agent-tools";
 import { assertPanelAccess } from "@/server/panel-auth";
 
@@ -184,4 +185,45 @@ export async function generateCampaignDraftAction(formData: FormData) {
   });
 
   redirect(agentesRedirect({ q, categoria, sku, campanaSku, campana: "1" }));
+}
+
+export async function generateSaasGuideAction(formData: FormData) {
+  const access = await assertPanelAccess();
+  if (!access) redirect("/ingresar");
+
+  const q = String(formData.get("q") ?? "").trim();
+  const categoria = String(formData.get("categoria") ?? "").trim();
+  const sku = String(formData.get("sku") ?? "").trim();
+  const campanaSku = String(formData.get("campanaSku") ?? "").trim();
+
+  const policy = await evaluateAgentPolicy("AG-10");
+  if (!policy.ok) {
+    await recordAgentRun({
+      agentId: "AG-10",
+      status: "cancelled",
+      summary: policy.reason,
+      createdBy: access.user.id,
+      actorName: access.actorName,
+    });
+    redirect(agentDeniedRedirect("AG-10", policy.reason, { q, categoria, sku, campanaSku }));
+  }
+
+  const guide = await generateSaasGuide(access.tenantName);
+  const via = guide.via === "openai" ? "openai" : "plantilla";
+
+  await recordAgentRun({
+    agentId: "AG-10",
+    status: "succeeded",
+    costEstimateCop: guide.costEstimateCop,
+    summary: [
+      `SaaS ${via}`,
+      guide.scoreLabel,
+      guide.nextFocus.slice(0, 120),
+      "no abrió ticket",
+    ].join(" · "),
+    createdBy: access.user.id,
+    actorName: access.actorName,
+  });
+
+  redirect(agentesRedirect({ q, categoria, sku, campanaSku, guia: "1" }));
 }

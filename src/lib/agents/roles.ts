@@ -76,8 +76,8 @@ export const AGENT_ROLES: AgentRoleDefinition[] = [
   {
     id: "AG-10",
     name: "Asistente SaaS",
-    job: "Guiar alta y configuración de cada comerciante.",
-    tools: ["get_onboarding_progress", "get_plan_limits", "create_support_ticket"],
+    job: "Guía de alta según el estado local; nota de soporte para copiar. No abre tickets solo.",
+    tools: ["get_onboarding_progress", "get_plan_limits", "draft_support_note"],
     priority: "P2",
   },
 ];

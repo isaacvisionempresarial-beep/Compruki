@@ -161,6 +161,9 @@ export default async function SettingsPage() {
         <Link href="/panel/agentes" target="_self" title="Abrirlo no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Centro de agentes
         </Link>
+        <Link href="/panel/agentes#saas" target="_self" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+          Guía de alta (AG-10)
+        </Link>
         <a href="/api/health" target="_self" title="Verla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Ver /api/health
         </a>

@@ -6,6 +6,7 @@ import { CampaignDraftPanel } from "@/components/panel/campaign-draft-panel";
 import { CentralRouterPanel } from "@/components/panel/central-router-panel";
 import { ContentCreatorPanel } from "@/components/panel/content-creator-panel";
 import { PendingApprovalsPanel } from "@/components/panel/pending-approvals-panel";
+import { SaasGuidePanel } from "@/components/panel/saas-guide-panel";
 import { publicationLabel } from "@/lib/catalog";
 import { formatCop } from "@/lib/format";
 import { usePanelSectionHash } from "@/lib/use-panel-section-hash";
@@ -15,6 +16,7 @@ import type { ContentDraft, ProductFacts, SavedContentDraft } from "@/server/age
 import type { ExplorerShortlist } from "@/server/agent-explorer";
 import type { AgentCenterView } from "@/server/agent-gateway";
 import { runAnalystAction, searchExplorerAction } from "@/server/agent-panel-actions";
+import type { SaasGuide } from "@/server/agent-saas-guide";
 import type { AnalystReading, AnalystToolkit } from "@/server/agent-tools";
 
 function agentIsOn(view: AgentCenterView, agentId: string) {
@@ -31,6 +33,7 @@ export function AgentsScreen({
   explorer,
   creator,
   campaign,
+  saasGuide = null,
   central,
   policyError = null,
   canApproveCatalog = false,
@@ -53,6 +56,7 @@ export function AgentsScreen({
     selectedSku: string;
     draft: CampaignDraft | null;
   };
+  saasGuide?: SaasGuide | null;
   central: { route: CentralRouteResult | null; defaultIntent: string };
   policyError?: { agentId: string | null; message: string } | null;
   canApproveCatalog?: boolean;
@@ -64,6 +68,7 @@ export function AgentsScreen({
   const ag07 = view.roles.find((role) => role.id === "AG-07");
   const ag08 = view.roles.find((role) => role.id === "AG-08");
   const ag09 = view.roles.find((role) => role.id === "AG-09");
+  const ag10 = view.roles.find((role) => role.id === "AG-10");
   const budgetRoles = [
     ...p0,
     ...(ag05 ? [ag05] : []),
@@ -71,6 +76,7 @@ export function AgentsScreen({
     ...(ag07 ? [ag07] : []),
     ...(ag08 ? [ag08] : []),
     ...(ag09 ? [ag09] : []),
+    ...(ag10 ? [ag10] : []),
   ];
   const later = view.roles.filter(
     (role) =>
@@ -79,14 +85,16 @@ export function AgentsScreen({
       role.id !== "AG-06" &&
       role.id !== "AG-07" &&
       role.id !== "AG-08" &&
-      role.id !== "AG-09",
+      role.id !== "AG-09" &&
+      role.id !== "AG-10",
   );
-  usePanelSectionHash(["pendientes-humanos", "publicidad", "corridas"]);
+  usePanelSectionHash(["pendientes-humanos", "publicidad", "saas", "corridas"]);
   const ag01 = agentIsOn(view, "AG-01");
   const ag02 = agentIsOn(view, "AG-02");
   const ag03 = agentIsOn(view, "AG-03");
   const ag04 = agentIsOn(view, "AG-04");
   const ag08On = agentIsOn(view, "AG-08");
+  const ag10On = agentIsOn(view, "AG-10");
 
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
@@ -310,6 +318,16 @@ export function AgentsScreen({
         canTurnOn={canApproveCatalog}
       />
 
+      <SaasGuidePanel
+        guide={saasGuide}
+        preserveQuery={explorer.query}
+        preserveCategory={explorer.category}
+        preserveContentSku={creator.selectedSku}
+        preserveCampaignSku={campaign.selectedSku}
+        enabled={ag10On}
+        canTurnOn={canApproveCatalog}
+      />
+
       <section className="mt-6" aria-labelledby="analista">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Margen</p>
         <h2 id="analista" className="mt-0.5 text-base font-bold">
@@ -455,7 +473,7 @@ export function AgentsScreen({
         canEdit={canApproveCatalog}
       />
 
-      {ag05 || ag06 || ag07 || ag08 || ag09 ? (
+      {ag05 || ag06 || ag07 || ag08 || ag09 || ag10 ? (
         <section className="elevate-1 mt-4 space-y-3 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="en-uso-lite">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">En uso</p>
           <h2 id="en-uso-lite" className="sr-only">
@@ -512,30 +530,45 @@ export function AgentsScreen({
               </p>
             </div>
           ) : null}
+          {ag10 ? (
+            <div>
+              <h3 className="text-sm font-bold">
+                {ag10.id} · {ag10.name}
+              </h3>
+              <p className="mt-1 text-sm text-muted">
+                Lite: «Generar guía» resume el alta y arma una nota de soporte. No abre tickets.
+              </p>
+            </div>
+          ) : null}
         </section>
       ) : null}
 
-      <p className="mt-6 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Después</p>
-
-      <section className="mt-3" aria-labelledby="mas-adelante">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Lista</p>
-        <h2 id="mas-adelante" className="mt-0.5 text-base font-bold">
-          Más adelante (P1 / P2)
-        </h2>
-        <p className="mt-1 text-sm text-muted">Todavía no se usan. Verlos no cobra ni cambia pedidos.</p>
-        <ul className="mt-3 space-y-2">
-          {later.map((role) => (
-            <li key={role.id} className="elevate-1 rounded-[14px] border border-line bg-card px-4 py-2.5">
-              <p className="text-sm font-semibold">
-                <span className="text-muted">{role.id} · </span>
-                {role.name}
-                <span className="ml-2 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{role.priority}</span>
-              </p>
-              <p className="mt-0.5 text-sm text-muted">{role.job}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {later.length > 0 ? (
+        <>
+          <p className="mt-6 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Después</p>
+          <section className="mt-3" aria-labelledby="mas-adelante">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Lista</p>
+            <h2 id="mas-adelante" className="mt-0.5 text-base font-bold">
+              Más adelante (P1 / P2)
+            </h2>
+            <p className="mt-1 text-sm text-muted">Todavía no se usan. Verlos no cobra ni cambia pedidos.</p>
+            <ul className="mt-3 space-y-2">
+              {later.map((role) => (
+                <li key={role.id} className="elevate-1 rounded-[14px] border border-line bg-card px-4 py-2.5">
+                  <p className="text-sm font-semibold">
+                    <span className="text-muted">{role.id} · </span>
+                    {role.name}
+                    <span className="ml-2 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
+                      {role.priority}
+                    </span>
+                  </p>
+                  <p className="mt-0.5 text-sm text-muted">{role.job}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </>
+      ) : null}
 
       <p className="mt-6 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Historial</p>
 

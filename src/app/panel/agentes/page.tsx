@@ -5,6 +5,7 @@ import { routeTask } from "@/server/agent-central";
 import { getContentDraftPreview, listContentDrafts, listDraftableProducts } from "@/server/agent-content";
 import { getExplorerShortlistPreview, searchLocalCatalog } from "@/server/agent-explorer";
 import { getAgentCenterView } from "@/server/agent-gateway";
+import { getSaasGuidePreview } from "@/server/agent-saas-guide";
 import { getAnalystReadingPreview, getAnalystToolkit } from "@/server/agent-tools";
 import { requirePanelAccess } from "@/server/panel-auth";
 
@@ -29,6 +30,7 @@ export default async function AgentsPage({
     explorado?: string;
     campanaSku?: string;
     campana?: string;
+    guia?: string;
     agente?: string;
     agenteError?: string;
   }>;
@@ -63,6 +65,7 @@ export default async function AgentsPage({
   const reading = showReading ? getAnalystReadingPreview(marginSku || undefined) : null;
   const explorer = cachedExplorer ?? explorerFallback;
   const campaignDraft = campaignSku ? getCampaignDraftPreview(campaignSku) : null;
+  const saasGuide = params.guia === "1" ? getSaasGuidePreview() : null;
 
   return (
     <AgentsScreen
@@ -83,6 +86,7 @@ export default async function AgentsPage({
         selectedSku: campaignSku,
         draft: campaignDraft,
       }}
+      saasGuide={saasGuide}
       central={{ route: central, defaultIntent: intent }}
       policyError={policyError}
       canApproveCatalog={access.role === "owner"}
