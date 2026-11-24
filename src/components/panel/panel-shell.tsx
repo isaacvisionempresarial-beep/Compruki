@@ -82,6 +82,7 @@ const groups: Array<{ id: string; label: string; items: Array<{ id: string; labe
     items: [
       { id: "panel", label: "Panel principal", icon: "panel", href: "/panel" },
       { id: "pedidos", label: "Pedidos", icon: "orders", href: "/panel/pedidos" },
+      { id: "clientes", label: "Clientes", icon: "people", href: "/panel/clientes" },
       { id: "catalogo", label: "Catálogo", icon: "catalog", href: "/panel/catalogo" },
       { id: "rentabilidad", label: "Rentabilidad", icon: "chart", href: "/panel/rentabilidad" },
     ],

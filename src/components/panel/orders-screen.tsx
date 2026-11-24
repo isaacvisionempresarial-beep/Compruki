@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useMemo, useState, type ReactNode } from "react";
 import { AttentionSheet } from "@/components/panel/attention-sheet";
 import { CloseSheet } from "@/components/panel/close-sheet";
+import { OrderCrmPanel } from "@/components/panel/order-crm-panel";
 import { OrderMessageDraftPanel } from "@/components/panel/order-message-draft-panel";
 import { OrderReadingPanel } from "@/components/panel/order-reading-panel";
 import { OrderSupportDraftPanel } from "@/components/panel/order-support-draft-panel";
@@ -501,6 +502,8 @@ export function OrderEditor({
   supportDraft = null,
   supportDraftEnabled = true,
   supportDraftError = null,
+  followupFlash = false,
+  followupError = null,
 }: {
   order: StoreOrder;
   orders: StoreOrder[];
@@ -518,6 +521,8 @@ export function OrderEditor({
   supportDraft?: SupportResolutionDraft | null;
   supportDraftEnabled?: boolean;
   supportDraftError?: string | null;
+  followupFlash?: boolean;
+  followupError?: string | null;
 }) {
   const [state, action, pending] = useActionState(updateOrderAction, initialState);
   const margin = orderMargin(order);
@@ -667,6 +672,14 @@ export function OrderEditor({
         draft={supportDraft}
         enabled={supportDraftEnabled}
         policyError={supportDraftError}
+      />
+
+      <OrderCrmPanel
+        orderNumber={order.number}
+        customerName={order.customerName}
+        phone={order.phone}
+        flash={followupFlash}
+        error={followupError}
       />
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-herramientas">

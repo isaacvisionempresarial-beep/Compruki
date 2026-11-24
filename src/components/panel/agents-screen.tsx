@@ -506,7 +506,7 @@ export function AgentsScreen({
                 {ag07.id} · {ag07.name}
               </h3>
               <p className="mt-1 text-sm text-muted">
-                Lite: «Generar borrador» en el pedido arma un mensaje para copiar. No envía WhatsApp ni cobra.
+                Lite: borrador en el pedido y «Priorizar» / seguimientos en Clientes. No envía WhatsApp ni cobra.
               </p>
             </div>
           ) : null}

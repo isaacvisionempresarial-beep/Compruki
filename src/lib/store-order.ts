@@ -593,6 +593,7 @@ export type OrderDetailSectionId =
   | "pedido-lectura"
   | "pedido-mensaje"
   | "pedido-posventa"
+  | "pedido-crm"
   | "pedido-herramientas"
   | "pedido-productos"
   | "pedido-entrega"
@@ -605,6 +606,7 @@ export const ORDER_DETAIL_SECTION_IDS: readonly OrderDetailSectionId[] = [
   "pedido-lectura",
   "pedido-mensaje",
   "pedido-posventa",
+  "pedido-crm",
   "pedido-herramientas",
   "pedido-productos",
   "pedido-entrega",

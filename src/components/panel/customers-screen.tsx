@@ -1,0 +1,283 @@
+"use client";
+
+import Link from "next/link";
+import type { CrmContact } from "@/lib/crm-contacts";
+import { formatDay } from "@/lib/format";
+import { orderFocusHref } from "@/lib/store-order";
+import type { FollowupPriority } from "@/server/agent-followup-priority";
+import type { FollowupTask } from "@/server/followups";
+import {
+  createFollowupAction,
+  createSuggestedFollowupAction,
+  prioritizeFollowupsAction,
+  resolveFollowupAction,
+} from "@/server/followup-actions";
+
+export function CustomersScreen({
+  contacts,
+  openTasks,
+  tableReady,
+  priority = null,
+  ag07Enabled = true,
+  flash = null,
+  error = null,
+  policyError = null,
+}: {
+  contacts: CrmContact[];
+  openTasks: FollowupTask[];
+  tableReady: boolean;
+  priority?: FollowupPriority | null;
+  ag07Enabled?: boolean;
+  flash?: string | null;
+  error?: string | null;
+  policyError?: string | null;
+}) {
+  return (
+    <div className="mx-auto max-w-[1600px] pb-8">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Operación</p>
+      <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Clientes</h1>
+      <p className="mt-1 max-w-2xl text-sm text-muted">
+        CRM lite: contactos sacados de pedidos y seguimientos manuales (AG-07). No es difusión masiva ni
+        WhatsApp automático. Crear o cerrar un seguimiento no cobra.
+      </p>
+
+      {!tableReady ? (
+        <p role="status" className="mt-3 rounded-[10px] bg-warning-tint px-3 py-2 text-sm text-warning">
+          Falta la tabla followup_tasks. Ejecuta supabase/migrations/013_followup_tasks.sql. La lista de
+          contactos sigue visible.
+        </p>
+      ) : null}
+
+      {flash ? (
+        <p role="status" className="mt-3 text-sm font-medium text-accent-strong">
+          {flash}
+        </p>
+      ) : null}
+      {error ? (
+        <p role="alert" className="mt-3 text-sm font-medium text-danger">
+          {error}
+        </p>
+      ) : null}
+      {policyError ? (
+        <p role="alert" className="mt-3 text-sm font-medium text-danger">
+          {policyError}
+        </p>
+      ) : null}
+
+      <section className="mt-5" aria-labelledby="prioridad">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">AG-07</p>
+        <h2 id="prioridad" className="mt-0.5 text-base font-bold">
+          Priorizar seguimientos
+        </h2>
+        <p className="mt-1 text-sm text-muted">
+          Sugiere a quién contactar (OpenAI o plantilla). No crea tareas ni envía mensajes hasta que tú lo
+          guardes.
+        </p>
+        {!ag07Enabled ? (
+          <p role="status" className="mt-2 text-sm font-medium text-coral">
+            AG-07 está apagado. Actívalo en Presupuesto y activación (Centro de agentes).
+          </p>
+        ) : null}
+        <form action={prioritizeFollowupsAction} className="mt-2">
+          <nav aria-label="Consulta" className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
+            <button
+              type="submit"
+              title="Priorizar no crea tareas ni cobra en la tienda."
+              disabled={!ag07Enabled}
+              className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
+            >
+              Priorizar
+            </button>
+          </nav>
+        </form>
+
+        {priority ? (
+          <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
+              Fuente: {priority.via === "openai" ? "OpenAI" : "plantilla"}
+              {priority.costEstimateCop > 0 ? ` · costo est. ${priority.costEstimateCop} COP` : ""}
+            </p>
+            {priority.suggestions.length === 0 ? (
+              <p className="mt-2 text-sm text-muted">No hay sugerencias ahora. Priorizar no cobra.</p>
+            ) : (
+              <ul className="mt-2 space-y-2">
+                {priority.suggestions.map((item) => (
+                  <li key={`${item.orderNumber}-${item.reason}`} className="rounded-[10px] border border-line bg-canvas px-3 py-2">
+                    <p className="text-sm font-semibold">
+                      {item.customerName} · {item.orderNumber}
+                    </p>
+                    <p className="mt-0.5 text-sm text-muted">{item.reason}</p>
+                    <form action={createSuggestedFollowupAction} className="mt-2 flex flex-wrap items-end gap-2">
+                      <input type="hidden" name="phone" value={item.phone} />
+                      <input type="hidden" name="customerName" value={item.customerName} />
+                      <input type="hidden" name="orderNumber" value={item.orderNumber} />
+                      <input type="hidden" name="note" value={item.reason} />
+                      <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+                        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
+                          Herramientas
+                        </span>
+                        <button
+                          type="submit"
+                          title="Guardarlo no envía WhatsApp ni cobra."
+                          disabled={!tableReady}
+                          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-55"
+                        >
+                          Guardar seguimiento
+                        </button>
+                        <Link
+                          href={orderFocusHref(item.orderNumber)}
+                          title="Abrirlo no cobra ni cambia el total guardado."
+                          className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
+                        >
+                          Ver pedido
+                        </Link>
+                      </nav>
+                    </form>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ) : null}
+      </section>
+
+      <section className="mt-6" aria-labelledby="abiertos">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cola</p>
+        <h2 id="abiertos" className="mt-0.5 text-base font-bold">
+          Seguimientos abiertos
+        </h2>
+        {openTasks.length === 0 ? (
+          <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm text-muted">No hay seguimientos abiertos. Verlo no cobra.</p>
+          </div>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {openTasks.map((task) => (
+              <li key={task.id} className="elevate-1 rounded-[14px] border border-line bg-card px-4 py-3">
+                <p className="text-sm font-semibold">
+                  {task.customerName || "Sin nombre"}
+                  {task.orderNumber ? ` · ${task.orderNumber}` : ""}
+                </p>
+                <p className="mt-0.5 text-xs text-muted">
+                  {task.phone}
+                  {task.createdBy ? ` · ${task.createdBy}` : ""}
+                  {task.createdAt ? ` · ${formatDay(task.createdAt)}` : ""}
+                </p>
+                <p className="mt-1 text-sm text-muted">{task.note}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <form action={resolveFollowupAction} className="contents">
+                    <input type="hidden" name="id" value={task.id} />
+                    <input type="hidden" name="status" value="done" />
+                    <button
+                      type="submit"
+                      title="Cerrarlo no envía mensaje ni cobra."
+                      className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft"
+                    >
+                      Hecho
+                    </button>
+                  </form>
+                  <form action={resolveFollowupAction} className="contents">
+                    <input type="hidden" name="id" value={task.id} />
+                    <input type="hidden" name="status" value="dismissed" />
+                    <button
+                      type="submit"
+                      title="Descartarlo no cobra."
+                      className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+                    >
+                      Descartar
+                    </button>
+                  </form>
+                  {task.orderNumber ? (
+                    <Link
+                      href={orderFocusHref(task.orderNumber)}
+                      title="Abrirlo no cobra ni cambia el total guardado."
+                      className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+                    >
+                      Ver pedido
+                    </Link>
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="mt-6" aria-labelledby="contactos">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Agenda</p>
+        <h2 id="contactos" className="mt-0.5 text-base font-bold">
+          Contactos de pedidos
+        </h2>
+        <p className="mt-1 text-sm text-muted">
+          {contacts.length} contacto{contacts.length === 1 ? "" : "s"} · agrupados por teléfono. Solo para
+          seguimiento del pedido.
+        </p>
+
+        {contacts.length === 0 ? (
+          <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm text-muted">Aún no hay pedidos con teléfono. Verlo no cobra.</p>
+          </div>
+        ) : (
+          <ul className="mt-3 grid gap-2 md:grid-cols-2">
+            {contacts.map((contact) => (
+              <li key={contact.phone} className="elevate-1 rounded-[14px] border border-line bg-card px-4 py-3">
+                <p className="text-sm font-semibold">{contact.customerName}</p>
+                <p className="mt-0.5 text-xs text-muted">
+                  {contact.phone}
+                  {contact.city ? ` · ${contact.city}` : ""}
+                  {" · "}
+                  {contact.orderCount} pedido{contact.orderCount === 1 ? "" : "s"}
+                  {contact.openFollowups > 0 ? ` · ${contact.openFollowups} abierto(s)` : ""}
+                </p>
+                <p className="mt-1 text-sm text-muted">
+                  Último: {contact.latestOrderNumber} · {contact.latestStatusLabel}
+                  {contact.latestAt ? ` · ${formatDay(contact.latestAt)}` : ""}
+                </p>
+                <form action={createFollowupAction} className="mt-2 space-y-2">
+                  <input type="hidden" name="phone" value={contact.phone} />
+                  <input type="hidden" name="customerName" value={contact.customerName} />
+                  <input type="hidden" name="orderNumber" value={contact.latestOrderNumber} />
+                  <label className="block">
+                    <span className="mb-1 block text-sm font-semibold">Nota del seguimiento</span>
+                    <input
+                      name="note"
+                      required
+                      maxLength={400}
+                      title="Escribirla no envía ni cobra."
+                      placeholder="Ej. Confirmar talla / avisar incidencia"
+                      disabled={!tableReady}
+                      className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
+                    />
+                  </label>
+                  <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
+                      Herramientas
+                    </span>
+                    <button
+                      type="submit"
+                      title="Guardarlo no envía WhatsApp ni cobra."
+                      disabled={!tableReady}
+                      className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-55"
+                    >
+                      Crear seguimiento
+                    </button>
+                    <Link
+                      href={orderFocusHref(contact.latestOrderNumber)}
+                      title="Abrirlo no cobra ni cambia el total guardado."
+                      className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+                    >
+                      Ver pedido
+                    </Link>
+                  </nav>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
+  );
+}

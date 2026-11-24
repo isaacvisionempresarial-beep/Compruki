@@ -26,6 +26,8 @@ export default async function OrderPage({
     lecturaPedido?: string;
     borradorMensaje?: string;
     borradorPosventa?: string;
+    seguimiento?: string;
+    seguimientoError?: string;
     agente?: string;
     agenteError?: string;
   }>;
@@ -72,6 +74,8 @@ export default async function OrderPage({
       supportDraft={supportDraft}
       supportDraftEnabled={policy09.ok}
       supportDraftError={agent === "AG-09" ? agentError : null}
+      followupFlash={query.seguimiento === "1"}
+      followupError={query.seguimientoError?.trim() || null}
     />
   );
 }
