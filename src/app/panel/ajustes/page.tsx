@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { StoreIdentityForm } from "@/components/panel/store-identity-form";
 import { getHealthSnapshot } from "@/server/health";
 import { requirePanelAccess } from "@/server/panel-auth";
+import { getStoreIdentity } from "@/server/store-identity";
 
 export const metadata: Metadata = {
   title: "Configuración",
@@ -11,7 +13,11 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
-  const [access, health] = await Promise.all([requirePanelAccess(), getHealthSnapshot()]);
+  const [access, health, identity] = await Promise.all([
+    requirePanelAccess(),
+    getHealthSnapshot(),
+    getStoreIdentity(),
+  ]);
 
   const checkLabels: Array<{ key: keyof typeof health.checks; label: string; hint?: string }> = [
     { key: "siteUrl", label: "NEXT_PUBLIC_SITE_URL" },
@@ -65,6 +71,8 @@ export default async function SettingsPage() {
           </div>
         </dl>
       </section>
+
+      <StoreIdentityForm identity={identity} canEdit={access.role === "owner"} />
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="alcance">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Permisos</p>

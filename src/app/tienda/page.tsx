@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
 import { StoreHome } from "@/components/store/store-home";
+import { storePublicTagline } from "@/lib/store-identity";
 import { listPublicProducts } from "@/server/catalog-store";
+import { getStoreIdentity } from "@/server/store-identity";
 
-export const metadata: Metadata = {
-  title: "Tienda",
-  description: "Productos publicados de la tienda piloto. Pagas al recibir. El envío se acuerda aparte.",
-};
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata(): Promise<Metadata> {
+  const identity = await getStoreIdentity();
+  return {
+    title: identity.name,
+    description: storePublicTagline(identity),
+  };
+}
+
 export default async function StorePage() {
-  return <StoreHome products={await listPublicProducts()} />;
+  const [products, identity] = await Promise.all([listPublicProducts(), getStoreIdentity()]);
+  return <StoreHome products={products} identity={identity} />;
 }

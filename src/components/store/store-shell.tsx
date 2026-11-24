@@ -7,9 +7,21 @@ import { Wordmark } from "@/components/brand/wordmark";
 import { Icon } from "@/components/icons";
 import { useCart } from "@/components/store/cart-state";
 import { cx } from "@/lib/cx";
+import type { StoreIdentity } from "@/lib/store-identity";
+import { whatsAppHref } from "@/lib/store-order";
 import { useRouteFocus } from "@/lib/use-route-focus";
 
-export function StoreShell({ children }: { children: ReactNode }) {
+export function StoreShell({
+  children,
+  identity = null,
+}: {
+  children: ReactNode;
+  identity?: StoreIdentity | null;
+}) {
+  const contactHref =
+    identity?.whatsapp && identity.name
+      ? whatsAppHref(identity.whatsapp, `Hola. Escribo por ${identity.name}.`)
+      : null;
   const pathname = usePathname();
   const { count, ready } = useCart();
   const [showBenefits, setShowBenefits] = useState(false);
@@ -36,10 +48,30 @@ export function StoreShell({ children }: { children: ReactNode }) {
     <div className="store-surface min-h-dvh">
       <header className="store-chrome-in sticky top-0 z-20 border-b border-line/80 bg-card/80 backdrop-blur-md">
         <div className={cx("mx-auto flex h-14 items-center justify-between gap-3 px-4", shellWidth)}>
-          <Link href="/tienda" target="_self" title="Ir al inicio no registra pedido ni cobra." className="rounded-[10px]" aria-label="COMPRUKI, inicio de la tienda">
+          <Link
+            href="/tienda"
+            target="_self"
+            title="Ir al inicio no registra pedido ni cobra."
+            className="min-w-0 rounded-[10px]"
+            aria-label="COMPRUKI, inicio de la tienda"
+          >
             <Wordmark className="[&_span]:store-display [&_span]:text-[15px]" />
+            {identity?.name ? (
+              <span className="mt-0.5 block truncate text-[11px] font-semibold text-muted">{identity.name}</span>
+            ) : null}
           </Link>
           <div className="flex items-center gap-2">
+            {contactHref ? (
+              <a
+                href={contactHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Abre WhatsApp a mano. Compruki no envía."
+                className="hidden h-10 items-center rounded-[12px] border border-line bg-canvas/90 px-3 text-sm font-semibold transition-colors hover:border-accent/40 hover:bg-card sm:inline-flex"
+              >
+                WhatsApp
+              </a>
+            ) : null}
             {productPage ? (
               <nav className="hidden items-center gap-3 text-sm font-semibold md:flex" aria-label="En esta ficha">
                 <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Ficha</span>

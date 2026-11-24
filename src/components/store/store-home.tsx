@@ -8,8 +8,20 @@ import { PhotoCarousel } from "@/components/photo-carousel";
 import { CatalogPhoto } from "@/components/store/product-thumb";
 import { formatCop } from "@/lib/format";
 import { cx } from "@/lib/cx";
+import { storePublicTagline, type StoreIdentity } from "@/lib/store-identity";
+import { whatsAppHref } from "@/lib/store-order";
 
-export function StoreHome({ products }: { products: PublicProduct[] }) {
+export function StoreHome({
+  products,
+  identity,
+}: {
+  products: PublicProduct[];
+  identity: StoreIdentity;
+}) {
+  const tagline = storePublicTagline(identity);
+  const contactHref = identity.whatsapp
+    ? whatsAppHref(identity.whatsapp, `Hola. Escribo por ${identity.name}.`)
+    : null;
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("todas");
@@ -62,6 +74,9 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
             >
               COMPRUKI
             </p>
+            <p className="store-rise mt-2 text-sm font-semibold text-ink" style={{ animationDelay: "70ms" }}>
+              {identity.name}
+            </p>
             <h1
               className="store-display store-rise mt-3 max-w-[12ch] text-[2.6rem] leading-[0.98] font-extrabold tracking-[-0.045em] text-ink sm:text-[3.35rem]"
               style={{ animationDelay: "110ms" }}
@@ -69,7 +84,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
               Pagas al recibir
             </h1>
             <p className="store-rise mt-4 max-w-md text-[15px] leading-6 text-muted" style={{ animationDelay: "180ms" }}>
-              Elige, deja el pedido y paga cuando te llegue. El envío se acuerda aparte. Nadie cobra aquí.
+              {tagline}
             </p>
             <div className="store-rise mt-6 flex flex-wrap items-center gap-2.5" style={{ animationDelay: "250ms" }}>
               <a
@@ -86,6 +101,17 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
               >
                 Consultar pedido
               </Link>
+              {contactHref ? (
+                <a
+                  href={contactHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Abre WhatsApp a mano. Compruki no envía."
+                  className="inline-flex h-11 items-center rounded-[12px] border border-line bg-card/85 px-4 text-sm font-semibold text-ink backdrop-blur transition-colors hover:bg-card"
+                >
+                  WhatsApp
+                </a>
+              ) : null}
             </div>
           </div>
 
