@@ -169,8 +169,8 @@ export function AgentsScreen({
               ))}
             </select>
           </label>
-          <nav aria-label="Herramientas" className="flex flex-wrap items-end gap-2">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <nav aria-label="Consulta" className="flex flex-wrap items-end gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
             <button
               type="submit"
               title="Buscar no cobra ni cambia el catálogo."
@@ -219,8 +219,8 @@ export function AgentsScreen({
                   Margen estimado {formatCop(product.margin)}. No es dinero cobrado.
                   {product.variants.length > 0 ? ` · ${product.variants.length} variantes` : ""}
                 </p>
-                <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                <nav aria-label="Línea" className="mt-2 flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Línea</span>
                   <Link href={`/panel/catalogo/${encodeURIComponent(product.sku)}`} title="Abrirla no cobra ni cambia el precio ni la publicación." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
                     Abrir en catálogo
                   </Link>
@@ -280,8 +280,8 @@ export function AgentsScreen({
               className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
             />
           </label>
-          <nav aria-label="Herramientas" className="flex flex-wrap items-end gap-2">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <nav aria-label="Consulta" className="flex flex-wrap items-end gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
             <button
               type="submit"
               title="Calcular no cobra ni cambia pedidos."

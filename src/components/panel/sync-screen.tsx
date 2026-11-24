@@ -122,10 +122,10 @@ export function SyncScreen({
                   <span className="mt-0.5 block text-xs leading-5 text-muted">{job.detail}</span>
                 </span>
                 {tableReady ? (
-                  <form action={noticeAction}>
+                  <form action={noticeAction} className="contents">
                     <input type="hidden" name="orderId" value={job.orderId} />
-                    <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-                      <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                    <nav aria-label="Línea" className="flex flex-wrap items-center gap-2">
+                      <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Línea</span>
                       <button
                         type="submit"
                         title="Registrar el aviso no lo envía a Dropi, no avisa al cliente y no cobra."
@@ -161,10 +161,10 @@ export function SyncScreen({
               <li key={order.id} className="flex items-center justify-between gap-3 text-sm">
                 <span className="font-semibold">{order.number}</span>
                 {canEnqueue ? (
-                  <form action={queueAction}>
+                  <form action={queueAction} className="contents">
                     <input type="hidden" name="orderId" value={order.id} />
-                    <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-                      <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                    <nav aria-label="Línea" className="flex flex-wrap items-center gap-2">
+                      <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Línea</span>
                       <button
                         type="submit"
                         title="Dejarlo en cola no lo envía a Dropi ni cobra. El total guardado no cambia."

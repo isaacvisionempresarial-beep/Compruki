@@ -194,9 +194,9 @@ export function ConnectionsScreen({
             <p className="mt-1 text-xs leading-5 text-muted">
               Lee el aviso público de autorización. No abre el ingreso, no pide la contraseña y no cobra. El total guardado no cambia.
             </p>
-            <form action={inspect} className="mt-3">
-              <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <form action={inspect} className="contents">
+              <nav aria-label="Consulta" className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
                 <button
                   type="submit"
                   title="Consultarlo no autoriza la cuenta, no pide la contraseña y no cobra."
@@ -231,9 +231,9 @@ export function ConnectionsScreen({
             <p className="mt-1 text-xs leading-5 text-muted">
               Opcional. Solo prueba el saludo; no autoriza la cuenta. Probarlo no cobra ni cambia pedidos. El total guardado no cambia.
             </p>
-            <form action={action} className="mt-3">
-              <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <form action={action} className="contents">
+              <nav aria-label="Consulta" className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
                 <button
                   type="submit"
                   title="Probarlo no cobra ni cambia pedidos."

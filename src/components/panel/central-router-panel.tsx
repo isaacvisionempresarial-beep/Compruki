@@ -47,8 +47,8 @@ export function CentralRouterPanel({
             className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
           />
         </label>
-        <nav aria-label="Herramientas" className="flex flex-wrap items-end gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <nav aria-label="Consulta" className="flex flex-wrap items-end gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
           <button
             type="submit"
             title="Enrutar no cobra ni cambia pedidos."

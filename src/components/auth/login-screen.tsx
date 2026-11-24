@@ -106,7 +106,7 @@ function LoginForm({
           <p role="alert" className="rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
             Tu cuenta es de otra tienda. Este panel solo abre la tienda piloto. No se leyeron ni se cambiaron sus pedidos.
           </p>
-          <form action={signOut}>
+          <form action={signOut} className="contents">
             <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
               <button
@@ -128,7 +128,7 @@ function LoginForm({
             Tu cuenta entró, pero no tiene membresía en la tienda piloto. No cobra ni cambia pedidos. Pide que te enlacen en Supabase
             (tabla memberships) o cierra sesión.
           </p>
-          <form action={signOut}>
+          <form action={signOut} className="contents">
             <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
               <button
@@ -288,8 +288,8 @@ function RecoveryForm({ onBack, linkError }: { onBack: () => void; linkError?: b
         </nav>
       </form>
 
-      <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+      <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
         <a href="/ingresar?modo=nueva-clave" title="Abrirla no guarda la contraseña ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Ya puedo cambiar la contraseña aquí
         </a>
@@ -412,11 +412,14 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
           >
             {pending ? "Guardando…" : "Guardar y entrar"}
           </button>
-          <button type="button" title="Volver no guarda la contraseña ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle" onClick={onBack}>
-            Volver a iniciar sesión
-          </button>
         </nav>
       </form>
+      <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
+        <button type="button" title="Volver no guarda la contraseña ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle" onClick={onBack}>
+          Volver a iniciar sesión
+        </button>
+      </nav>
       <p className="mt-2 text-xs leading-5 text-muted">Volver no guarda la contraseña ni cobra.</p>
     </>
   );

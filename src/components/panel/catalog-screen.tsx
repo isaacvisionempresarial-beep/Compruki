@@ -316,8 +316,8 @@ function CatalogProductRow({
               ) : null}
             </div>
 
-            <nav aria-label="Herramientas" className="flex shrink-0 flex-wrap items-center gap-1.5">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <nav aria-label="Línea" className="flex shrink-0 flex-wrap items-center gap-1.5">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Línea</span>
               {product.published ? (
                 <a
                   href={campaignPath(product.sku)}
