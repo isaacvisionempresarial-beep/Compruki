@@ -33,9 +33,10 @@ export type AgentPendingSummary = {
   borradores: number;
   agentes: number;
   preguntas: number;
+  seguimientos: number;
   preview: Array<{
     id: string;
-    kind: "pedido" | "agente" | "borrador" | "pregunta";
+    kind: "pedido" | "agente" | "borrador" | "pregunta" | "seguimiento";
     label: string;
     detail: string;
     href: string;
@@ -189,6 +190,18 @@ export function Dashboard({
                 ) : null}
               </Link>
               <Link
+                href="/panel/clientes"
+                title="Abrirlo no cobra ni cambia pedidos."
+                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold whitespace-nowrap text-ink hover:bg-subtle"
+              >
+                Clientes
+                {agentPendingSummary && agentPendingSummary.seguimientos > 0 ? (
+                  <span className="ml-2 rounded-[8px] bg-accent-tint px-1.5 py-0.5 text-xs font-bold text-accent-strong tabular-nums">
+                    {agentPendingSummary.seguimientos}
+                  </span>
+                ) : null}
+              </Link>
+              <Link
                 href="/panel/agentes?intent=margen%20LAM-MES-01"
                 title="Abrirlo no cobra ni cambia pedidos."
                 className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold whitespace-nowrap text-ink hover:bg-subtle"
@@ -266,6 +279,9 @@ export function Dashboard({
                 {agentPendingSummary.agentes} corrida{agentPendingSummary.agentes === 1 ? "" : "s"}
                 {" · "}
                 {agentPendingSummary.preguntas} pregunta{agentPendingSummary.preguntas === 1 ? "" : "s"}
+                {" · "}
+                {agentPendingSummary.seguimientos} seguimiento
+                {agentPendingSummary.seguimientos === 1 ? "" : "s"}
                 {canApproveCatalog ? "" : ". Aprobar lo guarda el propietario."}
               </p>
             </div>
@@ -281,6 +297,15 @@ export function Dashboard({
                   className="inline-flex h-8 items-center rounded-[10px] border border-line bg-canvas px-2.5 text-sm font-semibold text-ink hover:bg-subtle"
                 >
                   Catálogo
+                </Link>
+              ) : null}
+              {agentPendingSummary.seguimientos > 0 ? (
+                <Link
+                  href="/panel/clientes"
+                  title="Abrirlo no cobra ni cambia pedidos."
+                  className="inline-flex h-8 items-center rounded-[10px] border border-line bg-canvas px-2.5 text-sm font-semibold text-ink hover:bg-subtle"
+                >
+                  Clientes
                 </Link>
               ) : null}
             </nav>

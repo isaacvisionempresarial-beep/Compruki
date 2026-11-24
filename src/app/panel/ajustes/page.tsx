@@ -24,6 +24,11 @@ export default async function SettingsPage() {
       label: "product_questions (AG-05)",
       hint: "Migración supabase/migrations/012_product_questions.sql. Sin ella el handoff falla y la bandeja queda vacía.",
     },
+    {
+      key: "followupTasks",
+      label: "followup_tasks (AG-07)",
+      hint: "Migración supabase/migrations/013_followup_tasks.sql. Sin ella no se guardan seguimientos CRM.",
+    },
   ];
 
   return (
@@ -120,7 +125,11 @@ export default async function SettingsPage() {
               <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{item.label}</dt>
               <dd
                 className={`mt-0.5 text-sm font-semibold ${
-                  health.checks[item.key] ? "text-ink" : item.key === "productQuestions" ? "text-coral" : "text-ink"
+                  health.checks[item.key]
+                    ? "text-ink"
+                    : item.key === "productQuestions" || item.key === "followupTasks"
+                      ? "text-coral"
+                      : "text-ink"
                 }`}
               >
                 {health.checks[item.key] ? "OK" : "Falta"}

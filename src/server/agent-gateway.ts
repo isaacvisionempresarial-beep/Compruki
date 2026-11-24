@@ -4,6 +4,7 @@ import { listPendingApprovals, type PendingApproval } from "@/server/agent-centr
 import { listProducts } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
 import { probeOpenAI } from "@/server/openai-client";
+import { probeFollowupsTable } from "@/server/followups";
 import { probeProductQuestionsTable } from "@/server/product-questions";
 import { getPilotTenantId } from "@/server/tenant";
 
@@ -44,6 +45,7 @@ export type AgentCenterView = {
   };
   pendingApprovals: PendingApproval[];
   productQuestionsReady: boolean;
+  followupsReady: boolean;
   recentRuns: Array<{
     id: string;
     agentId: string;
@@ -97,15 +99,17 @@ export async function getAgentCenterView(): Promise<AgentCenterView> {
   const configs = await loadAgentConfigs();
   const configById = new Map(configs.map((row) => [row.agentId, row]));
 
-  const [status, products, orders, recentRuns, monthSpend, pendingApprovals, productQuestionsReady] = await Promise.all([
-    getAgentGatewayStatus(),
-    listProducts(),
-    listOrders(),
-    loadRecentRuns(),
-    loadMonthSpend(),
-    listPendingApprovals(),
-    probeProductQuestionsTable(),
-  ]);
+  const [status, products, orders, recentRuns, monthSpend, pendingApprovals, productQuestionsReady, followupsReady] =
+    await Promise.all([
+      getAgentGatewayStatus(),
+      listProducts(),
+      listOrders(),
+      loadRecentRuns(),
+      loadMonthSpend(),
+      listPendingApprovals(),
+      probeProductQuestionsTable(),
+      probeFollowupsTable(),
+    ]);
 
   return {
     status,
@@ -122,6 +126,7 @@ export async function getAgentCenterView(): Promise<AgentCenterView> {
     monthSpend,
     pendingApprovals,
     productQuestionsReady,
+    followupsReady,
     recentRuns,
   };
 }

@@ -156,6 +156,7 @@ export function AgentsScreen({
         items={view.pendingApprovals}
         canApproveCatalog={canApproveCatalog}
         productQuestionsReady={view.productQuestionsReady}
+        followupsReady={view.followupsReady}
       />
 
       <CentralRouterPanel

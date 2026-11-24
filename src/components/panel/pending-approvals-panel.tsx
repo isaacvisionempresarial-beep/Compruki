@@ -12,10 +12,12 @@ export function PendingApprovalsPanel({
   items,
   canApproveCatalog = false,
   productQuestionsReady = true,
+  followupsReady = true,
 }: {
   items: PendingApproval[];
   canApproveCatalog?: boolean;
   productQuestionsReady?: boolean;
+  followupsReady?: boolean;
 }) {
   return (
     <section className="mt-4" aria-labelledby="pendientes-humanos">
@@ -25,8 +27,8 @@ export function PendingApprovalsPanel({
       </h2>
       <p className="mt-1 text-sm text-muted">
         Bandeja de AG-01. Solo el propietario aprueba un borrador o anota una respuesta de ficha en
-        el catálogo. Un operador puede rechazar. Pedidos se atienden en Pedidos. Revisar esta bandeja no
-        cobra ni cambia pedidos. Las preguntas pueden traer borrador sugerido (OpenAI o plantilla).
+        el catálogo. Un operador puede rechazar. Pedidos se atienden en Pedidos; seguimientos CRM en
+        Clientes. Revisar esta bandeja no cobra ni cambia pedidos.
       </p>
 
       {!productQuestionsReady ? (
@@ -49,13 +51,23 @@ export function PendingApprovalsPanel({
         </div>
       ) : null}
 
+      {!followupsReady ? (
+        <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3" role="status">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-coral uppercase">Falta</p>
+          <p className="mt-0.5 text-sm font-medium text-coral">
+            Falta followup_tasks. Ejecuta supabase/migrations/013_followup_tasks.sql. Sin ella no entran
+            seguimientos CRM a esta bandeja.
+          </p>
+        </div>
+      ) : null}
+
       {items.length === 0 ? (
         <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
           <p className="mt-0.5 text-sm text-muted">
             {productQuestionsReady
-              ? "No hay pendientes humanos ahora. Borradores del Creador y preguntas de ficha que el comprador envía entran aquí."
-              : "Sin product_questions no se listan preguntas. Los pedidos y borradores sí pueden aparecer cuando existan."}
+              ? "No hay pendientes humanos ahora. Borradores, preguntas de ficha y seguimientos CRM entran aquí."
+              : "Sin product_questions no se listan preguntas. Los pedidos, borradores y seguimientos sí pueden aparecer."}
           </p>
         </div>
       ) : (
@@ -88,6 +100,17 @@ export function PendingApprovalsPanel({
                   preview={item.questionPreview}
                   canApproveCatalog={canApproveCatalog}
                 />
+              ) : item.kind === "seguimiento" ? (
+                <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
+                  <Link
+                    href="/panel/clientes"
+                    title="Abrirlo no cobra ni cambia pedidos."
+                    className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+                  >
+                    Abrir Clientes
+                  </Link>
+                </nav>
               ) : item.actionable ? (
                 <ApprovalButtons kind={item.kind} id={item.id} canApproveCatalog={canApproveCatalog} />
               ) : null}

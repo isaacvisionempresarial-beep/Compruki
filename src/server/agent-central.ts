@@ -6,6 +6,7 @@ import { searchLocalCatalog } from "@/server/agent-explorer";
 import { calculateMargin, comparePriceScenarios } from "@/server/agent-tools";
 import { previewContentDraftsAgainstCatalog, type CatalogFieldDiff } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
+import { listOpenFollowups } from "@/server/followups";
 import { listOpenProductQuestions } from "@/server/product-questions";
 import { getPilotTenantId } from "@/server/tenant";
 
@@ -13,7 +14,7 @@ export type RoutedAgent = "AG-01" | "AG-02" | "AG-03" | "AG-04";
 
 export type PendingApproval = {
   id: string;
-  kind: "pedido" | "agente" | "borrador" | "pregunta";
+  kind: "pedido" | "agente" | "borrador" | "pregunta" | "seguimiento";
   label: string;
   detail: string;
   href?: string;
@@ -93,13 +94,14 @@ const AGENT_LABEL: Record<RoutedAgent, string> = {
   "AG-04": "Analista",
 };
 
-/** AG-01 · list_pending_approvals (pedidos + borradores + corridas + preguntas de ficha). */
+/** AG-01 · list_pending_approvals (pedidos + borradores + corridas + preguntas + seguimientos). */
 export async function listPendingApprovals(): Promise<PendingApproval[]> {
-  const [orders, agentItems, draftItems, questionItems] = await Promise.all([
+  const [orders, agentItems, draftItems, questionItems, followupItems] = await Promise.all([
     listOrders(),
     listAwaitingAgentApprovals(),
     listPendingDraftApprovals(),
     listPendingQuestionApprovals(),
+    listPendingFollowupApprovals(),
   ]);
 
   const pendingOrders = orders
@@ -120,7 +122,25 @@ export async function listPendingApprovals(): Promise<PendingApproval[]> {
       actionable: false,
     }));
 
-  return [...pendingOrders, ...draftItems, ...agentItems, ...questionItems];
+  return [...pendingOrders, ...draftItems, ...agentItems, ...questionItems, ...followupItems];
+}
+
+async function listPendingFollowupApprovals(): Promise<PendingApproval[]> {
+  const tasks = await listOpenFollowups(12);
+  return tasks.map((task) => ({
+    id: task.id,
+    kind: "seguimiento" as const,
+    label: task.orderNumber || task.customerName || task.phone,
+    detail: [
+      task.customerName || "Sin nombre",
+      task.note.slice(0, 120),
+      "CRM · no enviado",
+    ]
+      .filter(Boolean)
+      .join(" · "),
+    href: "/panel/clientes",
+    actionable: false,
+  }));
 }
 
 async function listPendingQuestionApprovals(): Promise<PendingApproval[]> {
