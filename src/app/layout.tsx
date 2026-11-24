@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
 import { OfflineNotice } from "@/components/offline-notice";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
 import { siteOrigin } from "@/lib/site-url";
@@ -8,6 +8,12 @@ import "./globals.css";
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-jakarta",
+  display: "swap",
+});
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
   display: "swap",
 });
 
@@ -45,7 +51,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es-CO">
-      <body className={`${jakarta.variable} font-sans antialiased`}>
+      <body className={`${jakarta.variable} ${outfit.variable} font-sans antialiased`}>
         <a className="skip-link" href="#contenido" title="Saltar no cobra ni cambia el carrito.">
           Saltar al contenido
         </a>

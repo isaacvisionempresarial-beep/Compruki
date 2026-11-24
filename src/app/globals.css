@@ -190,6 +190,30 @@ body {
   animation: store-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.login-hero-veil {
+  background:
+    linear-gradient(180deg, rgb(23 26 40 / 0.42) 0%, rgb(23 26 40 / 0.28) 38%, rgb(23 26 40 / 0.78) 100%),
+    linear-gradient(90deg, rgb(23 26 40 / 0.35) 0%, transparent 55%);
+}
+
+.login-hero-photo {
+  transform: scale(1.03);
+  animation: login-hero-drift 18s ease-in-out infinite alternate;
+}
+
+.login-form-rise {
+  animation: store-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes login-hero-drift {
+  from {
+    transform: scale(1.03) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.08) translate3d(-1.5%, 1%, 0);
+  }
+}
+
 .store-card {
   animation: store-card-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }

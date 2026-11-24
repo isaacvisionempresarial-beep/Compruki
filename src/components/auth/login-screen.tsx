@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { useActionState } from "react";
 import { Wordmark } from "@/components/brand/wordmark";
@@ -31,48 +33,68 @@ export function LoginScreen({
   const [mode, setMode] = useState<Mode>(initialMode);
 
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(420px,0.95fr)]">
-      <section className="brand-panel hidden flex-col px-8 py-8 text-on-dark lg:flex lg:px-12" aria-label="Presentación">
-        <Wordmark onDark />
-        <div className="mt-8 max-w-lg">
-          <p className="text-3xl font-semibold tracking-tight text-balance">«Tu negocio, en modo venta.»</p>
-          <p className="mt-2 text-sm leading-5 text-on-dark-muted">
-            El panel está en tres bloques. Leer esto no cobra ni cambia pedidos. Dropi no está conectado.
-          </p>
-          <dl className="mt-4 grid gap-3">
-            <div>
-              <dt className="text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Tienda</dt>
-              <dd className="mt-0.5 text-sm leading-5 text-[#E7EAF2]">Panel, pedidos, catálogo y rentabilidad. El margen estimado no se presenta como dinero cobrado.</dd>
-            </div>
-            <div>
-              <dt className="text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Operación</dt>
-              <dd className="mt-0.5 text-sm leading-5 text-[#E7EAF2]">Sincronización y conexiones. Cada pedido tiene un estado claro. Dropi no está conectado.</dd>
-            </div>
-            <div>
-              <dt className="text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Sistema</dt>
-              <dd className="mt-0.5 text-sm leading-5 text-[#E7EAF2]">Centro de agentes y configuración. Publica solo lo que ya revisaste.</dd>
-            </div>
-          </dl>
-        </div>
-        <p className="mt-auto pt-8 text-xs text-on-dark-muted">Identidad provisional para el prototipo · Colombia</p>
-      </section>
-
-      <main id="contenido" tabIndex={-1} className="flex min-h-dvh items-start bg-canvas px-4 py-4 outline-none sm:px-8 lg:items-center lg:px-12">
-        <div className="mx-auto w-full max-w-[440px]">
-          <div className="mb-4 lg:hidden">
-            <Wordmark />
-            <p className="mt-2 text-lg font-semibold tracking-tight">«Tu negocio, en modo venta.»</p>
-            <p className="mt-1 text-sm leading-5 text-muted">
-              Tienda, operación y sistema. Leer esto no cobra ni cambia pedidos. Dropi no está conectado.
+    <div className="login-shell min-h-dvh lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(400px,0.85fr)]">
+      <section className="login-hero relative hidden overflow-hidden text-on-dark lg:flex" aria-label="Presentación">
+        <Image
+          src="/brand/login-hero.jpg"
+          alt=""
+          fill
+          priority
+          sizes="58vw"
+          className="login-hero-photo object-cover"
+        />
+        <div className="login-hero-veil absolute inset-0" aria-hidden="true" />
+        <div className="relative z-10 flex min-h-dvh w-full flex-col px-10 py-10 xl:px-14">
+          <Wordmark onDark badge />
+          <div className="mt-auto max-w-md pb-2">
+            <p className="store-display text-[2.65rem] leading-[1.02] font-extrabold tracking-[-0.04em] text-balance">
+              Tu negocio, en modo venta.
+            </p>
+            <p className="mt-3 max-w-[34ch] text-sm leading-6 text-on-dark/85">
+              Catálogo, pedidos y margen en un solo panel. Dropi no está conectado.
+            </p>
+            <p className="mt-6 text-[11px] font-semibold tracking-[0.06em] text-on-dark-muted uppercase">
+              Colombia · piloto
             </p>
           </div>
+        </div>
+      </section>
 
-          <div className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 sm:px-4">
-            {mode === "login" ? (
-              <LoginForm onRecover={() => setMode("recovery")} accessDenied={accessDenied} otherStore={otherStore} />
-            ) : null}
-            {mode === "recovery" ? <RecoveryForm onBack={() => setMode("login")} linkError={linkError} /> : null}
-            {mode === "nueva-clave" ? <NewPasswordForm onBack={() => setMode("login")} /> : null}
+      <main
+        id="contenido"
+        tabIndex={-1}
+        className="relative flex min-h-dvh flex-col outline-none"
+      >
+        <div className="login-mobile-hero relative h-44 overflow-hidden sm:h-52 lg:hidden">
+          <Image
+            src="/brand/login-hero.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+          <div className="login-hero-veil absolute inset-0" aria-hidden="true" />
+          <div className="relative z-10 flex h-full flex-col justify-between px-5 py-5 text-on-dark">
+            <Wordmark onDark badge />
+            <p className="store-display max-w-[14ch] text-[1.65rem] leading-[1.05] font-extrabold tracking-[-0.03em]">
+              Tu negocio, en modo venta.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-1 items-start bg-canvas px-5 py-7 sm:px-8 sm:py-10 lg:items-center lg:px-12">
+          <div className="login-form-rise mx-auto w-full max-w-[400px]">
+            <div className="rounded-[18px] border border-line/80 bg-card/95 px-5 py-6 shadow-[0_18px_40px_-28px_rgb(23_26_40/0.35)] sm:px-7 sm:py-7">
+              {mode === "login" ? (
+                <LoginForm onRecover={() => setMode("recovery")} accessDenied={accessDenied} otherStore={otherStore} />
+              ) : null}
+              {mode === "recovery" ? <RecoveryForm onBack={() => setMode("login")} linkError={linkError} /> : null}
+              {mode === "nueva-clave" ? <NewPasswordForm onBack={() => setMode("login")} /> : null}
+            </div>
+            <p className="mt-4 text-center text-xs leading-5 text-muted">
+              Entrar no cobra ni cambia pedidos.
+            </p>
           </div>
         </div>
       </main>
@@ -97,54 +119,25 @@ function LoginForm({
 
   return (
     <>
-      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sesión</p>
-      <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Iniciar sesión</h1>
-      <p className="mt-1 text-sm text-muted">Correo de tu comercio. Escribirlo no cobra ni cambia pedidos. Dropi no está conectado.</p>
+      <p className="text-[10px] font-bold tracking-[0.1em] text-muted uppercase">Sesión</p>
+      <h1 className="store-display mt-1 text-[1.85rem] leading-tight font-extrabold tracking-[-0.03em]">Iniciar sesión</h1>
+      <p className="mt-1.5 text-sm leading-5 text-muted">Correo de tu comercio.</p>
 
       {otherStore ? (
-        <div className="mt-3 space-y-2">
-          <p role="alert" className="rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
-            Tu cuenta es de otra tienda. Este panel solo abre la tienda piloto. No se leyeron ni se cambiaron sus pedidos.
-          </p>
-          <form action={signOut} className="contents">
-            <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-              <button
-                type="submit"
-                title="Cerrarla no cobra ni cambia pedidos."
-                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
-              >
-                Cerrar sesión
-              </button>
-            </nav>
-            <p className="mt-1 text-xs leading-5 text-muted">Cerrarla no cobra ni cambia pedidos.</p>
-          </form>
-        </div>
+        <AccessAlert
+          message="Tu cuenta es de otra tienda. Este panel solo abre la tienda piloto."
+          actionLabel="Cerrar sesión"
+        />
       ) : null}
 
       {accessDenied ? (
-        <div className="mt-3 space-y-2">
-          <p role="alert" className="rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
-            Tu cuenta entró, pero no tiene membresía en la tienda piloto. No cobra ni cambia pedidos. Pide que te enlacen en Supabase
-            (tabla memberships) o cierra sesión.
-          </p>
-          <form action={signOut} className="contents">
-            <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-              <button
-                type="submit"
-                title="Cerrarla no cobra ni cambia pedidos."
-                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
-              >
-                Cerrar sesión
-              </button>
-            </nav>
-            <p className="mt-1 text-xs leading-5 text-muted">Cerrarla no cobra ni cambia pedidos.</p>
-          </form>
-        </div>
+        <AccessAlert
+          message="Tu cuenta entró, pero no tiene membresía en la tienda piloto. Pide el enlace en Supabase (memberships) o cierra sesión."
+          actionLabel="Cerrar sesión"
+        />
       ) : null}
 
-      <form action={formAction} className="mt-3 space-y-2">
+      <form action={formAction} className="mt-5 space-y-3.5">
         <Field label="Correo" htmlFor="email">
           <input
             id="email"
@@ -177,11 +170,11 @@ function LoginForm({
               onChange={(event) => setPassword(event.target.value)}
               aria-invalid={state.error ? true : undefined}
               aria-describedby={state.error ? "login-error" : undefined}
-              className={`${inputClass} pr-24`}
+              className={`${inputClass} pr-20`}
             />
             <button
               type="button"
-              className="absolute top-1/2 right-2 h-10 -translate-y-1/2 rounded-[10px] px-2 text-sm font-semibold text-accent-strong"
+              className="absolute top-1/2 right-2 -translate-y-1/2 rounded-[8px] px-2 py-1 text-xs font-semibold text-accent-strong hover:bg-accent-tint"
               aria-pressed={visible}
               title="Mostrarla u ocultarla no cobra ni cambia pedidos."
               onClick={() => setVisible((current) => !current)}
@@ -197,32 +190,35 @@ function LoginForm({
           </p>
         ) : null}
 
-        <p className="text-xs leading-5 text-muted">
-          {canEnter ? "Entras al panel de la tienda piloto." : "Sin correo y contraseña el botón queda bloqueado."} Entrar no cobra ni cambia pedidos. Mostrarla u ocultarla tampoco.
-        </p>
+        <button
+          type="submit"
+          title="Entrar no cobra ni cambia pedidos."
+          className={`mt-2 inline-flex h-11 w-full items-center justify-center rounded-[12px] bg-primary text-sm font-semibold text-on-dark transition-colors hover:bg-primary-soft active:bg-primary-dark ${
+            pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
+          }`}
+          disabled={pending || !canEnter}
+        >
+          {pending ? "Entrando…" : "Entrar al panel"}
+        </button>
 
-        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-          <button
-            type="submit"
-            title="Entrar no cobra ni cambia pedidos."
-            className={`inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark ${
-              pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
-            }`}
-            disabled={pending || !canEnter}
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-line/80 pt-4 text-sm">
+          <Link
+            href="/ingresar?modo=nueva-clave"
+            target="_self"
+            title="Abrirla no cobra ni cambia pedidos."
+            className="font-semibold text-accent-strong hover:underline"
           >
-            {pending ? "Entrando…" : "Entrar al panel"}
-          </button>
-        </nav>
-        <nav aria-label="Vista" className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-          <a href="/ingresar?modo=nueva-clave" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
             Cambiar contraseña
-          </a>
-          <button type="button" title="Abrirlo no envía el enlace ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle" onClick={onRecover}>
+          </Link>
+          <button
+            type="button"
+            title="Abrirlo no envía el enlace ni cobra."
+            className="font-semibold text-muted hover:text-ink"
+            onClick={onRecover}
+          >
             Olvidé mi acceso
           </button>
-        </nav>
+        </div>
       </form>
     </>
   );
@@ -238,19 +234,17 @@ function RecoveryForm({ onBack, linkError }: { onBack: () => void; linkError?: b
 
   return (
     <>
-      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sesión</p>
-      <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Recuperar acceso</h1>
-      <p className="mt-1 text-sm text-muted">
-        Te enviamos un enlace. Al abrirlo volverás aquí para elegir la nueva contraseña. Pedir el enlace no cobra ni cambia pedidos. Dropi no está conectado.
-      </p>
+      <p className="text-[10px] font-bold tracking-[0.1em] text-muted uppercase">Sesión</p>
+      <h1 className="store-display mt-1 text-[1.85rem] leading-tight font-extrabold tracking-[-0.03em]">Recuperar acceso</h1>
+      <p className="mt-1.5 text-sm leading-5 text-muted">Te enviamos un enlace para elegir la nueva contraseña.</p>
 
       {linkError ? (
-        <p role="alert" className="mt-3 rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
+        <p role="alert" className="mt-4 rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
           El enlace no se pudo usar. Pide uno nuevo o cambia la contraseña con tu clave actual.
         </p>
       ) : null}
 
-      <form action={formAction} className="mt-3 space-y-2">
+      <form action={formAction} className="mt-5 space-y-3.5">
         <Field label="Correo" htmlFor="recovery-email">
           <input
             id="recovery-email"
@@ -267,9 +261,8 @@ function RecoveryForm({ onBack, linkError }: { onBack: () => void; linkError?: b
         </Field>
 
         {state.sent ? (
-          <p role="status" className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 text-sm leading-5 text-ink">
-            Si el correo existe, recibirás el enlace. Ábrelo en este mismo navegador; te traerá a «Nueva
-            contraseña». Recibirlo no cobra ni cambia pedidos.
+          <p role="status" className="rounded-[12px] border border-line bg-subtle/70 px-3 py-2.5 text-sm leading-5 text-ink">
+            Si el correo existe, recibirás el enlace. Ábrelo en este mismo navegador.
           </p>
         ) : null}
         {state.error ? (
@@ -278,29 +271,29 @@ function RecoveryForm({ onBack, linkError }: { onBack: () => void; linkError?: b
           </p>
         ) : null}
 
-        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-          <button
-            type="submit"
-            title="Enviarlo no cobra ni cambia pedidos."
-            disabled={!canSend || pending}
-            className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
-          >
-            {pending ? "Enviando…" : state.sent ? "Volver a enviar" : "Enviar enlace"}
-          </button>
-        </nav>
+        <button
+          type="submit"
+          title="Enviarlo no cobra ni cambia pedidos."
+          disabled={!canSend || pending}
+          className="inline-flex h-11 w-full items-center justify-center rounded-[12px] bg-primary text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
+        >
+          {pending ? "Enviando…" : state.sent ? "Volver a enviar" : "Enviar enlace"}
+        </button>
       </form>
 
-      <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-        <a href="/ingresar?modo=nueva-clave" title="Abrirla no guarda la contraseña ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
-          Ya puedo cambiar la contraseña aquí
-        </a>
-        <button type="button" title="Volver no envía el enlace ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle" onClick={onBack}>
-          Volver a iniciar sesión
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm">
+        <Link
+          href="/ingresar?modo=nueva-clave"
+          target="_self"
+          title="Abrirla no guarda la contraseña ni cobra."
+          className="font-semibold text-accent-strong hover:underline"
+        >
+          Ya tengo el enlace
+        </Link>
+        <button type="button" title="Volver no envía el enlace ni cobra." className="font-semibold text-muted hover:text-ink" onClick={onBack}>
+          Volver
         </button>
-      </nav>
-      <p className="mt-2 text-xs leading-5 text-muted">Volver no envía el enlace ni cobra.</p>
+      </div>
     </>
   );
 }
@@ -319,14 +312,13 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
 
   return (
     <>
-      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sesión</p>
-      <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Nueva contraseña</h1>
-      <p className="mt-1 text-sm text-muted">
-        Si viniste del correo de recuperación, basta la clave nueva. Si no, escribe también la actual (por ejemplo{" "}
-        <span className="font-semibold">ComprukiTemp2026!</span>). Cambiarla no cobra ni cambia pedidos.
+      <p className="text-[10px] font-bold tracking-[0.1em] text-muted uppercase">Sesión</p>
+      <h1 className="store-display mt-1 text-[1.85rem] leading-tight font-extrabold tracking-[-0.03em]">Nueva contraseña</h1>
+      <p className="mt-1.5 text-sm leading-5 text-muted">
+        Con el enlace basta la clave nueva. Si no, escribe también la actual.
       </p>
 
-      <form action={formAction} className="mt-3 space-y-2">
+      <form action={formAction} className="mt-5 space-y-3.5">
         <Field label="Correo" htmlFor="new-email">
           <input
             id="new-email"
@@ -341,7 +333,7 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
           />
         </Field>
 
-        <Field label="Contraseña actual (si no usaste el enlace)" htmlFor="current-password">
+        <Field label="Contraseña actual (opcional)" htmlFor="current-password">
           <input
             id="current-password"
             title="Escribirla no guarda la contraseña ni cobra."
@@ -366,11 +358,11 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
               minLength={8}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className={`${inputClass} pr-24`}
+              className={`${inputClass} pr-20`}
             />
             <button
               type="button"
-              className="absolute top-1/2 right-2 h-10 -translate-y-1/2 rounded-[10px] px-2 text-sm font-semibold text-accent-strong"
+              className="absolute top-1/2 right-2 -translate-y-1/2 rounded-[8px] px-2 py-1 text-xs font-semibold text-accent-strong hover:bg-accent-tint"
               aria-pressed={visible}
               title="Mostrarla u ocultarla no cobra ni cambia pedidos."
               onClick={() => setVisible((current) => !current)}
@@ -380,7 +372,7 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
           </div>
         </Field>
 
-        <Field label="Confirmar nueva contraseña" htmlFor="confirm-password">
+        <Field label="Confirmar" htmlFor="confirm-password">
           <input
             id="confirm-password"
             title="Escribirla no guarda la contraseña ni cobra."
@@ -402,36 +394,51 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
         ) : null}
 
         <p className="text-xs leading-5 text-muted">
-          {canSave ? "Al guardar entrarás al panel con la nueva clave." : "Mínimo 8 caracteres y que coincidan."}
+          {canSave ? "Al guardar entrarás al panel." : "Mínimo 8 caracteres y que coincidan."}
         </p>
 
-        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-          <button
-            type="submit"
-            title="Guardarla no cobra ni cambia pedidos."
-            disabled={!canSave || pending}
-            className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
-          >
-            {pending ? "Guardando…" : "Guardar y entrar"}
-          </button>
-        </nav>
+        <button
+          type="submit"
+          title="Guardarla no cobra ni cambia pedidos."
+          disabled={!canSave || pending}
+          className="inline-flex h-11 w-full items-center justify-center rounded-[12px] bg-primary text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
+        >
+          {pending ? "Guardando…" : "Guardar y entrar"}
+        </button>
       </form>
-      <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-        <button type="button" title="Volver no guarda la contraseña ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle" onClick={onBack}>
+
+      <div className="mt-4 text-sm">
+        <button type="button" title="Volver no guarda la contraseña ni cobra." className="font-semibold text-muted hover:text-ink" onClick={onBack}>
           Volver a iniciar sesión
         </button>
-      </nav>
-      <p className="mt-2 text-xs leading-5 text-muted">Volver no guarda la contraseña ni cobra.</p>
+      </div>
     </>
+  );
+}
+
+function AccessAlert({ message, actionLabel }: { message: string; actionLabel: string }) {
+  return (
+    <div className="mt-4 space-y-2">
+      <p role="alert" className="rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
+        {message}
+      </p>
+      <form action={signOut}>
+        <button
+          type="submit"
+          title="Cerrarla no cobra ni cambia pedidos."
+          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
+        >
+          {actionLabel}
+        </button>
+      </form>
+    </div>
   );
 }
 
 function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: ReactNode }) {
   return (
     <div>
-      <label htmlFor={htmlFor} className="mb-1 block text-sm font-semibold">
+      <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-semibold text-ink">
         {label}
       </label>
       {children}
@@ -440,4 +447,4 @@ function Field({ label, htmlFor, children }: { label: string; htmlFor: string; c
 }
 
 const inputClass =
-  "h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm text-ink placeholder:text-muted focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none";
+  "h-11 w-full rounded-[12px] border border-line bg-canvas px-3.5 text-sm text-ink placeholder:text-muted transition-[border-color,box-shadow] focus:border-accent focus:bg-card focus:shadow-[0_0_0_3px_rgba(37,199,165,0.14)] focus:outline-none";
