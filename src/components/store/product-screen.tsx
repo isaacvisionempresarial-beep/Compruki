@@ -159,31 +159,37 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
 
   return (
     <article>
-      <nav className="flex items-center gap-2 overflow-hidden text-xs text-muted whitespace-nowrap" aria-label="Ruta">
-        <span>Inicio</span>
-        <span aria-hidden="true">/</span>
-        {product.category ? (
-          <>
-            <span>{product.category}</span>
-            <span aria-hidden="true">/</span>
-          </>
-        ) : null}
-        <strong className="truncate font-bold text-ink">{product.title}</strong>
-      </nav>
-      <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-        <Link
-          href="/tienda"
-          title="Volver al inicio no registra pedido ni cobra."
-          className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
-        >
-          Volver a la tienda
-        </Link>
-      </nav>
-      <p className="mt-2 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>
+      <div className="store-rise" style={{ animationDelay: "40ms" }}>
+        <nav className="flex items-center gap-2 overflow-hidden text-xs text-muted whitespace-nowrap" aria-label="Ruta">
+          <span>Inicio</span>
+          <span aria-hidden="true">/</span>
+          {product.category ? (
+            <>
+              <span>{product.category}</span>
+              <span aria-hidden="true">/</span>
+            </>
+          ) : null}
+          <strong className="truncate font-bold text-ink">{product.title}</strong>
+        </nav>
+        <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
+          <Link
+            href="/tienda"
+            title="Volver al inicio no registra pedido ni cobra."
+            className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+          >
+            Volver a la tienda
+          </Link>
+        </nav>
+        <p className="mt-2 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>
+      </div>
 
       <div className="mt-3 grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,28rem)]">
-        <section className="store-hero elevate-1 rounded-[18px] border border-line px-4 py-4 sm:px-5" aria-label="Información principal del producto">
+        <section
+          className="store-hero store-rise elevate-1 rounded-[18px] border border-line px-4 py-4 sm:px-5"
+          style={{ animationDelay: "90ms" }}
+          aria-label="Información principal del producto"
+        >
           <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">
             {product.category ? product.category : "Ficha"}
           </p>
@@ -385,7 +391,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
             </ul>
           </div>
         </section>
-        <div className="min-w-0">
+        <div className="store-rise min-w-0" style={{ animationDelay: "140ms" }}>
           <div className="grid gap-3">
             {slides.length === 0 ? (
               <div className="grid min-h-36 place-items-center rounded-[14px] border border-line bg-subtle px-4 text-center">
@@ -431,7 +437,12 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
       </div>
 
       {pieces.length > 0 ? (
-        <section id="lo-especial" className="elevate-1 mt-3 scroll-mt-16 rounded-[14px] border border-line bg-card px-3 py-3" aria-label="Características y beneficios">
+        <section
+          id="lo-especial"
+          className="store-rise elevate-1 mt-3 scroll-mt-16 rounded-[14px] border border-line bg-card px-3 py-3"
+          style={{ animationDelay: "200ms" }}
+          aria-label="Características y beneficios"
+        >
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Beneficios</p>
           <h2 className="mt-0.5 text-base font-extrabold tracking-tight">Características y beneficios</h2>
           <p className="mt-1 max-w-xl text-xs leading-5 text-muted">Sale del catálogo. Si falta un dato, no se inventa. Leerlas no cambia el precio publicado ni crea un pedido.</p>
@@ -440,7 +451,12 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
       ) : null}
 
       {descriptionIsLong ? (
-        <section id="descripcion" className="elevate-1 mt-3 scroll-mt-16 rounded-[14px] border border-line bg-card px-3 py-3" aria-label="Descripción">
+        <section
+          id="descripcion"
+          className="store-rise elevate-1 mt-3 scroll-mt-16 rounded-[14px] border border-line bg-card px-3 py-3"
+          style={{ animationDelay: "240ms" }}
+          aria-label="Descripción"
+        >
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Texto</p>
           <h2 className="mt-0.5 text-base font-extrabold tracking-tight">Descripción</h2>
           <p className="mt-1 max-w-xl text-xs leading-5 text-muted">Leerla no cambia el precio publicado ni crea un pedido.</p>

@@ -58,7 +58,10 @@ const points = [
 export default function ConditionsPage() {
   return (
     <div>
-      <section className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line px-4 py-4 sm:px-5">
+      <section
+        className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line px-4 py-4 sm:px-5"
+        style={{ animationDelay: "40ms" }}
+      >
         <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Pedido</p>
         <h1 className="store-display mt-2 text-[1.75rem] leading-tight font-extrabold tracking-[-0.03em]">Condiciones de la compra</h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
@@ -66,7 +69,11 @@ export default function ConditionsPage() {
         </p>
       </section>
 
-      <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="en-corto">
+      <section
+        className="store-rise elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3"
+        style={{ animationDelay: "120ms" }}
+        aria-labelledby="en-corto"
+      >
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Resumen</p>
         <h2 id="en-corto" className="mt-0.5 text-sm font-semibold">En corto</h2>
         <ul className="mt-3 grid gap-3 sm:grid-cols-3">

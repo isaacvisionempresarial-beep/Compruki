@@ -48,14 +48,17 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
 
   return (
     <div>
-      <section className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line px-4 py-4 sm:px-5">
+      <section
+        className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line px-4 py-4 sm:px-5"
+        style={{ animationDelay: "40ms" }}
+      >
         <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Este navegador</p>
         <h1 className="store-display mt-2 text-[1.75rem] leading-tight font-extrabold tracking-[-0.03em]">Carrito</h1>
         <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
           Precios publicados. Se guarda aquí. Pagas al recibir · Envío aparte. Todavía no es un pedido.
         </p>
       </section>
-      <div className="mt-3 space-y-3">
+      <div className="store-rise mt-3 space-y-3" style={{ animationDelay: "120ms" }}>
       <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="carrito-resumen">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
             <h2 id="carrito-resumen" className="mt-0.5 text-sm font-semibold">Resumen</h2>

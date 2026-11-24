@@ -98,7 +98,10 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
 
   return (
     <div>
-      <section className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line px-4 py-4 sm:px-5">
+      <section
+        className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line px-4 py-4 sm:px-5"
+        style={{ animationDelay: "40ms" }}
+      >
         <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Carrito</p>
         <h1 className="store-display mt-2 text-[1.75rem] leading-tight font-extrabold tracking-[-0.03em]">Datos de entrega</h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
@@ -106,7 +109,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
         </p>
       </section>
 
-      <form action={formAction} className="mt-3 space-y-3">
+      <form action={formAction} className="store-rise mt-3 space-y-3" style={{ animationDelay: "120ms" }}>
         <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
         <input type="hidden" name="lines" value={JSON.stringify(payload)} />
         <input

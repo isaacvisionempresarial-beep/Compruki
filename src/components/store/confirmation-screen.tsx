@@ -69,7 +69,10 @@ export function ConfirmationScreen({
 
   return (
     <div>
-      <section className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line px-4 py-4 sm:px-5">
+      <section
+        className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line px-4 py-4 sm:px-5"
+        style={{ animationDelay: "40ms" }}
+      >
         <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">
           {repeated ? "Pedido ya pendiente" : justPlaced ? "Pedido registrado" : "Tu pedido"}
         </p>
@@ -81,7 +84,11 @@ export function ConfirmationScreen({
             : `Lo dejaste el ${formatDay(order.createdAt.slice(0, 10))}. El total guardado no cambia.`}
         </p>
       </section>
-      <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="siguiente-paso">
+      <section
+        className="store-rise elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2"
+        style={{ animationDelay: "110ms" }}
+        aria-labelledby="siguiente-paso"
+      >
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Ahora</p>
         <h2 id="siguiente-paso" className="mt-0.5 text-sm font-semibold">
           Siguiente paso
@@ -90,7 +97,7 @@ export function ConfirmationScreen({
         <p className="mt-1 text-xs leading-5 text-muted">{deliveryFollowUp(order.status)}</p>
       </section>
 
-      <div className="mt-3 space-y-3">
+      <div className="store-rise mt-3 space-y-3" style={{ animationDelay: "180ms" }}>
         <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="pedido-resumen-tienda">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
           <h2 id="pedido-resumen-tienda" className="mt-0.5 text-sm font-semibold">Resumen</h2>

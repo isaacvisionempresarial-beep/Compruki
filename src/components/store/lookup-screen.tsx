@@ -17,7 +17,10 @@ export function LookupScreen() {
 
   return (
     <div>
-      <section className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line px-4 py-4 sm:px-5">
+      <section
+        className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line px-4 py-4 sm:px-5"
+        style={{ animationDelay: "40ms" }}
+      >
         <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Pedido</p>
         <h1 className="store-display mt-2 text-[1.75rem] leading-tight font-extrabold tracking-[-0.03em]">Consultar pedido</h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
@@ -25,7 +28,11 @@ export function LookupScreen() {
         </p>
       </section>
 
-      <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="que-necesitas">
+      <section
+        className="store-rise elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3"
+        style={{ animationDelay: "110ms" }}
+        aria-labelledby="que-necesitas"
+      >
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Datos</p>
         <h2 id="que-necesitas" className="mt-0.5 text-sm font-semibold">Qué necesitas</h2>
         <ul className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -57,7 +64,12 @@ export function LookupScreen() {
         <p className="mt-2 text-xs leading-5 text-muted">Leerlas no registra pedido ni cobra.</p>
       </section>
 
-      <form action={formAction} className="elevate-1 mt-3 max-w-xl space-y-2 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="consulta-pedido">
+      <form
+        action={formAction}
+        className="store-rise elevate-1 mt-3 max-w-xl space-y-2 rounded-[14px] border border-line bg-card px-3 py-3"
+        style={{ animationDelay: "180ms" }}
+        aria-labelledby="consulta-pedido"
+      >
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</p>
           <h2 id="consulta-pedido" className="mt-0.5 text-sm font-semibold">Número y celular</h2>
           <div>
@@ -127,7 +139,7 @@ export function LookupScreen() {
           >
             Volver a la tienda
           </Link>
-        </nav>
+        </nav>
     </div>
   );
 }
