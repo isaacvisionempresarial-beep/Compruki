@@ -137,11 +137,11 @@ export function AgentsScreen({
       <section className="mt-3" aria-labelledby="explorador">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Buscar</p>
         <h2 id="explorador" className="mt-0.5 text-base font-bold">
-          Explorador de productos (catálogo local)
+          Explorador de productos
         </h2>
         <p className="mt-1 text-sm text-muted">
-          AG-02 en modo local. Fuente: {explorer.sourceLabel}. Cada búsqueda deja corrida en el historial y no
-          cambia el catálogo. Buscar no cobra ni cambia pedidos. No es Dropi en vivo.
+          AG-02: shortlist del catálogo local; si OpenAI responde, ordena y resume. Fuente: {explorer.sourceLabel}.
+          Buscar no cambia el catálogo ni cobra. No es Dropi en vivo.
           {canApproveCatalog ? "" : " El precio y la publicación los guarda el propietario."}
         </p>
         {!ag02 ? (
@@ -203,7 +203,21 @@ export function AgentsScreen({
           Selección: {explorer.results.length} producto{explorer.results.length === 1 ? "" : "s"}
           {explorer.query ? ` · «${explorer.query}»` : ""}
           {explorer.category ? ` · ${explorer.category}` : ""}
+          {" · "}
+          fuente {explorer.via === "openai" ? "OpenAI" : "local"}
+          {explorer.costEstimateCop > 0 ? ` · costo est. ${explorer.costEstimateCop} COP` : ""}
         </p>
+
+        {explorer.bullets.length > 0 ? (
+          <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Lectura</p>
+            <ul className="mt-1.5 space-y-1.5 text-sm text-muted">
+              {explorer.bullets.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
         {explorer.results.length === 0 ? (
           <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">

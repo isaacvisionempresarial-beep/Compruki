@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { generateContentDrafts } from "@/server/agent-content";
-import { searchLocalCatalog } from "@/server/agent-explorer";
+import { exploreCatalog } from "@/server/agent-explorer";
 import { agentDeniedRedirect, evaluateAgentPolicy } from "@/server/agent-policy";
 import { recordAgentRun } from "@/server/agent-runs";
 import { generateAnalystReading } from "@/server/agent-tools";
@@ -16,6 +16,10 @@ function agentesRedirect(params: Record<string, string | undefined>) {
   }
   const query = sp.toString();
   return query ? `/panel/agentes?${query}` : "/panel/agentes";
+}
+
+function countWord(count: number, one: string, many: string) {
+  return `${count} ${count === 1 ? one : many}`;
 }
 
 export async function searchExplorerAction(formData: FormData) {
@@ -38,29 +42,26 @@ export async function searchExplorerAction(formData: FormData) {
     redirect(agentDeniedRedirect("AG-02", policy.reason, { q, categoria, sku }));
   }
 
-  const shortlist = await searchLocalCatalog(q, categoria);
-  const filters = [
-    q ? `«${q}»` : null,
-    categoria ? `categoría ${categoria}` : null,
-  ]
-    .filter(Boolean)
-    .join(", ");
+  const shortlist = await exploreCatalog(q, categoria);
+  const via = shortlist.via === "openai" ? "openai" : "local";
+  const filters = [q ? `«${q}»` : null, categoria ? `categoría ${categoria}` : null].filter(Boolean).join(", ");
 
   await recordAgentRun({
     agentId: "AG-02",
     status: "succeeded",
+    costEstimateCop: shortlist.costEstimateCop,
     summary: [
-      "Explorador local",
+      `Explorador ${via}`,
       filters || "sin filtros",
       `${countWord(shortlist.results.length, "producto", "productos")} en shortlist`,
       "no cambia el catálogo",
-      shortlist.sourceLabel,
+      ...shortlist.bullets.slice(0, 2),
     ].join(" · "),
     createdBy: access.user.id,
     actorName: access.actorName,
   });
 
-  redirect(agentesRedirect({ q, categoria, sku }));
+  redirect(agentesRedirect({ q, categoria, sku, explorado: "1" }));
 }
 
 export async function generateContentDraftsAction(formData: FormData) {

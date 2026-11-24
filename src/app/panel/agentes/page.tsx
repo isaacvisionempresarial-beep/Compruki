@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AgentsScreen } from "@/components/panel/agents-screen";
 import { routeTask } from "@/server/agent-central";
 import { getContentDraftPreview, listContentDrafts, listDraftableProducts } from "@/server/agent-content";
-import { searchLocalCatalog } from "@/server/agent-explorer";
+import { getExplorerShortlistPreview, searchLocalCatalog } from "@/server/agent-explorer";
 import { getAgentCenterView } from "@/server/agent-gateway";
 import { getAnalystReadingPreview, getAnalystToolkit } from "@/server/agent-tools";
 import { requirePanelAccess } from "@/server/panel-auth";
@@ -24,6 +24,7 @@ export default async function AgentsPage({
     intent?: string;
     marginSku?: string;
     lectura?: string;
+    explorado?: string;
     agente?: string;
     agenteError?: string;
   }>;
@@ -32,17 +33,22 @@ export default async function AgentsPage({
   const selectedSku = (params.sku ?? "").trim().toUpperCase();
   const marginSku = (params.marginSku ?? "").trim().toUpperCase();
   const intent = (params.intent ?? "").trim();
+  const q = params.q ?? "";
+  const categoria = params.categoria ?? "";
   const showReading = params.lectura === "1" || Boolean(marginSku);
   const policyError =
     params.agenteError?.trim()
       ? { agentId: (params.agente ?? "").trim() || null, message: params.agenteError.trim() }
       : null;
 
-  const [access, view, analyst, explorer, products, packed, saved, central] = await Promise.all([
+  const cachedExplorer =
+    params.explorado === "1" ? getExplorerShortlistPreview(q, categoria) : null;
+
+  const [access, view, analyst, explorerFallback, products, packed, saved, central] = await Promise.all([
     requirePanelAccess(),
     getAgentCenterView(),
     getAnalystToolkit(),
-    searchLocalCatalog(params.q ?? "", params.categoria ?? ""),
+    cachedExplorer ? Promise.resolve(cachedExplorer) : searchLocalCatalog(q, categoria),
     listDraftableProducts(),
     selectedSku ? getContentDraftPreview(selectedSku) : Promise.resolve(null),
     listContentDrafts(selectedSku || undefined),
@@ -50,6 +56,7 @@ export default async function AgentsPage({
   ]);
 
   const reading = showReading ? getAnalystReadingPreview(marginSku || undefined) : null;
+  const explorer = cachedExplorer ?? explorerFallback;
 
   return (
     <AgentsScreen
