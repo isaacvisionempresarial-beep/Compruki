@@ -135,10 +135,10 @@ export function Dashboard({
   );
 
   const storeCards = [
-    { label: "Registrados", ...storeSummary.registered, hint: "Total guardado. Sin cancelados ni devueltos. No es dinero cobrado." },
-    { label: "Confirmados", ...storeSummary.confirmed, hint: "Total guardado. Ya confirmados. No es dinero cobrado." },
-    { label: "Entregados", ...storeSummary.delivered, hint: "Total guardado. Estado entregado. No es dinero cobrado." },
-    { label: "Cobrados", ...storeSummary.collected, hint: "Total guardado de los marcados como cobrados. No es un cobro de este sitio ni la utilidad." },
+    { label: "Registrados", ...storeSummary.registered, hint: "Sin cancelados ni devueltos. No es cobro." },
+    { label: "Confirmados", ...storeSummary.confirmed, hint: "Ya confirmados. No es cobro." },
+    { label: "Entregados", ...storeSummary.delivered, hint: "Estado entregado. No es cobro." },
+    { label: "Cobrados", ...storeSummary.collected, hint: "Marcados cobrados. No es utilidad." },
   ];
 
   return (
@@ -287,19 +287,26 @@ export function Dashboard({
             />
           </div>
         </div>
-        <p className="mt-3 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Totales</p>
-        <h3 className="mt-0.5 text-sm font-semibold">Totales guardados</h3>
-        <p className="mt-0.5 text-xs leading-5 text-muted">Lo que suma el pedido guardado. No es dinero cobrado en el sitio.</p>
-        <ul className="mt-2 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-3 flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Totales</p>
+            <h3 className="mt-0.5 text-sm font-semibold">Totales guardados</h3>
+          </div>
+          <p className="text-xs text-muted">Suma del pedido. No es cobro en el sitio.</p>
+        </div>
+        <ul className="mt-2 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
           {storeCards.map((card) => (
-            <li key={card.label} className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
-              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{card.label}</p>
+            <li key={card.label} className="elevate-1 rounded-[12px] border border-line bg-card px-3 py-2">
+              <div className="flex items-baseline justify-between gap-2">
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{card.label}</p>
+                <p className="text-[11px] text-muted tabular-nums">
+                  {card.count} {card.count === 1 ? "pedido" : "pedidos"}
+                </p>
+              </div>
               <p className="mt-1 text-lg leading-5 font-extrabold tracking-tight tabular-nums">{formatCop(card.amount)}</p>
-              <p className="mt-0.5 text-xs text-muted">
-                {card.count} {card.count === 1 ? "pedido" : "pedidos"} · {card.hint}
-              </p>
+              <p className="mt-0.5 text-[11px] leading-4 text-muted">{card.hint}</p>
               {card.numbers.length > 0 ? (
-                <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm leading-5">
+                <ul className="mt-1 flex flex-wrap gap-x-2.5 gap-y-0.5 text-sm leading-5">
                   {card.numbers.map((number) => (
                     <li key={number}>
                       <Link href={orderFocusHref(number)} title="Abrirlo no cobra ni cambia el total guardado." className="font-semibold text-accent-strong">
@@ -312,38 +319,41 @@ export function Dashboard({
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cuenta</p>
-        <h3 className="mt-0.5 text-sm font-semibold">La cuenta</h3>
-        <p className="mt-0.5 text-xs leading-5 text-muted">
-          Estimado es el margen de pedidos confirmados. Utilidad es lo entregado y marcado como cobrado. Ninguna es dinero cobrado en el sitio ni el total guardado del pedido.
-        </p>
-        <dl className="mt-2 grid gap-3 sm:grid-cols-3">
-          <div className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
+
+        <div className="mt-3 flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cuenta</p>
+            <h3 className="mt-0.5 text-sm font-semibold">La cuenta</h3>
+          </div>
+          <p className="text-xs text-muted">Estimado ≠ utilidad ≠ cobro del sitio.</p>
+        </div>
+        <dl className="mt-2 grid gap-2 sm:grid-cols-3">
+          <div className="elevate-1 rounded-[12px] border border-line bg-card px-3 py-2">
             <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Margen estimado</dt>
             <dd className="mt-1 text-base font-extrabold tabular-nums">{formatCop(storeSummary.estimatedMargin.amount)}</dd>
-            <dd className="mt-1 text-xs leading-5 text-muted">
-              Margen de confirmados. No es dinero cobrado ni el total guardado.
+            <dd className="mt-0.5 text-[11px] leading-4 text-muted">
+              Confirmados
               <OrderListPhrase numbers={storeSummary.estimatedMargin.numbers} lead=":" />
             </dd>
             {storeSummary.estimatedMargin.missingNumbers.length > 0 ? (
-              <dd className="mt-1 text-xs leading-5 text-muted">
-                Sin costo{canManageOrderMoney ? "" : " · lo copia el propietario"}
+              <dd className="mt-0.5 text-[11px] leading-4 text-muted">
+                Sin costo{canManageOrderMoney ? "" : " · propietario"}
                 <OrderListPhrase numbers={storeSummary.estimatedMargin.missingNumbers} lead=":" />
               </dd>
             ) : null}
           </div>
-          <div className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
+          <div className="elevate-1 rounded-[12px] border border-line bg-card px-3 py-2">
             <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Utilidad realizada</dt>
             <dd className="mt-1 text-base font-extrabold tabular-nums">{formatCop(storeSummary.realized.amount)}</dd>
-            <dd className="mt-1 text-xs leading-5 text-muted">
-              Utilidad de pedidos entregados y marcados como cobrados. No es un cobro de este sitio ni el total guardado.
+            <dd className="mt-0.5 text-[11px] leading-4 text-muted">
+              Entregados y cobrados
               <OrderListPhrase numbers={storeSummary.realized.numbers} lead=":" />
             </dd>
             {storeSummary.realized.missingNumbers.length > 0 || storeSummary.returnFreight > 0 || storeSummary.collectionCost > 0 ? (
-              <dd className="mt-1 space-y-0.5 text-xs leading-5 text-muted">
+              <dd className="mt-0.5 space-y-0.5 text-[11px] leading-4 text-muted">
                 {storeSummary.realized.missingNumbers.length > 0 ? (
                   <span className="block">
-                    Cobrado sin costo{canManageOrderMoney ? "" : " · lo copia el propietario"}
+                    Cobrado sin costo{canManageOrderMoney ? "" : " · propietario"}
                     <OrderListPhrase numbers={storeSummary.realized.missingNumbers} lead=":" />
                   </span>
                 ) : null}
@@ -362,63 +372,69 @@ export function Dashboard({
               </dd>
             ) : null}
           </div>
-          <div className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
+          <div className="elevate-1 rounded-[12px] border border-line bg-card px-3 py-2">
             <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Devueltos</dt>
             <dd className="mt-1 text-base font-extrabold tabular-nums">{formatCop(storeSummary.returned.amount)}</dd>
-            <dd className="mt-1 text-xs leading-5 text-muted">
-              Total guardado. No entra a la utilidad.
+            <dd className="mt-0.5 text-[11px] leading-4 text-muted">
+              No entra a la utilidad
               <OrderListPhrase numbers={storeSummary.returned.numbers} lead=":" />
             </dd>
           </div>
         </dl>
-        {periodShift ? <p className="mt-3 text-sm leading-5">{periodShift}</p> : null}
+        {periodShift ? <p className="mt-2 text-sm leading-5">{periodShift}</p> : null}
       </section>
 
-      <section className="mt-5" aria-labelledby="entradas">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Entradas</p>
-        <h2 id="entradas" className="mt-0.5 text-base font-bold">Dónde se trabaja</h2>
-        <p className="mt-0.5 text-xs leading-5 text-muted">
-          Todos los pedidos de la tienda. Estas entradas no cambian con el período. Abrirlas no cobra ni cambia pedidos. Dropi no está conectado: el número se anota en Sincronización.
-        </p>
-        <ul className="mt-2 grid gap-3 sm:grid-cols-2">
+      <section className="mt-4" aria-labelledby="entradas">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Entradas</p>
+            <h2 id="entradas" className="mt-0.5 text-base font-bold">Dónde se trabaja</h2>
+          </div>
+          <p className="text-xs text-muted">No cambian con el período. Abrirlas no cobra.</p>
+        </div>
+        <ul className="mt-2 grid gap-2 sm:grid-cols-2">
           <li>
-            <Link href="/panel/pedidos#por-atender" title="Abrirlos no cobra ni cambia el total guardado." className="elevate-1 block rounded-[14px] border border-line bg-card px-3 py-3 hover:bg-canvas">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedidos</span>
-              <span className="mt-1 block text-sm font-bold">
-                {orderWork.yours} {orderWork.yours === 1 ? "pedido por atender" : "pedidos por atender"}
+            <Link href="/panel/pedidos#por-atender" title="Abrirlos no cobra ni cambia el total guardado." className="elevate-1 block rounded-[12px] border border-line bg-card px-3 py-2.5 hover:bg-canvas">
+              <span className="flex items-baseline justify-between gap-2">
+                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedidos</span>
+                <span className="text-sm font-extrabold tabular-nums">{orderWork.yours}</span>
               </span>
-              <span className="mt-0.5 block text-xs leading-5 text-muted">
+              <span className="mt-1 block text-sm font-bold">Por atender</span>
+              <span className="mt-0.5 block text-[11px] leading-4 text-muted">
                 {canManageOrderMoney
-                  ? "Cola «Por atender»: un pedido, un siguiente paso. No se recorta por período."
+                  ? "Un pedido, un siguiente paso."
                   : orderWork.ownerMoney > 0
-                    ? `${orderWork.ownerMoney === 1 ? "1 pedido con flete, costo o recaudo lo guarda el propietario." : `${orderWork.ownerMoney} pedidos con flete, costo o recaudo los guarda el propietario.`} Tú sigues estado, entrega, talla y aviso.`
-                    : "Este número es lo que puedes hacer: estado, entrega, talla y aviso. No se recorta por período."}
+                    ? `${orderWork.ownerMoney} con flete/costo/recaudo lo guarda el propietario.`
+                    : "Estado, entrega, talla y aviso."}
               </span>
             </Link>
           </li>
           <li>
-            <Link href={syncSectionHref("sync-crear")} title="Abrirla no cobra. El total guardado no cambia." className="elevate-1 block rounded-[14px] border border-line bg-card px-3 py-3 hover:bg-canvas">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sincronización</span>
-              <span className="mt-1 block text-sm font-bold">
-                {syncWorkCount} {syncWorkCount === 1 ? "pedido sin número de Dropi" : "pedidos sin número de Dropi"}
+            <Link href={syncSectionHref("sync-crear")} title="Abrirla no cobra. El total guardado no cambia." className="elevate-1 block rounded-[12px] border border-line bg-card px-3 py-2.5 hover:bg-canvas">
+              <span className="flex items-baseline justify-between gap-2">
+                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sincronización</span>
+                <span className="text-sm font-extrabold tabular-nums">{syncWorkCount}</span>
               </span>
-              <span className="mt-0.5 block text-xs leading-5 text-muted">
-                Anotar el número lo concilia a mano. No se envía a Dropi y el total guardado no cambia.
+              <span className="mt-1 block text-sm font-bold">Sin número Dropi</span>
+              <span className="mt-0.5 block text-[11px] leading-4 text-muted">
+                Anotar a mano. No se envía desde aquí.
               </span>
             </Link>
           </li>
         </ul>
       </section>
 
-      <section className="mt-5" aria-labelledby="por-producto">
-        <div>
-          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Productos</p>
-          <h2 id="por-producto" className="mt-0.5 text-base font-bold">Por producto ({productResults.length})</h2>
-          <p className="mt-0.5 text-xs text-muted">Mismo período y la misma fecha que las cifras de arriba.</p>
-          <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+      <section className="mt-4" aria-labelledby="por-producto">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Productos</p>
+            <h2 id="por-producto" className="mt-0.5 text-base font-bold">Por producto ({productResults.length})</h2>
+            <p className="mt-0.5 text-xs text-muted">Mismo período y fecha que las cifras de arriba.</p>
+          </div>
+          <nav aria-label="Vista" className="flex flex-wrap items-center gap-2">
             <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-            <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
-              Ver el detalle en Rentabilidad
+            <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="inline-flex h-8 items-center rounded-[10px] border border-line bg-canvas px-2.5 text-sm font-semibold text-ink hover:bg-subtle">
+              Rentabilidad
             </Link>
           </nav>
         </div>
@@ -511,16 +527,20 @@ export function Dashboard({
         <CloseSheet orders={storeInPeriod} rest={storeOrders.filter((order) => !storeInPeriod.some((shown) => shown.number === order.number))} period={storePeriod} basis={basis} guides={sizeGuides} priceGuides={priceGuides} costGuides={costGuides} fieldId="cierre-tienda" />
       </section>
 
-      <section className="mt-5" aria-labelledby="por-atender">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cola</p>
-        <h2 id="por-atender" className="mt-0.5 text-base font-bold">Por atender ({waiting.length})</h2>
-        <p className="mt-0.5 text-xs leading-5 text-muted">
-          {canManageOrderMoney
-            ? "La misma cola que Pedidos. No se recorta por período. Buscar solo cambia esta lista. Copiarla no cobra ni envía el mensaje."
-            : "La misma cola que Pedidos. El flete y el costo los guarda el propietario. No se recorta por período. Buscar solo cambia esta lista. Copiarla no cobra ni envía el mensaje."}
-        </p>
+      <section className="mt-4" aria-labelledby="por-atender">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cola</p>
+            <h2 id="por-atender" className="mt-0.5 text-base font-bold">Por atender ({waiting.length})</h2>
+          </div>
+          <p className="max-w-xl text-xs text-muted">
+            {canManageOrderMoney
+              ? "Misma cola que Pedidos. No se recorta por período. Copiarla no cobra ni envía."
+              : "Misma cola que Pedidos. Flete y costo los guarda el propietario. No se recorta por período."}
+          </p>
+        </div>
         {waiting.length === 0 ? (
-          <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
+          <div className="elevate-1 mt-2 rounded-[12px] border border-line bg-card px-3 py-2">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
             <p className="mt-0.5 text-sm text-muted">
               {attention.length === 0
@@ -529,7 +549,7 @@ export function Dashboard({
             </p>
           </div>
         ) : (
-          <ul className="elevate-1 mt-3 divide-y divide-line overflow-hidden rounded-[14px] border border-line bg-card">
+          <ul className="elevate-1 mt-2 divide-y divide-line overflow-hidden rounded-[12px] border border-line bg-card">
             {waiting.map((row) => {
               const order = row.order;
               const phoneCount = samePhoneMatches(order, storeOrders).length;
