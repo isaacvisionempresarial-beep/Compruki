@@ -164,6 +164,9 @@ export function Dashboard({
         >
           Atender pedidos
         </Link>
+      </nav>
+      <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
         <Link
           href={agentPendingCount > 0 ? "/panel/agentes#pendientes-humanos" : "/panel/agentes"}
           title="Abrirlo no cobra ni cambia pedidos."
@@ -203,8 +206,8 @@ export function Dashboard({
                 {canApproveCatalog ? "" : ". Puedes rechazar. Aprobar un borrador o una corrida lo guarda el propietario."}
               </p>
             </div>
-            <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <nav aria-label="Vista" className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
               <Link href="/panel/agentes#pendientes-humanos" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
                 Abrir bandeja
               </Link>
@@ -389,8 +392,8 @@ export function Dashboard({
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Productos</p>
           <h2 id="por-producto" className="mt-0.5 text-base font-bold">Por producto ({productResults.length})</h2>
           <p className="mt-0.5 text-xs text-muted">Mismo período y la misma fecha que las cifras de arriba.</p>
-          <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
             <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
               Ver el detalle en Rentabilidad
             </Link>

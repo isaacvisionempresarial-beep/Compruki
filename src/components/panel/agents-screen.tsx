@@ -90,8 +90,8 @@ export function AgentsScreen({
           <Stat label="Pedidos abiertos" value={view.storeSummary.openOrders} />
           <Stat label="Pendiente confirmación" value={view.storeSummary.pendingConfirmation} />
         </dl>
-        <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
           <Link href="/panel/catalogo" title="Abrirlo no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
             Ir al catálogo
           </Link>
@@ -402,8 +402,8 @@ export function AgentsScreen({
         <p className="mt-1 text-sm text-muted">
           Últimas 8 en pantalla. Las corridas nuevas guardan quién las lanzó. Verlas o bajar el CSV no cobra ni cambia pedidos. El CSV trae hasta 500 del tenant.
         </p>
-        <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
           <a
             href="/panel/agentes/export"
             title="Bajarlo no cobra ni cambia pedidos."

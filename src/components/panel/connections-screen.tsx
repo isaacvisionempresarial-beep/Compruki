@@ -125,8 +125,8 @@ export function ConnectionsScreen({
               <li className="rounded-[10px] border border-line px-3 py-2">
                 <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Agentes prioritarios</p>
                 <p className="mt-0.5 font-semibold">Modo determinista</p>
-                <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
                   <Link href="/panel/agentes" title="Abrirlo no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
                     Abrir centro de agentes
                   </Link>
@@ -268,8 +268,8 @@ export function ConnectionsScreen({
             <p className="mt-1 text-xs leading-5 text-muted">
               Dropi no está conectado. Los pedidos a crear a mano están en Sincronización; esta pantalla no los envía. No cobra. El total guardado no cambia.
             </p>
-            <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
               <Link
                 href="/panel/sincronizacion"
                 title="Abrirla no cobra. El total guardado no cambia."

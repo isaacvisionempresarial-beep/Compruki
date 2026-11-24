@@ -73,8 +73,8 @@ export function ContentCreatorPanel({
             ))}
           </select>
         </label>
-        <nav aria-label="Herramientas" className="flex flex-wrap items-end gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <nav aria-label="Consulta" className="flex flex-wrap items-end gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
           <button
             type="submit"
             title="Generar no cobra ni publica."
@@ -205,13 +205,13 @@ function DraftCard({ sku, draft, enabled }: { sku: string; draft: ContentDraft; 
       <p className="mt-2 flex-1 text-sm leading-5 text-muted whitespace-pre-wrap">{draft.body}</p>
       <p className="mt-2 text-sm font-semibold">Invitación: {draft.cta}</p>
 
-      <form action={action} className="mt-3">
+      <form action={action} className="mt-3 contents">
         <input type="hidden" name="sku" value={sku} />
         <input type="hidden" name="channel" value={draft.channel} />
         <input type="hidden" name="title" value={draft.title} />
         <input type="hidden" name="body" value={draft.body} />
         <input type="hidden" name="cta" value={draft.cta} />
-        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+        <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
           <button
             type="submit"

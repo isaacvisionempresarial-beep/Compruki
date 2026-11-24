@@ -86,8 +86,8 @@ export function SyncScreen({
       <p className="mt-1 max-w-2xl text-sm leading-5 text-muted">
         Copia la entrega y anota el número a mano. Ver esta lista no cobra. Dropi no está conectado: no se envía desde aquí y el total guardado no cambia. El estado de la cuenta está en Conexiones.
       </p>
-      <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+      <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
         <Link href="/panel/conexiones" title="Verlas no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Abrir conexiones
         </Link>
