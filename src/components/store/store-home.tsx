@@ -44,66 +44,124 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
       );
     });
   }, [products, query, category]);
+  const heroProduct = products.find((product) => product.hasImage) ?? products[0] ?? null;
 
   return (
-    <div>
-      <section className="store-hero relative overflow-hidden rounded-[14px] border border-line px-3 py-2 sm:px-4">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Inicio</p>
-        <h1 className="mt-1 max-w-xl text-[24px] leading-7 font-extrabold tracking-tight">
-          Pagas al recibir
-        </h1>
-        <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Tienda piloto · Colombia. Elige y deja el pedido. El envío se acuerda aparte. Los precios son los publicados. Nadie cobra aquí.
-        </p>
+    <div className="store-home">
+      <section
+        className="store-hero-bleed store-rise relative -mx-4 overflow-hidden border-b border-line/70 px-4 pt-5 pb-8 sm:pt-7 sm:pb-10"
+        aria-labelledby="tienda-marca"
+      >
+        <div className="store-hero-glow" aria-hidden="true" />
+        <div className="relative grid gap-8 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] sm:items-stretch sm:gap-8 lg:gap-12">
+          <div className="flex min-w-0 flex-col justify-center">
+            <p id="tienda-marca" className="store-display text-[13px] font-bold tracking-[0.16em] text-accent-strong uppercase">
+              COMPRUKI
+            </p>
+            <h1 className="store-display mt-3 max-w-[12ch] text-[2.6rem] leading-[0.98] font-extrabold tracking-[-0.045em] text-ink sm:text-[3.35rem]">
+              Pagas al recibir
+            </h1>
+            <p className="mt-4 max-w-md text-[15px] leading-6 text-muted">
+              Elige, deja el pedido y paga cuando te llegue. El envío se acuerda aparte. Nadie cobra aquí.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center gap-2.5">
+              <a
+                href="#catalogo-publicado"
+                title="Verlos no cambia los precios publicados ni crea un pedido."
+                className="inline-flex h-11 items-center rounded-[12px] bg-primary px-4 text-sm font-semibold text-on-dark transition-[background-color,transform] hover:bg-primary-soft active:translate-y-px"
+              >
+                Ver productos
+              </a>
+              <Link
+                href="/tienda/consultar"
+                title="Consultar no cobra ni cambia el total guardado."
+                className="inline-flex h-11 items-center rounded-[12px] border border-line bg-card/85 px-4 text-sm font-semibold text-ink backdrop-blur transition-colors hover:bg-card"
+              >
+                Consultar pedido
+              </Link>
+            </div>
+          </div>
+
+          <div className="store-hero-stage relative min-h-[260px] sm:min-h-full sm:min-h-[320px]">
+            {heroProduct?.hasImage ? (
+              <Link
+                href={`/tienda/producto/${heroProduct.sku}`}
+                title="Abrirla no cambia el precio publicado ni crea un pedido."
+                className="store-hero-photo group absolute inset-0 overflow-hidden rounded-[8px] sm:rounded-[14px] outline-none"
+                aria-label={`Ver ${heroProduct.title}`}
+              >
+                <CatalogPhoto
+                  sku={heroProduct.sku}
+                  alt={heroProduct.title}
+                  frameClassName="h-full min-h-[260px] sm:min-h-[320px]"
+                  imgClassName="h-full min-h-[260px] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03] sm:min-h-[320px]"
+                />
+              </Link>
+            ) : (
+              <div className="store-hero-photo absolute inset-0 grid place-items-center rounded-[8px] px-6 text-center sm:rounded-[14px]">
+                <div>
+                  <p className="store-display text-lg font-extrabold tracking-tight text-ink">Tu catálogo aquí</p>
+                  <p className="mt-1 text-sm leading-5 text-muted">Cuando publiques productos, esta portada cobra vida.</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </section>
 
-      <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="como-pedir">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pasos</p>
-        <h2 id="como-pedir" className="mt-0.5 text-sm font-semibold">Cómo pedir</h2>
-        <ul className="mt-3 grid gap-3 sm:grid-cols-3">
-          <li>
-            <span className="font-semibold text-sm">Elige</span>
-            <span className="mt-0.5 block text-xs leading-5 text-muted">Entra a la ficha, elige talla o tamaño y agrega al carrito. No registra pedido ni cobra.</span>
-          </li>
-          <li>
-            <span className="font-semibold text-sm">Pagas al recibir</span>
-            <span className="mt-0.5 block text-xs leading-5 text-muted">El pedido queda pendiente. Nadie cobra aquí.</span>
-          </li>
-          <li>
-            <span className="font-semibold text-sm">Consulta</span>
-            <span className="mt-0.5 block text-xs leading-5 text-muted">Sigue el estado con el número del pedido y el celular de la entrega.</span>
-          </li>
-        </ul>
-        <nav aria-label="Consulta" className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
-          <Link
-            href="/tienda/consultar"
-            title="Consultar no cobra ni cambia el total guardado."
-            className="inline-flex h-9 items-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft"
-          >
-            Consultar pedido
-          </Link>
-        </nav>
-        <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
+      <section className="store-rise mt-2 border-y border-line/80 py-4" aria-labelledby="como-pedir" style={{ animationDelay: "80ms" }}>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-bold tracking-[0.1em] text-muted uppercase">En 3 pasos</p>
+            <h2 id="como-pedir" className="store-display mt-1 text-lg font-bold tracking-tight">
+              Pedir es simple
+            </h2>
+          </div>
           <Link
             href="/tienda/condiciones"
             title="Leerlas no registra pedido ni cobra."
-            className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
+            className="text-sm font-semibold text-accent-strong hover:underline"
           >
             Condiciones
           </Link>
-        </nav>
-        <p className="mt-2 text-xs leading-5 text-muted">Consultar no cobra ni cambia el total guardado. Leerlas no registra pedido ni cobra.</p>
+        </div>
+        <ol className="mt-4 grid gap-3 sm:grid-cols-3">
+          {[
+            { step: "1", title: "Elige", text: "Entra a la ficha, elige talla o tamaño y agrega al carrito." },
+            { step: "2", title: "Confirma", text: "Dejas tus datos. El pedido queda pendiente. Nadie cobra aquí." },
+            { step: "3", title: "Recibe", text: "Pagas al recibir. Consulta con el número y tu celular." },
+          ].map((item) => (
+            <li key={item.step} className="flex gap-3">
+              <span className="store-display grid h-9 w-9 shrink-0 place-items-center rounded-[12px] bg-accent-tint text-sm font-extrabold text-accent-strong">
+                {item.step}
+              </span>
+              <span>
+                <span className="block text-sm font-bold text-ink">{item.title}</span>
+                <span className="mt-0.5 block text-xs leading-5 text-muted">{item.text}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
       </section>
 
-      <section className="mt-3 min-w-0" aria-labelledby="catalogo-publicado">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Catálogo</p>
-        <h2 id="catalogo-publicado" className="mt-0.5 text-base font-bold">Productos publicados</h2>
-        <p className="mt-1 text-sm text-muted">Solo lo revisado. Ver una ficha no crea un pedido ni cambia el precio publicado.</p>
-        <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3">
-          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Lista</p>
-          <label className="mt-2 block">
+      <section className="store-rise mt-6 min-w-0" aria-labelledby="catalogo-publicado" style={{ animationDelay: "140ms" }}>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-bold tracking-[0.1em] text-muted uppercase">Catálogo</p>
+            <h2 id="catalogo-publicado" className="store-display mt-1 text-[1.35rem] font-bold tracking-tight scroll-mt-24">
+              Productos
+            </h2>
+            <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
+              Solo lo publicado. Ver una ficha no crea pedido ni cambia el precio.
+            </p>
+          </div>
+          <p className="text-sm font-semibold text-muted tabular-nums">
+            {visible.length} de {products.length}
+          </p>
+        </div>
+
+        <div className="store-toolbar mt-4 rounded-[16px] border border-line bg-card/90 p-3 backdrop-blur-sm">
+          <label className="block">
             <span className="sr-only">Buscar producto</span>
             <input
               type="search"
@@ -113,13 +171,11 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Buscar por nombre o SKU"
               title="Buscar no cambia los precios publicados ni crea un pedido."
-              className="h-10 w-full rounded-[10px] border border-line bg-canvas px-3 text-sm shadow-[0_1px_0_rgb(34_38_56/0.02)] transition-[border-color,box-shadow] focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
+              className="h-11 w-full rounded-[12px] border border-line bg-canvas px-3.5 text-sm transition-[border-color,box-shadow] focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.14)] focus:outline-none"
             />
-            <span className="mt-1 block text-xs leading-5 text-muted">Buscar no cambia los precios publicados ni crea un pedido.</span>
           </label>
           {categories.length > 0 ? (
-            <>
-            <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Filtrar por categoría">
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="radiogroup" aria-label="Filtrar por categoría">
               <CategoryChip label="Todas" count={products.length} selected={category === "todas"} onSelect={() => setCategory("todas")} />
               {categories.map(([key, label]) => (
                 <CategoryChip
@@ -139,116 +195,105 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
                 />
               ) : null}
             </div>
-            <p className="mt-2 text-xs leading-5 text-muted">Filtrar no cambia los precios publicados ni crea un pedido.</p>
-            </>
           ) : null}
         </div>
 
-          {visible.length === 0 ? (
-            <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
-              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
-              <p className="mt-0.5 text-sm leading-5 text-muted">{storeEmptyMessage(products.length, category, query)}</p>
-              {products.length > 0 && (category !== "todas" || query.trim()) ? (
-                <>
-                <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-                  <button
-                    type="button"
-                    title="Verlos no cambia los precios publicados ni crea un pedido."
-                    className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
-                    onClick={() => {
-                      setCategory("todas");
-                      setQuery("");
-                    }}
-                  >
-                    Ver todos los productos
-                  </button>
-                </nav>
-                <p className="mt-2 text-xs leading-5 text-muted">Verlos no cambia los precios publicados ni crea un pedido.</p>
-                </>
-              ) : null}
-            </div>
-          ) : (
-            <ul className="mt-3 grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-3">
-              {visible.map((product, index) => (
-                <li
-                  key={product.id}
-                  className="store-card elevate-1 group overflow-hidden rounded-[14px] border border-line bg-card transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_22px_-12px_rgb(34_38_56/0.16)]"
-                  style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}
-                >
-                  {product.images.length > 1 ? (
-                    <PhotoCarousel
-                      slides={product.images.map((image, imageIndex) => ({
-                        key: image.id,
-                        src: `/tienda/imagen/${product.sku}?m=${image.id}`,
-                        alt: imageIndex === 0 ? product.title : "",
-                      }))}
-                      label={`Fotos de ${product.title}`}
-                      frameClassName="h-32 w-full bg-subtle sm:h-36"
-                      roundedClassName="rounded-none"
-                      compact
-                      openLabel={`Ver ${product.title}`}
-                      openTitle="Abrirla no cambia el precio publicado ni crea un pedido."
-                      onOpen={() => router.push(`/tienda/producto/${product.sku}`)}
+        {visible.length === 0 ? (
+          <div className="mt-4 rounded-[16px] border border-dashed border-line bg-card/70 px-4 py-8 text-center">
+            <p className="store-display text-base font-bold tracking-tight">Nada por aquí</p>
+            <p className="mt-1 text-sm leading-5 text-muted">{storeEmptyMessage(products.length, category, query)}</p>
+            {products.length > 0 && (category !== "todas" || query.trim()) ? (
+              <button
+                type="button"
+                title="Verlos no cambia los precios publicados ni crea un pedido."
+                className="mt-4 inline-flex h-10 items-center justify-center rounded-[12px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft"
+                onClick={() => {
+                  setCategory("todas");
+                  setQuery("");
+                }}
+              >
+                Ver todos los productos
+              </button>
+            ) : null}
+          </div>
+        ) : (
+          <ul className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+            {visible.map((product, index) => (
+              <li
+                key={product.id}
+                className="store-card group overflow-hidden rounded-[18px] border border-line bg-card transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:border-accent/35 hover:shadow-[0_18px_36px_-20px_rgb(23_26_40/0.35)]"
+                style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}
+              >
+                {product.images.length > 1 ? (
+                  <PhotoCarousel
+                    slides={product.images.map((image, imageIndex) => ({
+                      key: image.id,
+                      src: `/tienda/imagen/${product.sku}?m=${image.id}`,
+                      alt: imageIndex === 0 ? product.title : "",
+                    }))}
+                    label={`Fotos de ${product.title}`}
+                    frameClassName="h-40 w-full bg-subtle sm:h-44"
+                    roundedClassName="rounded-none"
+                    compact
+                    openLabel={`Ver ${product.title}`}
+                    openTitle="Abrirla no cambia el precio publicado ni crea un pedido."
+                    onOpen={() => router.push(`/tienda/producto/${product.sku}`)}
+                  />
+                ) : null}
+                <Link href={`/tienda/producto/${product.sku}`} title="Abrirla no cambia el precio publicado ni crea un pedido." className="block">
+                  {product.images.length <= 1 && product.hasImage ? (
+                    <CatalogPhoto
+                      sku={product.sku}
+                      alt={product.title}
+                      frameClassName="h-40 bg-subtle sm:h-44"
+                      imgClassName="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-[1.04] sm:h-44"
+                      note=""
                     />
                   ) : null}
-                  <Link href={`/tienda/producto/${product.sku}`} title="Abrirla no cambia el precio publicado ni crea un pedido." className="block">
-                    {product.images.length <= 1 && product.hasImage ? (
-                      <CatalogPhoto
-                        sku={product.sku}
-                        alt={product.title}
-                        frameClassName="h-32 sm:h-36"
-                        imgClassName="h-32 w-full object-contain transition-transform duration-500 group-hover:scale-[1.04] sm:h-36"
-                        note="El precio publicado no cambia."
-                      />
-                    ) : null}
-                    {!product.hasImage && product.images.length === 0 ? (
-                      <div className="grid h-32 place-items-center bg-subtle px-2 text-center sm:h-36">
-                        <span>
-                          <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</span>
-                          <span className="mt-0.5 block text-xs font-semibold text-muted">Sin foto</span>
-                          <span className="mt-1 block text-[11px] leading-4 text-muted">El precio publicado no cambia.</span>
-                        </span>
-                      </div>
-                    ) : null}
-                    <div className="p-2">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <p
-                          className={cx(
-                            "inline-flex rounded-[8px] px-2 py-0.5 text-[10px] font-bold tracking-[0.08em] uppercase",
-                            product.available ? "bg-accent-tint text-accent-strong" : "bg-coral-tint text-coral-strong",
-                          )}
-                        >
-                          {product.available ? "Disponible" : "No disponible"}
-                        </p>
-                        {product.category ? (
-                          <span className="truncate text-[10px] font-semibold tracking-[0.08em] text-muted uppercase">
-                            {product.category}
-                          </span>
-                        ) : null}
-                      </div>
-                      <h2 className="mt-1 line-clamp-2 text-sm font-bold tracking-tight">{product.title}</h2>
-                      {product.sizeKind && product.variants.length > 0 ? (
-                        <p className="mt-0.5 line-clamp-1 text-xs text-muted">
-                          {product.sizeKind === "tamano" ? "Tamaños" : "Tallas"}: {product.variants.join(", ")}
-                        </p>
-                      ) : null}
-                      <div className="mt-2 flex items-end justify-between gap-2">
-                        <div>
-                          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Precio publicado</p>
-                          <p className="text-base font-extrabold tabular-nums">{formatCop(product.price)}</p>
-                        </div>
-                        <span className="inline-flex h-8 shrink-0 items-center rounded-[8px] bg-primary px-2.5 text-xs font-semibold text-on-dark transition-colors group-hover:bg-primary-soft">
-                          Ver
-                        </span>
-                      </div>
-                      <p className="mt-1 text-[11px] leading-4 text-muted">Pagas al recibir. Envío aparte. No se cobra aquí.</p>
+                  {!product.hasImage && product.images.length === 0 ? (
+                    <div className="grid h-40 place-items-center bg-gradient-to-br from-subtle to-accent-tint/40 px-3 text-center sm:h-44">
+                      <span>
+                        <span className="store-display block text-sm font-bold text-muted">Sin foto</span>
+                        <span className="mt-1 block text-[11px] leading-4 text-muted">El precio publicado no cambia.</span>
+                      </span>
                     </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
+                  ) : null}
+                  <div className="flex flex-col gap-2 p-3">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <p
+                        className={cx(
+                          "inline-flex rounded-[8px] px-2 py-0.5 text-[10px] font-bold tracking-[0.06em] uppercase",
+                          product.available ? "bg-accent-tint text-accent-strong" : "bg-coral-tint text-coral-strong",
+                        )}
+                      >
+                        {product.available ? "Disponible" : "No disponible"}
+                      </p>
+                      {product.category ? (
+                        <span className="truncate text-[11px] font-semibold text-muted">{product.category}</span>
+                      ) : null}
+                    </div>
+                    <h3 className="store-display line-clamp-2 text-[15px] leading-5 font-bold tracking-tight">{product.title}</h3>
+                    {product.sizeKind && product.variants.length > 0 ? (
+                      <p className="line-clamp-1 text-xs text-muted">
+                        {product.sizeKind === "tamano" ? "Tamaños" : "Tallas"}: {product.variants.join(", ")}
+                      </p>
+                    ) : null}
+                    <div className="mt-auto flex items-end justify-between gap-2 pt-1">
+                      <div>
+                        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Precio</p>
+                        <p className="text-lg font-extrabold tracking-tight tabular-nums">{formatCop(product.price)}</p>
+                      </div>
+                      <span className="inline-flex h-9 shrink-0 items-center rounded-[10px] bg-primary px-3 text-xs font-semibold text-on-dark transition-colors group-hover:bg-primary-soft">
+                        Ver
+                      </span>
+                    </div>
+                    <p className="text-[11px] leading-4 text-muted">Pagas al recibir · Envío aparte</p>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </div>
   );
@@ -279,13 +324,13 @@ function CategoryChip({
       aria-checked={selected}
       title="Filtrar no cambia los precios publicados ni crea un pedido."
       className={cx(
-        "min-h-9 rounded-[10px] px-2.5 text-sm font-semibold transition-colors",
-        selected ? "bg-primary text-on-dark" : "border border-line bg-card text-muted hover:bg-subtle",
+        "min-h-9 shrink-0 rounded-[11px] px-3 text-sm font-semibold transition-[background-color,color,border-color]",
+        selected ? "bg-primary text-on-dark" : "border border-line bg-canvas text-muted hover:bg-subtle hover:text-ink",
       )}
       onClick={onSelect}
     >
       {label}
-      <span className="ml-1 tabular-nums">{count}</span>
+      <span className="ml-1 tabular-nums opacity-80">{count}</span>
     </button>
   );
 }

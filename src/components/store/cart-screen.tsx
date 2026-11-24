@@ -48,12 +48,11 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
 
   return (
     <div>
-      <section className="store-hero relative overflow-hidden rounded-[14px] border border-line px-3 py-2 sm:px-4">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Este navegador</p>
-        <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">Carrito</h1>
-        <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Precios publicados de la ficha. Se guarda en este navegador. Abrirlo no cobra. Pagas al recibir. Envío aparte.
-          Todavía no es un pedido. Confirmarlo es el siguiente paso.
+      <section className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line px-4 py-4 sm:px-5">
+        <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Este navegador</p>
+        <h1 className="store-display mt-2 text-[1.75rem] leading-tight font-extrabold tracking-[-0.03em]">Carrito</h1>
+        <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
+          Precios publicados. Se guarda aquí. Abrirlo no cobra. Pagas al recibir · Envío aparte. Todavía no es un pedido.
         </p>
       </section>
       <div className="mt-3 space-y-3">

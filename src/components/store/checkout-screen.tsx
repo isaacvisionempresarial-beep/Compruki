@@ -98,9 +98,9 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
 
   return (
     <div>
-      <section className="store-hero relative overflow-hidden rounded-[14px] border border-line px-3 py-2 sm:px-4">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Carrito</p>
-        <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">Datos de entrega</h1>
+      <section className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line px-4 py-4 sm:px-5">
+        <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Carrito</p>
+        <h1 className="store-display mt-2 text-[1.75rem] leading-tight font-extrabold tracking-[-0.03em]">Datos de entrega</h1>
         <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
           Pago contra entrega. Al confirmar queda pendiente. Nadie cobra aquí. Pagas {formatCop(total)} al recibir.
         </p>

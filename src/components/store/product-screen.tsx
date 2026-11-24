@@ -182,12 +182,15 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
       </nav>
       <p className="mt-2 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>
 
-      <div className="mt-3 grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,28rem)]">
-        <section className="elevate-1 store-hero rounded-[14px] border border-line px-3 py-3" aria-label="Información principal del producto">
-          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Ficha</p>
-          <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">{product.title}</h1>
-          <p className="mt-1 text-xs text-muted">{`Tienda piloto${product.category ? ` · ${product.category}` : ""}.`}</p>
-          <p className="mt-1 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">SKU {product.sku}</p>
+      <div className="mt-3 grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,28rem)]">
+        <section className="store-hero elevate-1 rounded-[18px] border border-line px-4 py-4 sm:px-5" aria-label="Información principal del producto">
+          <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">
+            {product.category ? product.category : "Ficha"}
+          </p>
+          <h1 className="store-display mt-2 text-[1.75rem] leading-[1.15] font-extrabold tracking-[-0.03em] sm:text-[2rem]">
+            {product.title}
+          </h1>
+          <p className="mt-1 text-xs text-muted">SKU {product.sku}</p>
           {descriptionParagraphs.length > 0 ? (
             <>
             <p className="mt-2 text-sm leading-5 text-muted">
@@ -205,9 +208,9 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
             </>
           ) : null}
 
-          <div className="mt-2 border-y border-line py-2">
+          <div className="mt-3 rounded-[14px] border border-line bg-card/70 px-3 py-3">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Precio publicado</p>
-            <p className="mt-0.5 text-lg font-extrabold tracking-tight tabular-nums">{formatCop(product.price)}</p>
+            <p className="store-display mt-1 text-2xl font-extrabold tracking-tight tabular-nums">{formatCop(product.price)}</p>
             <p className="mt-1 text-xs leading-5 text-muted">
               Pagas al recibir. Envío aparte. No es dinero cobrado.
             </p>

@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
+import { Outfit } from "next/font/google";
 import { CartProvider } from "@/components/store/cart-state";
 import { StoreShell } from "@/components/store/store-shell";
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+  display: "swap",
+});
 
 const storeDescription =
   "Tienda piloto en Colombia. Pagas al recibir. El pedido queda pendiente de confirmación. El envío se acuerda aparte.";
@@ -28,8 +35,10 @@ export const metadata: Metadata = {
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
-    <CartProvider>
-      <StoreShell>{children}</StoreShell>
-    </CartProvider>
+    <div className={outfit.variable}>
+      <CartProvider>
+        <StoreShell>{children}</StoreShell>
+      </CartProvider>
+    </div>
   );
 }

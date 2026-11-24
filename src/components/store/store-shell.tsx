@@ -21,7 +21,6 @@ export function StoreShell({ children }: { children: ReactNode }) {
     pathname.startsWith("/tienda/condiciones");
   const cart = pathname.startsWith("/tienda/carrito") || pathname.startsWith("/tienda/pagar");
   const productPage = pathname.startsWith("/tienda/producto");
-  // Ancho fijo: usePathname en SSR puede no coincidir con el cliente y romper hidratación.
   const shellWidth = "max-w-7xl";
 
   useEffect(() => {
@@ -34,11 +33,11 @@ export function StoreShell({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div className="min-h-dvh bg-canvas">
-      <header className="sticky top-0 z-20 border-b border-line bg-card/95 backdrop-blur">
-        <div className={cx("mx-auto flex h-11 items-center justify-between gap-3 px-4", shellWidth)}>
+    <div className="store-surface min-h-dvh">
+      <header className="sticky top-0 z-20 border-b border-line/80 bg-card/80 backdrop-blur-md">
+        <div className={cx("mx-auto flex h-14 items-center justify-between gap-3 px-4", shellWidth)}>
           <Link href="/tienda" title="Ir al inicio no registra pedido ni cobra." className="rounded-[10px]" aria-label="COMPRUKI, inicio de la tienda">
-            <Wordmark />
+            <Wordmark className="[&_span]:store-display [&_span]:text-[15px]" />
           </Link>
           <div className="flex items-center gap-2">
             {productPage ? (
@@ -61,10 +60,12 @@ export function StoreShell({ children }: { children: ReactNode }) {
               href="/tienda/carrito"
               title="Abrir el carrito no cobra ni registra un pedido."
               aria-label={ready ? (count === 1 ? "Carrito, 1 producto" : `Carrito, ${count} productos`) : "Carrito"}
-              className="inline-flex h-9 items-center gap-2 rounded-[10px] border border-line bg-canvas px-2.5 text-sm font-semibold"
+              className="inline-flex h-10 items-center gap-2 rounded-[12px] border border-line bg-canvas/90 px-3 text-sm font-semibold transition-colors hover:border-accent/40 hover:bg-card"
             >
               <Icon name="bag" className="h-5 w-5" aria-hidden="true" />
-              <span aria-hidden="true">Carrito</span>
+              <span className="hidden sm:inline" aria-hidden="true">
+                Carrito
+              </span>
               <span className="min-w-5 rounded-[8px] bg-primary px-1.5 text-center text-xs text-on-dark tabular-nums" aria-live="polite">
                 {ready ? count : 0}
               </span>
@@ -72,18 +73,18 @@ export function StoreShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <main id="contenido" tabIndex={-1} className={cx("mx-auto px-4 pt-3 pb-[4.5rem] outline-none", shellWidth)}>
+      <main id="contenido" tabIndex={-1} className={cx("mx-auto px-4 pt-4 pb-[5.25rem] outline-none", shellWidth)}>
         {children}
       </main>
-      <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-card" aria-label="Tienda">
+      <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line/80 bg-card/92 backdrop-blur-md" aria-label="Tienda">
         <div className={cx("mx-auto grid grid-cols-3", shellWidth)}>
           <Link
             href="/tienda"
             title="Ir a inicio no cobra ni registra un pedido."
             aria-current={home ? "page" : undefined}
             className={cx(
-              "flex h-11 items-center justify-center gap-2 text-sm font-semibold",
-              home ? "text-accent-strong" : "text-muted",
+              "flex h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold sm:flex-row sm:gap-2 sm:text-sm",
+              home ? "store-nav-active" : "text-muted",
             )}
           >
             <Icon name="store" className="h-5 w-5" aria-hidden="true" />
@@ -94,8 +95,8 @@ export function StoreShell({ children }: { children: ReactNode }) {
             title="Consultar no cobra ni cambia el total guardado."
             aria-current={order ? "page" : undefined}
             className={cx(
-              "flex h-11 items-center justify-center gap-2 text-sm font-semibold",
-              order ? "text-accent-strong" : "text-muted",
+              "flex h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold sm:flex-row sm:gap-2 sm:text-sm",
+              order ? "store-nav-active" : "text-muted",
             )}
           >
             <Icon name="orders" className="h-5 w-5" aria-hidden="true" />
@@ -107,8 +108,8 @@ export function StoreShell({ children }: { children: ReactNode }) {
             aria-current={cart ? "page" : undefined}
             aria-label={ready ? (count === 1 ? "Carrito, 1 producto" : `Carrito, ${count} productos`) : "Carrito"}
             className={cx(
-              "flex h-11 items-center justify-center gap-2 text-sm font-semibold",
-              cart ? "text-accent-strong" : "text-muted",
+              "flex h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold sm:flex-row sm:gap-2 sm:text-sm",
+              cart ? "store-nav-active" : "text-muted",
             )}
           >
             <Icon name="bag" className="h-5 w-5" aria-hidden="true" />
