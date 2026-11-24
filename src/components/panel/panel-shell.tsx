@@ -180,7 +180,9 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
                 </span>
               </div>
               <nav aria-label="Herramientas" className="flex shrink-0 flex-wrap items-center gap-1">
-                <span className="sr-only">Herramientas</span>
+                <span className="hidden text-[10px] font-bold tracking-[0.08em] text-muted uppercase min-[1200px]:inline">
+                  Herramientas
+                </span>
                 <a
                   href="/ingresar?modo=nueva-clave"
                   title="Abrirla no cobra ni cambia pedidos."
@@ -188,7 +190,7 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
                 >
                   Clave
                 </a>
-                <form action={signOut}>
+                <form action={signOut} className="contents">
                   <button
                     type="submit"
                     aria-label="Cerrar sesión"

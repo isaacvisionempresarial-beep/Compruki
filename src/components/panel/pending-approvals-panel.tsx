@@ -307,7 +307,7 @@ function ApprovalButtons({
       ) : null}
       <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
         <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-        <form action={action}>
+        <form action={action} className="contents">
           <input type="hidden" name="kind" value={kind} />
           <input type="hidden" name="id" value={id} />
           <input type="hidden" name="decision" value="approve" />
@@ -320,7 +320,7 @@ function ApprovalButtons({
             {pending ? "…" : "Aprobar"}
           </button>
         </form>
-        <form action={action}>
+        <form action={action} className="contents">
           <input type="hidden" name="kind" value={kind} />
           <input type="hidden" name="id" value={id} />
           <input type="hidden" name="decision" value="reject" />

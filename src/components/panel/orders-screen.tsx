@@ -516,25 +516,28 @@ export function OrderEditor({
             {order.collected ? <CollectedPill /> : null}
           </div>
         </div>
-        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-          <Link
-            href="/panel/pedidos"
-            title="Volver no cobra ni cambia el total guardado."
-            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
-          >
-            Volver
-          </Link>
-          {canNoteDropiNumber(order) ? (
+        <div className="shrink-0">
+          <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
             <Link
-              href={syncFocusHref(order.number)}
-              title="Abrirla no cobra. El total guardado no cambia."
+              href="/panel/pedidos"
+              title="Volver no cobra ni cambia el total guardado."
               className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
             >
-              Sincronización
+              Volver a pedidos
             </Link>
-          ) : null}
-        </nav>
+            {canNoteDropiNumber(order) ? (
+              <Link
+                href={syncFocusHref(order.number)}
+                title="Abrirla no cobra. El total guardado no cambia."
+                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
+              >
+                Sincronización
+              </Link>
+            ) : null}
+          </nav>
+          <p className="mt-2 text-xs leading-5 text-muted">Volver no cobra ni cambia el total guardado.</p>
+        </div>
       </div>
 
 <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-resumen">
@@ -592,35 +595,44 @@ export function OrderEditor({
         <h2 id="pedido-herramientas" className="mt-0.5 text-sm font-semibold">Herramientas del pedido</h2>
         {actions.length > 0 || prepareDropiError(order) || resolveBlocked || confirmBlocked ? (
           <>
-          <FormTools className="mt-2">
-            {actions.map((item) =>
-              needsCustomerReason(item.id) ? (
-                <ReasonAction
-                  key={item.id}
-                  order={order}
-                  item={item}
-                  action={action}
-                  pending={pending}
-                  error={state.orderId === order.id && state.error?.includes("motivo") ? state.error : null}
-                />
-              ) : (
-                <form key={item.id} action={action}>
-                  <input type="hidden" name="orderId" value={order.id} />
-                  <input type="hidden" name="intent" value={item.id} />
-                  <button
-                    type="submit"
-                    title="No cambia el total guardado ni cobra en esta pantalla."
-                    disabled={pending || (moneyStatusAction(item.id) && !canManageOrderMoney)}
-                    className={`inline-flex h-9 items-center justify-center rounded-[10px] px-3 text-sm font-semibold ${
-                      pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
-                    } ${buttonTone[item.tone]}`}
-                  >
-                    {item.label}
-                  </button>
-                </form>
-              ),
-            )}
-          </FormTools>
+          {actions.some((item) => needsCustomerReason(item.id)) ? (
+            <div className="mt-2 space-y-2">
+              {actions
+                .filter((item) => needsCustomerReason(item.id))
+                .map((item) => (
+                  <ReasonAction
+                    key={item.id}
+                    order={order}
+                    item={item}
+                    action={action}
+                    pending={pending}
+                    error={state.orderId === order.id && state.error?.includes("motivo") ? state.error : null}
+                  />
+                ))}
+            </div>
+          ) : null}
+          {actions.some((item) => !needsCustomerReason(item.id)) ? (
+            <FormTools className="mt-2">
+              {actions
+                .filter((item) => !needsCustomerReason(item.id))
+                .map((item) => (
+                  <form key={item.id} action={action} className="contents">
+                    <input type="hidden" name="orderId" value={order.id} />
+                    <input type="hidden" name="intent" value={item.id} />
+                    <button
+                      type="submit"
+                      title="No cambia el total guardado ni cobra en esta pantalla."
+                      disabled={pending || (moneyStatusAction(item.id) && !canManageOrderMoney)}
+                      className={`inline-flex h-9 items-center justify-center rounded-[10px] px-3 text-sm font-semibold ${
+                        pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+                      } ${buttonTone[item.tone]}`}
+                    >
+                      {item.label}
+                    </button>
+                  </form>
+                ))}
+            </FormTools>
+          ) : null}
           <p className="mt-2 text-xs leading-5 text-muted">
             Estas herramientas no cambian el total guardado ni el precio de las líneas. No cobran en esta pantalla.
             {actions.some((item) => item.id === "entregar")
@@ -942,7 +954,8 @@ function ReasonAction({
           {error}
         </p>
       ) : null}
-      <FormTools>
+      <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
         <button
           type="submit"
           title="No cambia el total guardado ni cobra en esta pantalla."
@@ -953,7 +966,7 @@ function ReasonAction({
         >
           {item.label}
         </button>
-      </FormTools>
+      </nav>
     </form>
   );
 }

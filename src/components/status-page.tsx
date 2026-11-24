@@ -64,7 +64,7 @@ export function StatusPage({
 
 function ActionControl({ action }: { action: Action }) {
   const className = action.primary
-    ? "inline-flex h-10 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark"
+    ? "inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark"
     : "inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold";
 
   if (action.href) {
