@@ -247,12 +247,13 @@ function Sidebar({
         ) : null}
       </div>
 
-      <p className="px-4 pb-2 text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Secciones</p>
-
-      <nav aria-label="Secciones del panel" className="flex-1 overflow-y-auto px-2.5 pb-3">
+      <nav
+        aria-label="Secciones del panel"
+        className="panel-sidebar-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-2.5 pb-2"
+      >
         {groups.map((group) => (
-          <div key={group.id} className="mt-3 first:mt-0">
-            <p className="px-3 pb-1 text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">{group.label}</p>
+          <div key={group.id} className="mt-2.5 first:mt-0">
+            <p className="px-3 pb-0.5 text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">{group.label}</p>
             <ul className="space-y-0.5">
               {group.items.map((item) => {
                 const active = item.href === "/panel" ? pathname === "/panel" : pathname.startsWith(item.href);
@@ -265,11 +266,11 @@ function Sidebar({
                       onClick={onNavigate}
                       className={
                         active
-                          ? "flex h-10 items-center gap-3 rounded-[10px] bg-[#EEF2FA] px-3 text-sm font-semibold text-primary"
-                          : "flex h-10 items-center gap-3 rounded-[10px] px-3 text-sm font-medium text-on-dark-muted hover:bg-white/10 hover:text-white"
+                          ? "flex h-9 items-center gap-2.5 rounded-[10px] bg-[#EEF2FA] px-3 text-sm font-semibold text-primary"
+                          : "flex h-9 items-center gap-2.5 rounded-[10px] px-3 text-sm font-medium text-on-dark-muted hover:bg-white/10 hover:text-white"
                       }
                     >
-                      <Icon name={item.icon} className={cx("h-5 w-5", active ? "text-accent-strong" : undefined)} />
+                      <Icon name={item.icon} className={cx("h-4 w-4", active ? "text-accent-strong" : undefined)} />
                       {item.label}
                     </Link>
                   </li>
@@ -280,26 +281,25 @@ function Sidebar({
         ))}
       </nav>
 
-      <div className="m-2 rounded-[14px] border border-white/10 bg-white/5 px-3 py-2">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Estado</p>
-        <p className="mt-1 inline-flex items-center gap-2 text-[10px] font-bold tracking-[0.08em] text-coral uppercase">
-          <span className="h-2 w-2 rounded-full bg-coral" aria-hidden="true" />
-          Dropi no está conectado
+      <div
+        className="shrink-0 border-t border-white/10 px-3 py-2"
+        title="Navegar no cobra ni cambia pedidos. Dropi no está conectado."
+      >
+        <p className="inline-flex max-w-full items-center gap-1.5 text-[10px] font-bold tracking-[0.06em] text-coral uppercase">
+          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-coral" aria-hidden="true" />
+          <span className="truncate">Dropi no conectado</span>
         </p>
-        <p className="mt-1 text-xs leading-4 text-on-dark-muted">Navegar no cobra ni cambia pedidos.</p>
-        <p className="mt-2 text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Tienda</p>
-        <p className="mt-0.5 text-sm font-semibold">{storeName}</p>
-        <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Vista</span>
+        <div className="mt-1.5 flex items-center gap-2">
+          <p className="min-w-0 flex-1 truncate text-xs font-semibold leading-4">{storeName}</p>
           <Link
             href="/tienda"
             title="Abrirla no cobra ni cambia pedidos."
-            className="inline-flex h-9 items-center rounded-[10px] border border-white/15 bg-white/5 px-3 text-sm font-semibold text-on-dark hover:bg-white/10"
+            className="inline-flex h-7 shrink-0 items-center rounded-[8px] border border-white/15 bg-white/5 px-2 text-[11px] font-semibold text-on-dark hover:bg-white/10"
             onClick={onNavigate}
           >
             Abrir tienda
           </Link>
-        </nav>
+        </div>
       </div>
     </div>
   );

@@ -213,6 +213,35 @@ body {
   animation: route-skeleton-pulse 1.4s ease-in-out infinite;
 }
 
+/* Menú lateral del panel: barra fina y discreta sobre fondo oscuro. */
+.panel-sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.22) transparent;
+}
+
+.panel-sidebar-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.panel-sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.panel-sidebar-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.22);
+}
+
+.panel-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgb(255 255 255 / 0.38);
+}
+
+.panel-sidebar-scroll::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
