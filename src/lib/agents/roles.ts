@@ -62,8 +62,8 @@ export const AGENT_ROLES: AgentRoleDefinition[] = [
   {
     id: "AG-08",
     name: "Especialista en Publicidad",
-    job: "Preparar hipótesis y copies; no compra anuncios sin aprobación.",
-    tools: ["get_campaign_metrics", "draft_campaign", "prepare_publish_request"],
+    job: "Hipótesis y copy de prueba desde el catálogo; un humano confirma presupuesto. No compra anuncios solo.",
+    tools: ["get_product_facts", "draft_campaign", "estimate_budget_note"],
     priority: "P2",
   },
   {

@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { AgentBudgetPanel } from "@/components/panel/agent-budget-panel";
+import { CampaignDraftPanel } from "@/components/panel/campaign-draft-panel";
 import { CentralRouterPanel } from "@/components/panel/central-router-panel";
 import { ContentCreatorPanel } from "@/components/panel/content-creator-panel";
 import { PendingApprovalsPanel } from "@/components/panel/pending-approvals-panel";
 import { publicationLabel } from "@/lib/catalog";
 import { formatCop } from "@/lib/format";
 import { usePanelSectionHash } from "@/lib/use-panel-section-hash";
+import type { CampaignDraft } from "@/server/agent-campaign-draft";
 import type { CentralRouteResult } from "@/server/agent-central";
 import type { ContentDraft, ProductFacts, SavedContentDraft } from "@/server/agent-content";
 import type { ExplorerShortlist } from "@/server/agent-explorer";
@@ -28,6 +30,7 @@ export function AgentsScreen({
   marginSku = "",
   explorer,
   creator,
+  campaign,
   central,
   policyError = null,
   canApproveCatalog = false,
@@ -45,6 +48,11 @@ export function AgentsScreen({
     drafts: ContentDraft[];
     saved: SavedContentDraft[];
   };
+  campaign: {
+    products: Array<{ sku: string; title: string }>;
+    selectedSku: string;
+    draft: CampaignDraft | null;
+  };
   central: { route: CentralRouteResult | null; defaultIntent: string };
   policyError?: { agentId: string | null; message: string } | null;
   canApproveCatalog?: boolean;
@@ -54,12 +62,14 @@ export function AgentsScreen({
   const ag05 = view.roles.find((role) => role.id === "AG-05");
   const ag06 = view.roles.find((role) => role.id === "AG-06");
   const ag07 = view.roles.find((role) => role.id === "AG-07");
+  const ag08 = view.roles.find((role) => role.id === "AG-08");
   const ag09 = view.roles.find((role) => role.id === "AG-09");
   const budgetRoles = [
     ...p0,
     ...(ag05 ? [ag05] : []),
     ...(ag06 ? [ag06] : []),
     ...(ag07 ? [ag07] : []),
+    ...(ag08 ? [ag08] : []),
     ...(ag09 ? [ag09] : []),
   ];
   const later = view.roles.filter(
@@ -68,13 +78,15 @@ export function AgentsScreen({
       role.id !== "AG-05" &&
       role.id !== "AG-06" &&
       role.id !== "AG-07" &&
+      role.id !== "AG-08" &&
       role.id !== "AG-09",
   );
-  usePanelSectionHash(["pendientes-humanos", "corridas"]);
+  usePanelSectionHash(["pendientes-humanos", "publicidad", "corridas"]);
   const ag01 = agentIsOn(view, "AG-01");
   const ag02 = agentIsOn(view, "AG-02");
   const ag03 = agentIsOn(view, "AG-03");
   const ag04 = agentIsOn(view, "AG-04");
+  const ag08On = agentIsOn(view, "AG-08");
 
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
@@ -287,6 +299,17 @@ export function AgentsScreen({
         canTurnOn={canApproveCatalog}
       />
 
+      <CampaignDraftPanel
+        products={campaign.products}
+        selectedSku={campaign.selectedSku}
+        draft={campaign.draft}
+        preserveQuery={explorer.query}
+        preserveCategory={explorer.category}
+        preserveContentSku={creator.selectedSku}
+        enabled={ag08On}
+        canTurnOn={canApproveCatalog}
+      />
+
       <section className="mt-6" aria-labelledby="analista">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Margen</p>
         <h2 id="analista" className="mt-0.5 text-base font-bold">
@@ -432,7 +455,7 @@ export function AgentsScreen({
         canEdit={canApproveCatalog}
       />
 
-      {ag05 || ag06 || ag07 || ag09 ? (
+      {ag05 || ag06 || ag07 || ag08 || ag09 ? (
         <section className="elevate-1 mt-4 space-y-3 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="en-uso-lite">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">En uso</p>
           <h2 id="en-uso-lite" className="sr-only">
@@ -466,6 +489,16 @@ export function AgentsScreen({
               </h3>
               <p className="mt-1 text-sm text-muted">
                 Lite: «Generar borrador» en el pedido arma un mensaje para copiar. No envía WhatsApp ni cobra.
+              </p>
+            </div>
+          ) : null}
+          {ag08 ? (
+            <div>
+              <h3 className="text-sm font-bold">
+                {ag08.id} · {ag08.name}
+              </h3>
+              <p className="mt-1 text-sm text-muted">
+                Lite: «Generar campaña» arma hipótesis y copy. No compra anuncios ni publica.
               </p>
             </div>
           ) : null}

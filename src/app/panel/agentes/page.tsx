@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AgentsScreen } from "@/components/panel/agents-screen";
+import { getCampaignDraftPreview } from "@/server/agent-campaign-draft";
 import { routeTask } from "@/server/agent-central";
 import { getContentDraftPreview, listContentDrafts, listDraftableProducts } from "@/server/agent-content";
 import { getExplorerShortlistPreview, searchLocalCatalog } from "@/server/agent-explorer";
@@ -26,12 +27,15 @@ export default async function AgentsPage({
     marginSku?: string;
     lectura?: string;
     explorado?: string;
+    campanaSku?: string;
+    campana?: string;
     agente?: string;
     agenteError?: string;
   }>;
 }) {
   const params = await searchParams;
   const selectedSku = (params.sku ?? "").trim().toUpperCase();
+  const campaignSku = (params.campanaSku ?? "").trim().toUpperCase();
   const marginSku = (params.marginSku ?? "").trim().toUpperCase();
   const intent = (params.intent ?? "").trim();
   const q = params.q ?? "";
@@ -58,6 +62,7 @@ export default async function AgentsPage({
 
   const reading = showReading ? getAnalystReadingPreview(marginSku || undefined) : null;
   const explorer = cachedExplorer ?? explorerFallback;
+  const campaignDraft = campaignSku ? getCampaignDraftPreview(campaignSku) : null;
 
   return (
     <AgentsScreen
@@ -72,6 +77,11 @@ export default async function AgentsPage({
         facts: packed?.facts ?? null,
         drafts: packed?.drafts ?? [],
         saved,
+      }}
+      campaign={{
+        products,
+        selectedSku: campaignSku,
+        draft: campaignDraft,
       }}
       central={{ route: central, defaultIntent: intent }}
       policyError={policyError}

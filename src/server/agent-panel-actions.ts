@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { generateCampaignDraft } from "@/server/agent-campaign-draft";
 import { generateContentDrafts } from "@/server/agent-content";
 import { exploreCatalog } from "@/server/agent-explorer";
 import { agentDeniedRedirect, evaluateAgentPolicy } from "@/server/agent-policy";
@@ -143,4 +144,44 @@ export async function runAnalystAction(formData: FormData) {
   });
 
   redirect(agentesRedirect({ q, categoria, sku, marginSku: focusSku || undefined, lectura: "1" }));
+}
+
+export async function generateCampaignDraftAction(formData: FormData) {
+  const access = await assertPanelAccess();
+  if (!access) redirect("/ingresar");
+
+  const campanaSku = String(formData.get("campanaSku") ?? "").trim().toUpperCase();
+  const q = String(formData.get("q") ?? "").trim();
+  const categoria = String(formData.get("categoria") ?? "").trim();
+  const sku = String(formData.get("sku") ?? "").trim();
+
+  if (!campanaSku) redirect(agentesRedirect({ q, categoria, sku }));
+
+  const policy = await evaluateAgentPolicy("AG-08");
+  if (!policy.ok) {
+    await recordAgentRun({
+      agentId: "AG-08",
+      status: "cancelled",
+      summary: policy.reason,
+      createdBy: access.user.id,
+      actorName: access.actorName,
+    });
+    redirect(agentDeniedRedirect("AG-08", policy.reason, { q, categoria, sku, campanaSku }));
+  }
+
+  const draft = await generateCampaignDraft(campanaSku);
+  const via = draft?.via === "openai" ? "openai" : "plantilla";
+
+  await recordAgentRun({
+    agentId: "AG-08",
+    status: draft ? "succeeded" : "failed",
+    costEstimateCop: draft?.costEstimateCop ?? 0,
+    summary: draft
+      ? `Publicidad ${via} · ${draft.sku} · ${draft.headline.slice(0, 80)} · no compró anuncios ni publicó`
+      : `Publicidad · SKU ${campanaSku} no encontrado en catálogo local`,
+    createdBy: access.user.id,
+    actorName: access.actorName,
+  });
+
+  redirect(agentesRedirect({ q, categoria, sku, campanaSku, campana: "1" }));
 }

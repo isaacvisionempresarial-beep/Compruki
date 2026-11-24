@@ -13,6 +13,7 @@ const editableIds = new Set(
       role.id === "AG-05" ||
       role.id === "AG-06" ||
       role.id === "AG-07" ||
+      role.id === "AG-08" ||
       role.id === "AG-09",
   ).map((role) => role.id),
 );
@@ -31,7 +32,7 @@ export async function saveAgentConfigAction(
 
   const agentId = String(formData.get("agentId") ?? "").trim().toUpperCase();
   if (!editableIds.has(agentId)) {
-    return { error: "Solo se puede editar presupuesto de P0-IA, AG-05…07 y AG-09 en este piloto.", message: null };
+    return { error: "Solo se puede editar presupuesto de P0-IA y AG-05…09 en este piloto.", message: null };
   }
 
   const enabled = formData.get("enabled") === "on" || formData.get("enabled") === "true";
