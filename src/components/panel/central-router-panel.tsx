@@ -17,11 +17,12 @@ export function CentralRouterPanel({
     <section className="mt-4" aria-labelledby="central">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Enrutar</p>
       <h2 id="central" className="mt-0.5 text-base font-bold">
-        COMPRUKI Central (sin OpenAI)
+        COMPRUKI Central
       </h2>
       <p className="mt-1 text-sm text-muted">
-        AG-01 enruta con reglas a Explorador, Analista y Creador. Cada «Enrutar» deja una corrida en el
-        historial y no escribe el catálogo ni cambia el precio. Enrutar no cobra ni cambia pedidos. No usa modelo ni Dropi en vivo.
+        AG-01: si OpenAI responde, interpreta la intención; si no, usa reglas. Llama a Explorador, Analista y
+        Creador (plantillas). Cada «Enrutar» deja una corrida y no escribe el catálogo ni cambia el precio.
+        Enrutar no cobra ni cambia pedidos. Sin Dropi en vivo.
       </p>
       {!enabled ? (
         <p role="status" className="mt-2 text-sm font-medium text-coral">
@@ -72,7 +73,9 @@ export function CentralRouterPanel({
             <span className="font-semibold">Pedido:</span> {route.intent}
           </p>
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
-            OpenAI: no · Agentes: {route.agents.join(", ")}
+            Fuente: {route.via === "openai" ? "OpenAI" : "reglas"}
+            {route.costEstimateCop > 0 ? ` · costo est. ${route.costEstimateCop} COP` : ""} · Agentes:{" "}
+            {route.agents.join(", ")}
           </p>
           <ul className="space-y-1.5 text-sm text-muted">
             {route.summary.map((line) => (

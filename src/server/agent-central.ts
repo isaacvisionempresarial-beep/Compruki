@@ -36,9 +36,13 @@ export type PendingApproval = {
   };
 };
 
+export type CentralRouteVia = "openai" | "reglas";
+
 export type CentralRouteResult = {
   intent: string;
-  openaiUsed: false;
+  openaiUsed: boolean;
+  via: CentralRouteVia;
+  costEstimateCop: number;
   agents: RoutedAgent[];
   summary: string[];
   pending: PendingApproval[];
@@ -47,6 +51,36 @@ export type CentralRouteResult = {
   draftChannels: string[];
   suggestedLinks: Array<{ label: string; href: string }>;
 };
+
+type RoutePlan = {
+  wantsExplore: boolean;
+  wantsMargin: boolean;
+  wantsContent: boolean;
+  sku: string;
+  focus: string;
+  via: CentralRouteVia;
+  costEstimateCop: number;
+};
+
+const routePreviewByIntent = new Map<string, CentralRouteResult>();
+
+/** Evita volver a llamar al modelo al recargar `?intent=` tras Enrutar. */
+export function rememberCentralRoute(result: CentralRouteResult) {
+  const key = result.intent.trim().toLocaleLowerCase("es");
+  if (!key || key === "(resumen general)") return;
+  routePreviewByIntent.set(key, result);
+}
+
+export function getRememberedCentralRoute(rawIntent: string): CentralRouteResult | null {
+  const key = rawIntent.trim().toLocaleLowerCase("es");
+  if (!key) return null;
+  return routePreviewByIntent.get(key) ?? null;
+}
+
+/** Solo tests. */
+export function clearCentralRoutePreviewCache() {
+  routePreviewByIntent.clear();
+}
 
 function authorLine(name: string | null) {
   return `Guardó ${name?.trim() || "el panel"}.`;
@@ -182,35 +216,116 @@ function piece(count: number, one: string, many: string) {
   return `${count} ${count === 1 ? one : many}`;
 }
 
+function extractSku(intent: string) {
+  return intent.toUpperCase().match(/\b[A-Z0-9]+(?:-[A-Z0-9]+)+\b/)?.[0] ?? "";
+}
+
+/** Plan por palabras clave. Sin OpenAI. */
+export function planRouteFromRules(rawIntent: string): RoutePlan {
+  const intent = rawIntent.trim();
+  const lower = intent.toLocaleLowerCase("es");
+  const sku = extractSku(intent);
+  return {
+    wantsExplore:
+      !intent ||
+      /\b(busca|buscar|explora|producto|cat[aá]logo|shortlist|categor[ií]a)\b/i.test(lower) ||
+      Boolean(sku),
+    wantsMargin:
+      /\b(margen|rentab|precio|escenario|analista|costo|ganancia)\b/i.test(lower) || Boolean(sku),
+    wantsContent:
+      /\b(contenido|borrador|anuncio|copy|whatsapp|ficha|creador|texto)\b/i.test(lower) || Boolean(sku),
+    sku,
+    focus: "",
+    via: "reglas",
+    costEstimateCop: 0,
+  };
+}
+
+/** Interpreta JSON de OpenAI para el plan de enrutado. */
+export function parseOpenAIRoutePlan(raw: string, fallbackSku: string): Omit<RoutePlan, "via" | "costEstimateCop"> | null {
+  try {
+    const data = JSON.parse(raw) as Record<string, unknown>;
+    const skuRaw = typeof data.sku === "string" ? data.sku.trim().toUpperCase() : "";
+    const sku = extractSku(skuRaw) || (skuRaw.match(/^[A-Z0-9]+(?:-[A-Z0-9]+)+$/) ? skuRaw : "") || fallbackSku;
+    const focus = scrubRouteFocus(typeof data.focus === "string" ? data.focus : "").slice(0, 160);
+    return {
+      wantsExplore: Boolean(data.explore),
+      wantsMargin: Boolean(data.margin),
+      wantsContent: Boolean(data.content),
+      sku,
+      focus,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function scrubRouteFocus(text: string) {
+  return text
+    .replace(/\bDropi\b/gi, "")
+    .replace(/\bOpenAI\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function resolveRoutePlan(rawIntent: string): Promise<RoutePlan> {
+  const rules = planRouteFromRules(rawIntent);
+  const { openAIKeyConfigured } = await import("@/server/openai-client");
+  if (!openAIKeyConfigured()) return rules;
+
+  try {
+    const { chatJsonCompletion } = await import("@/server/openai-client");
+    const system = [
+      "Eres COMPRUKI Central (panel dueño, Colombia).",
+      "Devuelve SOLO JSON: {explore:boolean, margin:boolean, content:boolean, sku:string, focus:string}.",
+      "explore=buscar catálogo local; margin=rentabilidad/precios; content=borradores ficha/anuncio/whatsapp.",
+      "sku solo si aparece un código tipo ABC-DEF-01; si no, \"\".",
+      "focus: una frase corta en español colombiano sobre lo que pidió el dueño. Sin Dropi ni OpenAI.",
+      "Si la consulta es vaga, activa explore. Puedes activar varias banderas.",
+    ].join(" ");
+    const completion = await chatJsonCompletion({
+      system,
+      user: JSON.stringify({ intent: rawIntent.trim() || "(resumen general)" }),
+      maxTokens: 220,
+    });
+    if (!completion.ok) return rules;
+    const parsed = parseOpenAIRoutePlan(completion.text, rules.sku);
+    if (!parsed) return rules;
+    // Si el modelo apaga todo, al menos exploramos con reglas.
+    if (!parsed.wantsExplore && !parsed.wantsMargin && !parsed.wantsContent) {
+      return { ...rules, via: "openai", costEstimateCop: completion.costEstimateCop, focus: parsed.focus };
+    }
+    return { ...parsed, via: "openai", costEstimateCop: completion.costEstimateCop };
+  } catch {
+    return rules;
+  }
+}
+
 /**
- * AG-01 · route_task — orquestación determinista sin LLM.
- * Detecta intención por palabras clave y arma un paquete con tools locales.
+ * AG-01 · route_task — OpenAI interpreta la intención si responde; si no, reglas.
+ * Las tools (Explorador / Analista / Creador plantilla) siguen siendo locales.
  */
 export async function routeTask(rawIntent: string): Promise<CentralRouteResult> {
   const intent = rawIntent.trim();
-  const lower = intent.toLocaleLowerCase("es");
-  const skuMatch = intent.toUpperCase().match(/\b[A-Z0-9]+(?:-[A-Z0-9]+)+\b/);
-  const sku = skuMatch?.[0] ?? "";
+  const remembered = getRememberedCentralRoute(intent);
+  if (remembered) return remembered;
 
-  const wantsExplore =
-    !intent ||
-    /\b(busca|buscar|explora|producto|cat[aá]logo|shortlist|categor[ií]a)\b/i.test(lower) ||
-    Boolean(sku);
-  const wantsMargin =
-    /\b(margen|rentab|precio|escenario|analista|costo|ganancia)\b/i.test(lower) || Boolean(sku);
-  const wantsContent =
-    /\b(contenido|borrador|anuncio|copy|whatsapp|ficha|creador|texto)\b/i.test(lower) || Boolean(sku);
+  const plan = await resolveRoutePlan(intent);
+  const sku = plan.sku;
 
   const agents: RoutedAgent[] = ["AG-01"];
-  if (wantsExplore) agents.push("AG-02");
-  if (wantsMargin) agents.push("AG-04");
-  if (wantsContent) agents.push("AG-03");
+  if (plan.wantsExplore) agents.push("AG-02");
+  if (plan.wantsMargin) agents.push("AG-04");
+  if (plan.wantsContent) agents.push("AG-03");
 
   const uniqueAgents = [...new Set(agents)];
   const summary: string[] = [
-    "OpenAI no está conectado: este recorrido es solo con reglas y datos locales.",
+    plan.via === "openai"
+      ? "OpenAI interpretó la intención; datos y tools son locales (sin Dropi en vivo)."
+      : "Recorrido con reglas y datos locales (OpenAI no respondió o no hay clave).",
     `Agentes llamados: ${uniqueAgents.map((id) => AGENT_LABEL[id]).join(", ")}.`,
   ];
+  if (plan.focus) summary.push(`Lectura Central: ${plan.focus}`);
 
   let explorerCount = 0;
   let marginNote: string | null = null;
@@ -299,9 +414,11 @@ export async function routeTask(rawIntent: string): Promise<CentralRouteResult> 
     summary.push("Pendientes humanos: no hay pedidos, borradores, corridas ni preguntas en espera.");
   }
 
-  return {
+  const result: CentralRouteResult = {
     intent: intent || "(resumen general)",
-    openaiUsed: false,
+    openaiUsed: plan.via === "openai",
+    via: plan.via,
+    costEstimateCop: plan.costEstimateCop,
     agents: uniqueAgents,
     summary,
     pending,
@@ -310,4 +427,6 @@ export async function routeTask(rawIntent: string): Promise<CentralRouteResult> 
     draftChannels,
     suggestedLinks,
   };
+  rememberCentralRoute(result);
+  return result;
 }

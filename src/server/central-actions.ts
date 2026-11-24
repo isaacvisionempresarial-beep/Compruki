@@ -26,7 +26,9 @@ export async function routeCentralAction(formData: FormData) {
   }
 
   const result = await routeTask(intent);
+  const via = result.via === "openai" ? "openai" : "reglas";
   const summary = [
+    `Central ${via}`,
     `Intención: ${result.intent}`,
     `Agentes: ${result.agents.join(", ")}`,
     ...result.summary.slice(0, 6),
@@ -36,7 +38,7 @@ export async function routeCentralAction(formData: FormData) {
     agentId: "AG-01",
     status: "succeeded",
     summary,
-    costEstimateCop: 0,
+    costEstimateCop: result.costEstimateCop,
     createdBy: access.user.id,
     actorName: access.actorName,
   });
