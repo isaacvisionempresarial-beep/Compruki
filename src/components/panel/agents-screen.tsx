@@ -54,14 +54,21 @@ export function AgentsScreen({
   const ag05 = view.roles.find((role) => role.id === "AG-05");
   const ag06 = view.roles.find((role) => role.id === "AG-06");
   const ag07 = view.roles.find((role) => role.id === "AG-07");
+  const ag09 = view.roles.find((role) => role.id === "AG-09");
   const budgetRoles = [
     ...p0,
     ...(ag05 ? [ag05] : []),
     ...(ag06 ? [ag06] : []),
     ...(ag07 ? [ag07] : []),
+    ...(ag09 ? [ag09] : []),
   ];
   const later = view.roles.filter(
-    (role) => role.priority !== "P0-IA" && role.id !== "AG-05" && role.id !== "AG-06" && role.id !== "AG-07",
+    (role) =>
+      role.priority !== "P0-IA" &&
+      role.id !== "AG-05" &&
+      role.id !== "AG-06" &&
+      role.id !== "AG-07" &&
+      role.id !== "AG-09",
   );
   usePanelSectionHash(["pendientes-humanos", "corridas"]);
   const ag01 = agentIsOn(view, "AG-01");
@@ -425,7 +432,7 @@ export function AgentsScreen({
         canEdit={canApproveCatalog}
       />
 
-      {ag05 || ag06 || ag07 ? (
+      {ag05 || ag06 || ag07 || ag09 ? (
         <section className="elevate-1 mt-4 space-y-3 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="en-uso-lite">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">En uso</p>
           <h2 id="en-uso-lite" className="sr-only">
@@ -459,6 +466,16 @@ export function AgentsScreen({
               </h3>
               <p className="mt-1 text-sm text-muted">
                 Lite: «Generar borrador» en el pedido arma un mensaje para copiar. No envía WhatsApp ni cobra.
+              </p>
+            </div>
+          ) : null}
+          {ag09 ? (
+            <div>
+              <h3 className="text-sm font-bold">
+                {ag09.id} · {ag09.name}
+              </h3>
+              <p className="mt-1 text-sm text-muted">
+                Lite: «Generar resolución» propone pasos y aviso al cliente. No resuelve ni envía solo.
               </p>
             </div>
           ) : null}

@@ -7,10 +7,12 @@ import { AttentionSheet } from "@/components/panel/attention-sheet";
 import { CloseSheet } from "@/components/panel/close-sheet";
 import { OrderMessageDraftPanel } from "@/components/panel/order-message-draft-panel";
 import { OrderReadingPanel } from "@/components/panel/order-reading-panel";
+import { OrderSupportDraftPanel } from "@/components/panel/order-support-draft-panel";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
 import type { CustomerMessageDraft } from "@/server/agent-customer-draft";
 import type { OrderReading } from "@/server/agent-order-reading";
+import type { SupportResolutionDraft } from "@/server/agent-support-draft";
 import { parsePesos, sizeChoiceLabel, variantFits } from "@/lib/catalog";
 import { blockedDropiAnswer } from "@/lib/dropi-provider";
 import { cx } from "@/lib/cx";
@@ -496,6 +498,9 @@ export function OrderEditor({
   customerDraft = null,
   customerDraftEnabled = true,
   customerDraftError = null,
+  supportDraft = null,
+  supportDraftEnabled = true,
+  supportDraftError = null,
 }: {
   order: StoreOrder;
   orders: StoreOrder[];
@@ -510,6 +515,9 @@ export function OrderEditor({
   customerDraft?: CustomerMessageDraft | null;
   customerDraftEnabled?: boolean;
   customerDraftError?: string | null;
+  supportDraft?: SupportResolutionDraft | null;
+  supportDraftEnabled?: boolean;
+  supportDraftError?: string | null;
 }) {
   const [state, action, pending] = useActionState(updateOrderAction, initialState);
   const margin = orderMargin(order);
@@ -654,7 +662,14 @@ export function OrderEditor({
         policyError={customerDraftError}
       />
 
-<section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-herramientas">
+      <OrderSupportDraftPanel
+        orderNumber={order.number}
+        draft={supportDraft}
+        enabled={supportDraftEnabled}
+        policyError={supportDraftError}
+      />
+
+      <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-herramientas">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</p>
         <h2 id="pedido-herramientas" className="mt-0.5 scroll-mt-24 text-sm font-semibold">Herramientas del pedido</h2>
         {actions.length > 0 || prepareDropiError(order) || resolveBlocked || confirmBlocked ? (

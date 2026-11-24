@@ -69,8 +69,8 @@ export const AGENT_ROLES: AgentRoleDefinition[] = [
   {
     id: "AG-09",
     name: "Agente de Posventa",
-    job: "Clasificar incidencias y redactar respuestas para revisión humana.",
-    tools: ["get_order_history", "open_support_case", "draft_resolution"],
+    job: "Borradores de resolución y aviso al cliente en incidencias; un humano decide y envía.",
+    tools: ["get_order_history", "draft_resolution", "draft_customer_note"],
     priority: "P2",
   },
   {

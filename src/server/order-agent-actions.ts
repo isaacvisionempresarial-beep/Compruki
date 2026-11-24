@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { orderFocusHref } from "@/lib/store-order";
 import { generateCustomerMessageDraft } from "@/server/agent-customer-draft";
 import { generateOrderReading } from "@/server/agent-order-reading";
+import { generateSupportDraft } from "@/server/agent-support-draft";
 import { evaluateAgentPolicy } from "@/server/agent-policy";
 import { recordAgentRun } from "@/server/agent-runs";
 import { assertPanelAccess } from "@/server/panel-auth";
@@ -98,4 +99,45 @@ export async function runCustomerDraftAction(formData: FormData) {
   });
 
   redirect(orderSectionHref(number, "pedido-mensaje", { borradorMensaje: "1" }));
+}
+
+export async function runSupportDraftAction(formData: FormData) {
+  const access = await assertPanelAccess();
+  if (!access) redirect("/ingresar");
+
+  const number = String(formData.get("orderNumber") ?? "").trim();
+  if (!number) redirect("/panel/pedidos");
+
+  const policy = await evaluateAgentPolicy("AG-09");
+  if (!policy.ok) {
+    await recordAgentRun({
+      agentId: "AG-09",
+      status: "cancelled",
+      summary: policy.reason,
+      createdBy: access.user.id,
+      actorName: access.actorName,
+    });
+    redirect(
+      orderSectionHref(number, "pedido-posventa", {
+        agente: "AG-09",
+        agenteError: policy.reason.slice(0, 280),
+      }),
+    );
+  }
+
+  const draft = await generateSupportDraft(number);
+  const via = draft?.via === "openai" ? "openai" : "plantilla";
+
+  await recordAgentRun({
+    agentId: "AG-09",
+    status: draft ? "succeeded" : "failed",
+    costEstimateCop: draft?.costEstimateCop ?? 0,
+    summary: draft
+      ? [`Posventa ${via}`, draft.orderNumber, ...draft.bullets.slice(0, 2), "no resolvió solo"].join(" · ")
+      : `Posventa · pedido ${number} no encontrado`,
+    createdBy: access.user.id,
+    actorName: access.actorName,
+  });
+
+  redirect(orderSectionHref(number, "pedido-posventa", { borradorPosventa: "1" }));
 }

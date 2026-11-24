@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { OrderEditor } from "@/components/panel/orders-screen";
 import { getCustomerDraftPreview } from "@/server/agent-customer-draft";
 import { getOrderReadingPreview } from "@/server/agent-order-reading";
+import { getSupportDraftPreview } from "@/server/agent-support-draft";
 import { evaluateAgentPolicy } from "@/server/agent-policy";
 import { listCostGuides, listOrderableProducts, listPriceGuides, listSizeGuides } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
@@ -24,6 +25,7 @@ export default async function OrderPage({
   searchParams: Promise<{
     lecturaPedido?: string;
     borradorMensaje?: string;
+    borradorPosventa?: string;
     agente?: string;
     agenteError?: string;
   }>;
@@ -31,21 +33,24 @@ export default async function OrderPage({
   const { number } = await params;
   const query = await searchParams;
   const decoded = decodeURIComponent(number);
-  const [orders, access, products, sizeGuides, costGuides, priceGuides, policy06, policy07] = await Promise.all([
-    listOrders(),
-    requirePanelAccess(),
-    listOrderableProducts(),
-    listSizeGuides(),
-    listCostGuides(),
-    listPriceGuides(),
-    evaluateAgentPolicy("AG-06"),
-    evaluateAgentPolicy("AG-07"),
-  ]);
+  const [orders, access, products, sizeGuides, costGuides, priceGuides, policy06, policy07, policy09] =
+    await Promise.all([
+      listOrders(),
+      requirePanelAccess(),
+      listOrderableProducts(),
+      listSizeGuides(),
+      listCostGuides(),
+      listPriceGuides(),
+      evaluateAgentPolicy("AG-06"),
+      evaluateAgentPolicy("AG-07"),
+      evaluateAgentPolicy("AG-09"),
+    ]);
   const order = orders.find((item) => item.number === decoded);
   if (!order) notFound();
 
   const reading = query.lecturaPedido === "1" ? getOrderReadingPreview(order.number) : null;
   const customerDraft = query.borradorMensaje === "1" ? getCustomerDraftPreview(order.number) : null;
+  const supportDraft = query.borradorPosventa === "1" ? getSupportDraftPreview(order.number) : null;
   const agent = query.agente?.trim() ?? "";
   const agentError = query.agenteError?.trim() || null;
 
@@ -64,6 +69,9 @@ export default async function OrderPage({
       customerDraft={customerDraft}
       customerDraftEnabled={policy07.ok}
       customerDraftError={agent === "AG-07" ? agentError : null}
+      supportDraft={supportDraft}
+      supportDraftEnabled={policy09.ok}
+      supportDraftError={agent === "AG-09" ? agentError : null}
     />
   );
 }
