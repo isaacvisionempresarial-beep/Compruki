@@ -524,7 +524,8 @@ export function AgentsScreen({
                 {ag09.id} · {ag09.name}
               </h3>
               <p className="mt-1 text-sm text-muted">
-                Lite: «Generar resolución» propone pasos y aviso al cliente. No resuelve ni envía solo.
+                Lite: «Generar resolución» propone pasos y aviso (copiar o Abrir WhatsApp a mano). No resuelve ni
+                envía solo.
               </p>
             </div>
           ) : null}

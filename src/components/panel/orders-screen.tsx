@@ -681,6 +681,7 @@ export function OrderEditor({
 
       <OrderSupportDraftPanel
         orderNumber={order.number}
+        phone={order.phone}
         draft={supportDraft}
         enabled={supportDraftEnabled}
         policyError={supportDraftError}

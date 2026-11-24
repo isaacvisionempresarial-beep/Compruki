@@ -2,20 +2,24 @@
 
 import { useState } from "react";
 import type { SupportResolutionDraft } from "@/server/agent-support-draft";
+import { whatsAppHref } from "@/lib/store-order";
 import { runSupportDraftAction } from "@/server/order-agent-actions";
 
 export function OrderSupportDraftPanel({
   orderNumber,
+  phone = "",
   draft = null,
   policyError = null,
   enabled = true,
 }: {
   orderNumber: string;
+  phone?: string;
   draft?: SupportResolutionDraft | null;
   policyError?: string | null;
   enabled?: boolean;
 }) {
   const [copied, setCopied] = useState<"ok" | "fail" | null>(null);
+  const waHref = draft?.customerNote ? whatsAppHref(phone, draft.customerNote) : null;
 
   async function copyNote() {
     if (!draft?.customerNote) return;
@@ -34,7 +38,7 @@ export function OrderSupportDraftPanel({
         AG-09 · borrador de resolución
       </h2>
       <p className="mt-1 text-xs leading-5 text-muted">
-        Pasos internos y aviso al cliente (OpenAI o plantilla). No resuelve la incidencia ni envía solo.
+        Pasos internos y aviso al cliente (copiar o Abrir WhatsApp a mano). No resuelve la incidencia ni envía solo.
       </p>
       {!enabled ? (
         <p role="status" className="mt-2 text-sm font-medium text-coral">
@@ -90,7 +94,23 @@ export function OrderSupportDraftPanel({
             >
               {copied === "ok" ? "Aviso copiado" : "Copiar aviso"}
             </button>
+            {waHref ? (
+              <a
+                href={waHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Abre WhatsApp con el aviso. Compruki no envía ni resuelve."
+                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
+              >
+                Abrir WhatsApp
+              </a>
+            ) : null}
           </nav>
+          {!waHref ? (
+            <p className="text-xs text-muted">
+              Sin celular válido (10 dígitos que empiecen en 3) no se arma el enlace de WhatsApp.
+            </p>
+          ) : null}
           {copied === "ok" ? (
             <p role="status" className="text-xs text-accent-strong">
               Listo para pegarlo. Desde aquí no se envía ni se resuelve.
