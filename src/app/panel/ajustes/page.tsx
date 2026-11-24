@@ -132,7 +132,16 @@ export default async function SettingsPage() {
           ))}
           <div>
             <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">OpenAI</dt>
-            <dd className="mt-0.5 text-sm font-semibold">No</dd>
+            <dd className={`mt-0.5 text-sm font-semibold ${health.openaiConnected ? "text-ink" : "text-coral"}`}>
+              {health.openaiConnected ? "OK" : health.checks.openaiKey ? "Falla" : "No"}
+            </dd>
+            {!health.openaiConnected ? (
+              <p className="mt-0.5 text-xs leading-5 text-muted">
+                {health.checks.openaiKey
+                  ? "Hay clave, pero la prueba no respondió. El checkout no depende de OpenAI."
+                  : "Falta OPENAI_API_KEY en el servidor. El checkout no depende de OpenAI."}
+              </p>
+            ) : null}
           </div>
           <div>
             <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Dropi</dt>

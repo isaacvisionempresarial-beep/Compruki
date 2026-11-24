@@ -6,24 +6,33 @@ import { DROPI_CAPABILITIES, DROPI_MCP_HOST, DROPI_OAUTH_HOST, blockedDropiAnswe
 import { cx } from "@/lib/cx";
 import { syncSectionHref } from "@/lib/store-order";
 import { inspectDropiAuthorization, probeOfficialDropi, type DropiAdvertisement, type DropiProbe } from "@/server/dropi-read";
+import { probeOpenAIAction, type ProbeOpenAIState } from "@/server/openai-actions";
 
 const initial: DropiProbe | null = null;
 const initialAdvertisement: DropiAdvertisement | null = null;
+const openaiInitial: ProbeOpenAIState = { error: null, result: null };
 const capabilityGrid = "md:grid-cols-[minmax(0,1fr)_7.5rem_minmax(0,1.4fr)]";
 
 export function ConnectionsScreen({
   healthOk,
   tenantPilotOk,
+  openaiConnected = false,
+  openaiKeyConfigured = false,
   connection,
   jobs,
+  canProbeOpenAI = false,
 }: {
   healthOk: boolean;
   tenantPilotOk: boolean;
+  openaiConnected?: boolean;
+  openaiKeyConfigured?: boolean;
   connection: DropiConnectionState;
   jobs: DropiQueuedJob[];
+  canProbeOpenAI?: boolean;
 }) {
   const [probe, action, pending] = useActionState(probeOfficialDropi, initial);
   const [advertisement, inspect, inspecting] = useActionState(inspectDropiAuthorization, initialAdvertisement);
+  const [openaiProbe, openaiAction, openaiPending] = useActionState(probeOpenAIAction, openaiInitial);
 
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
@@ -108,7 +117,7 @@ export function ConnectionsScreen({
               Plataforma COMPRUKI
             </h2>
             <p className="mt-1 text-xs leading-5 text-muted">
-              Estado local del piloto. OpenAI no está conectado. Ver este estado no cobra ni cambia pedidos. El checkout no depende de Dropi.
+              Estado local del piloto. Ver este estado no cobra ni cambia pedidos. El checkout no depende de Dropi ni de OpenAI.
             </p>
             <ul className="mt-3 grid gap-2 sm:grid-cols-2 text-sm">
               <li className="rounded-[10px] border border-line px-3 py-2">
@@ -119,11 +128,50 @@ export function ConnectionsScreen({
                 <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda piloto</p>
                 <p className="mt-0.5 font-semibold">{tenantPilotOk ? "tienda-piloto" : "No responde"}</p>
               </li>
-              <li className="rounded-[10px] border border-line px-3 py-2">
+              <li className="rounded-[10px] border border-line px-3 py-2 sm:col-span-2">
                 <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">OpenAI</p>
-                <p className="mt-0.5 font-semibold text-warning">No conectado</p>
+                <p className={`mt-0.5 font-semibold ${openaiConnected || openaiProbe.result?.ok ? "text-ink" : "text-warning"}`}>
+                  {openaiProbe.result?.ok || openaiConnected
+                    ? "Conectado"
+                    : openaiKeyConfigured || openaiProbe.result?.keyConfigured
+                      ? "Clave presente · prueba falló"
+                      : "No conectado"}
+                </p>
+                <p className="mt-0.5 text-xs leading-5 text-muted">
+                  {openaiProbe.result?.detail ??
+                    (openaiConnected
+                      ? "La última prueba de health respondió OK. Agentes P0 siguen locales hasta AG-1."
+                      : openaiKeyConfigured
+                        ? "Hay OPENAI_API_KEY. Prueba la conexión; el checkout no depende de OpenAI."
+                        : "Falta OPENAI_API_KEY en el servidor. El checkout no depende de OpenAI.")}
+                </p>
+                {canProbeOpenAI ? (
+                  <form action={openaiAction} className="mt-2">
+                    <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+                      <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                      <button
+                        type="submit"
+                        disabled={openaiPending}
+                        title="Probar no cobra ni cambia pedidos. No envía datos de la tienda."
+                        className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-60"
+                      >
+                        {openaiPending ? "Probando…" : "Probar OpenAI"}
+                      </button>
+                    </nav>
+                  </form>
+                ) : null}
+                {openaiProbe.error ? (
+                  <p role="alert" className="mt-2 text-sm font-medium text-danger">
+                    {openaiProbe.error}
+                  </p>
+                ) : null}
+                {openaiProbe.result?.ok ? (
+                  <p role="status" className="mt-2 text-sm font-medium text-accent-strong">
+                    {openaiProbe.result.detail}
+                  </p>
+                ) : null}
               </li>
-              <li className="rounded-[10px] border border-line px-3 py-2">
+              <li className="rounded-[10px] border border-line px-3 py-2 sm:col-span-2">
                 <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Agentes prioritarios</p>
                 <p className="mt-0.5 font-semibold">Modo determinista</p>
                 <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">

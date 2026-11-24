@@ -3,6 +3,7 @@ import { AGENT_ROLES, type AgentRoleDefinition } from "@/lib/agents/roles";
 import { listPendingApprovals, type PendingApproval } from "@/server/agent-central";
 import { listProducts } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
+import { probeOpenAI } from "@/server/openai-client";
 import { probeProductQuestionsTable } from "@/server/product-questions";
 import { getPilotTenantId } from "@/server/tenant";
 
@@ -53,23 +54,30 @@ export type AgentCenterView = {
   }>;
 };
 
-/** Puerta de agentes: sin OpenAI aún. El checkout no depende de este módulo. */
-export function getAgentGatewayStatus(): AgentGatewayStatus {
+/** Puerta de agentes AG-0. El checkout no depende de este módulo. */
+export async function getAgentGatewayStatus(): Promise<AgentGatewayStatus> {
+  const openai = await probeOpenAI();
+  const openaiConnected = openai.ok;
+  const openaiBit = openaiConnected
+    ? "OpenAI respondió a la prueba de conexión."
+    : openai.keyConfigured
+      ? `OpenAI no confirmó: ${openai.detail}`
+      : "OpenAI no está conectado (falta OPENAI_API_KEY).";
+
   return {
-    openaiConnected: false,
+    openaiConnected,
     dropiConnected: false,
     checkoutIndependent: true,
-    message:
-      "Piloto P0-IA en modo determinista: Central, Explorador, Creador y Analista usan datos locales. OpenAI no está conectado. Dropi no está conectado. Pedidos y checkout siguen por su cuenta.",
+    message: `Piloto P0-IA: Central, Explorador, Creador y Analista siguen con datos locales. ${openaiBit} Dropi no está conectado. Pedidos y checkout siguen por su cuenta.`,
   };
 }
 
 export async function getAgentCenterView(): Promise<AgentCenterView> {
-  const status = getAgentGatewayStatus();
   const configs = await loadAgentConfigs();
   const configById = new Map(configs.map((row) => [row.agentId, row]));
 
-  const [products, orders, recentRuns, monthSpend, pendingApprovals, productQuestionsReady] = await Promise.all([
+  const [status, products, orders, recentRuns, monthSpend, pendingApprovals, productQuestionsReady] = await Promise.all([
+    getAgentGatewayStatus(),
     listProducts(),
     listOrders(),
     loadRecentRuns(),

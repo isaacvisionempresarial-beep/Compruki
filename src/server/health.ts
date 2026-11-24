@@ -1,4 +1,5 @@
 import { createAdminSupabase } from "@/lib/supabase/admin";
+import { openAIKeyConfigured, probeOpenAI } from "@/server/openai-client";
 import { probeProductQuestionsTable } from "@/server/product-questions";
 
 export type HealthChecks = {
@@ -9,12 +10,14 @@ export type HealthChecks = {
   tenantPilot: boolean;
   /** Tabla AG-05; no bloquea ok del deploy. */
   productQuestions: boolean;
+  /** Clave presente; el probe vivo va en openaiConnected. No bloquea ok. */
+  openaiKey: boolean;
 };
 
 export type HealthSnapshot = {
   ok: boolean;
   dropiConnected: false;
-  openaiConnected: false;
+  openaiConnected: boolean;
   checks: HealthChecks;
 };
 
@@ -32,6 +35,7 @@ export async function getHealthSnapshot(): Promise<HealthSnapshot> {
     ),
     tenantPilot: false,
     productQuestions: false,
+    openaiKey: openAIKeyConfigured(),
   };
 
   if (checks.supabaseUrl && checks.serviceRole) {
@@ -45,13 +49,16 @@ export async function getHealthSnapshot(): Promise<HealthSnapshot> {
     checks.productQuestions = await probeProductQuestionsTable();
   }
 
+  const openaiProbe = await probeOpenAI();
+  const openaiConnected = openaiProbe.ok;
+
   const ok =
     checks.siteUrl && checks.supabaseUrl && checks.supabaseAnon && checks.serviceRole && checks.tenantPilot;
 
   return {
     ok,
     dropiConnected: false,
-    openaiConnected: false,
+    openaiConnected,
     checks,
   };
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ConnectionsScreen } from "@/components/panel/connections-screen";
 import { readDropiQueue } from "@/server/dropi-connection";
 import { getHealthSnapshot } from "@/server/health";
+import { requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
   title: "Conexiones",
@@ -11,13 +12,16 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function ConnectionsPage() {
-  const [health, queue] = await Promise.all([getHealthSnapshot(), readDropiQueue()]);
+  const [access, health, queue] = await Promise.all([requirePanelAccess(), getHealthSnapshot(), readDropiQueue()]);
   return (
     <ConnectionsScreen
       healthOk={health.ok}
       tenantPilotOk={health.checks.tenantPilot}
+      openaiConnected={health.openaiConnected}
+      openaiKeyConfigured={health.checks.openaiKey}
       connection={queue.connection}
       jobs={queue.jobs}
+      canProbeOpenAI={access.role === "owner"}
     />
   );
 }

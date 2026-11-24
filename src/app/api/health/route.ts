@@ -3,7 +3,7 @@ import { getHealthSnapshot } from "@/server/health";
 
 export const dynamic = "force-dynamic";
 
-/** Readiness liviano para deploy. No expone secretos ni consulta Dropi/OpenAI. */
+/** Readiness liviano para deploy. No expone secretos. openaiConnected no bloquea el 200. */
 export async function GET() {
   const snapshot = await getHealthSnapshot();
 
