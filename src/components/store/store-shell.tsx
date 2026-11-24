@@ -36,7 +36,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
     <div className="store-surface min-h-dvh">
       <header className="sticky top-0 z-20 border-b border-line/80 bg-card/80 backdrop-blur-md">
         <div className={cx("mx-auto flex h-14 items-center justify-between gap-3 px-4", shellWidth)}>
-          <Link href="/tienda" title="Ir al inicio no registra pedido ni cobra." className="rounded-[10px]" aria-label="COMPRUKI, inicio de la tienda">
+          <Link href="/tienda" target="_self" title="Ir al inicio no registra pedido ni cobra." className="rounded-[10px]" aria-label="COMPRUKI, inicio de la tienda">
             <Wordmark className="[&_span]:store-display [&_span]:text-[15px]" />
           </Link>
           <div className="flex items-center gap-2">
@@ -58,6 +58,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
             ) : null}
             <Link
               href="/tienda/carrito"
+              target="_self"
               title="Abrir el carrito no cobra ni registra un pedido."
               aria-label={ready ? (count === 1 ? "Carrito, 1 producto" : `Carrito, ${count} productos`) : "Carrito"}
               className="inline-flex h-10 items-center gap-2 rounded-[12px] border border-line bg-canvas/90 px-3 text-sm font-semibold transition-colors hover:border-accent/40 hover:bg-card"
@@ -80,6 +81,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
         <div className={cx("mx-auto grid grid-cols-3", shellWidth)}>
           <Link
             href="/tienda"
+            target="_self"
             title="Ir a inicio no cobra ni registra un pedido."
             aria-current={home ? "page" : undefined}
             className={cx(
@@ -92,6 +94,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
           </Link>
           <Link
             href="/tienda/consultar"
+            target="_self"
             title="Consultar no cobra ni cambia el total guardado."
             aria-current={order ? "page" : undefined}
             className={cx(
@@ -104,6 +107,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
           </Link>
           <Link
             href="/tienda/carrito"
+            target="_self"
             title="Abrir el carrito no cobra ni registra un pedido."
             aria-current={cart ? "page" : undefined}
             aria-label={ready ? (count === 1 ? "Carrito, 1 producto" : `Carrito, ${count} productos`) : "Carrito"}

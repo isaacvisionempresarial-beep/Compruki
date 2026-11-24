@@ -1,13 +1,65 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
 import { Wordmark } from "@/components/brand/wordmark";
 import { Icon, type IconName } from "@/components/icons";
 import { cx } from "@/lib/cx";
 import { useRouteFocus } from "@/lib/use-route-focus";
 import { signOut } from "@/server/auth";
+
+/** Enlaces del menú del panel: siempre misma pestaña (salvo Ctrl/Cmd+clic). */
+function PanelMenuLink({
+  href,
+  title,
+  className,
+  children,
+  onCloseMenu,
+  "aria-current": ariaCurrent,
+  "aria-label": ariaLabel,
+}: {
+  href: string;
+  title?: string;
+  className?: string;
+  children: ReactNode;
+  onCloseMenu?: () => void;
+  "aria-current"?: "page" | undefined;
+  "aria-label"?: string;
+}) {
+  const router = useRouter();
+
+  function go(event: MouseEvent<HTMLAnchorElement>) {
+    if (event.defaultPrevented) return;
+    if (event.button !== 0) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    onCloseMenu?.();
+    router.push(href);
+  }
+
+  return (
+    <Link
+      href={href}
+      target="_self"
+      title={title}
+      aria-current={ariaCurrent}
+      aria-label={ariaLabel}
+      className={className}
+      onClick={go}
+    >
+      {children}
+    </Link>
+  );
+}
 
 const PanelQueryContext = createContext("");
 
@@ -130,7 +182,7 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
               aria-modal="true"
               aria-label="Menú del panel"
             >
-              <Sidebar storeName={storeName} onNavigate={() => setOpen(false)} showClose />
+              <Sidebar storeName={storeName} onCloseMenu={() => setOpen(false)} showClose />
             </div>
           </div>
         ) : null}
@@ -183,13 +235,13 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
                 <span className="hidden text-[10px] font-bold tracking-[0.08em] text-muted uppercase min-[1200px]:inline">
                   Vista
                 </span>
-                <a
+                <PanelMenuLink
                   href="/ingresar?modo=nueva-clave"
                   title="Abrirla no cobra ni cambia pedidos."
                   className="inline-flex h-9 items-center rounded-[10px] px-2 text-sm font-semibold text-accent-strong hover:bg-subtle"
                 >
                   Clave
-                </a>
+                </PanelMenuLink>
               </nav>
               <nav aria-label="Herramientas" className="flex shrink-0 flex-wrap items-center gap-1">
                 <span className="sr-only">Herramientas</span>
@@ -218,11 +270,11 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
 
 function Sidebar({
   storeName,
-  onNavigate,
+  onCloseMenu,
   showClose = false,
 }: {
   storeName: string;
-  onNavigate?: () => void;
+  onCloseMenu?: () => void;
   showClose?: boolean;
 }) {
   const pathname = usePathname();
@@ -230,9 +282,14 @@ function Sidebar({
   return (
     <div className="flex h-dvh flex-col bg-primary-dark text-on-dark">
       <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3">
-        <Link href="/panel" title="Ir al panel no cobra ni cambia pedidos." className="rounded-[10px]" onClick={onNavigate}>
+        <PanelMenuLink
+          href="/panel"
+          title="Ir al panel no cobra ni cambia pedidos."
+          className="rounded-[10px]"
+          onCloseMenu={onCloseMenu}
+        >
           <Wordmark onDark badge />
-        </Link>
+        </PanelMenuLink>
         {showClose ? (
           <button
             type="button"
@@ -240,7 +297,7 @@ function Sidebar({
             className="grid h-10 w-10 place-items-center rounded-[10px] hover:bg-white/10"
             aria-label="Cerrar menú"
             title="Cerrarlo no cobra ni cambia pedidos."
-            onClick={onNavigate}
+            onClick={onCloseMenu}
           >
             <Icon name="close" className="h-5 w-5" />
           </button>
@@ -259,11 +316,11 @@ function Sidebar({
                 const active = item.href === "/panel" ? pathname === "/panel" : pathname.startsWith(item.href);
                 return (
                   <li key={item.id}>
-                    <Link
+                    <PanelMenuLink
                       href={item.href}
                       title={navTitle(item.href)}
                       aria-current={active ? "page" : undefined}
-                      onClick={onNavigate}
+                      onCloseMenu={onCloseMenu}
                       className={
                         active
                           ? "flex h-9 items-center gap-2.5 rounded-[10px] bg-[#EEF2FA] px-3 text-sm font-semibold text-primary"
@@ -272,7 +329,7 @@ function Sidebar({
                     >
                       <Icon name={item.icon} className={cx("h-4 w-4", active ? "text-accent-strong" : undefined)} />
                       {item.label}
-                    </Link>
+                    </PanelMenuLink>
                   </li>
                 );
               })}
@@ -291,14 +348,14 @@ function Sidebar({
         </p>
         <div className="mt-1.5 flex items-center gap-2">
           <p className="min-w-0 flex-1 truncate text-xs font-semibold leading-4">{storeName}</p>
-          <Link
+          <PanelMenuLink
             href="/tienda"
             title="Abrirla no cobra ni cambia pedidos."
             className="inline-flex h-7 shrink-0 items-center rounded-[8px] border border-white/15 bg-white/5 px-2 text-[11px] font-semibold text-on-dark hover:bg-white/10"
-            onClick={onNavigate}
+            onCloseMenu={onCloseMenu}
           >
             Abrir tienda
-          </Link>
+          </PanelMenuLink>
         </div>
       </div>
     </div>
