@@ -49,22 +49,29 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
   return (
     <div className="store-home">
       <section
-        className="store-hero-bleed store-rise relative -mx-4 overflow-hidden border-b border-line/70 px-4 pt-5 pb-8 sm:pt-7 sm:pb-10"
+        className="store-hero-bleed relative -mx-4 overflow-hidden border-b border-line/70 px-4 pt-5 pb-8 sm:pt-7 sm:pb-10"
         aria-labelledby="tienda-marca"
       >
         <div className="store-hero-glow" aria-hidden="true" />
         <div className="relative grid gap-8 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] sm:items-stretch sm:gap-8 lg:gap-12">
           <div className="flex min-w-0 flex-col justify-center">
-            <p id="tienda-marca" className="store-display text-[13px] font-bold tracking-[0.16em] text-accent-strong uppercase">
+            <p
+              id="tienda-marca"
+              className="store-display store-rise text-[13px] font-bold tracking-[0.16em] text-accent-strong uppercase"
+              style={{ animationDelay: "40ms" }}
+            >
               COMPRUKI
             </p>
-            <h1 className="store-display mt-3 max-w-[12ch] text-[2.6rem] leading-[0.98] font-extrabold tracking-[-0.045em] text-ink sm:text-[3.35rem]">
+            <h1
+              className="store-display store-rise mt-3 max-w-[12ch] text-[2.6rem] leading-[0.98] font-extrabold tracking-[-0.045em] text-ink sm:text-[3.35rem]"
+              style={{ animationDelay: "110ms" }}
+            >
               Pagas al recibir
             </h1>
-            <p className="mt-4 max-w-md text-[15px] leading-6 text-muted">
+            <p className="store-rise mt-4 max-w-md text-[15px] leading-6 text-muted" style={{ animationDelay: "180ms" }}>
               Elige, deja el pedido y paga cuando te llegue. El envío se acuerda aparte. Nadie cobra aquí.
             </p>
-            <div className="mt-6 flex flex-wrap items-center gap-2.5">
+            <div className="store-rise mt-6 flex flex-wrap items-center gap-2.5" style={{ animationDelay: "250ms" }}>
               <a
                 href="#catalogo-publicado"
                 title="Verlos no cambia los precios publicados ni crea un pedido."
@@ -82,7 +89,10 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
             </div>
           </div>
 
-          <div className="store-hero-stage relative min-h-[260px] sm:min-h-full sm:min-h-[320px]">
+          <div
+            className="store-hero-stage store-rise relative min-h-[260px] sm:min-h-full sm:min-h-[320px]"
+            style={{ animationDelay: "160ms" }}
+          >
             {heroProduct?.hasImage ? (
               <Link
                 href={`/tienda/producto/${heroProduct.sku}`}
@@ -90,12 +100,14 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
                 className="store-hero-photo group absolute inset-0 overflow-hidden rounded-[8px] sm:rounded-[14px] outline-none"
                 aria-label={`Ver ${heroProduct.title}`}
               >
-                <CatalogPhoto
-                  sku={heroProduct.sku}
-                  alt={heroProduct.title}
-                  frameClassName="h-full min-h-[260px] sm:min-h-[320px]"
-                  imgClassName="h-full min-h-[260px] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03] sm:min-h-[320px]"
-                />
+                <div className="store-hero-photo-live h-full w-full">
+                  <CatalogPhoto
+                    sku={heroProduct.sku}
+                    alt={heroProduct.title}
+                    frameClassName="h-full min-h-[260px] sm:min-h-[320px]"
+                    imgClassName="h-full min-h-[260px] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03] sm:min-h-[320px]"
+                  />
+                </div>
               </Link>
             ) : (
               <div className="store-hero-photo absolute inset-0 grid place-items-center rounded-[8px] px-6 text-center sm:rounded-[14px]">
@@ -109,7 +121,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
         </div>
       </section>
 
-      <section className="store-rise mt-2 border-y border-line/80 py-4" aria-labelledby="como-pedir" style={{ animationDelay: "80ms" }}>
+      <section className="store-rise mt-2 border-y border-line/80 py-4" aria-labelledby="como-pedir" style={{ animationDelay: "280ms" }}>
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-[10px] font-bold tracking-[0.1em] text-muted uppercase">En 3 pasos</p>
@@ -130,8 +142,12 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
             { step: "1", title: "Elige", text: "Entra a la ficha, elige talla o tamaño y agrega al carrito." },
             { step: "2", title: "Confirma", text: "Dejas tus datos. El pedido queda pendiente. Nadie cobra aquí." },
             { step: "3", title: "Recibe", text: "Pagas al recibir. Consulta con el número y tu celular." },
-          ].map((item) => (
-            <li key={item.step} className="flex gap-3">
+          ].map((item, index) => (
+            <li
+              key={item.step}
+              className="store-rise flex gap-3"
+              style={{ animationDelay: `${320 + index * 70}ms` }}
+            >
               <span className="store-display grid h-9 w-9 shrink-0 place-items-center rounded-[12px] bg-accent-tint text-sm font-extrabold text-accent-strong">
                 {item.step}
               </span>
@@ -144,7 +160,7 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
         </ol>
       </section>
 
-      <section className="store-rise mt-6 min-w-0" aria-labelledby="catalogo-publicado" style={{ animationDelay: "140ms" }}>
+      <section className="store-rise mt-6 min-w-0" aria-labelledby="catalogo-publicado" style={{ animationDelay: "420ms" }}>
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-[10px] font-bold tracking-[0.1em] text-muted uppercase">Catálogo</p>

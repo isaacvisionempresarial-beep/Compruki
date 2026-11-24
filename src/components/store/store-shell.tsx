@@ -34,7 +34,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="store-surface min-h-dvh">
-      <header className="sticky top-0 z-20 border-b border-line/80 bg-card/80 backdrop-blur-md">
+      <header className="store-chrome-in sticky top-0 z-20 border-b border-line/80 bg-card/80 backdrop-blur-md">
         <div className={cx("mx-auto flex h-14 items-center justify-between gap-3 px-4", shellWidth)}>
           <Link href="/tienda" target="_self" title="Ir al inicio no registra pedido ni cobra." className="rounded-[10px]" aria-label="COMPRUKI, inicio de la tienda">
             <Wordmark className="[&_span]:store-display [&_span]:text-[15px]" />
@@ -67,17 +67,32 @@ export function StoreShell({ children }: { children: ReactNode }) {
               <span className="hidden sm:inline" aria-hidden="true">
                 Carrito
               </span>
-              <span className="min-w-5 rounded-[8px] bg-primary px-1.5 text-center text-xs text-on-dark tabular-nums" aria-live="polite">
+              <span
+                className={cx(
+                  "min-w-5 rounded-[8px] bg-primary px-1.5 text-center text-xs text-on-dark tabular-nums",
+                  ready && count > 0 ? "store-cart-badge-live" : "",
+                )}
+                aria-live="polite"
+              >
                 {ready ? count : 0}
               </span>
             </Link>
           </div>
         </div>
       </header>
-      <main id="contenido" tabIndex={-1} className={cx("mx-auto px-4 pt-4 pb-[5.25rem] outline-none", shellWidth)}>
+      <main
+        key={pathname}
+        id="contenido"
+        tabIndex={-1}
+        className={cx("store-page-enter mx-auto px-4 pt-4 pb-[5.25rem] outline-none", shellWidth)}
+      >
         {children}
       </main>
-      <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line/80 bg-card/92 backdrop-blur-md" aria-label="Tienda">
+      <nav
+        className="store-chrome-in fixed inset-x-0 bottom-0 z-20 border-t border-line/80 bg-card/92 backdrop-blur-md"
+        style={{ animationDelay: "60ms" }}
+        aria-label="Tienda"
+      >
         <div className={cx("mx-auto grid grid-cols-3", shellWidth)}>
           <Link
             href="/tienda"
@@ -85,7 +100,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
             title="Ir a inicio no cobra ni registra un pedido."
             aria-current={home ? "page" : undefined}
             className={cx(
-              "flex h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold sm:flex-row sm:gap-2 sm:text-sm",
+              "flex h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors sm:flex-row sm:gap-2 sm:text-sm",
               home ? "store-nav-active" : "text-muted",
             )}
           >
@@ -98,7 +113,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
             title="Consultar no cobra ni cambia el total guardado."
             aria-current={order ? "page" : undefined}
             className={cx(
-              "flex h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold sm:flex-row sm:gap-2 sm:text-sm",
+              "flex h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors sm:flex-row sm:gap-2 sm:text-sm",
               order ? "store-nav-active" : "text-muted",
             )}
           >
@@ -112,7 +127,7 @@ export function StoreShell({ children }: { children: ReactNode }) {
             aria-current={cart ? "page" : undefined}
             aria-label={ready ? (count === 1 ? "Carrito, 1 producto" : `Carrito, ${count} productos`) : "Carrito"}
             className={cx(
-              "flex h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold sm:flex-row sm:gap-2 sm:text-sm",
+              "flex h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors sm:flex-row sm:gap-2 sm:text-sm",
               cart ? "store-nav-active" : "text-muted",
             )}
           >

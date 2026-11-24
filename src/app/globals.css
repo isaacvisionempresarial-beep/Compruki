@@ -140,7 +140,7 @@ body {
     radial-gradient(circle at 30% 40%, rgb(37 199 165 / 0.18), transparent 42%),
     radial-gradient(circle at 78% 30%, rgb(255 138 101 / 0.12), transparent 38%);
   filter: blur(8px);
-  animation: store-glow-drift 12s ease-in-out infinite alternate;
+  animation: store-glow-drift 14s ease-in-out infinite alternate;
 }
 
 .store-hero-photo {
@@ -149,6 +149,23 @@ body {
   box-shadow:
     0 24px 48px -28px rgb(23 26 40 / 0.45),
     0 0 0 1px rgb(34 38 56 / 0.04);
+}
+
+.store-hero-photo-live {
+  will-change: transform;
+  animation: store-hero-drift 22s ease-in-out infinite alternate;
+}
+
+.store-page-enter {
+  animation: store-page-enter 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.store-chrome-in {
+  animation: store-chrome-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.store-cart-badge-live {
+  animation: store-badge-soft 2.6s ease-in-out infinite;
 }
 
 .store-toolbar {
@@ -160,7 +177,16 @@ body {
     transform: translate3d(0, 0, 0) scale(1);
   }
   to {
-    transform: translate3d(2%, 3%, 0) scale(1.04);
+    transform: translate3d(2.5%, 4%, 0) scale(1.05);
+  }
+}
+
+@keyframes store-hero-drift {
+  from {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.04) translate3d(-1.2%, 1.4%, 0);
   }
 }
 
@@ -183,6 +209,38 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes store-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes store-chrome-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes store-badge-soft {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.07);
   }
 }
 
