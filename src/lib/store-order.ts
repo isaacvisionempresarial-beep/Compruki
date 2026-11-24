@@ -588,6 +588,29 @@ export function orderFocusHref(number: string) {
   return `/panel/pedidos/${encodeURIComponent(number)}`;
 }
 
+export type OrderDetailSectionId =
+  | "pedido-resumen"
+  | "pedido-herramientas"
+  | "pedido-productos"
+  | "pedido-entrega"
+  | "pedido-dropi"
+  | "pedido-avisos"
+  | "pedido-historial";
+
+export const ORDER_DETAIL_SECTION_IDS: readonly OrderDetailSectionId[] = [
+  "pedido-resumen",
+  "pedido-herramientas",
+  "pedido-productos",
+  "pedido-entrega",
+  "pedido-dropi",
+  "pedido-avisos",
+  "pedido-historial",
+];
+
+export function orderDetailSectionHref(number: string, section: OrderDetailSectionId) {
+  return `${orderFocusHref(number)}#${section}`;
+}
+
 export function syncFocusHref(number: string) {
   return `/panel/sincronizacion/${encodeURIComponent(number)}`;
 }

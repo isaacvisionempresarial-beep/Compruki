@@ -67,6 +67,8 @@ import {
   orderPriceStayNote,
   payableTotalLabel,
   attentionQueueOpensSync,
+  ORDER_DETAIL_SECTION_IDS,
+  orderDetailSectionHref,
   syncFocusHref,
   syncSectionHref,
   readyToConfirm,
@@ -505,6 +507,7 @@ export function OrderEditor({
   const phoneMatches = samePhoneMatches(order, orders);
   const departmentNote = missingDepartmentNote(order);
   const sizeNote = missingSizeNote(order, sizeGuides);
+  usePanelSectionHash(ORDER_DETAIL_SECTION_IDS);
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
       {!canManageOrderMoney ? (
@@ -555,7 +558,7 @@ export function OrderEditor({
 
 <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-resumen">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Situación</p>
-        <h2 id="pedido-resumen" className="mt-0.5 text-sm font-semibold">Estado</h2>
+        <h2 id="pedido-resumen" className="mt-0.5 scroll-mt-24 text-sm font-semibold">Estado</h2>
         <p className="mt-2 text-sm font-extrabold tabular-nums">Total guardado {formatCop(order.total)}</p>
         <p className={cx("mt-1 text-xs leading-5", collectedWithoutCost(order) ? "text-warning" : "text-muted")}>
           {moneyNote(order, margin)}
@@ -590,7 +593,25 @@ export function OrderEditor({
           </p>
         ) : null}
         {awaitsDropiNumber(order) || needsIncidenceDropiNumber(order) || needsClosedDropiNumber(order) ? (
-          <p className="mt-1 text-xs leading-5 text-warning">Falta número Dropi — ver Sincronización.</p>
+          <p className="mt-1 text-xs leading-5 text-warning">
+            Falta número Dropi —{" "}
+            <Link
+              href={orderDetailSectionHref(order.number, "pedido-dropi")}
+              title="Ir a Sincronización en este pedido no cobra. El total guardado no cambia."
+              className="font-semibold underline decoration-warning/40 underline-offset-2 hover:decoration-warning"
+            >
+              ver en este pedido
+            </Link>
+            {" · "}
+            <Link
+              href={syncFocusHref(order.number)}
+              title="Abrirla no cobra. El total guardado no cambia."
+              className="font-semibold underline decoration-warning/40 underline-offset-2 hover:decoration-warning"
+            >
+              abrir Sincronización
+            </Link>
+            .
+          </p>
         ) : null}
         {readyToPrepare(order) ? (
           <p className="mt-1 text-xs leading-5 text-warning">{prepareQueueNote(order)}</p>
@@ -605,7 +626,7 @@ export function OrderEditor({
 
 <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-herramientas">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</p>
-        <h2 id="pedido-herramientas" className="mt-0.5 text-sm font-semibold">Herramientas del pedido</h2>
+        <h2 id="pedido-herramientas" className="mt-0.5 scroll-mt-24 text-sm font-semibold">Herramientas del pedido</h2>
         {actions.length > 0 || prepareDropiError(order) || resolveBlocked || confirmBlocked ? (
           <>
           {actions.some((item) => needsCustomerReason(item.id)) ? (
@@ -704,9 +725,24 @@ export function OrderEditor({
               ) : null}
               {prepareDropiError(order) ? (
                 <p className="mt-3 max-w-xl text-sm leading-5 text-ink">
-                  «Pasar a preparación» sigue bloqueado hasta anotar un número en Sincronización.{" "}
-                  {blockedDropiAnswer("createOrder").detail} Pasar a preparación no cambia el total guardado. Si más adelante anotas ese número y usas el botón, el
-                  mensaje para el cliente queda así.
+                  «Pasar a preparación» sigue bloqueado hasta anotar un número en{" "}
+                  <Link
+                    href={orderDetailSectionHref(order.number, "pedido-dropi")}
+                    title="Ir a Sincronización en este pedido no cobra. El total guardado no cambia."
+                    className="font-semibold text-accent-strong"
+                  >
+                    este pedido
+                  </Link>
+                  {" o en "}
+                  <Link
+                    href={syncFocusHref(order.number)}
+                    title="Abrirla no cobra. El total guardado no cambia."
+                    className="font-semibold text-accent-strong"
+                  >
+                    Sincronización
+                  </Link>
+                  . {blockedDropiAnswer("createOrder").detail} Pasar a preparación no cambia el total guardado. Si más
+                  adelante anotas ese número y usas el botón, el mensaje para el cliente queda así.
                   <span className="mt-1 block font-normal text-muted">
                     {customerMessage({ ...order, status: "en_preparacion" })}
                   </span>
@@ -760,7 +796,7 @@ export function OrderEditor({
       <div className="mt-3 grid items-start gap-3 lg:grid-cols-2">
 <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-productos">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Líneas</p>
-        <h2 id="pedido-productos" className="mt-0.5 text-sm font-semibold">Productos</h2>
+        <h2 id="pedido-productos" className="mt-0.5 scroll-mt-24 text-sm font-semibold">Productos</h2>
         {canEditLines(order) ? (
           <>
             <LinesForm order={order} products={products} canManageOrderMoney={canManageOrderMoney} />
@@ -794,7 +830,7 @@ export function OrderEditor({
 
 <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-entrega">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Destino</p>
-        <h2 id="pedido-entrega" className="mt-0.5 text-sm font-semibold">Entrega</h2>
+        <h2 id="pedido-entrega" className="mt-0.5 scroll-mt-24 text-sm font-semibold">Entrega</h2>
         <p className="mt-2 text-sm text-muted">
           {order.phone}
           {order.document ? ` · Cédula ${order.document}` : ""}
@@ -831,7 +867,7 @@ export function OrderEditor({
 
 <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-dropi">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Dropi</p>
-        <h2 id="pedido-dropi" className="mt-0.5 text-sm font-semibold">Sincronización</h2>
+        <h2 id="pedido-dropi" className="mt-0.5 scroll-mt-24 text-sm font-semibold">Sincronización</h2>
         {canNoteDropiNumber(order) ? (
           <>
           <p className="mt-1.5 text-xs leading-5 text-ink">
@@ -857,7 +893,7 @@ export function OrderEditor({
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-avisos">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Notas</p>
-        <h2 id="pedido-avisos" className="mt-0.5 text-sm font-semibold">Avisos y motivos</h2>
+        <h2 id="pedido-avisos" className="mt-0.5 scroll-mt-24 text-sm font-semibold">Avisos y motivos</h2>
         <div className="mt-2 grid gap-3 xl:grid-cols-2">
           <InternalNoteForm order={order} />
           <IncidenceReasonForm order={order} />
@@ -868,7 +904,7 @@ export function OrderEditor({
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-historial">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Registro</p>
-        <h2 id="pedido-historial" className="mt-0.5 text-sm font-semibold">Historial</h2>
+        <h2 id="pedido-historial" className="mt-0.5 scroll-mt-24 text-sm font-semibold">Historial</h2>
         {order.history.length > 0 ? (
           <div className="mt-2 overflow-hidden rounded-[10px] border border-line">
             {storedUtilityCaveat(order) ? (

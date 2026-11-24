@@ -20,7 +20,7 @@ export function PendingApprovalsPanel({
   return (
     <section className="mt-4" aria-labelledby="pendientes-humanos">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Bandeja</p>
-      <h2 id="pendientes-humanos" className="mt-0.5 text-base font-bold">
+      <h2 id="pendientes-humanos" className="mt-0.5 scroll-mt-24 text-base font-bold">
         Pendientes humanos
       </h2>
       <p className="mt-1 text-sm text-muted">

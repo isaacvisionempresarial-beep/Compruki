@@ -1,5 +1,5 @@
 import { formatCop } from "@/lib/format";
-import { orderFocusHref } from "@/lib/store-order";
+import { orderDetailSectionHref } from "@/lib/store-order";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { buildTemplateDrafts, listPendingContentDrafts } from "@/server/agent-content";
 import { searchLocalCatalog } from "@/server/agent-explorer";
@@ -79,7 +79,10 @@ export async function listPendingApprovals(): Promise<PendingApproval[]> {
         order.status === "incidencia"
           ? `${order.customerName} · incidencia`
           : `${order.customerName} · pendiente de confirmación`,
-      href: orderFocusHref(order.number),
+      href:
+        order.status === "incidencia"
+          ? orderDetailSectionHref(order.number, "pedido-avisos")
+          : orderDetailSectionHref(order.number, "pedido-herramientas"),
       actionable: false,
     }));
 

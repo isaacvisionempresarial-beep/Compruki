@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { AgentBudgetPanel } from "@/components/panel/agent-budget-panel";
 import { CentralRouterPanel } from "@/components/panel/central-router-panel";
@@ -5,6 +7,7 @@ import { ContentCreatorPanel } from "@/components/panel/content-creator-panel";
 import { PendingApprovalsPanel } from "@/components/panel/pending-approvals-panel";
 import { publicationLabel } from "@/lib/catalog";
 import { formatCop } from "@/lib/format";
+import { usePanelSectionHash } from "@/lib/use-panel-section-hash";
 import type { CentralRouteResult } from "@/server/agent-central";
 import type { ContentDraft, ProductFacts, SavedContentDraft } from "@/server/agent-content";
 import type { ExplorerShortlist } from "@/server/agent-explorer";
@@ -50,6 +53,7 @@ export function AgentsScreen({
     ...(ag05 ? [ag05] : []),
   ];
   const later = view.roles.filter((role) => role.priority !== "P0-IA" && role.id !== "AG-05");
+  usePanelSectionHash(["pendientes-humanos", "corridas"]);
   const ag01 = agentIsOn(view, "AG-01");
   const ag02 = agentIsOn(view, "AG-02");
   const ag03 = agentIsOn(view, "AG-03");
@@ -418,7 +422,7 @@ export function AgentsScreen({
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="corridas">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Registro</p>
-        <h2 id="corridas" className="mt-0.5 text-base font-bold">
+        <h2 id="corridas" className="mt-0.5 scroll-mt-24 text-base font-bold">
           Corridas recientes
         </h2>
         <p className="mt-1 text-sm text-muted">
