@@ -4,7 +4,7 @@ import { routeTask } from "@/server/agent-central";
 import { getContentDraftPreview, listContentDrafts, listDraftableProducts } from "@/server/agent-content";
 import { searchLocalCatalog } from "@/server/agent-explorer";
 import { getAgentCenterView } from "@/server/agent-gateway";
-import { getAnalystToolkit } from "@/server/agent-tools";
+import { getAnalystReadingPreview, getAnalystToolkit } from "@/server/agent-tools";
 import { requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
@@ -22,13 +22,17 @@ export default async function AgentsPage({
     categoria?: string;
     sku?: string;
     intent?: string;
+    marginSku?: string;
+    lectura?: string;
     agente?: string;
     agenteError?: string;
   }>;
 }) {
   const params = await searchParams;
   const selectedSku = (params.sku ?? "").trim().toUpperCase();
+  const marginSku = (params.marginSku ?? "").trim().toUpperCase();
   const intent = (params.intent ?? "").trim();
+  const showReading = params.lectura === "1" || Boolean(marginSku);
   const policyError =
     params.agenteError?.trim()
       ? { agentId: (params.agente ?? "").trim() || null, message: params.agenteError.trim() }
@@ -45,10 +49,14 @@ export default async function AgentsPage({
     intent ? routeTask(intent) : Promise.resolve(null),
   ]);
 
+  const reading = showReading ? getAnalystReadingPreview(marginSku || undefined) : null;
+
   return (
     <AgentsScreen
       view={view}
       analyst={analyst}
+      analystReading={reading}
+      marginSku={marginSku}
       explorer={explorer}
       creator={{
         products,

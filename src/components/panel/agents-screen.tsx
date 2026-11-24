@@ -13,7 +13,7 @@ import type { ContentDraft, ProductFacts, SavedContentDraft } from "@/server/age
 import type { ExplorerShortlist } from "@/server/agent-explorer";
 import type { AgentCenterView } from "@/server/agent-gateway";
 import { runAnalystAction, searchExplorerAction } from "@/server/agent-panel-actions";
-import type { AnalystToolkit } from "@/server/agent-tools";
+import type { AnalystReading, AnalystToolkit } from "@/server/agent-tools";
 
 function agentIsOn(view: AgentCenterView, agentId: string) {
   const role = view.roles.find((item) => item.id === agentId);
@@ -24,6 +24,8 @@ function agentIsOn(view: AgentCenterView, agentId: string) {
 export function AgentsScreen({
   view,
   analyst,
+  analystReading = null,
+  marginSku = "",
   explorer,
   creator,
   central,
@@ -33,6 +35,8 @@ export function AgentsScreen({
 }: {
   view: AgentCenterView;
   analyst: AnalystToolkit;
+  analystReading?: AnalystReading | null;
+  marginSku?: string;
   explorer: ExplorerShortlist;
   creator: {
     products: Array<{ sku: string; title: string }>;
@@ -259,11 +263,11 @@ export function AgentsScreen({
       <section className="mt-6" aria-labelledby="analista">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Margen</p>
         <h2 id="analista" className="mt-0.5 text-base font-bold">
-          Analista de rentabilidad (sin OpenAI)
+          Analista de rentabilidad
         </h2>
         <p className="mt-1 text-sm text-muted">
-          Herramientas deterministas AG-04: margen estimado y escenarios ±10 %. «Calcular» solo lee y deja
-          corrida auditable: no cambia el precio
+          AG-04: cifras locales siempre; si OpenAI responde, añade una lectura corta. «Calcular» solo lee y
+          deja corrida auditable: no cambia el precio
           {canApproveCatalog ? "" : " (lo guarda el propietario)"} ni el costo del pedido. No es utilidad
           realizada.
         </p>
@@ -289,6 +293,7 @@ export function AgentsScreen({
               name="marginSku"
               title="Escribirlo no cobra ni cambia pedidos."
               disabled={!ag04}
+              defaultValue={marginSku}
               placeholder="Vacío = todos los productos"
               className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
             />
@@ -305,6 +310,23 @@ export function AgentsScreen({
             </button>
           </nav>
         </form>
+
+        {analystReading ? (
+          <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Lectura</p>
+            <h3 className="mt-0.5 text-sm font-semibold">
+              Vista previa · fuente {analystReading.via === "openai" ? "OpenAI" : "cifras"}
+              {analystReading.costEstimateCop > 0
+                ? ` · costo est. ${analystReading.costEstimateCop} COP`
+                : ""}
+            </h3>
+            <ul className="mt-2 space-y-1.5 text-sm text-muted">
+              {analystReading.bullets.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
         <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Acumulado</p>

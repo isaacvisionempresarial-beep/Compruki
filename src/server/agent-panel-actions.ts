@@ -5,13 +5,8 @@ import { generateContentDrafts } from "@/server/agent-content";
 import { searchLocalCatalog } from "@/server/agent-explorer";
 import { agentDeniedRedirect, evaluateAgentPolicy } from "@/server/agent-policy";
 import { recordAgentRun } from "@/server/agent-runs";
-import { calculateMargin, comparePriceScenarios, getOrderFinancials } from "@/server/agent-tools";
+import { generateAnalystReading } from "@/server/agent-tools";
 import { assertPanelAccess } from "@/server/panel-auth";
-import { formatCop } from "@/lib/format";
-
-function countWord(count: number, one: string, many: string) {
-  return `${count} ${count === 1 ? one : many}`;
-}
 
 function agentesRedirect(params: Record<string, string | undefined>) {
   const sp = new URLSearchParams();
@@ -129,39 +124,22 @@ export async function runAnalystAction(formData: FormData) {
     redirect(agentDeniedRedirect("AG-04", policy.reason, { q, categoria, sku, marginSku: focusSku || undefined }));
   }
 
-  const [margins, scenarios, orders] = await Promise.all([
-    calculateMargin(focusSku || undefined),
-    comparePriceScenarios(focusSku || undefined),
-    getOrderFinancials(),
-  ]);
-
-  const row = margins[0];
-  const scenario = scenarios[0];
-  const down = scenario?.scenarios[0];
-  const up = scenario?.scenarios[2];
-
-  const productNote = row
-    ? focusSku
-      ? `${row.sku}: margen estimado ${formatCop(row.margin)} sobre el precio de la ficha ${formatCop(row.price)}. No es dinero cobrado` +
-        (down && up
-          ? `. ±10 % ${formatCop(down.margin)} / ${formatCop(up.margin)}. No guarda el precio ni es utilidad realizada`
-          : "")
-      : `${margins.length} productos; ${margins.filter((m) => m.margin > 0).length} con margen estimado positivo de la ficha. No es dinero cobrado`
-    : focusSku
-      ? `SKU ${focusSku} no está en el catálogo local`
-      : "Sin productos en catálogo";
+  const reading = await generateAnalystReading(focusSku || undefined);
+  const via = reading.via === "openai" ? "openai" : "cifras";
+  const missingFocus = Boolean(focusSku) && reading.bullets.some((line) => line.includes("no está en el catálogo"));
 
   await recordAgentRun({
     agentId: "AG-04",
-    status: row || !focusSku ? "succeeded" : "failed",
+    status: missingFocus ? "failed" : "succeeded",
+    costEstimateCop: reading.costEstimateCop,
     summary: [
-      "Analista rentabilidad",
-      productNote,
-      `Pedidos: margen estimado ${formatCop(orders.estimatedMargin)} (${countWord(orders.orderCount, "pedido", "pedidos")}). Lectura. No es utilidad realizada ni el total guardado`,
+      `Analista ${via}`,
+      focusSku ? `SKU ${focusSku}` : "catálogo completo",
+      ...reading.bullets.slice(0, 3),
     ].join(" · "),
     createdBy: access.user.id,
     actorName: access.actorName,
   });
 
-  redirect(agentesRedirect({ q, categoria, sku, marginSku: focusSku || undefined }));
+  redirect(agentesRedirect({ q, categoria, sku, marginSku: focusSku || undefined, lectura: "1" }));
 }
