@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useMemo, useState, type ReactNode } from "react";
 import { AttentionSheet } from "@/components/panel/attention-sheet";
 import { CloseSheet } from "@/components/panel/close-sheet";
+import { OrderMessageDraftPanel } from "@/components/panel/order-message-draft-panel";
 import { OrderReadingPanel } from "@/components/panel/order-reading-panel";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
+import type { CustomerMessageDraft } from "@/server/agent-customer-draft";
 import type { OrderReading } from "@/server/agent-order-reading";
 import { parsePesos, sizeChoiceLabel, variantFits } from "@/lib/catalog";
 import { blockedDropiAnswer } from "@/lib/dropi-provider";
@@ -491,6 +493,9 @@ export function OrderEditor({
   orderReading = null,
   orderReadingEnabled = true,
   orderReadingError = null,
+  customerDraft = null,
+  customerDraftEnabled = true,
+  customerDraftError = null,
 }: {
   order: StoreOrder;
   orders: StoreOrder[];
@@ -502,6 +507,9 @@ export function OrderEditor({
   orderReading?: OrderReading | null;
   orderReadingEnabled?: boolean;
   orderReadingError?: string | null;
+  customerDraft?: CustomerMessageDraft | null;
+  customerDraftEnabled?: boolean;
+  customerDraftError?: string | null;
 }) {
   const [state, action, pending] = useActionState(updateOrderAction, initialState);
   const margin = orderMargin(order);
@@ -637,6 +645,13 @@ export function OrderEditor({
         reading={orderReading}
         enabled={orderReadingEnabled}
         policyError={orderReadingError}
+      />
+
+      <OrderMessageDraftPanel
+        orderNumber={order.number}
+        draft={customerDraft}
+        enabled={customerDraftEnabled}
+        policyError={customerDraftError}
       />
 
 <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-herramientas">

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { OrderEditor } from "@/components/panel/orders-screen";
+import { getCustomerDraftPreview } from "@/server/agent-customer-draft";
 import { getOrderReadingPreview } from "@/server/agent-order-reading";
 import { evaluateAgentPolicy } from "@/server/agent-policy";
 import { listCostGuides, listOrderableProducts, listPriceGuides, listSizeGuides } from "@/server/catalog-store";
@@ -20,12 +21,17 @@ export default async function OrderPage({
   searchParams,
 }: {
   params: Promise<{ number: string }>;
-  searchParams: Promise<{ lecturaPedido?: string; agente?: string; agenteError?: string }>;
+  searchParams: Promise<{
+    lecturaPedido?: string;
+    borradorMensaje?: string;
+    agente?: string;
+    agenteError?: string;
+  }>;
 }) {
   const { number } = await params;
   const query = await searchParams;
   const decoded = decodeURIComponent(number);
-  const [orders, access, products, sizeGuides, costGuides, priceGuides, policy] = await Promise.all([
+  const [orders, access, products, sizeGuides, costGuides, priceGuides, policy06, policy07] = await Promise.all([
     listOrders(),
     requirePanelAccess(),
     listOrderableProducts(),
@@ -33,14 +39,15 @@ export default async function OrderPage({
     listCostGuides(),
     listPriceGuides(),
     evaluateAgentPolicy("AG-06"),
+    evaluateAgentPolicy("AG-07"),
   ]);
   const order = orders.find((item) => item.number === decoded);
   if (!order) notFound();
 
-  const showReading = query.lecturaPedido === "1";
-  const reading = showReading ? getOrderReadingPreview(order.number) : null;
-  const orderReadingError =
-    query.agente === "AG-06" && query.agenteError?.trim() ? query.agenteError.trim() : null;
+  const reading = query.lecturaPedido === "1" ? getOrderReadingPreview(order.number) : null;
+  const customerDraft = query.borradorMensaje === "1" ? getCustomerDraftPreview(order.number) : null;
+  const agent = query.agente?.trim() ?? "";
+  const agentError = query.agenteError?.trim() || null;
 
   return (
     <OrderEditor
@@ -52,8 +59,11 @@ export default async function OrderPage({
       costGuides={costGuides}
       canManageOrderMoney={access.role === "owner"}
       orderReading={reading}
-      orderReadingEnabled={policy.ok}
-      orderReadingError={orderReadingError}
+      orderReadingEnabled={policy06.ok}
+      orderReadingError={agent === "AG-06" ? agentError : null}
+      customerDraft={customerDraft}
+      customerDraftEnabled={policy07.ok}
+      customerDraftError={agent === "AG-07" ? agentError : null}
     />
   );
 }
