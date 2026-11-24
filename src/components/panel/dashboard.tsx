@@ -143,60 +143,73 @@ export function Dashboard({
 
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
-      <header className="flex flex-col gap-4 border-b border-line pb-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0">
-          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda</p>
-          <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Hola {greetingName}</h1>
-          <p className="mt-1 text-sm font-semibold">Tu tienda está en modo venta</p>
-          <p className="mt-1 max-w-2xl text-sm leading-5 text-muted">
-            {canManageOrderMoney
-              ? "Primero las cifras del período. Después, la cola por atender. Verlas no cobra ni cambia pedidos. Dropi no está conectado."
-              : "Primero las cifras del período. El flete, el costo, el cobro y los precios los guarda el propietario. Verlas no cobra ni cambia pedidos. Dropi no está conectado."}
-          </p>
+      <header className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3 sm:px-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
+            <h1 className="mt-0.5 text-xl leading-6 font-extrabold tracking-tight sm:text-[22px]">Hola {greetingName}</h1>
+            <p className="mt-0.5 text-sm text-muted">
+              Modo venta · cifras del período y cola por atender. Verlas no cobra ni cambia pedidos.
+              {canManageOrderMoney ? "" : " Flete, costo, cobro y precios los guarda el propietario."}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+              <Link
+                href="/panel/pedidos#por-atender"
+                title="Abrirlos no cobra ni cambia el total guardado."
+                className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3.5 text-sm font-semibold text-on-dark hover:bg-primary-soft"
+              >
+                Atender pedidos
+                {orderWork.yours > 0 ? (
+                  <span className="ml-2 rounded-[8px] bg-on-dark/15 px-1.5 py-0.5 text-xs font-bold tabular-nums">{orderWork.yours}</span>
+                ) : null}
+              </Link>
+            </nav>
+            <nav aria-label="Vista" className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
+              <Link
+                href={agentPendingCount > 0 ? "/panel/agentes#pendientes-humanos" : "/panel/agentes"}
+                title="Abrirlo no cobra ni cambia pedidos."
+                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+              >
+                Agentes
+                {agentPendingCount > 0 ? (
+                  <span className="ml-2 rounded-[8px] bg-coral/15 px-1.5 py-0.5 text-xs font-bold text-coral tabular-nums">{agentPendingCount}</span>
+                ) : null}
+              </Link>
+              <Link
+                href="/panel/agentes?intent=margen%20LAM-MES-01"
+                title="Abrirlo no cobra ni cambia pedidos."
+                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+              >
+                Probar Central
+              </Link>
+              {syncWorkCount > 0 ? (
+                <Link
+                  href={syncSectionHref("sync-crear")}
+                  title="Abrirla no cobra ni cambia el total guardado."
+                  className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+                >
+                  Sync
+                  <span className="ml-2 rounded-[8px] bg-accent-tint px-1.5 py-0.5 text-xs font-bold text-accent-strong tabular-nums">{syncWorkCount}</span>
+                </Link>
+              ) : null}
+            </nav>
+          </div>
         </div>
       </header>
 
-      <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-        <Link
-          href="/panel/pedidos#por-atender"
-          title="Abrirlos no cobra ni cambia el total guardado."
-          className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft"
-        >
-          Atender pedidos
-        </Link>
-      </nav>
-      <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-        <Link
-          href={agentPendingCount > 0 ? "/panel/agentes#pendientes-humanos" : "/panel/agentes"}
-          title="Abrirlo no cobra ni cambia pedidos."
-          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
-        >
-          Centro de agentes
-          {agentPendingCount > 0 ? (
-            <span className="ml-2 rounded-[8px] bg-coral/15 px-2 py-0.5 text-xs font-bold text-coral">{agentPendingCount}</span>
-          ) : null}
-        </Link>
-        <Link
-          href="/panel/agentes?intent=margen%20LAM-MES-01"
-          title="Abrirlo no cobra ni cambia pedidos."
-          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
-        >
-          Probar Central
-        </Link>
-      </nav>
-
       {agentPendingSummary && agentPendingSummary.total > 0 ? (
         <section
-          className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3"
+          className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2.5 sm:px-4"
           aria-labelledby="pendientes-agentes-home"
         >
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Bandeja</p>
-              <h2 id="pendientes-agentes-home" className="mt-0.5 text-sm font-semibold">
-                Pendientes humanos ({agentPendingSummary.total})
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="min-w-0">
+              <h2 id="pendientes-agentes-home" className="text-sm font-semibold">
+                Bandeja · {agentPendingSummary.total} pendiente{agentPendingSummary.total === 1 ? "" : "s"}
               </h2>
               <p className="mt-0.5 text-xs text-muted">
                 {agentPendingSummary.pedidos} pedido{agentPendingSummary.pedidos === 1 ? "" : "s"}
@@ -206,28 +219,28 @@ export function Dashboard({
                 {agentPendingSummary.agentes} corrida{agentPendingSummary.agentes === 1 ? "" : "s"}
                 {" · "}
                 {agentPendingSummary.preguntas} pregunta{agentPendingSummary.preguntas === 1 ? "" : "s"}
-                {canApproveCatalog ? "" : ". Puedes rechazar. Aprobar un borrador, una corrida o una pregunta lo guarda el propietario."}
+                {canApproveCatalog ? "" : ". Aprobar lo guarda el propietario."}
               </p>
             </div>
             <nav aria-label="Vista" className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-              <Link href="/panel/agentes#pendientes-humanos" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+              <Link href="/panel/agentes#pendientes-humanos" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-8 items-center rounded-[10px] border border-line bg-canvas px-2.5 text-sm font-semibold text-ink hover:bg-subtle">
                 Abrir bandeja
               </Link>
               {agentPendingSummary.preguntas > 0 ? (
                 <Link
                   href="/panel/catalogo?filtro=preguntas"
                   title="Ver fichas con preguntas abiertas no cobra ni cambia el precio ni la publicación."
-                  className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+                  className="inline-flex h-8 items-center rounded-[10px] border border-line bg-canvas px-2.5 text-sm font-semibold text-ink hover:bg-subtle"
                 >
-                  Ver en catálogo
+                  Catálogo
                 </Link>
               ) : null}
             </nav>
           </div>
-          <ul className="mt-2 space-y-1.5">
+          <ul className="mt-2 space-y-1">
             {agentPendingSummary.preview.map((item) => (
-              <li key={`${item.kind}-${item.id}`} className="text-sm">
+              <li key={`${item.kind}-${item.id}`} className="truncate text-sm">
                 <span className="mr-2 rounded-[8px] border border-line px-1.5 py-0.5 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
                   {item.kind}
                 </span>
@@ -241,42 +254,40 @@ export function Dashboard({
         </section>
       ) : null}
 
-      <section className="mt-5" aria-labelledby="tienda-titulo">
-        <div className="min-w-0">
-          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda pública</p>
-          <h2 id="tienda-titulo" className="mt-0.5 text-base font-bold leading-7">Pedidos de la tienda</h2>
-          <p className="mt-0.5 max-w-2xl text-xs leading-5 text-muted">
-            Cifras de {closePhrase(storePeriod, basis)}. Pedidos reales de este período. Verlas no cobra ni cambia pedidos.
-            {basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado en ese día." : ""}
-          </p>
-        </div>
-        <div className="elevate-1 mt-3 grid items-stretch gap-4 rounded-[14px] border border-line bg-card px-3 py-3 sm:grid-cols-2 sm:gap-x-6">
-          <div className="flex min-w-0 flex-col">
-            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Fecha</p>
-            <p className="mt-0.5 text-xs leading-5 text-muted">
-              Creados mira cuándo entró el pedido. Movidos incluye uno viejo si cambió en el período. Elegir no cobra.
+      <section className="mt-4" aria-labelledby="tienda-titulo">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda pública</p>
+            <h2 id="tienda-titulo" className="mt-0.5 text-base font-bold leading-6">Pedidos de la tienda</h2>
+            <p className="mt-0.5 max-w-2xl text-xs leading-5 text-muted">
+              {closePhrase(storePeriod, basis)}. Verlas no cobra ni cambia pedidos.
+              {basis === "movidos" ? " El total guardado es el del pedido, no lo cobrado ese día." : ""}
             </p>
-            <div className="mt-3 sm:mt-auto sm:pt-3">
-              <CloseBasisControl basis={basis} onChange={setBasis} name="base-tienda" wide />
-            </div>
-          </div>
-          <div className="flex min-w-0 flex-col">
-            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Período</p>
-            <p className="mt-0.5 text-xs leading-5 text-muted">
-              Solo cambia las cifras de esta sección. No recorta la cola Por atender ni cobra.
-            </p>
-            <div className="mt-3 sm:mt-auto sm:pt-3">
-              <PeriodControl
-                period={storePeriod}
-                onChange={setStorePeriod}
-                name="periodo-tienda"
-                legend="Período de los pedidos de la tienda"
-                wide
-              />
-            </div>
           </div>
         </div>
-        <p className="mt-4 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Totales</p>
+        <div className="elevate-1 mt-2 grid gap-3 rounded-[14px] border border-line bg-card px-3 py-2.5 sm:grid-cols-2 sm:items-center sm:gap-x-5">
+          <div className="min-w-0">
+            <div className="mb-1.5 flex flex-wrap items-baseline justify-between gap-2">
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Fecha</p>
+              <p className="text-[11px] leading-4 text-muted">Creados o movidos. Elegir no cobra.</p>
+            </div>
+            <CloseBasisControl basis={basis} onChange={setBasis} name="base-tienda" wide />
+          </div>
+          <div className="min-w-0">
+            <div className="mb-1.5 flex flex-wrap items-baseline justify-between gap-2">
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Período</p>
+              <p className="text-[11px] leading-4 text-muted">No recorta Por atender ni cobra.</p>
+            </div>
+            <PeriodControl
+              period={storePeriod}
+              onChange={setStorePeriod}
+              name="periodo-tienda"
+              legend="Período de los pedidos de la tienda"
+              wide
+            />
+          </div>
+        </div>
+        <p className="mt-3 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Totales</p>
         <h3 className="mt-0.5 text-sm font-semibold">Totales guardados</h3>
         <p className="mt-0.5 text-xs leading-5 text-muted">Lo que suma el pedido guardado. No es dinero cobrado en el sitio.</p>
         <ul className="mt-2 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
