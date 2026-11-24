@@ -92,9 +92,10 @@ export function ContentCreatorPanel({
           <p className="mt-0.5 text-sm text-muted">Elige un producto para ver hechos y borradores plantilla.</p>
         </div>
       ) : !facts ? (
-        <p role="alert" className="mt-3 rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
-          No encontré ese SKU en el catálogo local.
-        </p>
+        <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3" role="alert">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+          <p className="mt-0.5 text-sm font-medium text-danger">No encontré ese SKU en el catálogo local.</p>
+        </div>
       ) : (
         <>
           <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">

@@ -1101,16 +1101,19 @@ export function ProductEditor({
             Margen estimado de la ficha · no es dinero cobrado de pedidos
           </p>
         </div>
-        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-          <Link
-            href="/panel/catalogo"
-            title="Volver no cobra ni cambia el precio ni la publicación."
-            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
-          >
-            Volver al catálogo
-          </Link>
-        </nav>
+        <div className="shrink-0">
+          <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <Link
+              href="/panel/catalogo"
+              title="Volver no cobra ni cambia el precio ni la publicación."
+              className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
+            >
+              Volver al catálogo
+            </Link>
+          </nav>
+          <p className="mt-2 text-xs leading-5 text-muted">Volver no cobra ni cambia el precio ni la publicación.</p>
+        </div>
       </div>
 
       <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="ficha-resumen">
@@ -1246,8 +1249,8 @@ export function ProductEditor({
                 onChange={onPickImages}
               />
               <input ref={imagesRef} name="images" type="file" multiple className="hidden" tabIndex={-1} aria-hidden="true" />
-              <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+              <nav aria-label="Medios" className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Medios</span>
                 <button
                   type="button"
                   title="Elegirlas no las publica solas. El precio no cambia."
@@ -1275,8 +1278,8 @@ export function ProductEditor({
                 )}
                 <input ref={videoPickerRef} type="file" accept="video/mp4,.mp4" title="Elegirlo no lo publica solo. El precio no cambia." className="sr-only" onChange={onPickVideo} />
                 <input ref={videoRef} name="video" type="file" accept="video/mp4,.mp4" className="hidden" tabIndex={-1} aria-hidden="true" />
-                <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                <nav aria-label="Medios" className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Medios</span>
                   <button
                     type="button"
                     title="Elegirlo no lo publica solo. El precio no cambia."

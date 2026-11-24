@@ -155,9 +155,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
   return (
     <article>
       <nav className="flex items-center gap-2 overflow-hidden text-xs text-muted whitespace-nowrap" aria-label="Ruta">
-        <Link href="/tienda" title="Volver al inicio no registra pedido ni cobra." className="font-semibold hover:text-accent-strong">
-          Inicio
-        </Link>
+        <span>Inicio</span>
         <span aria-hidden="true">/</span>
         {product.category ? (
           <>
@@ -167,6 +165,17 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
         ) : null}
         <strong className="truncate font-bold text-ink">{product.title}</strong>
       </nav>
+      <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <Link
+          href="/tienda"
+          title="Volver al inicio no registra pedido ni cobra."
+          className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+        >
+          Volver a la tienda
+        </Link>
+      </nav>
+      <p className="mt-2 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>
 
       <div className="mt-3 grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,28rem)]">
         <section className="elevate-1 store-hero rounded-[14px] border border-line px-3 py-3" aria-label="Información principal del producto">

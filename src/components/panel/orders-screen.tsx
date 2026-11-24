@@ -1692,8 +1692,8 @@ function LinesForm({
                   />
                 </label>
                 {canManageOrderMoney && lines.length > 1 ? (
-                  <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                  <nav aria-label="Línea" className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Línea</span>
                     <button
                       type="button"
                       title="Quitarla de esta lista no guarda sola. No es dinero cobrado."
