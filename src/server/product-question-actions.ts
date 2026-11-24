@@ -78,21 +78,25 @@ export async function sendProductQuestionAction(
   });
   if (created.error) return { error: created.error, message: null };
 
-  await recordAgentRun({
-    agentId: "AG-05",
-    status: "succeeded",
-    summary: `Handoff humano · ${sku} · ${question.slice(0, 120)}`,
-    costEstimateCop: 0,
-  });
+  if (!created.duplicate) {
+    await recordAgentRun({
+      agentId: "AG-05",
+      status: "succeeded",
+      summary: `Handoff humano · ${sku} · ${question.slice(0, 120)}`,
+      costEstimateCop: 0,
+    });
 
-  revalidatePath("/panel");
-  revalidatePath("/panel/agentes");
-  revalidatePath("/panel/catalogo");
-  revalidatePath(`/panel/catalogo/${encodeURIComponent(sku)}`);
-  revalidatePath(`/tienda/producto/${encodeURIComponent(sku)}`);
+    revalidatePath("/panel");
+    revalidatePath("/panel/agentes");
+    revalidatePath("/panel/catalogo");
+    revalidatePath(`/panel/catalogo/${encodeURIComponent(sku)}`);
+    revalidatePath(`/tienda/producto/${encodeURIComponent(sku)}`);
+  }
 
   return {
     error: null,
-    message: "Quedó en la bandeja de la tienda. La revisan cuando puedan. No crea pedido ni cobra.",
+    message: created.duplicate
+      ? "Esa pregunta ya está en la bandeja de la tienda. La revisan cuando puedan. No crea pedido ni cobra."
+      : "Quedó en la bandeja de la tienda. La revisan cuando puedan. No crea pedido ni cobra.",
   };
 }

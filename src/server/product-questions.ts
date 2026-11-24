@@ -1,5 +1,8 @@
+import { normalizeProductQuestionKey } from "@/lib/product-question-key";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { getPilotTenantId } from "@/server/tenant";
+
+export { normalizeProductQuestionKey } from "@/lib/product-question-key";
 
 export type ProductQuestionStatus = "open" | "answered" | "dismissed";
 
@@ -40,11 +43,47 @@ function mapRow(row: Record<string, unknown>): ProductQuestionRow {
   };
 }
 
+export async function findOpenDuplicateProductQuestion(
+  productSku: string,
+  question: string,
+): Promise<ProductQuestionRow | null> {
+  const sku = productSku.trim().toUpperCase().slice(0, 40);
+  const key = normalizeProductQuestionKey(question);
+  if (!sku || !key) return null;
+
+  try {
+    const tenantId = await getPilotTenantId();
+    const supabase = createAdminSupabase();
+    const { data, error } = await supabase
+      .from("product_questions")
+      .select("id, product_sku, question, auto_reply, status, answered_line, resolved_by, resolved_at, created_at")
+      .eq("tenant_id", tenantId)
+      .eq("product_sku", sku)
+      .eq("status", "open")
+      .order("created_at", { ascending: false })
+      .limit(40);
+
+    if (error || !data) return null;
+    return (
+      data
+        .map((row) => mapRow(row as Record<string, unknown>))
+        .find((row) => normalizeProductQuestionKey(row.question) === key) ?? null
+    );
+  } catch {
+    return null;
+  }
+}
+
 export async function createProductQuestion(input: {
   productSku: string;
   question: string;
   autoReply: string;
-}): Promise<{ error: string | null; id: string | null }> {
+}): Promise<{ error: string | null; id: string | null; duplicate: boolean }> {
+  const duplicate = await findOpenDuplicateProductQuestion(input.productSku, input.question);
+  if (duplicate) {
+    return { error: null, id: duplicate.id, duplicate: true };
+  }
+
   try {
     const tenantId = await getPilotTenantId();
     const supabase = createAdminSupabase();
@@ -53,7 +92,7 @@ export async function createProductQuestion(input: {
       .insert({
         tenant_id: tenantId,
         product_sku: input.productSku.trim().toUpperCase().slice(0, 40),
-        question: input.question.trim().slice(0, 200),
+        question: input.question.trim().replace(/\s+/g, " ").slice(0, 200),
         auto_reply: input.autoReply.trim().slice(0, 500),
         status: "open",
       })
@@ -66,13 +105,15 @@ export async function createProductQuestion(input: {
           ? "Falta product_questions. Ejecuta supabase/migrations/012_product_questions.sql."
           : error.message,
         id: null,
+        duplicate: false,
       };
     }
-    return { error: null, id: data?.id ? String(data.id) : null };
+    return { error: null, id: data?.id ? String(data.id) : null, duplicate: false };
   } catch (error) {
     return {
       error: error instanceof Error ? error.message : "No se pudo guardar la pregunta.",
       id: null,
+      duplicate: false,
     };
   }
 }
