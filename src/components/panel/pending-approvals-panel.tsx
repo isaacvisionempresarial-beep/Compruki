@@ -25,8 +25,8 @@ export function PendingApprovalsPanel({
       </h2>
       <p className="mt-1 text-sm text-muted">
         Bandeja de AG-01. Solo el propietario aprueba un borrador o anota una respuesta de ficha en
-        el catálogo. Un operador puede rechazar. Pedidos se atienden en Pedidos. Revisar esta bandeja no cobra ni cambia pedidos. OpenAI no está
-        conectado.
+        el catálogo. Un operador puede rechazar. Pedidos se atienden en Pedidos. Revisar esta bandeja no
+        cobra ni cambia pedidos. Las preguntas pueden traer borrador sugerido (OpenAI o plantilla).
       </p>
 
       {!productQuestionsReady ? (

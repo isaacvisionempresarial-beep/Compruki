@@ -9,6 +9,7 @@ import {
   answerProductQuestion,
   productQuestionNeedsHandoff,
 } from "@/lib/product-answers";
+import { draftOwnerProductAnswer } from "@/server/agent-product-questions";
 import { evaluateAgentPolicy } from "@/server/agent-policy";
 import { recordAgentRun } from "@/server/agent-runs";
 import { getProductBySku, listPublicProducts } from "@/server/catalog-store";
@@ -71,10 +72,25 @@ export async function sendProductQuestionAction(
     };
   }
 
+  const draft = await draftOwnerProductAnswer(
+    {
+      sku,
+      title: product.title,
+      description: product.description,
+      highlights: product.highlights,
+      answers: product.answers,
+      price: product.price,
+      available: product.available,
+      variants: product.variants,
+      sizeKind: product.sizeKind,
+    },
+    question,
+  );
+
   const created = await createProductQuestion({
     productSku: sku,
     question,
-    autoReply,
+    autoReply: draft.text || autoReply,
   });
   if (created.error) return { error: created.error, message: null };
 
@@ -82,8 +98,8 @@ export async function sendProductQuestionAction(
     await recordAgentRun({
       agentId: "AG-05",
       status: "succeeded",
-      summary: `Handoff humano · ${sku} · ${question.slice(0, 120)}`,
-      costEstimateCop: 0,
+      summary: `Handoff humano · borrador ${draft.via} · ${sku} · ${question.slice(0, 100)}`,
+      costEstimateCop: draft.costEstimateCop,
     });
 
     revalidatePath("/panel");

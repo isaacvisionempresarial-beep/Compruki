@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { PRODUCT_QUESTION_HANDOFF_REPLY } from "@/lib/product-answers";
 import { resolvePendingApprovalAction, type ResolveApprovalState } from "@/server/approval-actions";
 
 const initial: ResolveApprovalState = { error: null, message: null };
@@ -10,6 +11,12 @@ export type QuestionReviewPreview = {
   autoReply: string;
   sku: string;
 };
+
+function suggestedDraft(autoReply: string) {
+  const trimmed = autoReply.trim();
+  if (!trimmed || trimmed === PRODUCT_QUESTION_HANDOFF_REPLY) return "";
+  return trimmed.slice(0, 400);
+}
 
 export function QuestionReviewForm({
   id,
@@ -21,7 +28,8 @@ export function QuestionReviewForm({
   canApproveCatalog: boolean;
 }) {
   const [state, action, pending] = useActionState(resolvePendingApprovalAction, initial);
-  const [answer, setAnswer] = useState("");
+  const draft = suggestedDraft(preview.autoReply);
+  const [answer, setAnswer] = useState(draft);
 
   return (
     <form action={action} className="mt-2 space-y-2">
@@ -30,7 +38,12 @@ export function QuestionReviewForm({
       <div className="rounded-[10px] border border-line bg-canvas px-3 py-2 text-xs leading-5">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pregunta</p>
         <p className="mt-0.5 text-ink">{preview.question}</p>
-        {preview.autoReply ? (
+        {draft ? (
+          <>
+            <p className="mt-2 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Borrador sugerido</p>
+            <p className="mt-0.5 text-muted">Revísalo antes de anotar. El precio y la publicación no cambian.</p>
+          </>
+        ) : preview.autoReply ? (
           <>
             <p className="mt-2 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Auto</p>
             <p className="mt-0.5 text-muted">{preview.autoReply}</p>
