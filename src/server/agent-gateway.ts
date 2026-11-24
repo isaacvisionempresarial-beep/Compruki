@@ -49,6 +49,7 @@ export type AgentCenterView = {
     agentId: string;
     status: string;
     summary: string;
+    costEstimateCop: number;
     createdAt: string;
     actorName: string;
   }>;
@@ -138,19 +139,20 @@ async function loadRecentRuns() {
     const supabase = createAdminSupabase();
     const first = await supabase
       .from("agent_runs")
-      .select("id, agent_id, status, summary, created_at, actor_name")
+      .select("id, agent_id, status, summary, cost_estimate_cop, created_at, actor_name")
       .eq("tenant_id", tenantId)
       .order("created_at", { ascending: false })
       .limit(8);
 
-    const loaded = first.error && first.error.message.includes("actor_name")
-      ? await supabase
-          .from("agent_runs")
-          .select("id, agent_id, status, summary, created_at")
-          .eq("tenant_id", tenantId)
-          .order("created_at", { ascending: false })
-          .limit(8)
-      : first;
+    const loaded =
+      first.error && first.error.message.includes("actor_name")
+        ? await supabase
+            .from("agent_runs")
+            .select("id, agent_id, status, summary, cost_estimate_cop, created_at")
+            .eq("tenant_id", tenantId)
+            .order("created_at", { ascending: false })
+            .limit(8)
+        : first;
 
     if (loaded.error || !loaded.data) return [];
 
@@ -159,6 +161,7 @@ async function loadRecentRuns() {
       agentId: String(row.agent_id),
       status: String(row.status),
       summary: typeof row.summary === "string" ? row.summary : "",
+      costEstimateCop: Math.max(0, Number(row.cost_estimate_cop) || 0),
       createdAt: String(row.created_at),
       actorName: "actor_name" in row && typeof row.actor_name === "string" ? row.actor_name.trim() : "",
     }));
