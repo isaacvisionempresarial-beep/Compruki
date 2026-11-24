@@ -99,8 +99,8 @@ function DropiCopy({ order }: { order: StoreOrder }) {
         />
         <span className="mt-1 block font-normal leading-5 text-muted">{dropiCopyHint(order)}</span>
       </label>
-      <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+      <nav aria-label="Consulta" className="flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
         <button
           type="button"
           title="Copiar no cobra. El total guardado no cambia."

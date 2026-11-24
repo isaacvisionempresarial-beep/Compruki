@@ -168,8 +168,8 @@ export function CatalogScreen({
             : "Textos, fotos y disponibilidad se editan en su página. Precio, publicación y alta los guarda el propietario."}{" "}
           Lo publicado se ve en la tienda. Copiar el enlace no cambia el precio ni crea una campaña. Lo vendido está en Rentabilidad. Leer esto no cobra ni cambia el precio ni la publicación.
         </p>
-        <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
           <Link href="/panel/rentabilidad" title="Verla no cobra ni cambia los pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
             Ver rentabilidad
           </Link>
@@ -576,8 +576,8 @@ function CampaignLink({
 
   if (compact) {
     return (
-      <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+      <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
         <a href={path} target="_blank" rel="noreferrer" title="Abrirla no cobra ni cambia el precio ni la publicación." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Abrir
         </a>
@@ -611,8 +611,8 @@ function CampaignLink({
       {product.available ? null : (
         <p className="text-xs leading-5 text-warning">La página se abre, pero ahora no se puede pedir.</p>
       )}
-      <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+      <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
         <a
           href={path}
           target="_blank"
@@ -715,8 +715,8 @@ function CatalogDriftSheet({ text }: { text: string }) {
             className="mt-1 min-h-32 w-full rounded-[10px] border border-line bg-canvas px-3 py-2 text-sm leading-5 font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
           />
         </label>
-        <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <nav aria-label="Consulta" className="mt-2 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
           <button
             type="button"
             title="Copiar no cobra ni cambia el total guardado."

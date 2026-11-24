@@ -134,8 +134,8 @@ export function ProfitabilityScreen({
           Estimado es el margen de confirmados. Utilidad es lo entregado y marcado como cobrado. Ninguna es dinero cobrado en el sitio ni el total guardado del pedido. Si la ficha de hoy es otra, el producto muestra las dos cifras y las cuentas siguen con lo guardado. Los pedidos van bajo «Ver pedidos».{" "}
           {canManageOrderMoney ? "El precio de la ficha se cambia en Catálogo." : "El precio de la ficha lo cambia el propietario en Catálogo."}
         </p>
-        <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
           <Link href="/panel/catalogo" title="Abrirlo no cobra ni cambia el precio ni la publicación." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
             Abrir catálogo
           </Link>

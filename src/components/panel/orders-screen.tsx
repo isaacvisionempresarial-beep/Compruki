@@ -209,8 +209,8 @@ export function OrdersScreen({
       <p className="mt-2 text-xs leading-5 text-muted">
         Dropi no está conectado. El número se anota en Sincronización. Abrirla no cobra. El total guardado no cambia.
       </p>
-      <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+      <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
         <Link href="/panel/sincronizacion" title="Abrirla no cobra. El total guardado no cambia." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Abrir sincronización
         </Link>
@@ -827,8 +827,8 @@ export function OrderEditor({
               : "Falta el número de Dropi. "}
             No se envía desde aquí.
           </p>
-          <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
             <Link href={syncFocusHref(order.number)} title="Abrirla no cobra. El total guardado no cambia." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
               Abrir sincronización
             </Link>
@@ -1071,8 +1071,8 @@ function DispatchSheet({ orders, moved }: { orders: StoreOrder[]; moved: boolean
               className="mt-1 min-h-32 w-full rounded-[10px] border border-line bg-canvas px-3 py-2 text-sm leading-5 font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
             />
           </label>
-          <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <nav aria-label="Consulta" className="mt-2 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
             <button
               type="button"
               title="Copiar no crea el pedido en Dropi ni cambia el total guardado."
@@ -2179,8 +2179,8 @@ function CustomerNote({ order }: { order: StoreOrder }) {
           Sale del estado del pedido. Lo envías tú. Copiarlo o abrir WhatsApp no lo envía, no cobra y el total guardado no cambia.
         </span>
       </label>
-      <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+      <nav aria-label="Consulta" className="flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
         <button
           type="button"
           className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"

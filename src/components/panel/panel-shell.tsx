@@ -179,9 +179,9 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
                   <span className="block text-xs text-muted">{roleLabel}</span>
                 </span>
               </div>
-              <nav aria-label="Herramientas" className="flex shrink-0 flex-wrap items-center gap-1">
+              <nav aria-label="Vista" className="flex shrink-0 flex-wrap items-center gap-1">
                 <span className="hidden text-[10px] font-bold tracking-[0.08em] text-muted uppercase min-[1200px]:inline">
-                  Herramientas
+                  Vista
                 </span>
                 <a
                   href="/ingresar?modo=nueva-clave"
@@ -190,6 +190,9 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
                 >
                   Clave
                 </a>
+              </nav>
+              <nav aria-label="Herramientas" className="flex shrink-0 flex-wrap items-center gap-1">
+                <span className="sr-only">Herramientas</span>
                 <form action={signOut} className="contents">
                   <button
                     type="submit"
@@ -286,8 +289,8 @@ function Sidebar({
         <p className="mt-1 text-xs leading-4 text-on-dark-muted">Navegar no cobra ni cambia pedidos.</p>
         <p className="mt-2 text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Tienda</p>
         <p className="mt-0.5 text-sm font-semibold">{storeName}</p>
-        <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Herramientas</span>
+        <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-on-dark-muted uppercase">Vista</span>
           <Link
             href="/tienda"
             title="Abrirla no cobra ni cambia pedidos."
