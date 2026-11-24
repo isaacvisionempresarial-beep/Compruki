@@ -1,4 +1,5 @@
 import { createAdminSupabase } from "@/lib/supabase/admin";
+import { probeProductQuestionsTable } from "@/server/product-questions";
 
 export type HealthChecks = {
   siteUrl: boolean;
@@ -6,6 +7,8 @@ export type HealthChecks = {
   supabaseAnon: boolean;
   serviceRole: boolean;
   tenantPilot: boolean;
+  /** Tabla AG-05; no bloquea ok del deploy. */
+  productQuestions: boolean;
 };
 
 export type HealthSnapshot = {
@@ -28,6 +31,7 @@ export async function getHealthSnapshot(): Promise<HealthSnapshot> {
       process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || process.env.SUPABASE_SECRET_KEY?.trim(),
     ),
     tenantPilot: false,
+    productQuestions: false,
   };
 
   if (checks.supabaseUrl && checks.serviceRole) {
@@ -38,6 +42,7 @@ export async function getHealthSnapshot(): Promise<HealthSnapshot> {
     } catch {
       checks.tenantPilot = false;
     }
+    checks.productQuestions = await probeProductQuestionsTable();
   }
 
   const ok =

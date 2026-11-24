@@ -11,9 +11,11 @@ const initial: ResolveApprovalState = { error: null, message: null };
 export function PendingApprovalsPanel({
   items,
   canApproveCatalog = false,
+  productQuestionsReady = true,
 }: {
   items: PendingApproval[];
   canApproveCatalog?: boolean;
+  productQuestionsReady?: boolean;
 }) {
   return (
     <section className="mt-4" aria-labelledby="pendientes-humanos">
@@ -27,11 +29,33 @@ export function PendingApprovalsPanel({
         conectado.
       </p>
 
+      {!productQuestionsReady ? (
+        <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3" role="status">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-coral uppercase">Falta</p>
+          <p className="mt-0.5 text-sm font-medium text-coral">
+            Falta la tabla product_questions. Ejecuta supabase/migrations/012_product_questions.sql. Sin ella el
+            handoff de la ficha falla y aquí no aparecen preguntas. Ver Configuración no cobra ni cambia pedidos.
+          </p>
+          <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
+            <Link
+              href="/panel/ajustes"
+              title="Abrirla no cobra ni cambia pedidos."
+              className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+            >
+              Ver Configuración
+            </Link>
+          </nav>
+        </div>
+      ) : null}
+
       {items.length === 0 ? (
         <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
           <p className="mt-0.5 text-sm text-muted">
-            No hay pendientes humanos ahora. Borradores del Creador y preguntas de ficha que el comprador envía entran aquí.
+            {productQuestionsReady
+              ? "No hay pendientes humanos ahora. Borradores del Creador y preguntas de ficha que el comprador envía entran aquí."
+              : "Sin product_questions no se listan preguntas. Los pedidos y borradores sí pueden aparecer cuando existan."}
           </p>
         </div>
       ) : (

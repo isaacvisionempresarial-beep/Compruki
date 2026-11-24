@@ -26,6 +26,23 @@ function missingTable(message: string) {
   );
 }
 
+/** True si existe la tabla product_questions (migración 012). */
+export async function probeProductQuestionsTable(): Promise<boolean> {
+  try {
+    const tenantId = await getPilotTenantId();
+    const supabase = createAdminSupabase();
+    const { error } = await supabase
+      .from("product_questions")
+      .select("id")
+      .eq("tenant_id", tenantId)
+      .limit(1);
+    if (!error) return true;
+    return !missingTable(error.message);
+  } catch {
+    return false;
+  }
+}
+
 function mapRow(row: Record<string, unknown>): ProductQuestionRow {
   const statusRaw = String(row.status ?? "open");
   const status: ProductQuestionStatus =

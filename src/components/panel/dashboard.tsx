@@ -159,7 +159,7 @@ export function Dashboard({
       <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
         <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
         <Link
-          href="/panel/pedidos"
+          href="/panel/pedidos#por-atender"
           title="Abrirlos no cobra ni cambia el total guardado."
           className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft"
         >
@@ -371,7 +371,7 @@ export function Dashboard({
         </p>
         <ul className="mt-2 grid gap-3 sm:grid-cols-2">
           <li>
-            <Link href="/panel/pedidos" title="Abrirlos no cobra ni cambia el total guardado." className="elevate-1 block rounded-[14px] border border-line bg-card px-3 py-3 hover:bg-canvas">
+            <Link href="/panel/pedidos#por-atender" title="Abrirlos no cobra ni cambia el total guardado." className="elevate-1 block rounded-[14px] border border-line bg-card px-3 py-3 hover:bg-canvas">
               <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedidos</span>
               <span className="mt-1 block text-sm font-bold">
                 {orderWork.yours} {orderWork.yours === 1 ? "pedido por atender" : "pedidos por atender"}

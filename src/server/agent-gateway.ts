@@ -3,6 +3,7 @@ import { AGENT_ROLES, type AgentRoleDefinition } from "@/lib/agents/roles";
 import { listPendingApprovals, type PendingApproval } from "@/server/agent-central";
 import { listProducts } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
+import { probeProductQuestionsTable } from "@/server/product-questions";
 import { getPilotTenantId } from "@/server/tenant";
 
 export type AgentGatewayStatus = {
@@ -41,6 +42,7 @@ export type AgentCenterView = {
     byAgent: AgentMonthSpend[];
   };
   pendingApprovals: PendingApproval[];
+  productQuestionsReady: boolean;
   recentRuns: Array<{
     id: string;
     agentId: string;
@@ -67,12 +69,13 @@ export async function getAgentCenterView(): Promise<AgentCenterView> {
   const configs = await loadAgentConfigs();
   const configById = new Map(configs.map((row) => [row.agentId, row]));
 
-  const [products, orders, recentRuns, monthSpend, pendingApprovals] = await Promise.all([
+  const [products, orders, recentRuns, monthSpend, pendingApprovals, productQuestionsReady] = await Promise.all([
     listProducts(),
     listOrders(),
     loadRecentRuns(),
     loadMonthSpend(),
     listPendingApprovals(),
+    probeProductQuestionsTable(),
   ]);
 
   return {
@@ -89,6 +92,7 @@ export async function getAgentCenterView(): Promise<AgentCenterView> {
     },
     monthSpend,
     pendingApprovals,
+    productQuestionsReady,
     recentRuns,
   };
 }

@@ -13,12 +13,17 @@ export const dynamic = "force-dynamic";
 export default async function SettingsPage() {
   const [access, health] = await Promise.all([requirePanelAccess(), getHealthSnapshot()]);
 
-  const checkLabels: Array<{ key: keyof typeof health.checks; label: string }> = [
+  const checkLabels: Array<{ key: keyof typeof health.checks; label: string; hint?: string }> = [
     { key: "siteUrl", label: "NEXT_PUBLIC_SITE_URL" },
     { key: "supabaseUrl", label: "Supabase URL" },
     { key: "supabaseAnon", label: "Clave anon / publishable" },
     { key: "serviceRole", label: "Service role" },
     { key: "tenantPilot", label: "Tienda piloto" },
+    {
+      key: "productQuestions",
+      label: "product_questions (AG-05)",
+      hint: "Migración supabase/migrations/012_product_questions.sql. Sin ella el handoff falla y la bandeja queda vacía.",
+    },
   ];
 
   return (
@@ -113,7 +118,16 @@ export default async function SettingsPage() {
           {checkLabels.map((item) => (
             <div key={item.key}>
               <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{item.label}</dt>
-              <dd className="mt-0.5 text-sm font-semibold">{health.checks[item.key] ? "OK" : "Falta"}</dd>
+              <dd
+                className={`mt-0.5 text-sm font-semibold ${
+                  health.checks[item.key] ? "text-ink" : item.key === "productQuestions" ? "text-coral" : "text-ink"
+                }`}
+              >
+                {health.checks[item.key] ? "OK" : "Falta"}
+              </dd>
+              {item.hint && !health.checks[item.key] ? (
+                <p className="mt-0.5 text-xs leading-5 text-muted">{item.hint}</p>
+              ) : null}
             </div>
           ))}
           <div>

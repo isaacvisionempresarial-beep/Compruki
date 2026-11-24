@@ -111,7 +111,11 @@ export function AgentsScreen({
 
       <p className="mt-6 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Atención</p>
 
-      <PendingApprovalsPanel items={view.pendingApprovals} canApproveCatalog={canApproveCatalog} />
+      <PendingApprovalsPanel
+        items={view.pendingApprovals}
+        canApproveCatalog={canApproveCatalog}
+        productQuestionsReady={view.productQuestionsReady}
+      />
 
       <CentralRouterPanel
         route={central.route}
