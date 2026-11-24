@@ -153,13 +153,13 @@ export function Dashboard({
               {canManageOrderMoney ? "" : " Flete, costo, cobro y precios los guarda el propietario."}
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <div className="flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto pb-0.5">
+            <nav aria-label="Herramientas" className="flex shrink-0 items-center gap-2">
+              <span className="sr-only">Herramientas</span>
               <Link
                 href="/panel/pedidos#por-atender"
                 title="Abrirlos no cobra ni cambia el total guardado."
-                className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3.5 text-sm font-semibold text-on-dark hover:bg-primary-soft"
+                className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3.5 text-sm font-semibold whitespace-nowrap text-on-dark hover:bg-primary-soft"
               >
                 Atender pedidos
                 {orderWork.yours > 0 ? (
@@ -167,12 +167,12 @@ export function Dashboard({
                 ) : null}
               </Link>
             </nav>
-            <nav aria-label="Vista" className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
+            <nav aria-label="Vista" className="flex shrink-0 items-center gap-2">
+              <span className="sr-only">Vista</span>
               <Link
                 href={agentPendingCount > 0 ? "/panel/agentes#pendientes-humanos" : "/panel/agentes"}
                 title="Abrirlo no cobra ni cambia pedidos."
-                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold whitespace-nowrap text-ink hover:bg-subtle"
               >
                 Agentes
                 {agentPendingCount > 0 ? (
@@ -182,7 +182,7 @@ export function Dashboard({
               <Link
                 href="/panel/agentes?intent=margen%20LAM-MES-01"
                 title="Abrirlo no cobra ni cambia pedidos."
-                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold whitespace-nowrap text-ink hover:bg-subtle"
               >
                 Probar Central
               </Link>
@@ -190,7 +190,7 @@ export function Dashboard({
                 <Link
                   href={syncSectionHref("sync-crear")}
                   title="Abrirla no cobra ni cambia el total guardado."
-                  className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+                  className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold whitespace-nowrap text-ink hover:bg-subtle"
                 >
                   Sync
                   <span className="ml-2 rounded-[8px] bg-accent-tint px-1.5 py-0.5 text-xs font-bold text-accent-strong tabular-nums">{syncWorkCount}</span>
