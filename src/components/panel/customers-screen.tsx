@@ -10,7 +10,7 @@ import {
   type FollowupStageId,
 } from "@/lib/crm-pipeline";
 import { formatDay } from "@/lib/format";
-import { orderFocusHref } from "@/lib/store-order";
+import { orderFocusHref, whatsAppHref } from "@/lib/store-order";
 import type { FollowupPriority } from "@/server/agent-followup-priority";
 import type { FollowupTask } from "@/server/followups";
 import {
@@ -49,8 +49,8 @@ export function CustomersScreen({
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Operación</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Clientes</h1>
       <p className="mt-1 max-w-2xl text-sm text-muted">
-        CRM lite con pipeline: Nuevo → Contactar → En espera. Contactos desde pedidos (AG-07). No es WhatsApp
-        automático.
+        CRM lite con pipeline: Nuevo → Contactar → En espera. Contactos desde pedidos (AG-07). Abrir WhatsApp es a
+        mano; Compruki no envía.
       </p>
 
       {!tableReady ? (
@@ -163,7 +163,12 @@ export function CustomersScreen({
               <p className="mt-2 text-sm text-muted">No hay sugerencias ahora.</p>
             ) : (
               <ul className="mt-2 space-y-2">
-                {priority.suggestions.map((item) => (
+                {priority.suggestions.map((item) => {
+                  const waHref = whatsAppHref(
+                    item.phone,
+                    `${crmHello(item.customerName)} Pedido ${item.orderNumber}. ${item.reason}`.slice(0, 500),
+                  );
+                  return (
                   <li key={`${item.orderNumber}-${item.reason}`} className="rounded-[10px] border border-line bg-canvas px-3 py-2">
                     <p className="text-sm font-semibold">
                       {item.customerName} · {item.orderNumber}
@@ -193,10 +198,22 @@ export function CustomersScreen({
                         >
                           Ver pedido
                         </Link>
+                        {waHref ? (
+                          <a
+                            href={waHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Abre WhatsApp. Compruki no envía."
+                            className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
+                          >
+                            Abrir WhatsApp
+                          </a>
+                        ) : null}
                       </nav>
                     </form>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             )}
           </div>
@@ -220,7 +237,9 @@ export function CustomersScreen({
           </div>
         ) : (
           <ul className="mt-3 grid gap-2 md:grid-cols-2">
-            {contacts.map((contact) => (
+            {contacts.map((contact) => {
+              const waHref = whatsAppHref(contact.phone, contactWhatsAppText(contact));
+              return (
               <li key={contact.phone} className="elevate-1 rounded-[14px] border border-line bg-card px-4 py-3">
                 <p className="text-sm font-semibold">{contact.customerName}</p>
                 <p className="mt-0.5 text-xs text-muted">
@@ -283,10 +302,22 @@ export function CustomersScreen({
                     >
                       Ver pedido
                     </Link>
+                    {waHref ? (
+                      <a
+                        href={waHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Abre WhatsApp. Compruki no envía."
+                        className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+                      >
+                        Abrir WhatsApp
+                      </a>
+                    ) : null}
                   </nav>
                 </form>
               </li>
-            ))}
+              );
+            })}
           </ul>
         )}
       </section>
@@ -294,8 +325,24 @@ export function CustomersScreen({
   );
 }
 
+function crmHello(name: string) {
+  const first = name.trim().split(/\s+/)[0] ?? "";
+  return first.length >= 2 ? `Hola ${first}.` : "Hola.";
+}
+
+function contactWhatsAppText(contact: CrmContact) {
+  return `${crmHello(contact.customerName)} Te escribo por tu pedido ${contact.latestOrderNumber}.`.slice(0, 500);
+}
+
+function followupWhatsAppText(task: FollowupTask) {
+  const order = task.orderNumber ? ` Pedido ${task.orderNumber}.` : "";
+  const note = task.note.trim() ? ` ${task.note.trim()}` : "";
+  return `${crmHello(task.customerName)}${order}${note}`.slice(0, 500);
+}
+
 function PipelineCard({ task, pipelineReady }: { task: FollowupTask; pipelineReady: boolean }) {
   const moves = nextFollowupStages(task.stage);
+  const waHref = whatsAppHref(task.phone, followupWhatsAppText(task));
   return (
     <li className="rounded-[10px] border border-line bg-canvas px-3 py-2">
       <p className="text-sm font-semibold">
@@ -336,6 +383,17 @@ function PipelineCard({ task, pipelineReady }: { task: FollowupTask; pipelineRea
             Descartar
           </button>
         </form>
+        {waHref ? (
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Abre WhatsApp con una nota. Compruki no envía."
+            className="inline-flex h-8 items-center rounded-[10px] border border-line bg-card px-2.5 text-xs font-semibold text-ink hover:bg-subtle"
+          >
+            WhatsApp
+          </a>
+        ) : null}
         {task.orderNumber ? (
           <Link
             href={orderFocusHref(task.orderNumber)}

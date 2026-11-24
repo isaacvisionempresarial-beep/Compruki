@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { whatsAppHref } from "@/lib/store-order";
 import { createFollowupAction } from "@/server/followup-actions";
 
 export function OrderCrmPanel({
@@ -16,6 +17,10 @@ export function OrderCrmPanel({
   flash?: boolean;
   error?: string | null;
 }) {
+  const first = customerName.trim().split(/\s+/)[0] ?? "";
+  const hello = first.length >= 2 ? `Hola ${first}.` : "Hola.";
+  const waHref = whatsAppHref(phone, `${hello} Te escribo por tu pedido ${orderNumber}.`.slice(0, 500));
+
   return (
     <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-crm">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">CRM</p>
@@ -23,7 +28,7 @@ export function OrderCrmPanel({
         Seguimiento (AG-07)
       </h2>
       <p className="mt-1 text-xs leading-5 text-muted">
-        Crea una tarea en Clientes. No envía WhatsApp ni cambia el pedido.
+        Crea una tarea en Clientes o abre WhatsApp a mano. No envía solo ni cambia el pedido.
       </p>
       {flash ? (
         <p role="status" className="mt-2 text-sm font-medium text-accent-strong">
@@ -66,6 +71,17 @@ export function OrderCrmPanel({
           >
             Ver clientes
           </Link>
+          {waHref ? (
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Abre WhatsApp. Compruki no envía."
+              className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+            >
+              Abrir WhatsApp
+            </a>
+          ) : null}
         </nav>
       </form>
     </section>
