@@ -76,6 +76,7 @@ import {
   orderPriceStayNote,
   payableTotalLabel,
   attentionQueueOpensSync,
+  attentionQueueOrderHref,
   ORDER_DETAIL_SECTION_IDS,
   orderDetailSectionHref,
   syncFocusHref,
@@ -330,11 +331,7 @@ export function OrdersScreen({
                     {queue.rows.map((row) => (
                       <li key={row.order.id}>
                         <a
-                          href={
-                            attentionQueueOpensSync(queue.id)
-                              ? syncFocusHref(row.order.number)
-                              : orderFocusHref(row.order.number)
-                          }
+                          href={attentionQueueOrderHref(queue.id, row.order.number)}
                           title={
                             attentionQueueOpensSync(queue.id)
                               ? " El total guardado no cambia."

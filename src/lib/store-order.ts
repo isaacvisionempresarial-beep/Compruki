@@ -644,6 +644,32 @@ export function attentionQueueOpensSync(queueId: string) {
   return queueId === "cola-numero-dropi" || queueId === "cola-numero-cerrado";
 }
 
+/** Enlace del siguiente paso en «Por atender» (ancla del pedido o Sincronización). */
+export function attentionQueueOrderHref(queueId: string, orderNumber: string) {
+  if (attentionQueueOpensSync(queueId)) return syncFocusHref(orderNumber);
+
+  const sectionByQueue: Record<string, OrderDetailSectionId> = {
+    "cola-preparacion": "pedido-preparar",
+    "cola-motivo": "pedido-avisos",
+    "cola-devolucion": "pedido-avisos",
+    "cola-aviso": "pedido-avisos",
+    "cola-resolver": "pedido-posventa",
+    "cola-talla": "pedido-productos",
+    "cola-departamento": "pedido-entrega",
+    "cola-departamento-cerrado": "pedido-entrega",
+    "cola-despacho": "pedido-herramientas",
+    "cola-entrega": "pedido-herramientas",
+    "cola-cobro": "pedido-herramientas",
+    "cola-flete-devolucion": "pedido-herramientas",
+    "cola-costo": "pedido-herramientas",
+    "cola-costo-hoy": "pedido-herramientas",
+    "cola-confirmar": "pedido-herramientas",
+  };
+
+  const section = sectionByQueue[queueId] ?? "pedido-herramientas";
+  return orderDetailSectionHref(orderNumber, section);
+}
+
 export function dropiHandoffText(
   order: Pick<StoreOrder, "number" | "customerName" | "phone" | "document" | "department" | "city" | "address" | "reference" | "lines" | "total" | "providerRef">,
 ) {
@@ -1966,9 +1992,9 @@ export function attentionQueues(
     {
       id: "cola-preparacion",
       title: "Listos para preparación",
-      hint: "Confirmados con número de Dropi anotado. Pasarlos a preparación no los envía. El total guardado no cambia.",
+      hint: "Confirmados con número de Dropi anotado. Abre el paquete AG-06 o pásalos a preparación a mano. No los envía. El total guardado no cambia.",
       short: "preparación",
-      cta: "Preparar",
+      cta: "Preparar paquete",
       match: readyToPrepare,
       note: (order) => prepareQueueNote(order),
     },

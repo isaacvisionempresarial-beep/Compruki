@@ -65,7 +65,7 @@ export function PendingApprovalsPanel({
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
           <p className="mt-0.5 text-sm text-muted">
             {productQuestionsReady
-              ? "No hay pendientes humanos ahora. Borradores, preguntas de ficha y seguimientos CRM entran aquí."
+              ? "No hay pendientes humanos ahora. Pedidos en cola, borradores, preguntas de ficha y seguimientos CRM entran aquí."
               : "Sin product_questions no se listan preguntas. Los pedidos, borradores y seguimientos sí pueden aparecer."}
           </p>
         </div>
