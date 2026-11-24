@@ -1,15 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useActionState, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import type { PublicProduct } from "@/server/catalog-store";
 import { useCart } from "@/components/store/cart-state";
 import { formatCop } from "@/lib/format";
 import { rememberCampaignSku } from "@/lib/campaign";
 import { sizeChoiceSentence } from "@/lib/catalog";
-import { answerProductQuestion } from "@/lib/product-answers";
+import { answerProductQuestion, productQuestionNeedsHandoff } from "@/lib/product-answers";
 import { PhotoCarousel, type PhotoSlide } from "@/components/photo-carousel";
+import {
+  sendProductQuestionAction,
+  type SendProductQuestionState,
+} from "@/server/product-question-actions";
 
 type HighlightPiece =
   | { kind: "heading"; text: string }
@@ -529,10 +533,14 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
   );
 }
 
+const handoffInitial: SendProductQuestionState = { error: null, message: null };
+
 function ProductQuestion({ product }: { product: PublicProduct }) {
   const [question, setQuestion] = useState("");
   const [reply, setReply] = useState<string | null>(null);
+  const [handoffState, handoffAction, handoffPending] = useActionState(sendProductQuestionAction, handoffInitial);
   const canAsk = Boolean(question.trim());
+  const needsHandoff = Boolean(reply && productQuestionNeedsHandoff(reply));
 
   function ask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -546,16 +554,22 @@ function ProductQuestion({ product }: { product: PublicProduct }) {
       <h3 id="pregunta-producto" className="mt-0.5 text-sm font-semibold">
         Pregunta sobre este producto
       </h3>
-      <p className="mt-1 text-xs leading-5 text-muted">Solo responde con lo de esta ficha. No se envía a la tienda, no registra pedido y no cobra.</p>
+      <p className="mt-1 text-xs leading-5 text-muted">
+        Primero responde con lo de esta ficha. Si no alcanza, puedes enviarla a la tienda para revisión humana. No
+        registra pedido y no cobra.
+      </p>
       <form className="mt-2 space-y-2" onSubmit={ask}>
         <label className="block text-xs font-semibold" htmlFor="pregunta">
           Tu pregunta
           <input
             id="pregunta"
-            title="Escribirla no se envía a la tienda ni cobra."
+            title="Preguntar aquí responde con la ficha. Enviar a la tienda es aparte y no cobra."
             value={question}
             maxLength={200}
-            onChange={(event) => setQuestion(event.target.value)}
+            onChange={(event) => {
+              setQuestion(event.target.value);
+              setReply(null);
+            }}
             className="mt-1.5 h-10 w-full rounded-[10px] border border-line bg-canvas px-3 text-sm font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
           />
         </label>
@@ -564,7 +578,7 @@ function ProductQuestion({ product }: { product: PublicProduct }) {
           <button
             type="submit"
             disabled={!canAsk}
-            title="Preguntar no se envía a la tienda ni cobra."
+            title="Preguntar responde con la ficha. No crea pedido ni cobra."
             className="inline-flex h-9 w-full items-center justify-center sm:w-auto sm:min-w-56 rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle disabled:cursor-not-allowed disabled:opacity-55"
           >
             Preguntar
@@ -574,6 +588,33 @@ function ProductQuestion({ product }: { product: PublicProduct }) {
       {reply ? (
         <p role="status" className="mt-3 text-xs leading-5 whitespace-pre-line text-ink">
           {reply}
+        </p>
+      ) : null}
+      {needsHandoff && !handoffState.message ? (
+        <form action={handoffAction} className="mt-2">
+          <input type="hidden" name="sku" value={product.sku} />
+          <input type="hidden" name="question" value={question.trim()} />
+          <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <button
+              type="submit"
+              disabled={handoffPending || question.trim().length < 8}
+              title="Enviarla deja la pregunta en la bandeja de la tienda. No crea pedido ni cobra."
+              className="inline-flex h-9 w-full items-center justify-center sm:w-auto sm:min-w-56 rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft disabled:cursor-not-allowed disabled:opacity-55"
+            >
+              {handoffPending ? "…" : "Enviar a la tienda"}
+            </button>
+          </nav>
+        </form>
+      ) : null}
+      {handoffState.error ? (
+        <p role="alert" className="mt-2 text-xs font-medium text-danger">
+          {handoffState.error}
+        </p>
+      ) : null}
+      {handoffState.message ? (
+        <p role="status" className="mt-2 text-xs font-medium text-accent-strong">
+          {handoffState.message}
         </p>
       ) : null}
     </section>

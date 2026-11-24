@@ -32,9 +32,10 @@ export type AgentPendingSummary = {
   pedidos: number;
   borradores: number;
   agentes: number;
+  preguntas: number;
   preview: Array<{
     id: string;
-    kind: "pedido" | "agente" | "borrador";
+    kind: "pedido" | "agente" | "borrador" | "pregunta";
     label: string;
     detail: string;
     href: string;
@@ -203,7 +204,9 @@ export function Dashboard({
                 {agentPendingSummary.borradores} borrador{agentPendingSummary.borradores === 1 ? "" : "es"}
                 {" · "}
                 {agentPendingSummary.agentes} corrida{agentPendingSummary.agentes === 1 ? "" : "s"}
-                {canApproveCatalog ? "" : ". Puedes rechazar. Aprobar un borrador o una corrida lo guarda el propietario."}
+                {" · "}
+                {agentPendingSummary.preguntas} pregunta{agentPendingSummary.preguntas === 1 ? "" : "s"}
+                {canApproveCatalog ? "" : ". Puedes rechazar. Aprobar un borrador, una corrida o una pregunta lo guarda el propietario."}
               </p>
             </div>
             <nav aria-label="Vista" className="flex flex-wrap items-center gap-2">

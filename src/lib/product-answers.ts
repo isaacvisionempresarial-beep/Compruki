@@ -53,6 +53,14 @@ const STOP = new Set([
   "sus",
 ]);
 
+/** Respuesta cuando la ficha no alcanza; el comprador puede derivarla a un humano. */
+export const PRODUCT_QUESTION_HANDOFF_REPLY =
+  "Eso no está escrito en la ficha. Puedes enviarla a la tienda para que la revisen. No crea pedido ni cobra.";
+
+export function productQuestionNeedsHandoff(reply: string) {
+  return reply === PRODUCT_QUESTION_HANDOFF_REPLY;
+}
+
 export function answerProductQuestion(product: AnswerableProduct, raw: string) {
   const question = fold(raw).trim();
   if (!question) return "Escribe la pregunta.";
@@ -86,7 +94,7 @@ export function answerProductQuestion(product: AnswerableProduct, raw: string) {
     return "En la ficha no hay tallas ni tamaños.";
   }
   if (matched.length > 0) return joinLines(matched);
-  return "Eso no está escrito en la ficha. La tienda lo aclara al revisar el pedido. Esta pregunta no se envía ni cobra.";
+  return PRODUCT_QUESTION_HANDOFF_REPLY;
 }
 
 function factLines(product: AnswerableProduct) {

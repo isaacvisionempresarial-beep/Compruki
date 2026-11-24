@@ -2,9 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import { applyApprovedContentDraft } from "@/server/catalog-store";
+import { appendProductAnswerLine, applyApprovedContentDraft } from "@/server/catalog-store";
 import { recordAgentRun } from "@/server/agent-runs";
 import { assertPanelAccess } from "@/server/panel-auth";
+import { getOpenProductQuestion, resolveProductQuestion } from "@/server/product-questions";
 import { getPilotTenantId } from "@/server/tenant";
 
 export type ResolveApprovalState = { error: string | null; message: string | null };
@@ -30,8 +31,96 @@ export async function resolvePendingApprovalAction(
   if (kind === "agente") {
     return resolveAgentRun(id, decision, access.user.id, access.actorName, access.role);
   }
+  if (kind === "pregunta") {
+    return resolveQuestion(id, decision, access.user.id, access.actorName, access.role, formData);
+  }
 
   return { error: "Este pendiente se resuelve en Pedidos.", message: null };
+}
+
+async function resolveQuestion(
+  id: string,
+  decision: "approve" | "reject",
+  userId: string,
+  actorName: string,
+  role: "owner" | "operator",
+  formData: FormData,
+): Promise<ResolveApprovalState> {
+  if (decision === "approve" && role !== "owner") {
+    return {
+      error: "Solo el propietario puede anotar la respuesta en la ficha.",
+      message: null,
+    };
+  }
+
+  const open = await getOpenProductQuestion(id);
+  if (!open) return { error: "Esa pregunta ya no está abierta.", message: null };
+
+  if (decision === "reject") {
+    const resolved = await resolveProductQuestion({
+      id,
+      status: "dismissed",
+      resolvedBy: actorName,
+    });
+    if (resolved.error) return { error: resolved.error, message: null };
+
+    await recordAgentRun({
+      agentId: "AG-05",
+      status: "cancelled",
+      summary: `Pregunta descartada · ${open.productSku} · ${open.question.slice(0, 100)}`,
+      createdBy: userId,
+      actorName,
+    });
+
+    revalidatePath("/panel/agentes");
+    revalidatePath("/panel");
+    revalidatePath("/panel/catalogo");
+    return { error: null, message: `Pregunta de ${open.productSku} descartada. La ficha no cambió.` };
+  }
+
+  const answer = String(formData.get("answer") ?? "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .slice(0, 400);
+  if (answer.length < 4) {
+    return { error: "Escribe la respuesta que quieres anotar en Respuestas de la ficha.", message: null };
+  }
+
+  const line = `P: ${open.question}\nR: ${answer}`.slice(0, 400);
+  const applied = await appendProductAnswerLine(open.productSku, line, actorName);
+  if (applied.error || !applied.product) {
+    return { error: applied.error ?? "No se pudo anotar en el catálogo.", message: null };
+  }
+
+  const resolved = await resolveProductQuestion({
+    id,
+    status: "answered",
+    answeredLine: line,
+    resolvedBy: actorName,
+  });
+  if (resolved.error) {
+    return {
+      error: `Se anotó en la ficha, pero no se cerró la bandeja: ${resolved.error}`,
+      message: null,
+    };
+  }
+
+  await recordAgentRun({
+    agentId: "AG-05",
+    status: "succeeded",
+    summary: `Pregunta respondida en ficha · ${open.productSku} · ${open.question.slice(0, 100)}`,
+    createdBy: userId,
+    actorName,
+  });
+
+  revalidatePath("/panel/agentes");
+  revalidatePath("/panel");
+  revalidatePath("/panel/catalogo");
+  revalidatePath(`/tienda/producto/${encodeURIComponent(open.productSku)}`);
+  return {
+    error: null,
+    message: `Respuesta anotada en ${open.productSku}. El precio y la publicación no cambiaron.`,
+  };
 }
 
 async function resolveDraft(

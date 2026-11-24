@@ -6,13 +6,14 @@ import { searchLocalCatalog } from "@/server/agent-explorer";
 import { calculateMargin, comparePriceScenarios } from "@/server/agent-tools";
 import { previewContentDraftsAgainstCatalog, type CatalogFieldDiff } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
+import { listOpenProductQuestions } from "@/server/product-questions";
 import { getPilotTenantId } from "@/server/tenant";
 
 export type RoutedAgent = "AG-01" | "AG-02" | "AG-03" | "AG-04";
 
 export type PendingApproval = {
   id: string;
-  kind: "pedido" | "agente" | "borrador";
+  kind: "pedido" | "agente" | "borrador" | "pregunta";
   label: string;
   detail: string;
   href?: string;
@@ -26,6 +27,12 @@ export type PendingApproval = {
     diffs: CatalogFieldDiff[];
     catalogError: string | null;
     fallbackTitle: string;
+  };
+  /** Pregunta de ficha (AG-05) pendiente de respuesta humana. */
+  questionPreview?: {
+    question: string;
+    autoReply: string;
+    sku: string;
   };
 };
 
@@ -52,12 +59,13 @@ const AGENT_LABEL: Record<RoutedAgent, string> = {
   "AG-04": "Analista",
 };
 
-/** AG-01 · list_pending_approvals (pedidos + borradores + corridas awaiting_approval). */
+/** AG-01 · list_pending_approvals (pedidos + borradores + corridas + preguntas de ficha). */
 export async function listPendingApprovals(): Promise<PendingApproval[]> {
-  const [orders, agentItems, draftItems] = await Promise.all([
+  const [orders, agentItems, draftItems, questionItems] = await Promise.all([
     listOrders(),
     listAwaitingAgentApprovals(),
     listPendingDraftApprovals(),
+    listPendingQuestionApprovals(),
   ]);
 
   const pendingOrders = orders
@@ -75,7 +83,24 @@ export async function listPendingApprovals(): Promise<PendingApproval[]> {
       actionable: false,
     }));
 
-  return [...pendingOrders, ...draftItems, ...agentItems];
+  return [...pendingOrders, ...draftItems, ...agentItems, ...questionItems];
+}
+
+async function listPendingQuestionApprovals(): Promise<PendingApproval[]> {
+  const questions = await listOpenProductQuestions(8);
+  return questions.map((item) => ({
+    id: item.id,
+    kind: "pregunta" as const,
+    label: item.productSku,
+    detail: `Pregunta de ficha · ${item.question.slice(0, 140)}`,
+    href: `/panel/catalogo?sku=${encodeURIComponent(item.productSku)}`,
+    actionable: true,
+    questionPreview: {
+      question: item.question,
+      autoReply: item.autoReply,
+      sku: item.productSku,
+    },
+  }));
 }
 
 async function listPendingDraftApprovals(): Promise<PendingApproval[]> {
@@ -259,14 +284,16 @@ export async function routeTask(rawIntent: string): Promise<CentralRouteResult> 
     const pedidos = pending.filter((item) => item.kind === "pedido").length;
     const borradores = pending.filter((item) => item.kind === "borrador").length;
     const corridas = pending.filter((item) => item.kind === "agente").length;
+    const preguntas = pending.filter((item) => item.kind === "pregunta").length;
     const parts = [
       piece(pedidos, "pedido", "pedidos"),
       piece(borradores, "borrador", "borradores"),
       piece(corridas, "corrida", "corridas"),
+      piece(preguntas, "pregunta", "preguntas"),
     ].filter(Boolean);
     summary.push(`Pendientes humanos: ${parts.join(", ")}.`);
   } else {
-    summary.push("Pendientes humanos: no hay pedidos, borradores ni corridas en espera.");
+    summary.push("Pendientes humanos: no hay pedidos, borradores, corridas ni preguntas en espera.");
   }
 
   return {

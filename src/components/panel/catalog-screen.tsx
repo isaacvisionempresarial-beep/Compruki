@@ -1502,7 +1502,7 @@ export function ProductEditor({
             <Field
               label="Respuestas para el comprador"
               htmlFor="answers"
-              hint="Opcional. Escribe solo lo que se puede afirmar: medidas, material, qué incluye y qué no. El comprador lo ve en la ficha. El chat que responda con estos datos todavía no está conectado. No escribas aquí el costo ni las comisiones. No es el precio ni la publicación."
+              hint="Opcional. Escribe solo lo que se puede afirmar: medidas, material, qué incluye y qué no. El comprador lo ve en la ficha y la pregunta automática lo usa. Si no alcanza, el comprador puede enviarla a Pendientes humanos para que anotes aquí. No escribas el costo ni las comisiones. No es el precio ni la publicación."
             >
               <textarea
                 id="answers"

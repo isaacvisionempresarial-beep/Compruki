@@ -46,6 +46,39 @@ export async function getProductBySku(sku: string) {
   return products.find((product) => product.sku === normalized) ?? null;
 }
 
+/** Anexa una línea a Respuestas del producto. No toca precio ni publicación. */
+export async function appendProductAnswerLine(
+  sku: string,
+  line: string,
+  actorName = DEMO_USER.name,
+): Promise<{ error: string | null; product: CatalogProduct | null }> {
+  const product = await getProductBySku(sku);
+  if (!product) return { error: `No encontré ${sku.trim().toUpperCase() || "ese SKU"} en el catálogo.`, product: null };
+  const trimmed = line.trim().replace(/\s+/g, " ").slice(0, 400);
+  if (!trimmed) return { error: "Escribe la respuesta que quieres anotar en la ficha.", product: null };
+
+  const nextAnswers = product.answers.trim() ? `${product.answers.trim()}\n${trimmed}` : trimmed;
+  const draft: ProductDraft = {
+    id: product.id,
+    title: product.title,
+    description: product.description,
+    highlights: product.highlights,
+    answers: nextAnswers.slice(0, 4000),
+    sku: product.sku,
+    externalRef: product.externalRef,
+    category: product.category,
+    price: product.price,
+    cost: product.cost,
+    shipping: product.shipping,
+    commissions: product.commissions,
+    published: product.published,
+    available: product.available,
+    variants: product.variants,
+    sizeKind: product.sizeKind ?? "",
+  };
+  return saveProduct(draft, actorName, emptyMedia(), "Anotó una respuesta para el comprador.");
+}
+
 export type ContentDraftApplyInput = {
   sku: string;
   channel: "ficha" | "anuncio" | "whatsapp";

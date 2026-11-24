@@ -3,6 +3,7 @@ export const LOOKUP_IP_RULE = { limit: 40, windowMs: 10 * 60 * 1000 };
 export const CHECKOUT_TRY_RULE = { limit: 40, windowMs: 10 * 60 * 1000 };
 export const CHECKOUT_CREATE_RULE = { limit: 30, windowMs: 60 * 60 * 1000 };
 export const CUSTOMER_WRITE_RULE = { limit: 20, windowMs: 10 * 60 * 1000 };
+export const PRODUCT_QUESTION_RULE = { limit: 12, windowMs: 10 * 60 * 1000 };
 
 export const LOOKUP_BURST_ERROR =
   "Demasiados intentos seguidos. Espera unos minutos y vuelve a consultar. No se abrió ningún pedido. Nadie cobra en la tienda.";
@@ -12,3 +13,6 @@ export const CHECKOUT_BURST_ERROR =
 
 export const CUSTOMER_BURST_ERROR =
   "Demasiados cambios seguidos. Espera unos minutos. No se cambió el pedido. Nadie cobra en la tienda.";
+
+export const PRODUCT_QUESTION_BURST_ERROR =
+  "Demasiadas preguntas seguidas. Espera unos minutos. No se envió nada a la tienda. Nadie cobra en la tienda.";

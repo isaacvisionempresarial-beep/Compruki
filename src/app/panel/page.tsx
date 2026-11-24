@@ -30,6 +30,7 @@ export default async function PanelPage() {
     pedidos: pendingApprovals.filter((item) => item.kind === "pedido").length,
     borradores: pendingApprovals.filter((item) => item.kind === "borrador").length,
     agentes: pendingApprovals.filter((item) => item.kind === "agente").length,
+    preguntas: pendingApprovals.filter((item) => item.kind === "pregunta").length,
     preview: pendingApprovals.slice(0, 4).map((item) => ({
       id: item.id,
       kind: item.kind,
