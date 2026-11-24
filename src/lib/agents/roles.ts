@@ -55,8 +55,8 @@ export const AGENT_ROLES: AgentRoleDefinition[] = [
   {
     id: "AG-07",
     name: "Gestor de Clientes",
-    job: "Borradores de mensaje desde el pedido; priorizar y crear seguimientos CRM. Envío WhatsApp manual más adelante.",
-    tools: ["draft_customer_message", "list_order_contacts", "prioritize_followups", "create_followup_task"],
+    job: "Borradores desde el pedido; priorizar y mover seguimientos en el pipeline CRM. WhatsApp manual más adelante.",
+    tools: ["draft_customer_message", "list_order_contacts", "prioritize_followups", "create_followup_task", "move_followup_stage"],
     priority: "P1",
   },
   {

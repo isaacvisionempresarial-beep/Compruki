@@ -5,7 +5,8 @@ import { orderFocusHref } from "@/lib/store-order";
 import { generateFollowupPriority } from "@/server/agent-followup-priority";
 import { evaluateAgentPolicy } from "@/server/agent-policy";
 import { recordAgentRun } from "@/server/agent-runs";
-import { createFollowup, resolveFollowup } from "@/server/followups";
+import { isFollowupStageId, normalizeFollowupStage } from "@/lib/crm-pipeline";
+import { createFollowup, moveFollowupStage, resolveFollowup } from "@/server/followups";
 import { assertPanelAccess } from "@/server/panel-auth";
 
 function clientesRedirect(extra: Record<string, string> = {}) {
@@ -22,6 +23,7 @@ export async function createFollowupAction(formData: FormData) {
   const customerName = String(formData.get("customerName") ?? "").trim();
   const orderNumber = String(formData.get("orderNumber") ?? "").trim();
   const note = String(formData.get("note") ?? "").trim();
+  const stage = normalizeFollowupStage(String(formData.get("stage") ?? "nuevo"));
   const from = String(formData.get("from") ?? "").trim();
 
   const result = await createFollowup({
@@ -29,6 +31,7 @@ export async function createFollowupAction(formData: FormData) {
     customerName,
     orderNumber,
     note,
+    stage,
     createdBy: access.actorName,
   });
 
@@ -65,6 +68,23 @@ export async function resolveFollowupAction(formData: FormData) {
     redirect(clientesRedirect({ error: result.error.slice(0, 200) }));
   }
   redirect(clientesRedirect({ cerrado: "1" }));
+}
+
+export async function moveFollowupStageAction(formData: FormData) {
+  const access = await assertPanelAccess();
+  if (!access) redirect("/ingresar");
+
+  const id = String(formData.get("id") ?? "").trim();
+  const stageRaw = String(formData.get("stage") ?? "").trim();
+  if (!isFollowupStageId(stageRaw)) {
+    redirect(clientesRedirect({ error: "Etapa no válida." }));
+  }
+
+  const result = await moveFollowupStage({ id, stage: stageRaw });
+  if (result.error) {
+    redirect(clientesRedirect({ error: result.error.slice(0, 200) }));
+  }
+  redirect(clientesRedirect({ movido: "1" }));
 }
 
 export async function prioritizeFollowupsAction() {
@@ -110,12 +130,14 @@ export async function createSuggestedFollowupAction(formData: FormData) {
   const customerName = String(formData.get("customerName") ?? "").trim();
   const orderNumber = String(formData.get("orderNumber") ?? "").trim();
   const note = String(formData.get("note") ?? "").trim();
+  const stage = normalizeFollowupStage(String(formData.get("stage") ?? "nuevo"));
 
   const result = await createFollowup({
     phone,
     customerName,
     orderNumber,
     note,
+    stage,
     createdBy: access.actorName,
   });
 

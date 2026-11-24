@@ -502,7 +502,7 @@ export function AgentsScreen({
                 {ag07.id} · {ag07.name}
               </h3>
               <p className="mt-1 text-sm text-muted">
-                Lite: borrador en el pedido y «Priorizar» / seguimientos en Clientes. No envía WhatsApp ni cobra.
+                Lite: borrador en el pedido y pipeline CRM en Clientes (Nuevo → Contactar → En espera). No envía WhatsApp.
               </p>
             </div>
           ) : null}

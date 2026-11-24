@@ -2,6 +2,13 @@
 
 import Link from "next/link";
 import type { CrmContact } from "@/lib/crm-contacts";
+import {
+  FOLLOWUP_OPEN_STAGES,
+  followupStageLabel,
+  groupFollowupsByStage,
+  nextFollowupStages,
+  type FollowupStageId,
+} from "@/lib/crm-pipeline";
 import { formatDay } from "@/lib/format";
 import { orderFocusHref } from "@/lib/store-order";
 import type { FollowupPriority } from "@/server/agent-followup-priority";
@@ -9,6 +16,7 @@ import type { FollowupTask } from "@/server/followups";
 import {
   createFollowupAction,
   createSuggestedFollowupAction,
+  moveFollowupStageAction,
   prioritizeFollowupsAction,
   resolveFollowupAction,
 } from "@/server/followup-actions";
@@ -17,6 +25,7 @@ export function CustomersScreen({
   contacts,
   openTasks,
   tableReady,
+  pipelineReady = true,
   priority = null,
   ag07Enabled = true,
   flash = null,
@@ -26,25 +35,35 @@ export function CustomersScreen({
   contacts: CrmContact[];
   openTasks: FollowupTask[];
   tableReady: boolean;
+  pipelineReady?: boolean;
   priority?: FollowupPriority | null;
   ag07Enabled?: boolean;
   flash?: string | null;
   error?: string | null;
   policyError?: string | null;
 }) {
+  const byStage = groupFollowupsByStage(openTasks);
+
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Operación</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Clientes</h1>
       <p className="mt-1 max-w-2xl text-sm text-muted">
-        CRM lite: contactos sacados de pedidos y seguimientos manuales (AG-07). No es difusión masiva ni
-        WhatsApp automático.
+        CRM lite con pipeline: Nuevo → Contactar → En espera. Contactos desde pedidos (AG-07). No es WhatsApp
+        automático.
       </p>
 
       {!tableReady ? (
         <p role="status" className="mt-3 rounded-[10px] bg-warning-tint px-3 py-2 text-sm text-warning">
-          Falta la tabla followup_tasks. Ejecuta supabase/migrations/013_followup_tasks.sql. La lista de
-          contactos sigue visible.
+          Falta followup_tasks. Ejecuta supabase/migrations/013_followup_tasks.sql. La lista de contactos sigue
+          visible.
+        </p>
+      ) : null}
+
+      {tableReady && !pipelineReady ? (
+        <p role="status" className="mt-3 rounded-[10px] bg-warning-tint px-3 py-2 text-sm text-warning">
+          Falta la columna stage. Ejecuta supabase/migrations/014_followup_pipeline.sql para mover tarjetas entre
+          etapas.
         </p>
       ) : null}
 
@@ -64,7 +83,49 @@ export function CustomersScreen({
         </p>
       ) : null}
 
-      <section className="mt-5" aria-labelledby="prioridad">
+      <section className="mt-5" aria-labelledby="pipeline">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pipeline</p>
+        <h2 id="pipeline" className="mt-0.5 text-base font-bold">
+          Seguimientos abiertos
+        </h2>
+        <p className="mt-1 text-sm text-muted">
+          {openTasks.length} abierto{openTasks.length === 1 ? "" : "s"}. Mueve la etapa o cierra con Hecho /
+          Descartar. No envía mensajes.
+        </p>
+
+        {openTasks.length === 0 ? (
+          <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm text-muted">No hay seguimientos abiertos. Crea uno desde un contacto.</p>
+          </div>
+        ) : (
+          <div className="mt-3 grid gap-3 lg:grid-cols-3">
+            {FOLLOWUP_OPEN_STAGES.map((stage) => (
+              <div key={stage.id} className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3">
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{stage.label}</p>
+                <p className="mt-0.5 text-xs text-muted">
+                  {stage.hint} · {byStage[stage.id].length}
+                </p>
+                {byStage[stage.id].length === 0 ? (
+                  <p className="mt-3 text-sm text-muted">Sin tarjetas.</p>
+                ) : (
+                  <ul className="mt-3 space-y-2">
+                    {byStage[stage.id].map((task) => (
+                      <PipelineCard
+                        key={task.id}
+                        task={task}
+                        pipelineReady={pipelineReady}
+                      />
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-6" aria-labelledby="prioridad">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">AG-07</p>
         <h2 id="prioridad" className="mt-0.5 text-base font-bold">
           Priorizar seguimientos
@@ -113,6 +174,7 @@ export function CustomersScreen({
                       <input type="hidden" name="customerName" value={item.customerName} />
                       <input type="hidden" name="orderNumber" value={item.orderNumber} />
                       <input type="hidden" name="note" value={item.reason} />
+                      <input type="hidden" name="stage" value="nuevo" />
                       <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
                         <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
                           Herramientas
@@ -123,7 +185,7 @@ export function CustomersScreen({
                           disabled={!tableReady}
                           className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle disabled:opacity-55"
                         >
-                          Guardar seguimiento
+                          Guardar en Nuevo
                         </button>
                         <Link
                           href={orderFocusHref(item.orderNumber)}
@@ -139,68 +201,6 @@ export function CustomersScreen({
             )}
           </div>
         ) : null}
-      </section>
-
-      <section className="mt-6" aria-labelledby="abiertos">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cola</p>
-        <h2 id="abiertos" className="mt-0.5 text-base font-bold">
-          Seguimientos abiertos
-        </h2>
-        {openTasks.length === 0 ? (
-          <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
-            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
-            <p className="mt-0.5 text-sm text-muted">No hay seguimientos abiertos.</p>
-          </div>
-        ) : (
-          <ul className="mt-3 space-y-2">
-            {openTasks.map((task) => (
-              <li key={task.id} className="elevate-1 rounded-[14px] border border-line bg-card px-4 py-3">
-                <p className="text-sm font-semibold">
-                  {task.customerName || "Sin nombre"}
-                  {task.orderNumber ? ` · ${task.orderNumber}` : ""}
-                </p>
-                <p className="mt-0.5 text-xs text-muted">
-                  {task.phone}
-                  {task.createdBy ? ` · ${task.createdBy}` : ""}
-                  {task.createdAt ? ` · ${formatDay(task.createdAt)}` : ""}
-                </p>
-                <p className="mt-1 text-sm text-muted">{task.note}</p>
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <form action={resolveFollowupAction} className="contents">
-                    <input type="hidden" name="id" value={task.id} />
-                    <input type="hidden" name="status" value="done" />
-                    <button
-                      type="submit"
-                      title="Cerrarlo no envía mensaje."
-                      className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark hover:bg-primary-soft"
-                    >
-                      Hecho
-                    </button>
-                  </form>
-                  <form action={resolveFollowupAction} className="contents">
-                    <input type="hidden" name="id" value={task.id} />
-                    <input type="hidden" name="status" value="dismissed" />
-                    <button
-                      type="submit"
-                      
-                      className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
-                    >
-                      Descartar
-                    </button>
-                  </form>
-                  {task.orderNumber ? (
-                    <Link
-                      href={orderFocusHref(task.orderNumber)}
-                      className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
-                    >
-                      Ver pedido
-                    </Link>
-                  ) : null}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
       </section>
 
       <section className="mt-6" aria-labelledby="contactos">
@@ -239,6 +239,21 @@ export function CustomersScreen({
                   <input type="hidden" name="customerName" value={contact.customerName} />
                   <input type="hidden" name="orderNumber" value={contact.latestOrderNumber} />
                   <label className="block">
+                    <span className="mb-1 block text-sm font-semibold">Etapa inicial</span>
+                    <select
+                      name="stage"
+                      defaultValue="nuevo"
+                      disabled={!tableReady}
+                      className="h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm focus:border-accent focus:outline-none disabled:opacity-55"
+                    >
+                      {FOLLOWUP_OPEN_STAGES.map((stage) => (
+                        <option key={stage.id} value={stage.id}>
+                          {stage.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block">
                     <span className="mb-1 block text-sm font-semibold">Nota del seguimiento</span>
                     <input
                       name="note"
@@ -276,5 +291,76 @@ export function CustomersScreen({
         )}
       </section>
     </div>
+  );
+}
+
+function PipelineCard({ task, pipelineReady }: { task: FollowupTask; pipelineReady: boolean }) {
+  const moves = nextFollowupStages(task.stage);
+  return (
+    <li className="rounded-[10px] border border-line bg-canvas px-3 py-2">
+      <p className="text-sm font-semibold">
+        {task.customerName || "Sin nombre"}
+        {task.orderNumber ? ` · ${task.orderNumber}` : ""}
+      </p>
+      <p className="mt-0.5 text-xs text-muted">
+        {task.phone}
+        {task.createdAt ? ` · ${formatDay(task.createdAt)}` : ""}
+        {" · "}
+        {followupStageLabel(task.stage)}
+      </p>
+      <p className="mt-1 text-sm text-muted">{task.note}</p>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        {pipelineReady
+          ? moves.map((stage) => (
+              <MoveButton key={stage} id={task.id} stage={stage} />
+            ))
+          : null}
+        <form action={resolveFollowupAction} className="contents">
+          <input type="hidden" name="id" value={task.id} />
+          <input type="hidden" name="status" value="done" />
+          <button
+            type="submit"
+            title="Cerrarlo no envía mensaje."
+            className="inline-flex h-8 items-center justify-center rounded-[10px] bg-primary px-2.5 text-xs font-semibold text-on-dark hover:bg-primary-soft"
+          >
+            Hecho
+          </button>
+        </form>
+        <form action={resolveFollowupAction} className="contents">
+          <input type="hidden" name="id" value={task.id} />
+          <input type="hidden" name="status" value="dismissed" />
+          <button
+            type="submit"
+            className="inline-flex h-8 items-center justify-center rounded-[10px] border border-line bg-card px-2.5 text-xs font-semibold text-ink hover:bg-subtle"
+          >
+            Descartar
+          </button>
+        </form>
+        {task.orderNumber ? (
+          <Link
+            href={orderFocusHref(task.orderNumber)}
+            className="inline-flex h-8 items-center rounded-[10px] border border-line bg-card px-2.5 text-xs font-semibold text-ink hover:bg-subtle"
+          >
+            Pedido
+          </Link>
+        ) : null}
+      </div>
+    </li>
+  );
+}
+
+function MoveButton({ id, stage }: { id: string; stage: FollowupStageId }) {
+  return (
+    <form action={moveFollowupStageAction} className="contents">
+      <input type="hidden" name="id" value={id} />
+      <input type="hidden" name="stage" value={stage} />
+      <button
+        type="submit"
+        title="Mover etapa no envía mensaje."
+        className="inline-flex h-8 items-center justify-center rounded-[10px] border border-line bg-card px-2.5 text-xs font-semibold text-ink hover:bg-subtle"
+      >
+        → {followupStageLabel(stage)}
+      </button>
+    </form>
   );
 }
