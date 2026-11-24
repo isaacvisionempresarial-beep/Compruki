@@ -591,6 +591,7 @@ export function orderFocusHref(number: string) {
 export type OrderDetailSectionId =
   | "pedido-resumen"
   | "pedido-lectura"
+  | "pedido-preparar"
   | "pedido-mensaje"
   | "pedido-posventa"
   | "pedido-crm"
@@ -604,6 +605,7 @@ export type OrderDetailSectionId =
 export const ORDER_DETAIL_SECTION_IDS: readonly OrderDetailSectionId[] = [
   "pedido-resumen",
   "pedido-lectura",
+  "pedido-preparar",
   "pedido-mensaje",
   "pedido-posventa",
   "pedido-crm",

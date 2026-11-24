@@ -19,7 +19,7 @@ export function OrderReadingPanel({
         AG-06 · lectura del pedido
       </h2>
       <p className="mt-1 text-xs leading-5 text-muted">
-        Resume el estado con datos locales; si OpenAI responde, añade lectura corta. No cambia el pedido ni cobra.
+        Resume el estado con datos locales; si OpenAI responde, añade lectura corta. No cambia el pedido.
       </p>
       {!enabled ? (
         <p role="status" className="mt-2 text-sm font-medium text-coral">

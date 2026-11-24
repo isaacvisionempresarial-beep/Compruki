@@ -492,7 +492,7 @@ export function AgentsScreen({
                 {ag06.id} · {ag06.name}
               </h3>
               <p className="mt-1 text-sm text-muted">
-                Lite: «Leer pedido» en el detalle resume el estado (OpenAI o cifras). No cambia el pedido ni cobra.
+                Lite: «Leer pedido» y «Preparar paquete» en el detalle. No cambia el estado ni envía al proveedor.
               </p>
             </div>
           ) : null}

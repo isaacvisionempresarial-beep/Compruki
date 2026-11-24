@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { orderFocusHref } from "@/lib/store-order";
 import { generateCustomerMessageDraft } from "@/server/agent-customer-draft";
+import { generateOrderPrepare } from "@/server/agent-order-prepare";
 import { generateOrderReading } from "@/server/agent-order-reading";
 import { generateSupportDraft } from "@/server/agent-support-draft";
 import { evaluateAgentPolicy } from "@/server/agent-policy";
@@ -58,6 +59,52 @@ export async function runOrderReadingAction(formData: FormData) {
   });
 
   redirect(orderReadingHref(number, { lecturaPedido: "1" }));
+}
+
+export async function runOrderPrepareAction(formData: FormData) {
+  const access = await assertPanelAccess();
+  if (!access) redirect("/ingresar");
+
+  const number = String(formData.get("orderNumber") ?? "").trim();
+  if (!number) redirect("/panel/pedidos");
+
+  const policy = await evaluateAgentPolicy("AG-06");
+  if (!policy.ok) {
+    await recordAgentRun({
+      agentId: "AG-06",
+      status: "cancelled",
+      summary: policy.reason,
+      createdBy: access.user.id,
+      actorName: access.actorName,
+    });
+    redirect(
+      orderSectionHref(number, "pedido-preparar", {
+        agente: "AG-06",
+        agenteError: policy.reason.slice(0, 280),
+      }),
+    );
+  }
+
+  const pack = await generateOrderPrepare(number);
+  const via = pack?.via === "openai" ? "openai" : "plantilla";
+
+  await recordAgentRun({
+    agentId: "AG-06",
+    status: pack ? "succeeded" : "failed",
+    costEstimateCop: pack?.costEstimateCop ?? 0,
+    summary: pack
+      ? [
+          `Pedidos preparar ${via}`,
+          pack.orderNumber,
+          pack.ready ? "sin bloqueos" : `${pack.blockers.length} bloqueo(s)`,
+          "no cambió estado ni envió",
+        ].join(" · ")
+      : `Pedidos preparar · pedido ${number} no encontrado`,
+    createdBy: access.user.id,
+    actorName: access.actorName,
+  });
+
+  redirect(orderSectionHref(number, "pedido-preparar", { prepararPedido: "1" }));
 }
 
 export async function runCustomerDraftAction(formData: FormData) {

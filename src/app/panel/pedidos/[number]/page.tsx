@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { OrderEditor } from "@/components/panel/orders-screen";
 import { getCustomerDraftPreview } from "@/server/agent-customer-draft";
+import { getOrderPreparePreview } from "@/server/agent-order-prepare";
 import { getOrderReadingPreview } from "@/server/agent-order-reading";
 import { getSupportDraftPreview } from "@/server/agent-support-draft";
 import { evaluateAgentPolicy } from "@/server/agent-policy";
@@ -24,6 +25,7 @@ export default async function OrderPage({
   params: Promise<{ number: string }>;
   searchParams: Promise<{
     lecturaPedido?: string;
+    prepararPedido?: string;
     borradorMensaje?: string;
     borradorPosventa?: string;
     seguimiento?: string;
@@ -51,10 +53,13 @@ export default async function OrderPage({
   if (!order) notFound();
 
   const reading = query.lecturaPedido === "1" ? getOrderReadingPreview(order.number) : null;
+  const prepare = query.prepararPedido === "1" ? getOrderPreparePreview(order.number) : null;
   const customerDraft = query.borradorMensaje === "1" ? getCustomerDraftPreview(order.number) : null;
   const supportDraft = query.borradorPosventa === "1" ? getSupportDraftPreview(order.number) : null;
   const agent = query.agente?.trim() ?? "";
   const agentError = query.agenteError?.trim() || null;
+  const ag06Error = agent === "AG-06" ? agentError : null;
+  const prepareFocused = query.prepararPedido === "1" || Boolean(ag06Error && !query.lecturaPedido);
 
   return (
     <OrderEditor
@@ -67,7 +72,10 @@ export default async function OrderPage({
       canManageOrderMoney={access.role === "owner"}
       orderReading={reading}
       orderReadingEnabled={policy06.ok}
-      orderReadingError={agent === "AG-06" ? agentError : null}
+      orderReadingError={!prepareFocused ? ag06Error : null}
+      orderPrepare={prepare}
+      orderPrepareEnabled={policy06.ok}
+      orderPrepareError={prepareFocused ? ag06Error : null}
       customerDraft={customerDraft}
       customerDraftEnabled={policy07.ok}
       customerDraftError={agent === "AG-07" ? agentError : null}

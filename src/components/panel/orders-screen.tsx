@@ -7,11 +7,13 @@ import { AttentionSheet } from "@/components/panel/attention-sheet";
 import { CloseSheet } from "@/components/panel/close-sheet";
 import { OrderCrmPanel } from "@/components/panel/order-crm-panel";
 import { OrderMessageDraftPanel } from "@/components/panel/order-message-draft-panel";
+import { OrderPreparePanel } from "@/components/panel/order-prepare-panel";
 import { OrderReadingPanel } from "@/components/panel/order-reading-panel";
 import { OrderSupportDraftPanel } from "@/components/panel/order-support-draft-panel";
 import { usePanelQuery } from "@/components/panel/panel-shell";
 import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
 import type { CustomerMessageDraft } from "@/server/agent-customer-draft";
+import type { OrderPreparePack } from "@/server/agent-order-prepare";
 import type { OrderReading } from "@/server/agent-order-reading";
 import type { SupportResolutionDraft } from "@/server/agent-support-draft";
 import { parsePesos, sizeChoiceLabel, variantFits } from "@/lib/catalog";
@@ -496,6 +498,9 @@ export function OrderEditor({
   orderReading = null,
   orderReadingEnabled = true,
   orderReadingError = null,
+  orderPrepare = null,
+  orderPrepareEnabled = true,
+  orderPrepareError = null,
   customerDraft = null,
   customerDraftEnabled = true,
   customerDraftError = null,
@@ -515,6 +520,9 @@ export function OrderEditor({
   orderReading?: OrderReading | null;
   orderReadingEnabled?: boolean;
   orderReadingError?: string | null;
+  orderPrepare?: OrderPreparePack | null;
+  orderPrepareEnabled?: boolean;
+  orderPrepareError?: string | null;
   customerDraft?: CustomerMessageDraft | null;
   customerDraftEnabled?: boolean;
   customerDraftError?: string | null;
@@ -578,7 +586,7 @@ export function OrderEditor({
                 Sincronización
               </Link>
             ) : null}
-          </nav>
+          </nav>
         </div>
       </div>
 
@@ -654,6 +662,13 @@ export function OrderEditor({
         reading={orderReading}
         enabled={orderReadingEnabled}
         policyError={orderReadingError}
+      />
+
+      <OrderPreparePanel
+        orderNumber={order.number}
+        pack={orderPrepare}
+        enabled={orderPrepareEnabled}
+        policyError={orderPrepareError}
       />
 
       <OrderMessageDraftPanel
