@@ -68,7 +68,9 @@ export async function getAgentGatewayStatus(): Promise<AgentGatewayStatus> {
     openaiConnected,
     dropiConnected: false,
     checkoutIndependent: true,
-    message: `Piloto P0-IA: Central, Explorador, Creador y Analista siguen con datos locales. ${openaiBit} Dropi no está conectado. Pedidos y checkout siguen por su cuenta.`,
+    message: openaiConnected
+      ? `Piloto P0-IA: Central, Explorador, Creador, Analista y borradores AG-05 usan OpenAI cuando responde; si no, reglas o plantilla con datos locales. Dropi no está conectado. Pedidos y checkout siguen por su cuenta.`
+      : `Piloto P0-IA: Central, Explorador, Creador, Analista y AG-05 operan con datos locales (reglas/plantilla). ${openaiBit} Dropi no está conectado. Pedidos y checkout siguen por su cuenta.`,
   };
 }
 

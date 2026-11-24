@@ -6,7 +6,9 @@ import { AGENT_ROLES } from "@/lib/agents/roles";
 import { assertPanelAccess } from "@/server/panel-auth";
 import { getPilotTenantId } from "@/server/tenant";
 
-const editableIds = new Set(AGENT_ROLES.filter((role) => role.priority === "P0-IA").map((role) => role.id));
+const editableIds = new Set(
+  AGENT_ROLES.filter((role) => role.priority === "P0-IA" || role.id === "AG-05").map((role) => role.id),
+);
 
 export type SaveAgentConfigState = { error: string | null; message: string | null };
 
@@ -22,7 +24,7 @@ export async function saveAgentConfigAction(
 
   const agentId = String(formData.get("agentId") ?? "").trim().toUpperCase();
   if (!editableIds.has(agentId)) {
-    return { error: "Solo se puede editar presupuesto de roles P0-IA en este piloto.", message: null };
+    return { error: "Solo se puede editar presupuesto de P0-IA y AG-05 en este piloto.", message: null };
   }
 
   const enabled = formData.get("enabled") === "on" || formData.get("enabled") === "true";
@@ -39,7 +41,11 @@ export async function saveAgentConfigAction(
         agent_id: agentId,
         enabled,
         monthly_budget_cop: monthlyBudgetCop,
-        notes: notes || (enabled ? "Piloto local. OpenAI no está conectado." : "Apagado. OpenAI no está conectado."),
+        notes:
+          notes ||
+          (enabled
+            ? "Piloto: OpenAI si responde; si no, reglas o plantilla local."
+            : "Apagado. OpenAI no se usa en este rol."),
         updated_at: new Date().toISOString(),
       },
       { onConflict: "tenant_id,agent_id" },

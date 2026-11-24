@@ -9,7 +9,8 @@ import { requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
   title: "Centro de agentes",
-  description: "Esqueleto P0-IA. Agentes locales. Dropi no está conectado. OpenAI solo si hay clave y prueba OK.",
+  description:
+    "Centro P0-IA. OpenAI cuando responde; si no, reglas o plantilla local. Dropi no está conectado.",
 };
 
 export const dynamic = "force-dynamic";

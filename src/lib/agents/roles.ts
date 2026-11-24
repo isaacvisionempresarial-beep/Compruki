@@ -41,8 +41,8 @@ export const AGENT_ROLES: AgentRoleDefinition[] = [
   {
     id: "AG-05",
     name: "Asesor de Ventas",
-    job: "Responder dudas verificables del catálogo público y derivar a un humano.",
-    tools: ["search_public_catalog", "get_delivery_terms", "request_human_handoff"],
+    job: "Responder dudas verificables del catálogo público; si no alcanza, handoff con borrador para revisión humana.",
+    tools: ["search_public_catalog", "get_delivery_terms", "request_human_handoff", "draft_owner_answer"],
     priority: "P1",
   },
   {

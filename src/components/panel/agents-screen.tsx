@@ -426,8 +426,8 @@ export function AgentsScreen({
             {ag05.id} · {ag05.name}
           </h2>
           <p className="mt-1 text-sm text-muted">
-            Lite activo: responde con la ficha y deriva a Pendientes humanos si no alcanza. OpenAI no está conectado.
-            Apágalo en Presupuesto y activación. Verlo no cobra ni cambia pedidos.
+            Lite activo: responde con la ficha; si no alcanza, deriva a Pendientes humanos con borrador sugerido
+            (OpenAI o plantilla). Apágalo en Presupuesto y activación. Verlo no cobra ni cambia pedidos.
           </p>
         </section>
       ) : null}
@@ -479,7 +479,7 @@ export function AgentsScreen({
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
             <p className="mt-0.5 text-sm text-muted">
               Todavía no hay corridas. Usa Enrutar, Buscar, Generar borradores o Calcular para dejar el
-              primer registro (sin OpenAI).
+              primer registro. Si OpenAI responde, la corrida puede mostrar costo estimado.
             </p>
           </div>
         ) : (
