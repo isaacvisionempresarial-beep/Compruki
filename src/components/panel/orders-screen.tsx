@@ -673,6 +673,7 @@ export function OrderEditor({
 
       <OrderMessageDraftPanel
         orderNumber={order.number}
+        phone={order.phone}
         draft={customerDraft}
         enabled={customerDraftEnabled}
         policyError={customerDraftError}

@@ -2,20 +2,24 @@
 
 import { useState } from "react";
 import type { CustomerMessageDraft } from "@/server/agent-customer-draft";
+import { whatsAppHref } from "@/lib/store-order";
 import { runCustomerDraftAction } from "@/server/order-agent-actions";
 
 export function OrderMessageDraftPanel({
   orderNumber,
+  phone = "",
   draft = null,
   policyError = null,
   enabled = true,
 }: {
   orderNumber: string;
+  phone?: string;
   draft?: CustomerMessageDraft | null;
   policyError?: string | null;
   enabled?: boolean;
 }) {
   const [copied, setCopied] = useState<"ok" | "fail" | null>(null);
+  const waHref = draft?.text ? whatsAppHref(phone, draft.text) : null;
 
   async function copyText() {
     if (!draft?.text) return;
@@ -34,7 +38,7 @@ export function OrderMessageDraftPanel({
         AG-07 · borrador para el cliente
       </h2>
       <p className="mt-1 text-xs leading-5 text-muted">
-        Arma un texto para copiar (OpenAI o plantilla). No envía WhatsApp ni cambia el pedido.
+        Arma un texto para copiar o abrir en WhatsApp a mano. Compruki no envía el mensaje ni cambia el pedido.
       </p>
       {!enabled ? (
         <p role="status" className="mt-2 text-sm font-medium text-coral">
@@ -79,7 +83,23 @@ export function OrderMessageDraftPanel({
             >
               {copied === "ok" ? "Copiado" : "Copiar borrador"}
             </button>
+            {waHref ? (
+              <a
+                href={waHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Abre WhatsApp con el texto. Compruki no envía."
+                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle"
+              >
+                Abrir WhatsApp
+              </a>
+            ) : null}
           </nav>
+          {!waHref ? (
+            <p className="mt-1 text-xs text-muted">
+              Sin celular válido (10 dígitos que empiecen en 3) no se arma el enlace de WhatsApp.
+            </p>
+          ) : null}
           {copied === "ok" ? (
             <p role="status" className="mt-1 text-xs text-accent-strong">
               Listo para pegarlo. Desde aquí no se envía.
