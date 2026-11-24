@@ -134,6 +134,9 @@ export function CatalogScreen({
           Catálogo interno. Precio y margen de la ficha. No son el total de un pedido ni dinero cobrado. Desactivar no cambia el precio ni la publicación. Dropi no está conectado.
         </p>
       </div>
+      {!canManageCommerce ? (
+        <p className="mt-2 text-sm text-muted">Solo el propietario crea productos. No cobra.</p>
+      ) : null}
       <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
         <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
         {canManageCommerce ? (
@@ -144,9 +147,7 @@ export function CatalogScreen({
           >
             Nuevo producto
           </Link>
-        ) : (
-          <p className="text-sm text-muted">Solo el propietario crea productos. No cobra.</p>
-        )}
+        ) : null}
         <button
           type="button"
           disabled
@@ -404,52 +405,54 @@ function CatalogRowLifecycle({
       return <span className="text-xs font-semibold text-muted">{deactivateState.message ?? "Inactivo"}</span>;
     }
     return (
-      <>
-        <form action={deactivateAction} className="contents">
-          <input type="hidden" name="id" value={product.id} />
-          <button
-            type="submit"
-            disabled={deactivatePending}
-            title="No se puede pedir. No cambia el precio ni la publicación."
-            className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas ${
-              deactivatePending ? "cursor-wait opacity-70" : ""
-            }`}
-          >
-            {deactivatePending ? "…" : "Desactivar"}
-          </button>
-        </form>
-        {deactivateState.error ? <span className="text-xs font-semibold text-danger">{deactivateState.error}</span> : null}
-      </>
+      <form action={deactivateAction} className="contents">
+        <input type="hidden" name="id" value={product.id} />
+        <button
+          type="submit"
+          disabled={deactivatePending}
+          title={
+            deactivateState.error
+              ? deactivateState.error
+              : "No se puede pedir. No cambia el precio ni la publicación."
+          }
+          className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas ${
+            deactivatePending ? "cursor-wait opacity-70" : ""
+          }`}
+        >
+          {deactivatePending ? "…" : "Desactivar"}
+        </button>
+      </form>
     );
   }
 
   if (!hasOrders) {
     if (confirmDelete) {
       return (
-        <>
-          <form action={deleteAction} className="contents">
-            <input type="hidden" name="id" value={product.id} />
-            <button
-              type="submit"
-              title="Quita el producto del catálogo. No cobra ni confirma un pedido."
-              disabled={deletePending}
-              className={`inline-flex h-9 items-center justify-center rounded-[10px] bg-danger px-3 text-sm font-semibold text-on-dark ${
-                deletePending ? "cursor-wait opacity-70" : ""
-              }`}
-            >
-              {deletePending ? "…" : "Confirmar"}
-            </button>
-            <button
-              type="button"
-              title="No lo quita ni cobra."
-              className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
-              onClick={() => setConfirmDelete(false)}
-            >
-              No
-            </button>
-          </form>
-          {deleteState.error ? <span className="text-xs font-semibold text-danger">{deleteState.error}</span> : null}
-        </>
+        <form action={deleteAction} className="contents">
+          <input type="hidden" name="id" value={product.id} />
+          <button
+            type="submit"
+            title={
+              deleteState.error
+                ? deleteState.error
+                : "Quita el producto del catálogo. No cobra ni confirma un pedido."
+            }
+            disabled={deletePending}
+            className={`inline-flex h-9 items-center justify-center rounded-[10px] bg-danger px-3 text-sm font-semibold text-on-dark ${
+              deletePending ? "cursor-wait opacity-70" : ""
+            }`}
+          >
+            {deletePending ? "…" : "Confirmar"}
+          </button>
+          <button
+            type="button"
+            title="No lo quita ni cobra."
+            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
+            onClick={() => setConfirmDelete(false)}
+          >
+            No
+          </button>
+        </form>
       );
     }
     return (
@@ -469,22 +472,23 @@ function CatalogRowLifecycle({
   }
 
   return (
-    <>
-      <form action={deactivateAction} className="contents">
-        <input type="hidden" name="id" value={product.id} />
-        <button
-          type="submit"
-          disabled={deactivatePending}
-          title="Hay pedidos con este producto; no se puede eliminar. Desactivar no cambia el precio ni la publicación."
-          className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas ${
-            deactivatePending ? "cursor-wait opacity-70" : ""
-          }`}
-        >
-          {deactivatePending ? "…" : "Desactivar"}
-        </button>
-      </form>
-      {deactivateState.error ? <span className="text-xs font-semibold text-danger">{deactivateState.error}</span> : null}
-    </>
+    <form action={deactivateAction} className="contents">
+      <input type="hidden" name="id" value={product.id} />
+      <button
+        type="submit"
+        disabled={deactivatePending}
+        title={
+          deactivateState.error
+            ? deactivateState.error
+            : "Hay pedidos con este producto; no se puede eliminar. Desactivar no cambia el precio ni la publicación."
+        }
+        className={`inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas ${
+          deactivatePending ? "cursor-wait opacity-70" : ""
+        }`}
+      >
+        {deactivatePending ? "…" : "Desactivar"}
+      </button>
+    </form>
   );
 }
 

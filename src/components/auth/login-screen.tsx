@@ -191,16 +191,6 @@ function LoginForm({
           </div>
         </Field>
 
-        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-          <a href="/ingresar?modo=nueva-clave" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
-            Cambiar contraseña
-          </a>
-          <button type="button" title="Abrirlo no envía el enlace ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle" onClick={onRecover}>
-            Olvidé mi acceso
-          </button>
-        </nav>
-
         {state.error ? (
           <p id="login-error" role="alert" className="rounded-[10px] bg-danger-tint px-3 py-2 text-sm font-medium text-danger">
             {state.error}
@@ -211,16 +201,25 @@ function LoginForm({
           {canEnter ? "Entras al panel de la tienda piloto." : "Sin correo y contraseña el botón queda bloqueado."} Entrar no cobra ni cambia pedidos. Mostrarla u ocultarla tampoco.
         </p>
 
-        <button
-          type="submit"
-          title="Entrar no cobra ni cambia pedidos."
-          className={`inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark ${
-            pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
-          }`}
-          disabled={pending || !canEnter}
-        >
-          {pending ? "Entrando…" : "Entrar al panel"}
-        </button>
+        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <button
+            type="submit"
+            title="Entrar no cobra ni cambia pedidos."
+            className={`inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark ${
+              pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
+            }`}
+            disabled={pending || !canEnter}
+          >
+            {pending ? "Entrando…" : "Entrar al panel"}
+          </button>
+          <a href="/ingresar?modo=nueva-clave" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+            Cambiar contraseña
+          </a>
+          <button type="button" title="Abrirlo no envía el enlace ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle" onClick={onRecover}>
+            Olvidé mi acceso
+          </button>
+        </nav>
       </form>
     </>
   );
@@ -276,14 +275,17 @@ function RecoveryForm({ onBack, linkError }: { onBack: () => void; linkError?: b
           </p>
         ) : null}
 
-        <button
-          type="submit"
-          title="Enviarlo no cobra ni cambia pedidos."
-          disabled={!canSend || pending}
-          className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
-        >
-          {pending ? "Enviando…" : state.sent ? "Volver a enviar" : "Enviar enlace"}
-        </button>
+        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <button
+            type="submit"
+            title="Enviarlo no cobra ni cambia pedidos."
+            disabled={!canSend || pending}
+            className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
+          >
+            {pending ? "Enviando…" : state.sent ? "Volver a enviar" : "Enviar enlace"}
+          </button>
+        </nav>
       </form>
 
       <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
@@ -400,22 +402,21 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
           {canSave ? "Al guardar entrarás al panel con la nueva clave." : "Mínimo 8 caracteres y que coincidan."}
         </p>
 
-        <button
-          type="submit"
-          title="Guardarla no cobra ni cambia pedidos."
-          disabled={!canSave || pending}
-          className="inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
-        >
-          {pending ? "Guardando…" : "Guardar y entrar"}
-        </button>
+        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <button
+            type="submit"
+            title="Guardarla no cobra ni cambia pedidos."
+            disabled={!canSave || pending}
+            className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-4 text-sm font-semibold text-on-dark hover:bg-primary-soft active:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
+          >
+            {pending ? "Guardando…" : "Guardar y entrar"}
+          </button>
+          <button type="button" title="Volver no guarda la contraseña ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle" onClick={onBack}>
+            Volver a iniciar sesión
+          </button>
+        </nav>
       </form>
-
-      <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-        <button type="button" title="Volver no guarda la contraseña ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle" onClick={onBack}>
-          Volver a iniciar sesión
-        </button>
-      </nav>
       <p className="mt-2 text-xs leading-5 text-muted">Volver no guarda la contraseña ni cobra.</p>
     </>
   );

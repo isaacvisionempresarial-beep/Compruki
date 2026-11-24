@@ -38,7 +38,12 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
       : "Quita lo que ya no se puede pedir para continuar. No entra en el total al recibir ni registra pedido.";
 
   if (!cart.ready) {
-    return <p className="text-sm text-muted">Cargando el carrito… No registra pedido ni cobra.</p>;
+    return (
+      <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3" aria-busy="true">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
+        <p className="mt-0.5 text-sm text-muted">Cargando el carrito… No registra pedido ni cobra.</p>
+      </section>
+    );
   }
 
   return (

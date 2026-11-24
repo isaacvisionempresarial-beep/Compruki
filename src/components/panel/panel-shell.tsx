@@ -179,11 +179,12 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
                   <span className="block text-xs text-muted">{roleLabel}</span>
                 </span>
               </div>
-              <nav aria-label="Cuenta" className="flex shrink-0 items-center">
+              <nav aria-label="Herramientas" className="flex shrink-0 flex-wrap items-center gap-1">
+                <span className="sr-only">Herramientas</span>
                 <a
                   href="/ingresar?modo=nueva-clave"
                   title="Abrirla no cobra ni cambia pedidos."
-                  className="inline-flex h-10 items-center rounded-[10px] px-2 text-sm font-semibold text-accent-strong hover:bg-subtle"
+                  className="inline-flex h-9 items-center rounded-[10px] px-2 text-sm font-semibold text-accent-strong hover:bg-subtle"
                 >
                   Clave
                 </a>
@@ -192,7 +193,7 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
                     type="submit"
                     aria-label="Cerrar sesión"
                     title="Salir no cobra ni cambia pedidos."
-                    className="inline-flex h-10 items-center gap-2 rounded-[10px] px-2 text-sm font-semibold text-ink hover:bg-subtle"
+                    className="inline-flex h-9 items-center gap-2 rounded-[10px] px-2 text-sm font-semibold text-ink hover:bg-subtle"
                   >
                     <Icon name="logout" className="h-5 w-5" />
                     <span className="hidden min-[1200px]:inline">Salir</span>
