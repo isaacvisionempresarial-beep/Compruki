@@ -31,7 +31,8 @@ describe("pendingOrderApprovals", () => {
     ]);
     expect(items.map((item) => item.label)).toEqual(["PED-A", "PED-B"]);
     expect(items[0]?.href).toContain("pedido-herramientas");
-    expect(items[1]?.href).toContain("pedido-avisos");
+    expect(items[1]?.href).toContain("pedido-posventa");
+    expect(items[1]?.detail).toContain("AG-09");
   });
 
   it("incluye listos para preparar con ancla AG-06", () => {
@@ -44,5 +45,16 @@ describe("pendingOrderApprovals", () => {
     expect(items[0]?.id).toBe("prep-c");
     expect(items[0]?.href).toContain("pedido-preparar");
     expect(items[0]?.detail).toContain("AG-06");
+  });
+
+  it("incluye despacho, entrega y cobro pendientes", () => {
+    const items = pendingOrderApprovals([
+      { ...base, id: "e", number: "PED-E", status: "en_preparacion" },
+      { ...base, id: "f", number: "PED-F", status: "en_transporte" },
+      { ...base, id: "g", number: "PED-G", status: "entregado", collected: false },
+      { ...base, id: "h", number: "PED-H", status: "entregado", collected: true },
+    ]);
+    expect(items.map((item) => item.id)).toEqual(["desp-e", "ent-f", "cob-g"]);
+    expect(items.every((item) => item.href?.includes("pedido-herramientas"))).toBe(true);
   });
 });

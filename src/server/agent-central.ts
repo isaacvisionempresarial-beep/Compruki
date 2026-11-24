@@ -1,5 +1,12 @@
 import { formatCop } from "@/lib/format";
-import { orderDetailSectionHref, readyToPrepare, type StoreOrder } from "@/lib/store-order";
+import {
+  orderDetailSectionHref,
+  readyToCollect,
+  readyToDeliver,
+  readyToDispatch,
+  readyToPrepare,
+  type StoreOrder,
+} from "@/lib/store-order";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { buildTemplateDrafts, listPendingContentDrafts } from "@/server/agent-content";
 import { searchLocalCatalog } from "@/server/agent-explorer";
@@ -94,7 +101,7 @@ const AGENT_LABEL: Record<RoutedAgent, string> = {
   "AG-04": "Analista",
 };
 
-/** Pedidos que AG-01 muestra en la bandeja (confirmación, incidencia, listos para preparar). */
+/** Pedidos que AG-01 muestra en la bandeja (atención + colas de operación). */
 export function pendingOrderApprovals(orders: StoreOrder[]): PendingApproval[] {
   const attention = orders
     .filter((order) => order.status === "pendiente_confirmacion" || order.status === "incidencia")
@@ -105,11 +112,11 @@ export function pendingOrderApprovals(orders: StoreOrder[]): PendingApproval[] {
       label: order.number,
       detail:
         order.status === "incidencia"
-          ? `${order.customerName} · incidencia`
+          ? `${order.customerName} · incidencia (AG-09)`
           : `${order.customerName} · pendiente de confirmación`,
       href:
         order.status === "incidencia"
-          ? orderDetailSectionHref(order.number, "pedido-avisos")
+          ? orderDetailSectionHref(order.number, "pedido-posventa")
           : orderDetailSectionHref(order.number, "pedido-herramientas"),
       actionable: false,
     }));
@@ -126,7 +133,43 @@ export function pendingOrderApprovals(orders: StoreOrder[]): PendingApproval[] {
       actionable: false,
     }));
 
-  return [...attention, ...prepare];
+  const dispatch = orders
+    .filter((order) => readyToDispatch(order))
+    .slice(0, 8)
+    .map((order) => ({
+      id: `desp-${order.id}`,
+      kind: "pedido" as const,
+      label: order.number,
+      detail: `${order.customerName} · listo para despachar · a mano, sin guía Dropi`,
+      href: orderDetailSectionHref(order.number, "pedido-herramientas"),
+      actionable: false,
+    }));
+
+  const deliver = orders
+    .filter((order) => readyToDeliver(order))
+    .slice(0, 8)
+    .map((order) => ({
+      id: `ent-${order.id}`,
+      kind: "pedido" as const,
+      label: order.number,
+      detail: `${order.customerName} · en transporte · anotar entrega a mano`,
+      href: orderDetailSectionHref(order.number, "pedido-herramientas"),
+      actionable: false,
+    }));
+
+  const collect = orders
+    .filter((order) => readyToCollect(order))
+    .slice(0, 8)
+    .map((order) => ({
+      id: `cob-${order.id}`,
+      kind: "pedido" as const,
+      label: order.number,
+      detail: `${order.customerName} · entregado sin cobro anotado`,
+      href: orderDetailSectionHref(order.number, "pedido-herramientas"),
+      actionable: false,
+    }));
+
+  return [...attention, ...prepare, ...dispatch, ...deliver, ...collect];
 }
 
 /** AG-01 · list_pending_approvals (pedidos + borradores + corridas + preguntas + seguimientos). */
