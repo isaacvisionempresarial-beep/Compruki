@@ -5,6 +5,8 @@ import { StoreShell } from "@/components/store/store-shell";
 import { storePublicTagline } from "@/lib/store-identity";
 import { getStoreIdentity } from "@/server/store-identity";
 
+export const dynamic = "force-dynamic";
+
 const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-outfit",
