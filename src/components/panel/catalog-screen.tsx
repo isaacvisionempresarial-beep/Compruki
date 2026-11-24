@@ -1726,7 +1726,7 @@ export function ProductDangerZone({
       </h2>
       {canDelete && canManageCommerce ? (
         <p className="mt-1.5 max-w-2xl text-xs leading-5 text-muted">
-          No hay pedidos con este SKU. Puedes eliminarlo del catálogo. Esta acción no se puede deshacer. No cobra ni confirma un pedido.
+          No hay pedidos con este SKU. Puedes eliminarlo del catálogo. Esto no se puede deshacer. No cobra ni confirma un pedido.
         </p>
       ) : canDelete ? (
         <p className="mt-1.5 max-w-2xl text-xs leading-5 text-muted">

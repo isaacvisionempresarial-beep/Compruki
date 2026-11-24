@@ -262,7 +262,7 @@ function SyncHead() {
       <span>Cliente</span>
       <span>Estado</span>
       <span>Número</span>
-      <span>Acción</span>
+      <span>Herramienta</span>
     </div>
   );
 }

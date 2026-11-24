@@ -279,7 +279,7 @@ export function OrdersScreen({
           Por atender
         </h2>
         <p className="mt-0.5 text-xs leading-5 text-muted">
-          Cada pedido sale una sola vez, en su siguiente paso. Ábrelo para completar el dato o la acción.
+          Cada pedido sale una sola vez, en su siguiente paso. Ábrelo para completar el dato o la herramienta.
           {canManageOrderMoney
             ? " Ahí se confirma, se anota la entrega, el despacho y el cobro."
             : " Si puedes hacer algo, ese es el paso. El flete, el costo y el cobro quedan después y los guarda el propietario."}
@@ -287,7 +287,7 @@ export function OrdersScreen({
         {work.length === 0 ? (
           <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
-            <p className="mt-0.5 text-sm text-muted">No hay pedidos esperando un dato o una acción.</p>
+            <p className="mt-0.5 text-sm text-muted">No hay pedidos esperando un dato o una herramienta.</p>
           </div>
         ) : (
           <div className="mt-2">
@@ -308,7 +308,7 @@ export function OrdersScreen({
                     <span>Pedido</span>
                     <span>Cliente</span>
                     <span>Siguiente paso</span>
-                    <span>Acción</span>
+                    <span>Herramienta</span>
                   </div>
                   <ul className="divide-y divide-line">
                     {queue.rows.map((row) => (
@@ -587,9 +587,9 @@ export function OrderEditor({
         ) : null}
       </section>
 
-<section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-acciones">
+<section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="pedido-herramientas">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Siguiente</p>
-        <h2 id="pedido-acciones" className="mt-0.5 text-sm font-semibold">Herramientas del pedido</h2>
+        <h2 id="pedido-herramientas" className="mt-0.5 text-sm font-semibold">Herramientas del pedido</h2>
         {actions.length > 0 || prepareDropiError(order) || resolveBlocked || confirmBlocked ? (
           <>
           <FormTools className="mt-2">
@@ -622,7 +622,7 @@ export function OrderEditor({
             )}
           </FormTools>
           <p className="mt-2 text-xs leading-5 text-muted">
-            Estas acciones no cambian el total guardado ni el precio de las líneas. No cobran en esta pantalla.
+            Estas herramientas no cambian el total guardado ni el precio de las líneas. No cobran en esta pantalla.
             {actions.some((item) => item.id === "entregar")
               ? " Marcar entregado no anota el cobro ni la utilidad realizada."
               : ""}
@@ -727,7 +727,7 @@ export function OrderEditor({
         ) : (
           <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
-            <p className="mt-0.5 text-sm text-muted">No hay una acción disponible en este estado. No cobra. El total guardado no cambia.</p>
+            <p className="mt-0.5 text-sm text-muted">No hay una herramienta disponible en este estado. No cobra. El total guardado no cambia.</p>
           </div>
         )}
       </section>

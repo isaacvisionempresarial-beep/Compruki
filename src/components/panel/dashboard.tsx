@@ -498,7 +498,7 @@ export function Dashboard({
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
             <p className="mt-0.5 text-sm text-muted">
               {attention.length === 0
-                ? "No hay pedidos esperando un dato o una acción."
+                ? "No hay pedidos esperando un dato o una herramienta."
                 : "Ningún pedido de la cola coincide con la búsqueda."}
             </p>
           </div>

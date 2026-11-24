@@ -2108,7 +2108,7 @@ export function attentionSheetText(
   }
   lines.push("");
   if (queues.length === 0) {
-    lines.push("No hay pedidos esperando un dato o una acción.");
+    lines.push("No hay pedidos esperando un dato o una herramienta.");
   } else {
     for (const queue of queues) {
       lines.push(`${queue.title} (${queue.rows.length})`);

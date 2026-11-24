@@ -85,13 +85,14 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
               <div className="mt-3">
                 <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
                   <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-                  <p
+                  <button
+                    type="button"
+                    disabled
                     className="inline-flex h-9 sm:min-w-56 cursor-not-allowed items-center justify-center rounded-[10px] bg-accent px-3 text-sm font-extrabold text-primary-dark opacity-55"
-                    aria-disabled="true"
                     title="Continuar no confirma el pedido ni cobra."
                   >
                     Continuar · pagas al recibir
-                  </p>
+                  </button>
                 </nav>
                 <p className="mt-2 text-sm leading-5 text-coral-strong">{blockedHint}</p>
                 <p className="mt-2 text-xs leading-5 text-muted">Continuar no confirma el pedido ni cobra.</p>
@@ -108,7 +109,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                     Ver productos
                   </Link>
                 </nav>
-                <p className="mt-2 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>
+                <p className="mt-2 text-xs leading-5 text-muted">Ver productos no registra pedido ni cobra.</p>
               </>
             )}
 

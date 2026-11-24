@@ -236,12 +236,14 @@ function OrderProgress({ order, sizes }: { order: CustomerOrder; sizes: Customer
   if (!steps) {
     const missing = customerMissingReasonNote(order);
     return (
-      <div className="mt-2">
-        <p className="text-sm leading-5 text-muted">
+      <section aria-label="Avance" className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+        <h2 className="mt-0.5 text-sm font-semibold">Avance</h2>
+        <p className="mt-2 text-sm leading-5 text-muted">
           {customerStatusNote(order.status, order.customerReason, order.cancelledByCustomer, order.collected)}
         </p>
         {missing ? <p className="mt-2 text-sm leading-5 font-semibold">{missing}</p> : null}
-      </div>
+      </section>
     );
   }
   const hold = order.status === "pendiente_confirmacion" ? customerSizeHoldNote(order.lines, sizes) : "";
