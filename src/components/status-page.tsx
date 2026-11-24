@@ -52,11 +52,23 @@ export function StatusPage({
         </ul>
       </section>
 
-      <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3">
-        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-          {actions.map((action) => <ActionControl key={action.label} action={action} />)}
-        </nav>
+      <div className="elevate-1 mt-3 space-y-2 rounded-[14px] border border-line bg-card px-3 py-3">
+        {actions.some((action) => action.primary) ? (
+          <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            {actions.filter((action) => action.primary).map((action) => (
+              <ActionControl key={action.label} action={action} />
+            ))}
+          </nav>
+        ) : null}
+        {actions.some((action) => !action.primary) ? (
+          <nav aria-label="Vista" className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
+            {actions.filter((action) => !action.primary).map((action) => (
+              <ActionControl key={action.label} action={action} />
+            ))}
+          </nav>
+        ) : null}
       </div>
     </div>
   );

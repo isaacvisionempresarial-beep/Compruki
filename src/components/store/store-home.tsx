@@ -74,8 +74,8 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
             <span className="mt-0.5 block text-xs leading-5 text-muted">No está conectado. Consulta el estado con número y celular.</span>
           </li>
         </ul>
-        <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <nav aria-label="Consulta" className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
           <Link
             href="/tienda/consultar"
             title="Consultar no cobra ni cambia el total guardado."
@@ -83,6 +83,9 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
           >
             Consultar pedido
           </Link>
+        </nav>
+        <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
           <Link
             href="/tienda/condiciones"
             title="Leerlas no registra pedido ni cobra."
@@ -147,8 +150,8 @@ export function StoreHome({ products }: { products: PublicProduct[] }) {
               <p className="mt-0.5 text-sm leading-5 text-muted">{storeEmptyMessage(products.length, category, query)}</p>
               {products.length > 0 && (category !== "todas" || query.trim()) ? (
                 <>
-                <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
                   <button
                     type="button"
                     title="Verlos no cambia los precios publicados ni crea un pedido."

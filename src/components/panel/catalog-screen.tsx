@@ -1102,8 +1102,8 @@ export function ProductEditor({
           </p>
         </div>
         <div className="shrink-0">
-          <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <nav aria-label="Vista" className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
             <Link
               href="/panel/catalogo"
               title="Volver no cobra ni cambia el precio ni la publicación."

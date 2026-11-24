@@ -165,8 +165,8 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
         ) : null}
         <strong className="truncate font-bold text-ink">{product.title}</strong>
       </nav>
-      <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+      <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
         <Link
           href="/tienda"
           title="Volver al inicio no registra pedido ni cobra."
@@ -355,9 +355,12 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               ) : null}
             </form>
           ) : (
-            <p className="mt-3 rounded-[10px] bg-coral-tint px-3 py-2 text-sm font-semibold text-coral-strong">
-              Este producto está publicado, pero ahora no se puede pedir. El precio publicado no cambia.
-            </p>
+            <div className="mt-3 rounded-[10px] bg-coral-tint px-3 py-2">
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
+              <p className="mt-0.5 text-sm font-semibold text-coral-strong">
+                Este producto está publicado, pero ahora no se puede pedir. El precio publicado no cambia.
+              </p>
+            </div>
           )}
 
           <div className="mt-2 border-t border-line pt-2">

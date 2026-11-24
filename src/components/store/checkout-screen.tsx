@@ -85,8 +85,8 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
       <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
         <p className="mt-0.5 text-sm text-muted">No hay productos que se puedan pedir. No registra pedido ni cobra.</p>
-        <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
           <Link href="/tienda/carrito" title="Volver no confirma el pedido ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
             Volver al carrito
           </Link>
@@ -150,8 +150,8 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
           <p className="mt-1.5 text-xs leading-5 text-muted">
             Confirmar registra en la tienda y no cobra. Dropi no está conectado: no crea el pedido ahí.
           </p>
-          <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
             <Link href="/tienda/carrito" title="Volver no confirma el pedido ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
               Volver al carrito
             </Link>

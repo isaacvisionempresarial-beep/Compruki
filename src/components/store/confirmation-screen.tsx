@@ -122,8 +122,8 @@ export function ConfirmationScreen({
             {customerPayLine(order.status, order.collected)}
             Dropi no está conectado. Sin guía ni fecha exacta.
           </p>
-          <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
             <Link
               href="/tienda"
               title="Volver no cobra. El total guardado no cambia."
