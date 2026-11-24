@@ -1,5 +1,5 @@
 import { formatCop } from "@/lib/format";
-import { orderDetailSectionHref } from "@/lib/store-order";
+import { orderDetailSectionHref, readyToPrepare, type StoreOrder } from "@/lib/store-order";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { buildTemplateDrafts, listPendingContentDrafts } from "@/server/agent-content";
 import { searchLocalCatalog } from "@/server/agent-explorer";
@@ -94,17 +94,9 @@ const AGENT_LABEL: Record<RoutedAgent, string> = {
   "AG-04": "Analista",
 };
 
-/** AG-01 · list_pending_approvals (pedidos + borradores + corridas + preguntas + seguimientos). */
-export async function listPendingApprovals(): Promise<PendingApproval[]> {
-  const [orders, agentItems, draftItems, questionItems, followupItems] = await Promise.all([
-    listOrders(),
-    listAwaitingAgentApprovals(),
-    listPendingDraftApprovals(),
-    listPendingQuestionApprovals(),
-    listPendingFollowupApprovals(),
-  ]);
-
-  const pendingOrders = orders
+/** Pedidos que AG-01 muestra en la bandeja (confirmación, incidencia, listos para preparar). */
+export function pendingOrderApprovals(orders: StoreOrder[]): PendingApproval[] {
+  const attention = orders
     .filter((order) => order.status === "pendiente_confirmacion" || order.status === "incidencia")
     .slice(0, 8)
     .map((order) => ({
@@ -122,7 +114,32 @@ export async function listPendingApprovals(): Promise<PendingApproval[]> {
       actionable: false,
     }));
 
-  return [...pendingOrders, ...draftItems, ...agentItems, ...questionItems, ...followupItems];
+  const prepare = orders
+    .filter((order) => readyToPrepare(order))
+    .slice(0, 8)
+    .map((order) => ({
+      id: `prep-${order.id}`,
+      kind: "pedido" as const,
+      label: order.number,
+      detail: `${order.customerName} · listo para preparar (AG-06) · no envía al proveedor`,
+      href: orderDetailSectionHref(order.number, "pedido-preparar"),
+      actionable: false,
+    }));
+
+  return [...attention, ...prepare];
+}
+
+/** AG-01 · list_pending_approvals (pedidos + borradores + corridas + preguntas + seguimientos). */
+export async function listPendingApprovals(): Promise<PendingApproval[]> {
+  const [orders, agentItems, draftItems, questionItems, followupItems] = await Promise.all([
+    listOrders(),
+    listAwaitingAgentApprovals(),
+    listPendingDraftApprovals(),
+    listPendingQuestionApprovals(),
+    listPendingFollowupApprovals(),
+  ]);
+
+  return [...pendingOrderApprovals(orders), ...draftItems, ...agentItems, ...questionItems, ...followupItems];
 }
 
 async function listPendingFollowupApprovals(): Promise<PendingApproval[]> {

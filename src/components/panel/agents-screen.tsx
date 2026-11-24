@@ -492,7 +492,8 @@ export function AgentsScreen({
                 {ag06.id} · {ag06.name}
               </h3>
               <p className="mt-1 text-sm text-muted">
-                Lite: «Leer pedido» y «Preparar paquete» en el detalle. No cambia el estado ni envía al proveedor.
+                Lite: «Leer pedido» y «Preparar paquete» en el detalle; listos para preparar también en Pendientes
+                humanos. No cambia el estado ni envía al proveedor.
               </p>
             </div>
           ) : null}

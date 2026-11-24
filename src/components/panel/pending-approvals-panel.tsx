@@ -27,8 +27,8 @@ export function PendingApprovalsPanel({
       </h2>
       <p className="mt-1 text-sm text-muted">
         Bandeja de AG-01. Solo el propietario aprueba un borrador o anota una respuesta de ficha en
-        el catálogo. Un operador puede rechazar. Pedidos se atienden en Pedidos; seguimientos CRM en
-        Clientes.
+        el catálogo. Un operador puede rechazar. Pedidos (incl. listos para preparar) se atienden en
+        Pedidos; seguimientos CRM en Clientes.
       </p>
 
       {!productQuestionsReady ? (
