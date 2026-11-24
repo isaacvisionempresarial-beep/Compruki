@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { buildTemplateDrafts } from "@/server/agent-content";
+import { generateContentDrafts } from "@/server/agent-content";
 import { searchLocalCatalog } from "@/server/agent-explorer";
 import { agentDeniedRedirect, evaluateAgentPolicy } from "@/server/agent-policy";
 import { recordAgentRun } from "@/server/agent-runs";
@@ -90,15 +90,17 @@ export async function generateContentDraftsAction(formData: FormData) {
     redirect(agentDeniedRedirect("AG-03", policy.reason, { q, categoria, sku }));
   }
 
-  const packed = await buildTemplateDrafts(sku);
+  const packed = await generateContentDrafts(sku);
   const channels = packed?.drafts.map((draft) => draft.channel) ?? [];
+  const via = packed?.via ?? "plantilla";
 
   await recordAgentRun({
     agentId: "AG-03",
     status: packed ? "succeeded" : "failed",
+    costEstimateCop: packed?.costEstimateCop ?? 0,
     summary: packed
-      ? `Creador plantilla · ${sku} · ${channels.join(", ") || "ninguno"} · no se guardaron ni se publicaron. El precio no cambió`
-      : `Creador plantilla · SKU ${sku} no encontrado en catálogo local`,
+      ? `Creador ${via} · ${sku} · ${channels.join(", ") || "ninguno"} · no se guardaron ni se publicaron. El precio no cambió`
+      : `Creador · SKU ${sku} no encontrado en catálogo local`,
     createdBy: access.user.id,
     actorName: access.actorName,
   });

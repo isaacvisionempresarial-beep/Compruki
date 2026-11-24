@@ -37,9 +37,9 @@ export function AgentBudgetPanel({
         Presupuesto y activación
       </h2>
       <p className="mt-1 text-sm text-muted">
-        Activación y tope mensual por rol. Solo el propietario los cambia. Si un rol está
-        apagado o sin presupuesto, Enrutar / Buscar / Generar / Calcular se cancelan. OpenAI no está
-        conectado: el costo estimado sigue en cero. Verlo o guardarlo no cobra ni cambia pedidos. El costo estimado no es dinero cobrado.
+        Activación y tope mensual por rol. Solo el propietario los cambia. Si un rol está apagado o sin presupuesto,
+        Enrutar / Buscar / Generar / Calcular se cancelan. OpenAI solo se usa si hay clave y responde; si no, plantilla.
+        Verlo o guardarlo no cobra ni cambia pedidos. El costo estimado no es dinero cobrado.
       </p>
 
       <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">

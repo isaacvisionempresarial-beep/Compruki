@@ -27,12 +27,14 @@ export async function saveContentDraftAction(_state: SaveDraftState, formData: F
     return { error: policy.reason, message: null };
   }
 
+  const sourceRaw = String(formData.get("source") ?? "").trim();
   const result = await saveContentDraft({
     sku,
     channel,
     title: String(formData.get("title") ?? ""),
     body: String(formData.get("body") ?? ""),
     cta: String(formData.get("cta") ?? ""),
+    source: sourceRaw === "openai" ? "openai" : "plantilla",
     createdBy: access.user.id,
     authorName: access.actorName,
   });

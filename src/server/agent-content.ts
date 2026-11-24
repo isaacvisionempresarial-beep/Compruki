@@ -23,12 +23,14 @@ export type ProductFacts = {
   brandNotes: string[];
 };
 
+export type ContentDraftSource = "plantilla" | "openai";
+
 export type ContentDraft = {
   channel: ContentChannel;
   title: string;
   body: string;
   cta: string;
-  source: "plantilla";
+  source: ContentDraftSource;
 };
 
 export type DraftReviewStatus = "pending" | "approved" | "rejected";
@@ -45,10 +47,15 @@ export type SavedContentDraft = ContentDraft & {
 
 const BRAND_NOTES = [
   "Marca de trabajo COMPRUKI.",
-  "Dropi no está conectado: no digas que el stock viene del proveedor en vivo.",
+  "No digas que el stock viene de un proveedor en vivo ni nombres plataformas de dropshipping.",
   "El precio se paga al recibir; el envío se confirma aparte.",
   "No inventes medidas, materiales ni promesas no escritas en la ficha.",
 ];
+
+type DraftPack = { facts: ProductFacts; drafts: ContentDraft[]; costEstimateCop: number; via: ContentDraftSource };
+
+const previewCache = new Map<string, { at: number; pack: DraftPack }>();
+const PREVIEW_TTL_MS = 15 * 60_000;
 
 /** AG-03 · get_product_facts */
 export async function getProductFacts(sku: string): Promise<ProductFacts | null> {
@@ -62,17 +69,14 @@ export function getBrandGuidelines() {
   return [...BRAND_NOTES];
 }
 
-/** Borradores plantilla a partir de hechos verificables. No usa OpenAI. */
-export async function buildTemplateDrafts(sku: string): Promise<{ facts: ProductFacts; drafts: ContentDraft[] } | null> {
-  const facts = await getProductFacts(sku);
-  if (!facts) return null;
-
+function templatePack(facts: ProductFacts): DraftPack {
   const variantLine =
     facts.variants.length > 0
       ? `Opciones: ${facts.variants.slice(0, 6).join(", ")}${facts.variants.length > 6 ? "…" : ""}.`
       : "Sin variantes registradas.";
 
-  const highlightLine = firstNonEmptyLine(facts.highlights) || firstNonEmptyLine(facts.description) || "Revisa la ficha antes de publicar.";
+  const highlightLine =
+    firstNonEmptyLine(facts.highlights) || firstNonEmptyLine(facts.description) || "Revisa la ficha antes de publicar.";
 
   const drafts: ContentDraft[] = [
     {
@@ -82,8 +86,7 @@ export async function buildTemplateDrafts(sku: string): Promise<{ facts: Product
         facts.description.trim() || `${facts.title} en ${facts.category || "el catálogo"}.`,
         highlightLine,
         variantLine,
-        `Precio: ${facts.priceLabel}. Pagas al recibir. El envío se confirma aparte.`,
-        "Dropi no está conectado.",
+        `Precio: ${facts.priceLabel}. Pagas al recibir. El envío se acuerda aparte.`,
       ].join("\n\n"),
       cta: "Ver producto",
       source: "plantilla",
@@ -95,7 +98,7 @@ export async function buildTemplateDrafts(sku: string): Promise<{ facts: Product
         highlightLine,
         variantLine,
         `Precio ${facts.priceLabel}. Contra entrega. Envío por confirmar.`,
-        "Información del catálogo local de COMPRUKI. Dropi no está conectado.",
+        "Información del catálogo local de COMPRUKI.",
       ].join(" "),
       cta: "Pedir ahora",
       source: "plantilla",
@@ -107,14 +110,146 @@ export async function buildTemplateDrafts(sku: string): Promise<{ facts: Product
         `Hola, te escribo por ${facts.title} (${facts.sku}).`,
         `Va en ${facts.priceLabel}, pago contra entrega.`,
         variantLine,
-        "¿Te confirmo disponibilidad y datos de envío? Dropi no está conectado desde aquí.",
+        "¿Te confirmo disponibilidad y datos de envío?",
       ].join(" "),
       cta: "Quiero pedirlo",
       source: "plantilla",
     },
   ];
 
-  return { facts, drafts };
+  return { facts, drafts, costEstimateCop: 0, via: "plantilla" };
+}
+
+/** Borradores plantilla a partir de hechos verificables. No usa OpenAI. */
+export async function buildTemplateDrafts(sku: string): Promise<{ facts: ProductFacts; drafts: ContentDraft[] } | null> {
+  const facts = await getProductFacts(sku);
+  if (!facts) return null;
+  const pack = templatePack(facts);
+  return { facts: pack.facts, drafts: pack.drafts };
+}
+
+function previewKey(sku: string) {
+  return sku.trim().toUpperCase();
+}
+
+export function rememberContentPreview(sku: string, pack: DraftPack) {
+  previewCache.set(previewKey(sku), { at: Date.now(), pack });
+}
+
+export async function getContentDraftPreview(sku: string): Promise<DraftPack | null> {
+  const key = previewKey(sku);
+  if (!key) return null;
+  const cached = previewCache.get(key);
+  if (cached && Date.now() - cached.at < PREVIEW_TTL_MS) return cached.pack;
+
+  const facts = await getProductFacts(key);
+  if (!facts) return null;
+  return templatePack(facts);
+}
+
+/** AG-03 · genera con OpenAI si responde; si no, plantilla. Solo hechos de catálogo. */
+export async function generateContentDrafts(sku: string): Promise<DraftPack | null> {
+  const facts = await getProductFacts(sku);
+  if (!facts) return null;
+
+  const { openAIKeyConfigured } = await import("@/server/openai-client");
+  if (!openAIKeyConfigured()) {
+    const pack = templatePack(facts);
+    rememberContentPreview(facts.sku, pack);
+    return pack;
+  }
+
+  try {
+    const { chatJsonCompletion } = await import("@/server/openai-client");
+    const system = [
+      "Eres el Creador de contenido de COMPRUKI (tienda Colombia).",
+      "Devuelve SOLO JSON con clave drafts: array de 3 objetos {channel,title,body,cta}.",
+      "channels exactos: ficha, anuncio, whatsapp.",
+      "Usa únicamente los hechos del usuario. No inventes stock, medidas, materiales ni promesas.",
+      "No menciones Dropi, OpenAI ni proveedores. Español colombiano claro.",
+      "Pagas al recibir. Envío aparte. Nadie cobra en la tienda web.",
+      "title ≤ 80 caracteres, body ≤ 600, cta ≤ 40.",
+    ].join(" ");
+
+    const user = JSON.stringify({
+      sku: facts.sku,
+      title: facts.title,
+      category: facts.category,
+      priceLabel: facts.priceLabel,
+      published: facts.published,
+      available: facts.available,
+      variants: facts.variants,
+      sizeKind: facts.sizeKind,
+      description: facts.description.slice(0, 800),
+      highlights: facts.highlights.slice(0, 500),
+      brandNotes: facts.brandNotes,
+    });
+
+    const completion = await chatJsonCompletion({ system, user, maxTokens: 1000 });
+    if (!completion.ok) {
+      const pack = templatePack(facts);
+      rememberContentPreview(facts.sku, pack);
+      return pack;
+    }
+
+    const parsed = parseOpenAIDrafts(completion.text, facts);
+    if (!parsed) {
+      const pack = templatePack(facts);
+      rememberContentPreview(facts.sku, pack);
+      return pack;
+    }
+
+    const pack: DraftPack = {
+      facts,
+      drafts: parsed,
+      costEstimateCop: completion.costEstimateCop,
+      via: "openai",
+    };
+    rememberContentPreview(facts.sku, pack);
+    return pack;
+  } catch {
+    const pack = templatePack(facts);
+    rememberContentPreview(facts.sku, pack);
+    return pack;
+  }
+}
+
+function parseOpenAIDrafts(raw: string, facts: ProductFacts): ContentDraft[] | null {
+  try {
+    const data = JSON.parse(raw) as { drafts?: unknown };
+    if (!Array.isArray(data.drafts)) return null;
+    const byChannel = new Map<ContentChannel, ContentDraft>();
+    for (const item of data.drafts) {
+      if (!item || typeof item !== "object") continue;
+      const row = item as Record<string, unknown>;
+      const channel = row.channel;
+      if (channel !== "ficha" && channel !== "anuncio" && channel !== "whatsapp") continue;
+      const title = scrubPublicDraft(String(row.title ?? "").trim()).slice(0, 80);
+      const body = scrubPublicDraft(String(row.body ?? "").trim()).slice(0, 600);
+      const cta = scrubPublicDraft(String(row.cta ?? "").trim()).slice(0, 40);
+      if (!title || !body || !cta) continue;
+      byChannel.set(channel, { channel, title, body, cta, source: "openai" });
+    }
+    const ordered: ContentChannel[] = ["ficha", "anuncio", "whatsapp"];
+    const drafts = ordered.map((channel) => byChannel.get(channel)).filter(Boolean) as ContentDraft[];
+    if (drafts.length !== 3) return null;
+    // Ancla mínima al producto real
+    if (!drafts.some((draft) => draft.body.includes(facts.priceLabel) || draft.title.includes(facts.title.slice(0, 12)))) {
+      return null;
+    }
+    return drafts;
+  } catch {
+    return null;
+  }
+}
+
+function scrubPublicDraft(value: string) {
+  return value
+    .replace(/\bDropi\b/gi, "")
+    .replace(/\bOpenAI\b/gi, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\s+([.,;:!?])/g, "$1")
+    .trim();
 }
 
 /** AG-03 · save_content_draft */
@@ -124,6 +259,7 @@ export async function saveContentDraft(input: {
   title: string;
   body: string;
   cta: string;
+  source?: ContentDraftSource;
   createdBy?: string | null;
   authorName?: string | null;
 }): Promise<{ error: string | null; draft: SavedContentDraft | null }> {
@@ -134,6 +270,7 @@ export async function saveContentDraft(input: {
   if (channel !== "ficha" && channel !== "anuncio" && channel !== "whatsapp") {
     return { error: "Canal no válido.", draft: null };
   }
+  const source: ContentDraftSource = input.source === "openai" ? "openai" : "plantilla";
 
   try {
     const tenantId = await getPilotTenantId();
@@ -146,7 +283,7 @@ export async function saveContentDraft(input: {
       title: input.title.trim().slice(0, 200),
       body: input.body.trim().slice(0, 4000),
       cta: input.cta.trim().slice(0, 120),
-      source: "plantilla",
+      source,
       review_status: "pending",
       created_by: input.createdBy ?? null,
       ...(authorName ? { author_name: authorName } : {}),
@@ -199,7 +336,7 @@ export async function saveContentDraft(input: {
         title: String(data.title ?? ""),
         body: String(data.body ?? ""),
         cta: String(data.cta ?? ""),
-        source: "plantilla",
+        source: data.source === "openai" ? "openai" : "plantilla",
         createdAt: String(data.created_at),
         reviewStatus: mapReviewStatus(data.review_status),
         reviewedBy: null,
@@ -267,6 +404,7 @@ type DraftListRow = {
   title: unknown;
   body: unknown;
   cta: unknown;
+  source?: unknown;
   created_at: unknown;
   review_status?: unknown;
   reviewed_by?: unknown;
@@ -282,7 +420,7 @@ function mapSavedDraft(row: DraftListRow): SavedContentDraft {
     title: String(row.title ?? ""),
     body: String(row.body ?? ""),
     cta: String(row.cta ?? ""),
-    source: "plantilla",
+    source: row.source === "openai" ? "openai" : "plantilla",
     createdAt: String(row.created_at),
     reviewStatus: mapReviewStatus(row.review_status),
     reviewedBy: typeof row.reviewed_by === "string" && row.reviewed_by.trim() ? row.reviewed_by.trim() : null,

@@ -32,11 +32,12 @@ export function ContentCreatorPanel({
     <section className="mt-6" aria-labelledby="creador">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Borradores</p>
       <h2 id="creador" className="mt-0.5 text-base font-bold">
-        Creador de contenido (plantillas)
+        Creador de contenido
       </h2>
       <p className="mt-1 text-sm text-muted">
-        AG-03 sin OpenAI: arma borradores con hechos del catálogo. Generar o guardar deja corrida en el
-        historial. Generar no cobra ni cambia pedidos. Guardar no publica ni cambia el precio de la ficha.{" "}
+        AG-03: si OpenAI responde, arma borradores con el modelo; si no, usa plantilla. Solo hechos del catálogo.
+        Generar o guardar deja corrida en el historial. Generar no cobra en la tienda ni publica. Guardar no cambia el
+        precio de la ficha.{" "}
         {canTurnOn
           ? "El borrador espera tu aprobación para escribirse en el catálogo."
           : "No escribe el catálogo. Lo aprueba el propietario."}
@@ -89,7 +90,7 @@ export function ContentCreatorPanel({
       {!selectedSku ? (
         <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
-          <p className="mt-0.5 text-sm text-muted">Elige un producto para ver hechos y borradores plantilla.</p>
+          <p className="mt-0.5 text-sm text-muted">Elige un producto y genera borradores (OpenAI o plantilla).</p>
         </div>
       ) : !facts ? (
         <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3" role="alert">
@@ -119,7 +120,8 @@ export function ContentCreatorPanel({
           </div>
 
           <p className="mt-3 text-sm text-muted">
-            Estas plantillas no están guardadas. Guardar no publica ni cambia el precio.
+            Vista previa · fuente {drafts[0]?.source === "openai" ? "OpenAI" : "plantilla"}. Guardar no publica ni cambia
+            el precio.
           </p>
           <ul className="mt-3 grid gap-3 lg:grid-cols-3">
             {drafts.map((draft) => (
@@ -200,7 +202,9 @@ function DraftCard({ sku, draft, enabled }: { sku: string; draft: ContentDraft; 
 
   return (
     <article className="elevate-1 flex h-full flex-col rounded-[14px] border border-line bg-card px-4 py-3">
-      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{draft.channel}</p>
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
+        {draft.channel} · {draft.source}
+      </p>
       <h4 className="mt-1 text-sm font-semibold">{draft.title}</h4>
       <p className="mt-2 flex-1 text-sm leading-5 text-muted whitespace-pre-wrap">{draft.body}</p>
       <p className="mt-2 text-sm font-semibold">Invitación: {draft.cta}</p>
@@ -211,6 +215,7 @@ function DraftCard({ sku, draft, enabled }: { sku: string; draft: ContentDraft; 
         <input type="hidden" name="title" value={draft.title} />
         <input type="hidden" name="body" value={draft.body} />
         <input type="hidden" name="cta" value={draft.cta} />
+        <input type="hidden" name="source" value={draft.source} />
         <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
           <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
           <button

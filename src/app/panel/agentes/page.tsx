@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { AgentsScreen } from "@/components/panel/agents-screen";
 import { routeTask } from "@/server/agent-central";
-import { buildTemplateDrafts, listContentDrafts, listDraftableProducts } from "@/server/agent-content";
+import { getContentDraftPreview, listContentDrafts, listDraftableProducts } from "@/server/agent-content";
 import { searchLocalCatalog } from "@/server/agent-explorer";
 import { getAgentCenterView } from "@/server/agent-gateway";
 import { getAnalystToolkit } from "@/server/agent-tools";
@@ -40,7 +40,7 @@ export default async function AgentsPage({
     getAnalystToolkit(),
     searchLocalCatalog(params.q ?? "", params.categoria ?? ""),
     listDraftableProducts(),
-    selectedSku ? buildTemplateDrafts(selectedSku) : Promise.resolve(null),
+    selectedSku ? getContentDraftPreview(selectedSku) : Promise.resolve(null),
     listContentDrafts(selectedSku || undefined),
     intent ? routeTask(intent) : Promise.resolve(null),
   ]);
