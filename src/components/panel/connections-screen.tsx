@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { DROPI_CAPABILITIES, DROPI_MCP_HOST, DROPI_OAUTH_HOST, blockedDropiAnswer, type DropiConnectionState, type DropiQueuedJob } from "@/lib/dropi-provider";
 import { cx } from "@/lib/cx";
+import { syncSectionHref } from "@/lib/store-order";
 import { inspectDropiAuthorization, probeOfficialDropi, type DropiAdvertisement, type DropiProbe } from "@/server/dropi-read";
 
 const initial: DropiProbe | null = null;
@@ -271,7 +272,7 @@ export function ConnectionsScreen({
             <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
               <Link
-                href="/panel/sincronizacion"
+                href={syncSectionHref("sync-crear")}
                 title="Abrirla no cobra. El total guardado no cambia."
                 className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
               >

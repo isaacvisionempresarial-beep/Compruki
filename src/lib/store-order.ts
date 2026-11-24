@@ -592,6 +592,17 @@ export function syncFocusHref(number: string) {
   return `/panel/sincronizacion/${encodeURIComponent(number)}`;
 }
 
+export type SyncSectionId = "sync-crear" | "sync-incidencia" | "sync-cerrado" | "cola-dropi" | "sync-anotados";
+
+export function syncSectionHref(section: SyncSectionId = "sync-crear") {
+  return `/panel/sincronizacion#${section}`;
+}
+
+/** Colas de «Por atender» cuyo siguiente paso es anotar el número en Sincronización. */
+export function attentionQueueOpensSync(queueId: string) {
+  return queueId === "cola-numero-dropi" || queueId === "cola-numero-cerrado";
+}
+
 export function dropiHandoffText(
   order: Pick<StoreOrder, "number" | "customerName" | "phone" | "document" | "department" | "city" | "address" | "reference" | "lines" | "total" | "providerRef">,
 ) {

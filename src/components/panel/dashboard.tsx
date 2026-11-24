@@ -10,7 +10,7 @@ import { CollectedPill, StatusPill } from "@/components/panel/status-pill";
 import { STATUS_LABEL, type Period } from "@/lib/demo-data";
 import { cx } from "@/lib/cx";
 import { formatCop, formatDay } from "@/lib/format";
-import { accountHoldNote, attentionCostAside, attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, costDrift, costDriftNote, ordersInSpan, priceDrift, orderPriceStayNote, resultDriftNote, resultsByProduct, samePhoneMatches, orderCostCopyNote, outsideCostCopyNote, periodCostShiftNote, skuCostPreviewNote, storedSkuLines, summarizeStoreOrders, widerPeriodWithResults, type CloseBasis, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import { accountHoldNote, attentionCostAside, attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, costDrift, costDriftNote, ordersInSpan, priceDrift, orderPriceStayNote, resultDriftNote, resultsByProduct, samePhoneMatches, orderCostCopyNote, outsideCostCopyNote, periodCostShiftNote, skuCostPreviewNote, storedSkuLines, summarizeStoreOrders, syncSectionHref, widerPeriodWithResults, type CloseBasis, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
 
 function outsideCopyNote(all: StoreOrder[], sku: string, guides: CostGuide[]) {
   const guide = guides.find((item) => item.sku === sku);
@@ -386,7 +386,7 @@ export function Dashboard({
             </Link>
           </li>
           <li>
-            <Link href="/panel/sincronizacion" title="Abrirla no cobra. El total guardado no cambia." className="elevate-1 block rounded-[14px] border border-line bg-card px-3 py-3 hover:bg-canvas">
+            <Link href={syncSectionHref("sync-crear")} title="Abrirla no cobra. El total guardado no cambia." className="elevate-1 block rounded-[14px] border border-line bg-card px-3 py-3 hover:bg-canvas">
               <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Sincronización</span>
               <span className="mt-1 block text-sm font-bold">
                 {syncWorkCount} {syncWorkCount === 1 ? "pedido sin número de Dropi" : "pedidos sin número de Dropi"}

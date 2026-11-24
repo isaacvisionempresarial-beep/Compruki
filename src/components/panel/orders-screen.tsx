@@ -65,7 +65,9 @@ import {
   priceDrift,
   orderPriceStayNote,
   payableTotalLabel,
+  attentionQueueOpensSync,
   syncFocusHref,
+  syncSectionHref,
   readyToConfirm,
   readyToDispatch,
   readyToPrepare,
@@ -211,7 +213,7 @@ export function OrdersScreen({
       </p>
       <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
         <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-        <Link href="/panel/sincronizacion" title="Abrirla no cobra. El total guardado no cambia." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+        <Link href={syncSectionHref("sync-crear")} title="Abrirla no cobra. El total guardado no cambia." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Abrir sincronización
         </Link>
       </nav>
@@ -314,8 +316,16 @@ export function OrdersScreen({
                     {queue.rows.map((row) => (
                       <li key={row.order.id}>
                         <a
-                          href={orderFocusHref(row.order.number)}
-                          title="Abrirlo no cobra ni cambia el total guardado."
+                          href={
+                            attentionQueueOpensSync(queue.id)
+                              ? syncFocusHref(row.order.number)
+                              : orderFocusHref(row.order.number)
+                          }
+                          title={
+                            attentionQueueOpensSync(queue.id)
+                              ? "Abrirla no cobra. El total guardado no cambia."
+                              : "Abrirlo no cobra ni cambia el total guardado."
+                          }
                           className={cx("grid items-start gap-3 px-3 py-2 text-sm hover:bg-canvas md:gap-4", queueGrid)}
                         >
                           <span>
