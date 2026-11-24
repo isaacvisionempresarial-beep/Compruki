@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Dashboard } from "@/components/panel/dashboard";
 import { bogotaNow } from "@/lib/catalog";
 import { listPendingApprovals } from "@/server/agent-central";
+import { getAgentHomeBrief } from "@/server/agent-gateway";
 import { listOrders } from "@/server/order-store";
 import { listCostGuides, listPriceGuides, listSizeGuides } from "@/server/catalog-store";
 import { requirePanelAccess } from "@/server/panel-auth";
@@ -17,12 +18,13 @@ export default async function PanelPage() {
   const access = await requirePanelAccess();
   const today = bogotaNow().slice(0, 10);
   const greetingName = access.actorName.split(/\s+/)[0] || access.actorName;
-  const [storeOrders, sizeGuides, priceGuides, costGuides, pendingApprovals] = await Promise.all([
+  const [storeOrders, sizeGuides, priceGuides, costGuides, pendingApprovals, agentHome] = await Promise.all([
     listOrders(),
     listSizeGuides(),
     listPriceGuides(),
     listCostGuides(),
     listPendingApprovals(),
+    getAgentHomeBrief(),
   ]);
 
   const pendingSummary = {
@@ -52,6 +54,7 @@ export default async function PanelPage() {
       canApproveCatalog={access.role === "owner"}
       agentPendingCount={pendingSummary.total}
       agentPendingSummary={pendingSummary}
+      agentHome={agentHome}
     />
   );
 }

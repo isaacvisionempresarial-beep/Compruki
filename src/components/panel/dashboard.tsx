@@ -42,6 +42,13 @@ export type AgentPendingSummary = {
   }>;
 };
 
+export type AgentHomeBriefView = {
+  openaiConnected: boolean;
+  periodLabel: string;
+  monthRuns: number;
+  monthCostEstimateCop: number;
+};
+
 export function Dashboard({
   storeOrders,
   sizeGuides,
@@ -53,6 +60,7 @@ export function Dashboard({
   canApproveCatalog = false,
   agentPendingCount = 0,
   agentPendingSummary = null,
+  agentHome = null,
 }: {
   storeOrders: StoreOrder[];
   sizeGuides: SizeGuide[];
@@ -64,6 +72,7 @@ export function Dashboard({
   canApproveCatalog?: boolean;
   agentPendingCount?: number;
   agentPendingSummary?: AgentPendingSummary | null;
+  agentHome?: AgentHomeBriefView | null;
 }) {
   const [storePeriod, setStorePeriod] = useState<Period>("7d");
   const [basis, setBasis] = useState<CloseBasis>("creados");
@@ -200,6 +209,44 @@ export function Dashboard({
           </div>
         </div>
       </header>
+
+      {agentHome ? (
+        <section
+          className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2.5 sm:px-4"
+          aria-labelledby="uso-ia-home"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">IA</p>
+              <h2 id="uso-ia-home" className="text-sm font-semibold">
+                OpenAI {agentHome.openaiConnected ? "conectado" : "no conectado"}
+              </h2>
+              <p className="mt-0.5 text-xs text-muted">
+                {agentHome.periodLabel}: {agentHome.monthRuns} corrida{agentHome.monthRuns === 1 ? "" : "s"}
+                {" · "}
+                costo est. {formatCop(agentHome.monthCostEstimateCop)}. No es dinero cobrado. Dropi no está conectado.
+              </p>
+            </div>
+            <nav aria-label="Vista" className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
+              <Link
+                href="/panel/agentes#corridas"
+                title="Abrirlo no cobra ni cambia pedidos."
+                className="inline-flex h-8 items-center rounded-[10px] border border-line bg-canvas px-2.5 text-sm font-semibold text-ink hover:bg-subtle"
+              >
+                Ver corridas
+              </Link>
+              <Link
+                href="/panel/agentes#presupuesto-ia"
+                title="Abrirlo no cobra ni cambia pedidos."
+                className="inline-flex h-8 items-center rounded-[10px] border border-line bg-canvas px-2.5 text-sm font-semibold text-ink hover:bg-subtle"
+              >
+                Presupuesto
+              </Link>
+            </nav>
+          </div>
+        </section>
+      ) : null}
 
       {agentPendingSummary && agentPendingSummary.total > 0 ? (
         <section

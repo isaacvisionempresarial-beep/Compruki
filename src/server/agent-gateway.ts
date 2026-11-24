@@ -55,6 +55,24 @@ export type AgentCenterView = {
   }>;
 };
 
+export type AgentHomeBrief = {
+  openaiConnected: boolean;
+  periodLabel: string;
+  monthRuns: number;
+  monthCostEstimateCop: number;
+};
+
+/** Resumen liviano para el panel principal (sin cargar toda la vista de agentes). */
+export async function getAgentHomeBrief(): Promise<AgentHomeBrief> {
+  const [status, monthSpend] = await Promise.all([getAgentGatewayStatus(), loadMonthSpend()]);
+  return {
+    openaiConnected: status.openaiConnected,
+    periodLabel: monthSpend.periodLabel,
+    monthRuns: monthSpend.totalRuns,
+    monthCostEstimateCop: monthSpend.totalCostEstimateCop,
+  };
+}
+
 /** Puerta de agentes AG-0. El checkout no depende de este módulo. */
 export async function getAgentGatewayStatus(): Promise<AgentGatewayStatus> {
   const openai = await probeOpenAI();
