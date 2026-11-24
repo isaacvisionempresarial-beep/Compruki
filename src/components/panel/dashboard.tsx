@@ -214,6 +214,15 @@ export function Dashboard({
               <Link href="/panel/agentes#pendientes-humanos" title="Abrirla no cobra ni cambia pedidos." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
                 Abrir bandeja
               </Link>
+              {agentPendingSummary.preguntas > 0 ? (
+                <Link
+                  href="/panel/catalogo?filtro=preguntas"
+                  title="Ver fichas con preguntas abiertas no cobra ni cambia el precio ni la publicación."
+                  className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+                >
+                  Ver en catálogo
+                </Link>
+              ) : null}
             </nav>
           </div>
           <ul className="mt-2 space-y-1.5">

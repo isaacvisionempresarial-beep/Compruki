@@ -6,6 +6,7 @@ import { MAX_PRODUCT_IMAGES, parsePesos, parseVariants, productMargin, type Cata
 import { prepareProductImage } from "@/lib/prepare-image";
 import { formatCop, formatDay } from "@/lib/format";
 import { campaignPath } from "@/lib/campaign";
+import { formatAnswersForDisplay } from "@/lib/product-answers";
 import { catalogDriftText, fichaDrift, fichaDriftNote, orderFocusHref, pendingSizeHoldPhrase, pendingSizeHolds, outsideCostCopyNote, skuCostGroupNote, skuCostGroups, skuCostPreviewNote, storedSkuLines, type StoredSkuLine, type StoreOrder } from "@/lib/store-order";
 import { cx } from "@/lib/cx";
 import { usePanelQuery } from "@/components/panel/panel-shell";
@@ -36,13 +37,17 @@ export function CatalogScreen({
   orders,
   canManageCommerce = false,
   openQuestionCounts = {},
+  initialFilter = "todos",
 }: {
   products: CatalogProduct[];
   orders: StoreOrder[];
   canManageCommerce?: boolean;
   openQuestionCounts?: Record<string, number>;
+  initialFilter?: FilterId;
 }) {
-  const [filter, setFilter] = useState<FilterId>("todos");
+  const [filter, setFilter] = useState<FilterId>(() =>
+    filters.some((item) => item.id === initialFilter) ? initialFilter : "todos",
+  );
   const query = usePanelQuery().trim().toLocaleLowerCase("es");
   const skusInOrders = useMemo(() => {
     const skus = new Set<string>();
@@ -1550,6 +1555,7 @@ export function ProductEditor({
                 onChange={(event) => setAnswers(event.target.value)}
               />
             </Field>
+            <AnswersBuyerPreview answers={answers} />
               </div>
             </div>
 
@@ -1682,6 +1688,34 @@ export function ProductEditor({
             </nav>
           </div>
       </form>
+    </div>
+  );
+}
+
+function AnswersBuyerPreview({ answers }: { answers: string }) {
+  const display = formatAnswersForDisplay(answers);
+  if (!display.prose && display.pairs.length === 0) return null;
+
+  return (
+    <div className="mt-3 rounded-[10px] border border-line bg-canvas px-3 py-2">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista comprador</p>
+      <p className="mt-0.5 text-xs leading-5 text-muted">
+        Así se ve en la ficha pública. Los pares P:/R: salen como pregunta y respuesta. Verla no cobra ni cambia el
+        precio ni la publicación.
+      </p>
+      {display.prose ? (
+        <p className="mt-2 text-xs leading-5 whitespace-pre-line text-ink">{display.prose}</p>
+      ) : null}
+      {display.pairs.length > 0 ? (
+        <ul className="mt-2 divide-y divide-line overflow-hidden rounded-[10px] border border-line bg-card">
+          {display.pairs.map((pair) => (
+            <li key={`${pair.question}-${pair.answer}`} className="px-3 py-2">
+              <p className="text-sm font-bold text-ink">{pair.question}</p>
+              <p className="mt-0.5 text-sm leading-5 text-muted">{pair.answer}</p>
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }

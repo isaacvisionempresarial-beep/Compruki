@@ -12,7 +12,21 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function CatalogPage() {
+export default async function CatalogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ filtro?: string }>;
+}) {
+  const params = await searchParams;
+  const filtro = params.filtro?.trim() ?? "todos";
+  const initialFilter =
+    filtro === "diferencia" ||
+    filtro === "preguntas" ||
+    filtro === "tienda" ||
+    filtro === "agotados" ||
+    filtro === "ocultos"
+      ? filtro
+      : "todos";
   const [products, orders, access, openQuestionCounts] = await Promise.all([
     listProducts(),
     listOrders(),
@@ -25,6 +39,7 @@ export default async function CatalogPage() {
       orders={orders}
       canManageCommerce={access.role === "owner"}
       openQuestionCounts={openQuestionCounts}
+      initialFilter={initialFilter}
     />
   );
 }

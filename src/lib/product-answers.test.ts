@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   answerProductQuestion,
+  formatAnswersForDisplay,
   PRODUCT_QUESTION_HANDOFF_REPLY,
   productQuestionNeedsHandoff,
 } from "@/lib/product-answers";
@@ -51,5 +52,30 @@ describe("answerProductQuestion", () => {
     };
     const reply = answerProductQuestion(product, "¿Sirve para acuario marino tropical?");
     expect(reply).toBe(PRODUCT_QUESTION_HANDOFF_REPLY);
+  });
+});
+
+describe("formatAnswersForDisplay", () => {
+  it("deja solo prosa cuando no hay P/R", () => {
+    expect(formatAnswersForDisplay("Material: metal y tela.")).toEqual({
+      prose: "Material: metal y tela.",
+      pairs: [],
+    });
+  });
+
+  it("separa prosa y pares P/R", () => {
+    expect(
+      formatAnswersForDisplay("Material: metal.\nP: ¿Incluye cable?\nR: Sí, incluye cable.\nGarantía 30 días."),
+    ).toEqual({
+      prose: "Material: metal.\nGarantía 30 días.",
+      pairs: [{ question: "¿Incluye cable?", answer: "Sí, incluye cable." }],
+    });
+  });
+
+  it("ignora P: huérfano sin R:", () => {
+    expect(formatAnswersForDisplay("P: ¿Sin respuesta?\nMaterial: metal.")).toEqual({
+      prose: "¿Sin respuesta?\nMaterial: metal.",
+      pairs: [],
+    });
   });
 });

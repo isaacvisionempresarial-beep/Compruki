@@ -10,6 +10,7 @@ import { rememberCampaignSku } from "@/lib/campaign";
 import { sizeChoiceSentence } from "@/lib/catalog";
 import { answerProductQuestion, productQuestionNeedsHandoff } from "@/lib/product-answers";
 import { PhotoCarousel, type PhotoSlide } from "@/components/photo-carousel";
+import { ProductAnswersBlock } from "@/components/store/product-answers-block";
 import {
   sendProductQuestionAction,
   type SendProductQuestionState,
@@ -472,14 +473,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               </div>
             ))}
           </dl>
-          {product.answers ? (
-            <div className="mt-3 rounded-[14px] border border-line bg-card px-3 py-2">
-              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Respuestas</p>
-              <p className="mt-0.5 text-sm font-bold text-ink">Lo que puedes saber</p>
-              <p className="mt-0.5 text-xs leading-5 whitespace-pre-line text-muted">{product.answers}</p>
-              <p className="mt-1 text-xs leading-5 text-muted">Leerlas no cambia el precio publicado ni crea un pedido.</p>
-            </div>
-          ) : null}
+          {product.answers ? <ProductAnswersBlock answers={product.answers} /> : null}
         </section>
 
         <div id="preguntas" className="elevate-1 max-w-xl rounded-[14px] border border-line bg-card px-3 py-3">

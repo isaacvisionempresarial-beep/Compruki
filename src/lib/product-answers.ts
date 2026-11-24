@@ -101,29 +101,52 @@ export function answerProductQuestion(product: AnswerableProduct, raw: string) {
   return PRODUCT_QUESTION_HANDOFF_REPLY;
 }
 
-function matchStoredQa(answers: string, raw: string) {
-  const key = normalizeProductQuestionKey(raw);
-  if (!key) return null;
-  const pairs = parseStoredQaPairs(answers);
-  const hit = pairs.find((pair) => normalizeProductQuestionKey(pair.question) === key);
-  return hit?.answer ?? null;
-}
+export type AnswersDisplay = {
+  prose: string;
+  pairs: Array<{ question: string; answer: string }>;
+};
 
-/** Pares P:/R: anotados desde Pendientes humanos (AG-05). */
-function parseStoredQaPairs(answers: string) {
+/** Separa texto libre y pares P:/R: para mostrar al comprador sin el markup interno. */
+export function formatAnswersForDisplay(answers: string): AnswersDisplay {
   const lines = answers.split(/\n/).map((line) => line.trim()).filter(Boolean);
-  const pairs: Array<{ question: string; answer: string }> = [];
+  const pairs: AnswersDisplay["pairs"] = [];
+  const consumed = new Set<number>();
+
   for (let index = 0; index < lines.length; index += 1) {
+    if (consumed.has(index)) continue;
     const prompt = lines[index].match(/^P:\s*(.+)$/i);
     if (!prompt) continue;
     const next = lines[index + 1]?.match(/^R:\s*(.+)$/i);
     if (!next) continue;
     const question = prompt[1].trim();
     const answer = next[1].trim();
-    if (question && answer) pairs.push({ question, answer });
-    index += 1;
+    if (!question || !answer) continue;
+    pairs.push({ question, answer });
+    consumed.add(index);
+    consumed.add(index + 1);
   }
-  return pairs;
+
+  const prose = lines
+    .filter((_, index) => !consumed.has(index))
+    .map((line) => {
+      const asPrompt = line.match(/^P:\s*(.+)$/i);
+      if (asPrompt) return asPrompt[1].trim();
+      const asReply = line.match(/^R:\s*(.+)$/i);
+      if (asReply) return asReply[1].trim();
+      return line;
+    })
+    .filter(Boolean)
+    .join("\n");
+
+  return { prose, pairs };
+}
+
+function matchStoredQa(answers: string, raw: string) {
+  const key = normalizeProductQuestionKey(raw);
+  if (!key) return null;
+  const pairs = formatAnswersForDisplay(answers).pairs;
+  const hit = pairs.find((pair) => normalizeProductQuestionKey(pair.question) === key);
+  return hit?.answer ?? null;
 }
 
 function factLines(product: AnswerableProduct) {
