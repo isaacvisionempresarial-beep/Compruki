@@ -3,6 +3,7 @@ import { CatalogScreen } from "@/components/panel/catalog-screen";
 import { listProducts } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
 import { requirePanelAccess } from "@/server/panel-auth";
+import { listOpenProductQuestionCountBySku } from "@/server/product-questions";
 
 export const metadata: Metadata = {
   title: "Catálogo",
@@ -12,6 +13,18 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function CatalogPage() {
-  const [products, orders, access] = await Promise.all([listProducts(), listOrders(), requirePanelAccess()]);
-  return <CatalogScreen products={products} orders={orders} canManageCommerce={access.role === "owner"} />;
+  const [products, orders, access, openQuestionCounts] = await Promise.all([
+    listProducts(),
+    listOrders(),
+    requirePanelAccess(),
+    listOpenProductQuestionCountBySku(),
+  ]);
+  return (
+    <CatalogScreen
+      products={products}
+      orders={orders}
+      canManageCommerce={access.role === "owner"}
+      openQuestionCounts={openQuestionCounts}
+    />
+  );
 }

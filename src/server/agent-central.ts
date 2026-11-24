@@ -87,7 +87,7 @@ export async function listPendingApprovals(): Promise<PendingApproval[]> {
 }
 
 async function listPendingQuestionApprovals(): Promise<PendingApproval[]> {
-  const questions = await listOpenProductQuestions(8);
+  const questions = await listOpenProductQuestions(20);
   return questions.map((item) => ({
     id: item.id,
     kind: "pregunta" as const,

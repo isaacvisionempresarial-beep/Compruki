@@ -34,10 +34,12 @@ export function CatalogScreen({
   products,
   orders,
   canManageCommerce = false,
+  openQuestionCounts = {},
 }: {
   products: CatalogProduct[];
   orders: StoreOrder[];
   canManageCommerce?: boolean;
+  openQuestionCounts?: Record<string, number>;
 }) {
   const [filter, setFilter] = useState<FilterId>("todos");
   const query = usePanelQuery().trim().toLocaleLowerCase("es");
@@ -100,9 +102,16 @@ export function CatalogScreen({
 
   const searched = useMemo(
     () =>
-      products.filter(
-        (product) =>
-          !query ||
+      products.filter((product) => {
+        if (!query) return true;
+        const openCount = openQuestionCounts[product.sku] ?? 0;
+        const openPhrase =
+          openCount > 0
+            ? openCount === 1
+              ? "1 pregunta abierta"
+              : `${openCount} preguntas abiertas`
+            : "";
+        return (
           product.title.toLocaleLowerCase("es").includes(query) ||
           product.sku.toLocaleLowerCase("es").includes(query) ||
           product.category.toLocaleLowerCase("es").includes(query) ||
@@ -112,13 +121,15 @@ export function CatalogScreen({
           (holds.get(product.sku) ? pendingSizeHoldPhrase(holds.get(product.sku)!.orders, holds.get(product.sku)!.kind, "ficha") : "")
             .toLocaleLowerCase("es")
             .includes(query) ||
+          openPhrase.toLocaleLowerCase("es").includes(query) ||
           (rowDrift.get(product.sku)?.note ?? "").toLocaleLowerCase("es").includes(query) ||
           (rowDrift.get(product.sku)?.plan ?? "").toLocaleLowerCase("es").includes(query) ||
           (rowDrift.get(product.sku)?.preview ?? "").toLocaleLowerCase("es").includes(query) ||
           (rowDrift.get(product.sku)?.outside ?? "").toLocaleLowerCase("es").includes(query) ||
-          (rowDrift.get(product.sku)?.numbers ?? []).some((number) => number.toLocaleLowerCase("es").includes(query)),
-      ),
-    [products, query, holds, rowDrift],
+          (rowDrift.get(product.sku)?.numbers ?? []).some((number) => number.toLocaleLowerCase("es").includes(query))
+        );
+      }),
+    [products, query, holds, rowDrift, openQuestionCounts],
   );
   const visible = useMemo(
     () => searched.filter((product) => matches(product, filter, rowDrift.has(product.sku))),
@@ -236,6 +247,7 @@ export function CatalogScreen({
                   hasOrders={skusInOrders.has(product.sku)}
                   hold={holds.get(product.sku) ?? null}
                   drift={rowDrift.get(product.sku) ?? null}
+                  openQuestionCount={openQuestionCounts[product.sku] ?? 0}
                   canManageCommerce={canManageCommerce}
                 />
               ))}
@@ -251,12 +263,14 @@ function CatalogProductRow({
   hasOrders,
   hold,
   drift,
+  openQuestionCount,
   canManageCommerce,
 }: {
   product: CatalogProduct;
   hasOrders: boolean;
   hold: { orders: number; kind: "talla" | "tamano" } | null;
   drift: { note: string; plan: string; preview: string; outside: string; numbers: string[]; pending: string[]; cancel: string[]; incidence: string[]; returned: string[] } | null;
+  openQuestionCount: number;
   canManageCommerce: boolean;
 }) {
   const margin = productMargin(product);
@@ -314,6 +328,11 @@ function CatalogProductRow({
                   {pendingSizeHoldPhrase(hold.orders, hold.kind, "ficha")}
                 </p>
               ) : null}
+              {openQuestionCount > 0 ? (
+                <p className="mt-1 truncate text-xs font-semibold text-warning">
+                  {openQuestionCount === 1 ? "1 pregunta abierta" : `${openQuestionCount} preguntas abiertas`}
+                </p>
+              ) : null}
             </div>
 
             <nav aria-label="Línea" className="flex shrink-0 flex-wrap items-center gap-1.5">
@@ -330,8 +349,16 @@ function CatalogProductRow({
                 </a>
               ) : null}
               <Link
-                href={`/panel/catalogo/${product.sku}`}
-                title="Abrirla no cobra ni cambia el precio ni la publicación."
+                href={
+                  openQuestionCount > 0
+                    ? `/panel/catalogo/${product.sku}#preguntas-abiertas`
+                    : `/panel/catalogo/${product.sku}`
+                }
+                title={
+                  openQuestionCount > 0
+                    ? "Abrir las preguntas abiertas no cobra ni cambia el precio ni la publicación."
+                    : "Abrirla no cobra ni cambia el precio ni la publicación."
+                }
                 className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-canvas"
               >
                 {canManageCommerce ? "Editar" : "Editar textos"}

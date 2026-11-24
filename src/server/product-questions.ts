@@ -99,6 +99,36 @@ export async function listOpenProductQuestions(limit = 8): Promise<ProductQuesti
   }
 }
 
+/** Conteos de preguntas abiertas por SKU (lista de catálogo). */
+export async function listOpenProductQuestionCountBySku(): Promise<Record<string, number>> {
+  try {
+    const tenantId = await getPilotTenantId();
+    const supabase = createAdminSupabase();
+    const { data, error } = await supabase
+      .from("product_questions")
+      .select("product_sku")
+      .eq("tenant_id", tenantId)
+      .eq("status", "open");
+
+    if (error) {
+      if (missingTable(error.message)) return {};
+      return {};
+    }
+
+    const counts: Record<string, number> = {};
+    for (const row of data ?? []) {
+      const sku = String((row as { product_sku?: string }).product_sku ?? "")
+        .trim()
+        .toUpperCase();
+      if (!sku) continue;
+      counts[sku] = (counts[sku] ?? 0) + 1;
+    }
+    return counts;
+  } catch {
+    return {};
+  }
+}
+
 export async function listOpenProductQuestionsForSku(sku: string, limit = 12): Promise<ProductQuestionRow[]> {
   const normalized = sku.trim().toUpperCase();
   if (!normalized) return [];
