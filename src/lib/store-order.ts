@@ -594,6 +594,14 @@ export function syncFocusHref(number: string) {
 
 export type SyncSectionId = "sync-crear" | "sync-incidencia" | "sync-cerrado" | "cola-dropi" | "sync-anotados";
 
+export const SYNC_SECTION_IDS: readonly SyncSectionId[] = [
+  "sync-crear",
+  "sync-incidencia",
+  "sync-cerrado",
+  "cola-dropi",
+  "sync-anotados",
+];
+
 export function syncSectionHref(section: SyncSectionId = "sync-crear") {
   return `/panel/sincronizacion#${section}`;
 }

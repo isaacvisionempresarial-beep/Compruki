@@ -13,10 +13,12 @@ import {
   needsClosedDropiNumber,
   needsIncidenceDropiNumber,
   normalizeProviderRef,
+  SYNC_SECTION_IDS,
   syncFocusHref,
   type StoreOrder,
 } from "@/lib/store-order";
 import type { DropiEnqueueState, DropiQueuedJob } from "@/lib/dropi-provider";
+import { usePanelSectionHash } from "@/lib/use-panel-section-hash";
 import { enqueueDropiSend, recordOperationalNotice } from "@/server/dropi-connection";
 
 const syncGrid = "md:grid-cols-[6.75rem_minmax(0,1.4fr)_12.5rem_9rem_4.25rem]";
@@ -79,6 +81,8 @@ export function SyncScreen({
     },
   ];
 
+  usePanelSectionHash(SYNC_SECTION_IDS);
+
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Operación</p>
@@ -96,7 +100,7 @@ export function SyncScreen({
 
       <section className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="cola-dropi">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cola</p>
-        <h2 id="cola-dropi" className="mt-0.5 text-base font-bold">
+        <h2 id="cola-dropi" className="mt-0.5 scroll-mt-24 text-base font-bold">
           Cola de envío ({blockedJobs.length} bloqueados · {noticeJobs.length} avisos · {reconciledJobs.length} conciliados)
         </h2>
         <p className="mt-0.5 text-xs leading-5 text-muted">
@@ -197,7 +201,7 @@ export function SyncScreen({
         return (
           <section key={group.id} className="mt-3" aria-labelledby={group.id}>
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Grupo</p>
-            <h3 id={group.id} className="mt-0.5 text-sm font-semibold">
+            <h3 id={group.id} className="mt-0.5 scroll-mt-24 text-sm font-semibold">
               {group.title} ({group.rows.length})
             </h3>
             <p className="mt-0.5 text-xs leading-5 text-muted">{group.hint}</p>
@@ -225,7 +229,7 @@ export function SyncScreen({
 
       <section className="mt-5" aria-labelledby="sync-anotados">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Anotados</p>
-        <h2 id="sync-anotados" className="mt-0.5 text-base font-bold">
+        <h2 id="sync-anotados" className="mt-0.5 scroll-mt-24 text-base font-bold">
           Número ya anotado ({noted.length})
         </h2>
         <p className="mt-0.5 text-xs leading-5 text-muted">

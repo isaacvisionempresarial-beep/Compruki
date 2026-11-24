@@ -12,6 +12,7 @@ import { blockedDropiAnswer } from "@/lib/dropi-provider";
 import { cx } from "@/lib/cx";
 import { STATUS_LABEL, STATUS_SEQUENCE, type OrderStatus } from "@/lib/demo-data";
 import { formatCop, formatDay } from "@/lib/format";
+import { usePanelSectionHash } from "@/lib/use-panel-section-hash";
 import {
   actionsFor,
   awaitsDropiNumber,
@@ -160,6 +161,8 @@ export function OrdersScreen({
     return () => window.removeEventListener("hashchange", focusFromHash);
   }, [router]);
 
+  usePanelSectionHash(["por-atender"]);
+
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda</p>
@@ -277,7 +280,7 @@ export function OrdersScreen({
       </section>
       <section className="mt-5" aria-labelledby="por-atender">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cola</p>
-        <h2 id="por-atender" className="mt-0.5 text-base font-bold">
+        <h2 id="por-atender" className="mt-0.5 scroll-mt-24 text-base font-bold">
           Por atender
         </h2>
         <p className="mt-0.5 text-xs leading-5 text-muted">
