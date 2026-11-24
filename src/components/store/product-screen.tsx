@@ -189,8 +189,8 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               {descriptionIsLong ? descriptionParagraphs[0] : product.description.trim()}
             </p>
             {descriptionIsLong ? (
-              <nav aria-label="Herramientas" className="mt-2 flex flex-wrap items-center gap-2">
-                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+              <nav aria-label="Vista" className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
                 <a href="#descripcion" title="Leerla no cambia el precio publicado ni crea un pedido." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
                   Leer la descripción completa
                 </a>
@@ -438,8 +438,8 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               <p key={`${index}-${paragraph.slice(0, 16)}`}>{paragraph}</p>
             ))}
           </div>
-          <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+          <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
             <a href="#detalles" title="Ir ahí no cambia el precio publicado ni crea un pedido." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
               Ver antes de pedir
             </a>
@@ -480,13 +480,13 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
         </div>
       </div>
 
-      <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-        <a href="#contenido" title="Volver no registra pedido ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
+      <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
+        <a href="#contenido" title="Volver al inicio de esta ficha no registra pedido ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Volver al producto
         </a>
       </nav>
-      <p className="mt-2 text-xs leading-5 text-muted">Volver no registra pedido ni cobra.</p>
+      <p className="mt-2 text-xs leading-5 text-muted">Volver al inicio de esta ficha no registra pedido ni cobra.</p>
 
       <dialog
         ref={dialogRef}
@@ -556,8 +556,8 @@ function ProductQuestion({ product }: { product: PublicProduct }) {
             className="mt-1.5 h-10 w-full rounded-[10px] border border-line bg-canvas px-3 text-sm font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
           />
         </label>
-        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <nav aria-label="Consulta" className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
           <button
             type="submit"
             disabled={!canAsk}

@@ -124,12 +124,6 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
             <p className="mt-0.5 text-sm leading-5 text-muted">El carrito está vacío. Vacío no registra pedido ni cobra.</p>
-            <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-              <Link href="/tienda" title="Verlos no cambia los precios publicados ni crea un pedido." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
-                Ver productos
-              </Link>
-            </nav>
           </section>
         ) : (
           <section aria-labelledby="carrito-lineas">
@@ -251,8 +245,8 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                         <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">
                           Quitar
                         </span>
-                        <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-                          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+                        <nav aria-label="Línea" className="flex flex-wrap items-center gap-2">
+                          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Línea</span>
                           <button
                             type="button"
                             title="Quitarla no registra pedido ni cobra."

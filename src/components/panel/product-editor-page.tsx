@@ -41,6 +41,7 @@ export function ProductEditorPage({
               Volver al catálogo
             </Link>
           </nav>
+          <p className="mt-2 text-xs leading-5 text-muted">Volver no cobra ni cambia el precio ni la publicación.</p>
         </section>
       </div>
     );

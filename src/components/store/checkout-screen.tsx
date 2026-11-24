@@ -303,8 +303,8 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                 </label>
               </p>
             </div>
-            <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+            <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
               <Link href="/tienda/condiciones" title="Leerlas no confirma el pedido ni cobra." className="inline-flex h-9 scroll-mb-24 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
                 Leer condiciones
               </Link>

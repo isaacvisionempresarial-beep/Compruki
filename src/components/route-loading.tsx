@@ -14,9 +14,13 @@ export function RouteLoading({
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{eyebrow}</p>
       <h1 className="mt-1 text-[24px] leading-7 font-extrabold tracking-tight">{title}</h1>
       <p className="mt-1.5 max-w-2xl text-sm leading-5 text-muted">{hint}</p>
-      <p className="sr-only" role="status">
-        Cargando
-      </p>
+
+      <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3" aria-live="polite">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
+        <p className="mt-0.5 text-sm text-muted" role="status">
+          Cargando…
+        </p>
+      </section>
 
       <div className="mt-3 grid gap-3" aria-hidden="true">
         <div className="elevate-1 route-skeleton h-28 rounded-[14px] border border-line bg-card" />

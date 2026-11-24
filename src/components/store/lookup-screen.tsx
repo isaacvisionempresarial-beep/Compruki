@@ -44,8 +44,8 @@ export function LookupScreen() {
         <p className="mt-2 text-xs leading-5 text-muted">
           Corregir la entrega, la talla o un aviso no cobra aquí. El total guardado no cambia. Agregar o quitar un producto sí puede cambiar ese total, y tampoco es dinero cobrado.
         </p>
-        <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
+        <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
           <Link
             href="/tienda/condiciones"
             title="Leerlas no registra pedido ni cobra."
