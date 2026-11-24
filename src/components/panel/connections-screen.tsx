@@ -21,6 +21,8 @@ export function ConnectionsScreen({
   connection,
   jobs,
   canProbeOpenAI = false,
+  siteUrl = null,
+  plannedDomain = "compruki.com",
 }: {
   healthOk: boolean;
   tenantPilotOk: boolean;
@@ -29,7 +31,12 @@ export function ConnectionsScreen({
   connection: DropiConnectionState;
   jobs: DropiQueuedJob[];
   canProbeOpenAI?: boolean;
+  siteUrl?: string | null;
+  plannedDomain?: string;
 }) {
+  const publicBase = siteUrl ?? `https://${plannedDomain}`;
+  const oauthCallback = `${publicBase}/auth/dropi/callback`;
+  const storeHome = `${publicBase}/tienda`;
   const [probe, action, pending] = useActionState(probeOfficialDropi, initial);
   const [advertisement, inspect, inspecting] = useActionState(inspectDropiAuthorization, initialAdvertisement);
   const [openaiProbe, openaiAction, openaiPending] = useActionState(probeOpenAIAction, openaiInitial);
@@ -62,6 +69,36 @@ export function ConnectionsScreen({
       </section>
 
       <div className="mt-3 space-y-3">
+          <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="dominio-publico">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Dominio</p>
+            <h2 id="dominio-publico" className="mt-0.5 text-sm font-semibold">
+              Dominio público previsto
+            </h2>
+            <p className="mt-1 text-xs leading-5 text-muted">
+              Cuando Dropi pida URLs de redirección OAuth, usaremos este dominio. Comprarlo no conecta Dropi solo.
+            </p>
+            <dl className="mt-3 grid gap-2 sm:grid-cols-2 text-sm">
+              <div className="rounded-[10px] border border-line px-3 py-2">
+                <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Dominio</dt>
+                <dd className="mt-0.5 font-semibold tabular-nums">{plannedDomain}</dd>
+              </div>
+              <div className="rounded-[10px] border border-line px-3 py-2">
+                <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Origen actual</dt>
+                <dd className="mt-0.5 font-semibold break-all">
+                  {siteUrl ?? "Falta NEXT_PUBLIC_SITE_URL (sigue el piloto local/Vercel)"}
+                </dd>
+              </div>
+              <div className="rounded-[10px] border border-line px-3 py-2 sm:col-span-2">
+                <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Callback OAuth (previsto)</dt>
+                <dd className="mt-0.5 font-semibold break-all tabular-nums">{oauthCallback}</dd>
+              </div>
+              <div className="rounded-[10px] border border-line px-3 py-2 sm:col-span-2">
+                <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda pública</dt>
+                <dd className="mt-0.5 font-semibold break-all tabular-nums">{storeHome}</dd>
+              </div>
+            </dl>
+          </section>
+
           <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="para-conectar">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Requisitos</p>
             <h2 id="para-conectar" className="mt-0.5 text-sm font-semibold">
@@ -77,7 +114,10 @@ export function ConnectionsScreen({
               </li>
               <li className="rounded-[10px] border border-line px-3 py-2">
                 <p className="font-semibold">Registro de esta aplicación</p>
-                <p className="mt-0.5 text-xs leading-5 text-muted">Falta el client_id que Dropi tendría que entregar. Sin eso no se abre la autorización.</p>
+                <p className="mt-0.5 text-xs leading-5 text-muted">
+                  Falta el client_id que Dropi tendría que entregar. Sin eso no se abre la autorización. El dominio previsto
+                  es {plannedDomain}.
+                </p>
               </li>
               <li className="rounded-[10px] border border-line px-3 py-2">
                 <p className="font-semibold">Cola de envío</p>

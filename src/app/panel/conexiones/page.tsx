@@ -13,6 +13,7 @@ export const dynamic = "force-dynamic";
 
 export default async function ConnectionsPage() {
   const [access, health, queue] = await Promise.all([requirePanelAccess(), getHealthSnapshot(), readDropiQueue()]);
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim().replace(/\/$/, "") || null;
   return (
     <ConnectionsScreen
       healthOk={health.ok}
@@ -22,6 +23,8 @@ export default async function ConnectionsPage() {
       connection={queue.connection}
       jobs={queue.jobs}
       canProbeOpenAI={access.role === "owner"}
+      siteUrl={siteUrl}
+      plannedDomain="compruki.com"
     />
   );
 }
