@@ -91,84 +91,92 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
         </div>
       </section>
 
-      <div
-        className="store-rise mt-4 grid gap-3 lg:grid-cols-[minmax(15rem,17.5rem)_minmax(0,1fr)] lg:items-start"
-        style={{ animationDelay: "110ms" }}
-      >
-        <aside
-          className="elevate-1 overflow-hidden rounded-[18px] border border-line bg-card lg:sticky lg:top-20"
-          aria-labelledby="carrito-resumen"
-        >
-          <div className="border-b border-line bg-gradient-to-br from-accent-tint via-card to-card px-3.5 py-3.5">
+      <div className="store-rise mt-4" style={{ animationDelay: "110ms" }}>
+        <div className="mb-2 hidden items-end justify-between gap-3 lg:grid lg:grid-cols-[minmax(15rem,17.5rem)_minmax(0,1fr)]">
+          <div className="px-0.5">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Resumen</p>
-            <h2 id="carrito-resumen" className="mt-0.5 text-sm font-bold">
-              Lo que llevas
-            </h2>
-            <p className="mt-1 text-xs text-muted">
-              {rows.length === 0
-                ? "Sin productos aún"
-                : `${payable.length} de ${rows.length} ${rows.length === 1 ? "producto listo" : "productos listos"}`}
-            </p>
-            <p className="mt-3 text-[11px] font-semibold tracking-[0.04em] text-muted uppercase">Total al recibir</p>
-            <p className="store-display mt-0.5 text-[1.85rem] leading-none font-extrabold tracking-tight tabular-nums">
-              {formatCop(total)}
-            </p>
-            <p className="mt-2 text-[11px] leading-4 text-muted">Envío aparte. Confirmar en el pago no cobra.</p>
+            <p className="mt-0.5 text-base font-bold">Lo que llevas</p>
           </div>
-          <div className="space-y-2 px-3.5 py-3">
-            {canContinue ? (
-              <Link
-                href="/tienda/pagar"
-                title="Continuar no confirma el pedido ni cobra."
-                className="inline-flex h-10 w-full items-center justify-center rounded-[12px] bg-accent px-3 text-sm font-extrabold text-primary-dark shadow-[0_12px_28px_-16px_rgb(37_199_165/0.95)] transition-transform hover:-translate-y-0.5"
-              >
-                Continuar · pagas al recibir
-              </Link>
-            ) : rows.length > 0 ? (
-              <>
-                <button
-                  type="button"
-                  disabled
-                  className="inline-flex h-10 w-full cursor-not-allowed items-center justify-center rounded-[12px] bg-accent px-3 text-sm font-extrabold text-primary-dark opacity-55"
-                  title="Continuar no confirma el pedido ni cobra."
-                >
-                  Continuar · pagas al recibir
-                </button>
-                <p className="text-sm leading-5 text-coral-strong">{blockedHint}</p>
-              </>
-            ) : (
-              <Link
-                href="/tienda"
-                title="Verlos no cambia los precios publicados ni crea un pedido."
-                className="inline-flex h-10 w-full items-center justify-center rounded-[12px] bg-primary px-3 text-sm font-semibold text-on-dark"
-              >
-                Ver productos
-              </Link>
-            )}
-            <p className="text-[11px] leading-4 text-muted">
-              {rows.length === 0 ? "Ver productos no registra pedido ni cobra." : "Continuar no confirma el pedido ni cobra."}
-            </p>
-            <Link
-              href="/tienda"
-              title="Seguir viendo no cambia precios ni crea pedido."
-              className="inline-flex text-xs font-semibold text-accent-strong hover:underline"
-            >
-              Seguir mirando la tienda
-            </Link>
-          </div>
-        </aside>
-
-        <section aria-labelledby="carrito-lineas" className="min-w-0">
-          <div className="mb-2 flex items-end justify-between gap-2 px-0.5">
+          <div className="flex items-end justify-between gap-2 px-0.5">
             <div>
               <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Productos</p>
-              <h2 id="carrito-lineas" className="mt-0.5 text-base font-bold">
-                En este carrito
-              </h2>
+              <h2 className="mt-0.5 text-base font-bold">En este carrito</h2>
             </div>
             <p className="text-[11px] leading-4 text-muted">Cambiar o quitar no cobra.</p>
           </div>
+        </div>
 
+        <div className="mb-2 flex items-end justify-between gap-2 px-0.5 lg:hidden">
+          <div>
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Carrito</p>
+            <h2 className="mt-0.5 text-base font-bold">Resumen y productos</h2>
+          </div>
+          <p className="text-[11px] leading-4 text-muted">Cambiar o quitar no cobra.</p>
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-[minmax(15rem,17.5rem)_minmax(0,1fr)] lg:items-start">
+          <aside
+            className="elevate-1 overflow-hidden rounded-[18px] border border-line bg-card lg:sticky lg:top-20"
+            aria-label="Resumen de lo que llevas"
+          >
+            <div className="border-b border-line bg-gradient-to-br from-accent-tint via-card to-card px-3.5 py-3.5">
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase lg:sr-only">Resumen</p>
+              <p className="text-sm font-semibold text-muted lg:sr-only">Lo que llevas</p>
+              <p className="text-xs text-muted lg:mt-0">
+                {rows.length === 0
+                  ? "Sin productos aún"
+                  : `${payable.length} de ${rows.length} ${rows.length === 1 ? "producto listo" : "productos listos"}`}
+              </p>
+              <p className="mt-3 text-[11px] font-semibold tracking-[0.04em] text-muted uppercase">Total al recibir</p>
+              <p className="store-display mt-0.5 text-[1.85rem] leading-none font-extrabold tracking-tight tabular-nums">
+                {formatCop(total)}
+              </p>
+              <p className="mt-2 text-[11px] leading-4 text-muted">Envío aparte. Confirmar en el pago no cobra.</p>
+            </div>
+            <div className="space-y-2 px-3.5 py-3">
+              {canContinue ? (
+                <Link
+                  href="/tienda/pagar"
+                  title="Continuar no confirma el pedido ni cobra."
+                  className="inline-flex h-10 w-full items-center justify-center rounded-[12px] bg-accent px-3 text-sm font-extrabold text-primary-dark shadow-[0_12px_28px_-16px_rgb(37_199_165/0.95)] transition-transform hover:-translate-y-0.5"
+                >
+                  Continuar · pagas al recibir
+                </Link>
+              ) : rows.length > 0 ? (
+                <>
+                  <button
+                    type="button"
+                    disabled
+                    className="inline-flex h-10 w-full cursor-not-allowed items-center justify-center rounded-[12px] bg-accent px-3 text-sm font-extrabold text-primary-dark opacity-55"
+                    title="Continuar no confirma el pedido ni cobra."
+                  >
+                    Continuar · pagas al recibir
+                  </button>
+                  <p className="text-sm leading-5 text-coral-strong">{blockedHint}</p>
+                </>
+              ) : (
+                <Link
+                  href="/tienda"
+                  title="Verlos no cambia los precios publicados ni crea un pedido."
+                  className="inline-flex h-10 w-full items-center justify-center rounded-[12px] bg-primary px-3 text-sm font-semibold text-on-dark"
+                >
+                  Ver productos
+                </Link>
+              )}
+              <p className="text-[11px] leading-4 text-muted">
+                {rows.length === 0 ? "Ver productos no registra pedido ni cobra." : "Continuar no confirma el pedido ni cobra."}
+              </p>
+              <Link
+                href="/tienda"
+                title="Seguir viendo no cambia precios ni crea pedido."
+                className="inline-flex text-xs font-semibold text-accent-strong hover:underline"
+              >
+                Seguir mirando la tienda
+              </Link>
+            </div>
+          </aside>
+
+          <section aria-label="Productos en este carrito" className="min-w-0">
           {rows.length === 0 ? (
             <div className="elevate-1 rounded-[18px] border border-dashed border-line bg-card/80 px-4 py-10 text-center">
               <p className="store-display text-base font-bold tracking-tight">Carrito vacío</p>
@@ -193,7 +201,6 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                         alt={product?.title ?? ""}
                         query={primaryImage ? `m=${primaryImage.id}` : undefined}
                         note="Sin foto en el catálogo."
-                        title="Verla no cambia el precio publicado ni crea un pedido."
                         frameClassName="h-36 w-full shrink-0 bg-subtle sm:h-auto sm:w-36 lg:w-40"
                         imgClassName="h-full w-full object-cover sm:min-h-[9.5rem]"
                       />
@@ -307,7 +314,8 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
               })}
             </ul>
           )}
-        </section>
+          </section>
+        </div>
       </div>
     </div>
   );
