@@ -16,13 +16,19 @@ import { placeOrderAction, type PlaceOrderState } from "@/server/store-actions";
 const initialState: PlaceOrderState = { error: null };
 const colombiaDepartments = listColombiaDepartments();
 
-export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
+export function CheckoutScreen({
+  products,
+  defaults,
+}: {
+  products: PublicProduct[];
+  defaults?: { customerName?: string; phone?: string };
+}) {
   const cart = useCart();
   const [state, formAction, pending] = useActionState(placeOrderAction, initialState);
   const [idempotencyKey] = useState(() => crypto.randomUUID());
   const [campaignSkus] = useState(() => readCampaignSkus());
-  const [customerName, setCustomerName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [customerName, setCustomerName] = useState(defaults?.customerName ?? "");
+  const [phone, setPhone] = useState(defaults?.phone ?? "");
   const [documentId, setDocumentId] = useState("");
   const [city, setCity] = useState("");
   const [department, setDepartment] = useState("");

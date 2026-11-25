@@ -102,12 +102,17 @@ export async function saveOrders(orders: StoreOrder[]): Promise<void> {
     phone: order.phone,
     idempotency_key: order.idempotencyKey,
     created_at: order.createdAt,
+    customer_user_id: order.customerUserId ?? null,
     document: order,
   }));
 
   if (rows.length > 0) {
     await refuseForeignIds(supabase, "orders", tenantId, rows.map((row) => row.id));
-    const { error: upsertError } = await supabase.from("orders").upsert(rows, { onConflict: "id" });
+    let { error: upsertError } = await supabase.from("orders").upsert(rows, { onConflict: "id" });
+    if (upsertError && upsertError.message.includes("customer_user_id")) {
+      const legacy = rows.map(({ customer_user_id: _drop, ...rest }) => rest);
+      ({ error: upsertError } = await supabase.from("orders").upsert(legacy, { onConflict: "id" }));
+    }
     if (upsertError) {
       throw new Error(`No se pudieron guardar los pedidos: ${upsertError.message}`);
     }

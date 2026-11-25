@@ -117,7 +117,17 @@ export async function findOrderForCustomer(number: string, phone: string) {
   return (await readOrders()).find((order) => order.number === normalizedNumber && order.phone === normalizedPhone) ?? null;
 }
 
-export async function placeOrder(input: CheckoutInput) {
+export async function placeOrder(
+  input: CheckoutInput,
+  customer?: { userId: string; email: string } | null,
+) {
+  if (!customer?.userId) {
+    return {
+      error: "Entra con tu cuenta para dejar el pedido. No se creó. Nadie cobra en la tienda.",
+      order: null,
+    };
+  }
+
   const orders = await readOrders();
   const existing = orders.find((order) => order.idempotencyKey === input.idempotencyKey);
   if (existing) return { error: null, order: existing, repeated: false };
@@ -189,6 +199,8 @@ export async function placeOrder(input: CheckoutInput) {
     lines,
     total: orderTotal(lines),
     payment: "contra_entrega",
+    customerUserId: customer.userId,
+    ...(customer.email ? { customerEmail: customer.email } : {}),
     ...(campaignSkus.length > 0 ? { campaignEntry: true } : {}),
     history: [
       {
@@ -197,8 +209,8 @@ export async function placeOrder(input: CheckoutInput) {
         actorName: customerName,
         summary:
           campaignSkus.length > 0
-            ? "Dejó el pedido, pendiente de confirmación. Entró por el enlace de campaña. No es gasto publicitario. El total guardado es el precio publicado de ese momento. Nadie cobró aquí."
-            : "Dejó el pedido, pendiente de confirmación. El total guardado es el precio publicado de ese momento. Nadie cobró aquí.",
+            ? "Dejó el pedido con su cuenta, pendiente de confirmación. Entró por el enlace de campaña. No es gasto publicitario. El total guardado es el precio publicado de ese momento. Nadie cobró aquí."
+            : "Dejó el pedido con su cuenta, pendiente de confirmación. El total guardado es el precio publicado de ese momento. Nadie cobró aquí.",
       },
     ],
   };
@@ -268,6 +280,13 @@ export async function updateOrder(id: string, action: OrderAction, actorName: st
   if (order.status !== current.status || order.collected !== current.collected) delete order.customerNotifiedAt;
 
   await writeOrders(orders.map((item) => (item.id === id ? order : item)));
+
+  if (order.status !== current.status) {
+    void import("@/server/customer-mail")
+      .then(({ notifyCustomerOrderStatus }) => notifyCustomerOrderStatus(order, current.status))
+      .catch(() => undefined);
+  }
+
   return { error: null, order };
 }
 
@@ -1086,6 +1105,14 @@ async function readOrders() {
         ? order.buyerNoteSeenAt
         : undefined,
     customerNotifiedAt: typeof order.customerNotifiedAt === "string" && /^\d{4}-\d{2}-\d{2}T/.test(order.customerNotifiedAt) ? order.customerNotifiedAt : undefined,
+    customerUserId:
+      typeof order.customerUserId === "string" && /^[0-9a-f-]{36}$/i.test(order.customerUserId)
+        ? order.customerUserId
+        : undefined,
+    customerEmail:
+      typeof order.customerEmail === "string" && order.customerEmail.includes("@")
+        ? order.customerEmail.trim().toLowerCase().slice(0, 160)
+        : undefined,
     history: Array.isArray(order.history) ? order.history : [],
   }));
 }

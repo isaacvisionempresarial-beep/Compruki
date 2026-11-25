@@ -147,7 +147,9 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                 </Link>
               )}
               <p className="text-[11px] leading-4 text-muted">
-                {rows.length === 0 ? "Ver productos no registra pedido ni cobra." : "Continuar no confirma el pedido ni cobra."}
+                {rows.length === 0
+                  ? "Ver productos no registra pedido ni cobra."
+                  : "Para pagar necesitas entrar con tu cuenta. Continuar no confirma ni cobra."}
               </p>
               <Link
                 href="/tienda"

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { LoginScreen } from "@/components/auth/login-screen";
+import { getAuthUser, userHasPanelMembership } from "@/server/customer-auth";
 
 const loginDescription = "Acceso al panel de la tienda piloto. Dropi no está conectado.";
 
@@ -29,6 +31,12 @@ export default async function LoginPage({
   const linkError = params.error === "enlace";
   const accessDenied = params.error === "sin-acceso";
   const otherStore = params.error === "otra-tienda";
+
+  const user = await getAuthUser();
+  if (user && initialMode !== "nueva-clave" && !accessDenied && !otherStore) {
+    if (await userHasPanelMembership(user.id)) redirect("/panel");
+    redirect("/tienda/cuenta");
+  }
 
   return <LoginScreen initialMode={initialMode} linkError={linkError} accessDenied={accessDenied} otherStore={otherStore} />;
 }

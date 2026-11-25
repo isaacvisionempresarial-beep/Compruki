@@ -90,6 +90,14 @@ export function StoreShell({
               </nav>
             ) : null}
             <Link
+              href="/tienda/cuenta"
+              target="_self"
+              title="Entrar o ver tu cuenta. No cobra."
+              className="inline-flex h-10 items-center rounded-[12px] border border-line bg-canvas/90 px-3 text-sm font-semibold transition-colors hover:border-accent/40 hover:bg-card"
+            >
+              Cuenta
+            </Link>
+            <Link
               href="/tienda/carrito"
               target="_self"
               title="Abrir el carrito no cobra ni registra un pedido."

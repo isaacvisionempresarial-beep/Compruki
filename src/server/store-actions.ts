@@ -7,6 +7,8 @@ import { parsePesos } from "@/lib/catalog";
 import { assertPanelAccess } from "@/server/panel-auth";
 import { normalizePhone, ownerOnlyOrderIntent, type OrderAction } from "@/lib/store-order";
 import { syncQueueWithOrderIncident } from "@/server/dropi-connection";
+import { assertCustomerSession } from "@/server/customer-auth";
+import { saveCustomerCart } from "@/server/customer-cart";
 import { addOrderLine, applyCatalogCosts, applySkuCatalogCosts, markBuyerNoteSeen, markCustomerNotice, placeOrder, saveClosedDepartment, saveDelivery, saveFreight, saveIncidenceReason, saveInternalNote, saveOrderLines, saveProviderRef, saveReturnReason, updateOrder } from "@/server/order-store";
 
 function refreshOrderScreens() {
@@ -45,7 +47,12 @@ function campaignSkusFrom(value: FormDataEntryValue | null) {
 }
 
 export async function placeOrderAction(_state: PlaceOrderState, formData: FormData): Promise<PlaceOrderState> {
-  let lines: Array<{ sku: string; quantity: number }> = [];
+  const session = await assertCustomerSession();
+  if (!session) {
+    return { error: "Entra con tu cuenta para dejar el pedido. No se creó. Nadie cobra en la tienda." };
+  }
+
+  let lines: Array<{ sku: string; quantity: number; variant?: string }> = [];
   try {
     const parsed = JSON.parse(String(formData.get("lines") ?? "[]")) as unknown;
     if (!Array.isArray(parsed)) throw new Error("invalid");
@@ -57,25 +64,30 @@ export async function placeOrderAction(_state: PlaceOrderState, formData: FormDa
     return { error: "No se pudo leer el carrito. Vuelve a abrirlo." };
   }
 
-  const result = await placeOrder({
-    idempotencyKey: String(formData.get("idempotencyKey") ?? ""),
-    customerName: String(formData.get("customerName") ?? ""),
-    phone: normalizePhone(String(formData.get("phone") ?? "")),
-    document: String(formData.get("document") ?? ""),
-    city: String(formData.get("city") ?? ""),
-    department: String(formData.get("department") ?? ""),
-    address: String(formData.get("address") ?? ""),
-    reference: String(formData.get("reference") ?? ""),
-    accepted: formData.get("accepted") === "on",
-    lines,
-    campaignSkus: campaignSkusFrom(formData.get("campaignSkus")),
-  });
+  const result = await placeOrder(
+    {
+      idempotencyKey: String(formData.get("idempotencyKey") ?? ""),
+      customerName: String(formData.get("customerName") ?? ""),
+      phone: normalizePhone(String(formData.get("phone") ?? "")),
+      document: String(formData.get("document") ?? ""),
+      city: String(formData.get("city") ?? ""),
+      department: String(formData.get("department") ?? ""),
+      address: String(formData.get("address") ?? ""),
+      reference: String(formData.get("reference") ?? ""),
+      accepted: formData.get("accepted") === "on",
+      lines,
+      campaignSkus: campaignSkusFrom(formData.get("campaignSkus")),
+    },
+    { userId: session.user.id, email: session.profile.email || session.user.email || "" },
+  );
 
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudo registrar el pedido." };
   }
 
+  await saveCustomerCart(session.user.id, []);
   refreshOrderScreens();
+  revalidatePath("/tienda/cuenta");
   const flag = result.repeated ? "ya=1" : "nuevo=1";
   redirect(`/tienda/pedido/${result.order.id}?t=${result.order.viewToken}&${flag}`);
 }

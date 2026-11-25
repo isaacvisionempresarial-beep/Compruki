@@ -47,6 +47,9 @@ export type StoreOrder = {
   /** Cuándo el panel marcó que leyó el aviso del comprador. Se limpia si el cliente actualiza el aviso. */
   buyerNoteSeenAt?: string;
   customerNotifiedAt?: string;
+  /** Cuenta de comprador (Supabase Auth) que creó el pedido. */
+  customerUserId?: string;
+  customerEmail?: string;
   actualShipping?: number;
   returnFreight?: number;
   collectionCost?: number;

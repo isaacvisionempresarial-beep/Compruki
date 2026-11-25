@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { isSizeKind, type SizeKind } from "@/lib/catalog";
+import { persistCustomerCartAction, syncCustomerCartAction } from "@/server/customer-cart-actions";
 
 const storageKey = "store_cart";
 
@@ -55,6 +56,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const client = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [lines, setLines] = useState<CartLine[]>([]);
   const [ready, setReady] = useState(false);
+  const [accountLinked, setAccountLinked] = useState(false);
+  const skipPersist = useRef(false);
 
   if (client && !ready) {
     setLines(readStoredLines());
@@ -63,8 +66,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!ready) return;
+    let cancelled = false;
+    void syncCustomerCartAction(JSON.stringify(readStoredLines())).then((result) => {
+      if (cancelled || !result.lines) return;
+      skipPersist.current = true;
+      setAccountLinked(true);
+      setLines(result.lines);
+      writeStoredLines(result.lines);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [ready]);
+
+  useEffect(() => {
+    if (!ready) return;
+    if (skipPersist.current) {
+      skipPersist.current = false;
+      return;
+    }
     writeStoredLines(lines);
-  }, [lines, ready]);
+    if (accountLinked) {
+      void persistCustomerCartAction(JSON.stringify(lines));
+    }
+  }, [lines, ready, accountLinked]);
 
   const add = useCallback((sku: string, quantity = 1, variant = "", sizeKind?: SizeKind) => {
     setLines((current) => {

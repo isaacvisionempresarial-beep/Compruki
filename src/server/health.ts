@@ -1,4 +1,5 @@
 import { createAdminSupabase } from "@/lib/supabase/admin";
+import { probeCustomerProfilesTable } from "@/server/customer-auth";
 import { probeFollowupsTable } from "@/server/followups";
 import { openAIKeyConfigured, probeOpenAI } from "@/server/openai-client";
 import { probeProductQuestionsTable } from "@/server/product-questions";
@@ -13,6 +14,8 @@ export type HealthChecks = {
   productQuestions: boolean;
   /** Tabla AG-07 CRM; no bloquea ok del deploy. */
   followupTasks: boolean;
+  /** Perfiles de comprador (017); no bloquea ok. */
+  customerProfiles: boolean;
   /** Clave presente; el probe vivo va en openaiConnected. No bloquea ok. */
   openaiKey: boolean;
 };
@@ -39,6 +42,7 @@ export async function getHealthSnapshot(): Promise<HealthSnapshot> {
     tenantPilot: false,
     productQuestions: false,
     followupTasks: false,
+    customerProfiles: false,
     openaiKey: openAIKeyConfigured(),
   };
 
@@ -50,12 +54,14 @@ export async function getHealthSnapshot(): Promise<HealthSnapshot> {
     } catch {
       checks.tenantPilot = false;
     }
-    const [productQuestions, followupTasks] = await Promise.all([
+    const [productQuestions, followupTasks, customerProfiles] = await Promise.all([
       probeProductQuestionsTable(),
       probeFollowupsTable(),
+      probeCustomerProfilesTable(),
     ]);
     checks.productQuestions = productQuestions;
     checks.followupTasks = followupTasks;
+    checks.customerProfiles = customerProfiles;
   }
 
   const openaiProbe = await probeOpenAI();

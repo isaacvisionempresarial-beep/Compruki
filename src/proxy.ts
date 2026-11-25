@@ -4,7 +4,6 @@ import { updateSession } from "@/lib/supabase/middleware";
 export async function proxy(request: NextRequest) {
   const { response, user } = await updateSession(request);
   const { pathname } = request.nextUrl;
-  const modo = request.nextUrl.searchParams.get("modo");
 
   if (pathname.startsWith("/panel") && !user) {
     const url = request.nextUrl.clone();
@@ -15,12 +14,11 @@ export async function proxy(request: NextRequest) {
     return redirect;
   }
 
-  // Con sesión, /ingresar va al panel… salvo cambio de clave, sin membresía o cuenta de otra tienda.
-  const error = request.nextUrl.searchParams.get("error");
-  if (pathname === "/ingresar" && user && modo !== "nueva-clave" && error !== "sin-acceso" && error !== "otra-tienda") {
+  // Checkout exige sesión; el destino final (panel vs comprador) lo resuelve /tienda/cuenta.
+  if (pathname.startsWith("/tienda/pagar") && !user) {
     const url = request.nextUrl.clone();
-    url.pathname = "/panel";
-    url.search = "";
+    url.pathname = "/tienda/cuenta";
+    url.search = `?next=${encodeURIComponent("/tienda/pagar")}`;
     const redirect = NextResponse.redirect(url);
     response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
     return redirect;
@@ -30,5 +28,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/panel", "/panel/:path*", "/ingresar"],
+  matcher: ["/panel", "/panel/:path*", "/ingresar", "/tienda/pagar", "/tienda/pagar/:path*"],
 };

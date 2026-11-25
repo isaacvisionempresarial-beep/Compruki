@@ -35,6 +35,11 @@ export default async function SettingsPage() {
       label: "followup_tasks (AG-07)",
       hint: "Migración supabase/migrations/013_followup_tasks.sql. Sin ella no se guardan seguimientos CRM.",
     },
+    {
+      key: "customerProfiles",
+      label: "customer_profiles (tienda)",
+      hint: "Migración supabase/migrations/017_customer_accounts.sql. Sin ella no hay cuentas de comprador.",
+    },
   ];
 
   return (
@@ -135,7 +140,7 @@ export default async function SettingsPage() {
                 className={`mt-0.5 text-sm font-semibold ${
                   health.checks[item.key]
                     ? "text-ink"
-                    : item.key === "productQuestions" || item.key === "followupTasks"
+                    : item.key === "productQuestions" || item.key === "followupTasks" || item.key === "customerProfiles"
                       ? "text-coral"
                       : "text-ink"
                 }`}
