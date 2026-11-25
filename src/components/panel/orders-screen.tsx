@@ -17,6 +17,7 @@ import type { OrderPreparePack } from "@/server/agent-order-prepare";
 import type { OrderReading } from "@/server/agent-order-reading";
 import type { SupportResolutionDraft } from "@/server/agent-support-draft";
 import { parsePesos, sizeChoiceLabel, variantFits } from "@/lib/catalog";
+import { citiesForDepartment, listColombiaDepartments } from "@/lib/colombia-places";
 import { blockedDropiAnswer } from "@/lib/dropi-provider";
 import { cx } from "@/lib/cx";
 import { STATUS_LABEL, STATUS_SEQUENCE, type OrderStatus } from "@/lib/demo-data";
@@ -1858,6 +1859,8 @@ function LinesForm({
   );
 }
 
+const colombiaDepartments = listColombiaDepartments();
+
 function ClosedDepartmentForm({ order }: { order: StoreOrder }) {
   const [department, setDepartment] = useState("");
   const [departmentState, departmentAction, departmentPending] = useActionState(saveClosedDepartmentAction, initialState);
@@ -1871,17 +1874,24 @@ function ClosedDepartmentForm({ order }: { order: StoreOrder }) {
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cerrado</p>
       <label className="text-sm font-semibold" htmlFor={`departamento-cerrado-${order.id}`}>
         Departamento
-        <input
+        <select
           id={`departamento-cerrado-${order.id}`}
           name="department"
           autoComplete="address-level1"
           value={department}
           onChange={(event) => setDepartment(event.target.value)}
           className={freightInput}
-        />
+        >
+          <option value="">Elegir</option>
+          {colombiaDepartments.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
+        </select>
         <span className="mt-1 block font-normal leading-5 text-muted">
-          No es la ciudad. Vacío no se guarda: el botón queda bloqueado. Sale en el texto para Dropi. No cambia el estado
-          ni el cobro. El total guardado no cambia.
+          Lista de Colombia. No es la ciudad. Vacío no se guarda: el botón queda bloqueado. Sale en el texto para Dropi.
+          No cambia el estado ni el cobro. El total guardado no cambia.
         </span>
       </label>
       {previewText ? (
@@ -1932,6 +1942,16 @@ function DeliveryForm({ order }: { order: StoreOrder }) {
     setReference(order.reference);
   }
   const [deliveryState, deliveryAction, deliveryPending] = useActionState(saveDeliveryAction, initialState);
+  const departments = useMemo(() => {
+    const listed = [...colombiaDepartments];
+    if (department && !listed.includes(department)) listed.unshift(department);
+    return listed;
+  }, [department]);
+  const cities = useMemo(() => {
+    const listed = [...citiesForDepartment(department)];
+    if (city && !listed.includes(city)) listed.unshift(city);
+    return listed;
+  }, [department, city]);
 
   const checked = validateDelivery({
     customerName: name,
@@ -1991,15 +2011,59 @@ function DeliveryForm({ order }: { order: StoreOrder }) {
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-departamento-${order.id}`}>
         Departamento
-        <input id={`entrega-departamento-${order.id}`} name="department" autoComplete="address-level1" value={department} onChange={(event) => setDepartment(event.target.value)} className={freightInput} />
+        <select
+          id={`entrega-departamento-${order.id}`}
+          name="department"
+          autoComplete="address-level1"
+          value={department}
+          onChange={(event) => {
+            setDepartment(event.target.value);
+            setCity("");
+          }}
+          className={freightInput}
+        >
+          <option value="">Sin departamento</option>
+          {departments.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
+        </select>
         <span className="mt-1 block font-normal leading-5 text-muted">
-          Opcional si el pedido entró sin él. Vacío: no se agrega. En un pedido nuevo la tienda lo pide. El total guardado no cambia.
+          Lista de Colombia. Opcional si el pedido entró sin él. Vacío: no se agrega. El total guardado no cambia.
         </span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-ciudad-${order.id}`}>
         Ciudad
-        <input id={`entrega-ciudad-${order.id}`} name="city" autoComplete="address-level2" value={city} onChange={(event) => setCity(event.target.value)} className={freightInput} />
-        <span className="mt-1 block font-normal leading-5 text-muted"></span>
+        {department && cities.length > 0 ? (
+          <select
+            id={`entrega-ciudad-${order.id}`}
+            name="city"
+            autoComplete="address-level2"
+            value={city}
+            onChange={(event) => setCity(event.target.value)}
+            className={freightInput}
+          >
+            <option value="">Elegir</option>
+            {cities.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            id={`entrega-ciudad-${order.id}`}
+            name="city"
+            autoComplete="address-level2"
+            value={city}
+            onChange={(event) => setCity(event.target.value)}
+            className={freightInput}
+          />
+        )}
+        <span className="mt-1 block font-normal leading-5 text-muted">
+          {department ? "Municipios del departamento. El total guardado no cambia." : "Con departamento, la lista se filtra."}
+        </span>
       </label>
       <label className="text-sm font-semibold" htmlFor={`entrega-direccion-${order.id}`}>
         Dirección

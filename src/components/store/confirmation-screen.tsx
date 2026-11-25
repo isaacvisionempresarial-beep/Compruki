@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useEffect, useState, type ReactNode } from "react";
+import { useActionState, useEffect, useMemo, useState, type ReactNode } from "react";
 import { LinePhotos, ProductThumb } from "@/components/store/product-thumb";
 import { useCart } from "@/components/store/cart-state";
+import { citiesForDepartment, listColombiaDepartments } from "@/lib/colombia-places";
 import { STATUS_LABEL } from "@/lib/demo-data";
 import { formatCop, formatDay } from "@/lib/format";
 import { sizeChoiceLabel, type SizeKind } from "@/lib/catalog";
@@ -47,6 +48,8 @@ function photosOf(images: CustomerImages[], sku: string) {
 }
 const fieldClass =
   "h-10 w-full rounded-[10px] border border-line bg-canvas px-3 text-sm focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none";
+const selectClass = `${fieldClass} disabled:cursor-not-allowed disabled:opacity-60`;
+const colombiaDepartments = listColombiaDepartments();
 
 export function ConfirmationScreen({
   order,
@@ -314,6 +317,16 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
   const [city, setCity] = useState(order.city);
   const [address, setAddress] = useState(order.address);
   const [reference, setReference] = useState(order.reference);
+  const departments = useMemo(() => {
+    const listed = [...colombiaDepartments];
+    if (department && !listed.includes(department)) listed.unshift(department);
+    return listed;
+  }, [department]);
+  const cities = useMemo(() => {
+    const listed = [...citiesForDepartment(department)];
+    if (city && !listed.includes(city)) listed.unshift(city);
+    return listed;
+  }, [department, city]);
 
   const checked = validateDelivery({
     customerName,
@@ -374,14 +387,62 @@ function CustomerDelivery({ order, token }: { order: CustomerOrder; token: strin
           htmlFor="department"
           hint={
             department.trim()
-              ? "No es la ciudad. El total guardado no cambia."
-              : "Opcional. No es la ciudad. La tienda puede confirmar sin él. El total guardado no cambia."
+              ? "Lista de Colombia. No es la ciudad. El total guardado no cambia."
+              : "Opcional. Lista de Colombia. La tienda puede confirmar sin él. El total guardado no cambia."
           }
         >
-          <input id="department" name="department" autoComplete="address-level1" value={department} onChange={(event) => setDepartment(event.target.value)} className={fieldClass} />
+          <select
+            id="department"
+            name="department"
+            autoComplete="address-level1"
+            value={department}
+            onChange={(event) => {
+              setDepartment(event.target.value);
+              setCity("");
+            }}
+            className={selectClass}
+          >
+            <option value="">Sin departamento</option>
+            {departments.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
         </Field>
-        <Field label="Ciudad" htmlFor="city" hint="">
-          <input id="city" name="city" required autoComplete="address-level2" value={city} onChange={(event) => setCity(event.target.value)} className={fieldClass} />
+        <Field
+          label="Ciudad"
+          htmlFor="city"
+          hint={department ? "Municipios del departamento. El total guardado no cambia." : "Con departamento, la lista se filtra."}
+        >
+          {department && cities.length > 0 ? (
+            <select
+              id="city"
+              name="city"
+              required
+              autoComplete="address-level2"
+              value={city}
+              onChange={(event) => setCity(event.target.value)}
+              className={selectClass}
+            >
+              <option value="">Elegir</option>
+              {cities.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input
+              id="city"
+              name="city"
+              required
+              autoComplete="address-level2"
+              value={city}
+              onChange={(event) => setCity(event.target.value)}
+              className={fieldClass}
+            />
+          )}
         </Field>
         <div className="sm:col-span-2">
           <Field label="Dirección" htmlFor="address" hint="">
