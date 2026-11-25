@@ -125,7 +125,7 @@ export default async function SettingsPage() {
           </span>
         </div>
         <p className="mt-1 text-sm text-muted">
-          Misma señal que <span className="font-semibold">GET /api/health</span>. No expone secretos.
+          Detalle solo en el panel. <span className="font-semibold">GET /api/health</span> público responde solo ok.
         </p>
         <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {checkLabels.map((item) => (

@@ -3,7 +3,10 @@ export const LOOKUP_IP_RULE = { limit: 40, windowMs: 10 * 60 * 1000 };
 export const CHECKOUT_TRY_RULE = { limit: 40, windowMs: 10 * 60 * 1000 };
 export const CHECKOUT_CREATE_RULE = { limit: 30, windowMs: 60 * 60 * 1000 };
 export const CUSTOMER_WRITE_RULE = { limit: 20, windowMs: 10 * 60 * 1000 };
-export const PRODUCT_QUESTION_RULE = { limit: 12, windowMs: 10 * 60 * 1000 };
+/** Preguntas públicas: más estricto (antes disparaban OpenAI; ahora solo bandeja). */
+export const PRODUCT_QUESTION_RULE = { limit: 6, windowMs: 10 * 60 * 1000 };
+export const AUTH_IP_RULE = { limit: 12, windowMs: 15 * 60 * 1000 };
+export const AUTH_EMAIL_RULE = { limit: 8, windowMs: 15 * 60 * 1000 };
 
 export const LOOKUP_BURST_ERROR =
   "Demasiados intentos seguidos. Espera unos minutos y vuelve a consultar. No se abrió ningún pedido. Nadie cobra en la tienda.";
@@ -16,3 +19,6 @@ export const CUSTOMER_BURST_ERROR =
 
 export const PRODUCT_QUESTION_BURST_ERROR =
   "Demasiadas preguntas seguidas. Espera unos minutos. No se envió nada a la tienda. Nadie cobra en la tienda.";
+
+export const AUTH_BURST_ERROR =
+  "Demasiados intentos de ingreso. Espera unos minutos e inténtalo de nuevo.";

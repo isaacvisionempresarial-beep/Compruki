@@ -1,9 +1,18 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { AUTH_BURST_ERROR, AUTH_EMAIL_RULE, AUTH_IP_RULE } from "@/lib/public-limits";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { clientAddress, takePublicAttempt } from "@/server/public-guard";
 
 export type SignInState = { error: string | null };
+
+async function authAttemptAllowed(email: string) {
+  const address = await clientAddress();
+  if (!takePublicAttempt("auth-ip", address, AUTH_IP_RULE)) return false;
+  if (email && !takePublicAttempt("auth-email", email, AUTH_EMAIL_RULE)) return false;
+  return true;
+}
 
 export async function signIn(_state: SignInState, formData: FormData): Promise<SignInState> {
   const email = String(formData.get("email") ?? "")
@@ -13,6 +22,10 @@ export async function signIn(_state: SignInState, formData: FormData): Promise<S
 
   if (!email || !password) {
     return { error: "Escribe el correo y la contraseña." };
+  }
+
+  if (!(await authAttemptAllowed(email))) {
+    return { error: AUTH_BURST_ERROR };
   }
 
   const supabase = await createServerSupabase();
@@ -46,6 +59,10 @@ export async function requestPasswordReset(_state: RecoverState, formData: FormD
     .toLowerCase();
   if (!email) {
     return { error: "Escribe el correo de tu comercio.", sent: false };
+  }
+
+  if (!(await authAttemptAllowed(email))) {
+    return { error: AUTH_BURST_ERROR, sent: false };
   }
 
   const supabase = await createServerSupabase();

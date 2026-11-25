@@ -24,7 +24,7 @@ export type HealthSnapshot = {
   checks: HealthChecks;
 };
 
-/** Misma lógica que GET /api/health, reutilizable en el panel. */
+/** Snapshot completo para el panel. GET /api/health público solo expone ok. */
 export async function getHealthSnapshot(): Promise<HealthSnapshot> {
   const checks: HealthChecks = {
     siteUrl: Boolean(process.env.NEXT_PUBLIC_SITE_URL?.trim()),

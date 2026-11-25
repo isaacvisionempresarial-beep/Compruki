@@ -43,11 +43,30 @@ export async function evaluateAgentPolicy(agentId: string): Promise<AgentPolicy>
         .gte("created_at", monthStartIso()),
     ]);
 
-    if (configError && (configError.message.includes("schema cache") || configError.message.includes("does not exist"))) {
-      return { ok: true, enabled: true, monthlyBudgetCop: 0, monthSpendCop: 0 };
+    const missingSchema = (message: string) =>
+      message.includes("schema cache") || message.includes("does not exist");
+
+    // Piloto local sin migraciones: permitir. Cualquier otro error de DB: fail-closed.
+    if (configError) {
+      if (missingSchema(configError.message)) {
+        return { ok: true, enabled: true, monthlyBudgetCop: 0, monthSpendCop: 0 };
+      }
+      return {
+        ok: false,
+        code: "disabled",
+        reason: `${agentId} no pudo verificar la política. Intenta de nuevo en unos minutos.`,
+      };
     }
 
-    const monthSpendCop = (runsError ? [] : runs ?? []).reduce(
+    if (runsError && !missingSchema(runsError.message)) {
+      return {
+        ok: false,
+        code: "disabled",
+        reason: `${agentId} no pudo verificar el gasto del mes. Intenta de nuevo en unos minutos.`,
+      };
+    }
+
+    const monthSpendCop = (runs ?? []).reduce(
       (sum, row) => sum + Math.max(0, Number(row.cost_estimate_cop) || 0),
       0,
     );
@@ -77,7 +96,11 @@ export async function evaluateAgentPolicy(agentId: string): Promise<AgentPolicy>
 
     return { ok: true, enabled, monthlyBudgetCop, monthSpendCop };
   } catch {
-    return { ok: true, enabled: true, monthlyBudgetCop: 0, monthSpendCop: 0 };
+    return {
+      ok: false,
+      code: "disabled",
+      reason: `${agentId} no pudo verificar la política. Intenta de nuevo en unos minutos.`,
+    };
   }
 }
 

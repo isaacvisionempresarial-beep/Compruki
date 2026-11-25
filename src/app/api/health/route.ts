@@ -3,7 +3,11 @@ import { getHealthSnapshot } from "@/server/health";
 
 export const dynamic = "force-dynamic";
 
-/** Readiness liviano para deploy. No expone secretos. openaiConnected no bloquea el 200. */
+/**
+ * Readiness liviano para deploy.
+ * Público: solo ok/servicio (sin mapa de checks ni openai).
+ * El detalle sigue en el panel vía getHealthSnapshot().
+ */
 export async function GET() {
   const snapshot = await getHealthSnapshot();
 
@@ -11,9 +15,6 @@ export async function GET() {
     {
       ok: snapshot.ok,
       service: "compruki",
-      dropiConnected: snapshot.dropiConnected,
-      openaiConnected: snapshot.openaiConnected,
-      checks: snapshot.checks,
     },
     {
       status: snapshot.ok ? 200 : 503,
