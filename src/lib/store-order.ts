@@ -1414,6 +1414,12 @@ export function normalizeOrderNumber(raw: string) {
 export const PENDING_PHONE_LIMIT = 3;
 
 /** Siguiente P- libre. Usa el mayor número ya usado, no la cantidad de filas. */
+/** Acepta IDs cortos legacy (`ord_`+8) y los nuevos (`ord_`+32 hex). */
+export function isStoreOrderId(value: string) {
+  const id = value.trim();
+  return /^ord_[0-9a-f]{8}$/i.test(id) || /^ord_[0-9a-f]{32}$/i.test(id);
+}
+
 export function nextOrderNumber(numbers: string[]) {
   let max = 2000;
   for (const raw of numbers) {

@@ -4,6 +4,7 @@ import { foreignIds } from "@/lib/tenant-scope";
 import {
   actionsFor,
   applyOrderAction,
+  isStoreOrderId,
   nextOrderNumber,
   orderMargin,
   orderRealizedMargin,
@@ -146,6 +147,10 @@ describe("pedidos y antiabuso", () => {
     expect(nextOrderNumber([])).toBe("P-2001");
     expect(nextOrderNumber(["P-2000", "P-2005", "borrador"])).toBe("P-2006");
     expect(nextOrderNumber(["P-999999"])).toBeNull();
+    expect(isStoreOrderId("ord_abcd1234")).toBe(true);
+    expect(isStoreOrderId(`ord_${"a".repeat(32)}`)).toBe(true);
+    expect(isStoreOrderId("ord_short")).toBe(false);
+    expect(isStoreOrderId("pedido-1")).toBe(false);
   });
 
   it("deja reabrir el mismo pendiente y frena el cuarto distinto", () => {

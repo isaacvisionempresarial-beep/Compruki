@@ -49,6 +49,20 @@ import { listProducts } from "@/server/catalog-store";
 import { loadOrders, saveOrders } from "@/server/pg-persistence";
 import { clientAddress, takePublicAttempt } from "@/server/public-guard";
 
+function newHistoryEventId() {
+  return `evt_${randomUUID().replaceAll("-", "")}`;
+}
+
+/** `ord_` + 32 hex; reintenta si choca con un id existente. */
+export function allocateOrderId(existingIds: Iterable<string>) {
+  const taken = existingIds instanceof Set ? existingIds : new Set(existingIds);
+  for (let attempt = 0; attempt < 16; attempt += 1) {
+    const id = `ord_${randomUUID().replaceAll("-", "")}`;
+    if (!taken.has(id)) return id;
+  }
+  return `ord_${randomUUID().replaceAll("-", "")}${Date.now().toString(16)}`;
+}
+
 export async function listOrders() {
   return (await readOrders()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
@@ -84,7 +98,7 @@ export async function appendOrderHistory(id: string, summary: string, actorName:
     ...current,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName,
         summary,
@@ -158,7 +172,7 @@ export async function placeOrder(input: CheckoutInput) {
   const campaignSkus = campaignSkusInOrder(lines, input.campaignSkus ?? []);
   const document = validateDocument(input.document).value;
   const order: StoreOrder = {
-    id: `ord_${randomUUID().slice(0, 8)}`,
+    id: allocateOrderId(orders.map((item) => item.id)),
     number,
     idempotencyKey: input.idempotencyKey,
     viewToken: randomUUID(),
@@ -178,7 +192,7 @@ export async function placeOrder(input: CheckoutInput) {
     ...(campaignSkus.length > 0 ? { campaignEntry: true } : {}),
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: createdAt,
         actorName: customerName,
         summary:
@@ -238,7 +252,7 @@ export async function updateOrder(id: string, action: OrderAction, actorName: st
     ...result.order,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName,
         summary:
@@ -294,7 +308,7 @@ export async function cancelOrderByCustomer(id: string, token: string, rawReason
     customerReason: checked.value,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName: current.customerName,
         summary: "Canceló su pedido antes de la confirmación. Deja de sumar en las ventas. El total guardado no cambió. Nadie cobra en la tienda.",
@@ -335,7 +349,7 @@ export async function correctDeliveryByCustomer(id: string, token: string, input
     document: next.document || undefined,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName: current.customerName,
         summary: keptTotalNote("Corrigió sus datos de entrega."),
@@ -404,7 +418,7 @@ export async function chooseSizeByCustomer(
     lines,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName: current.customerName,
         summary: `${lead} El total guardado no cambió. El precio de la línea tampoco. Nadie cobra en la tienda. El catálogo no cambió.`,
@@ -433,7 +447,7 @@ export async function saveBuyerNoteByCustomer(id: string, token: string, raw: st
     ...current,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName: current.customerName,
         summary: keptTotalNote(
@@ -473,7 +487,7 @@ export async function saveIncidenceReason(id: string, rawReason: string, actorNa
     customerReason: checked.value,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName,
         summary: keptTotalNote("Anotó el motivo de la incidencia. El cliente lo ve en el pedido. Dropi no está conectado: no se entera desde aquí."),
@@ -505,7 +519,7 @@ export async function saveReturnReason(id: string, rawReason: string, actorName:
     customerReason: checked.value,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName,
         summary: keptTotalNote("Anotó el motivo de la devolución. El cliente lo ve en el pedido. Dropi no está conectado: no se entera desde aquí."),
@@ -542,7 +556,7 @@ export async function applyCatalogCosts(id: string, actorName: string) {
     total: current.total,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName,
         summary: catalogCostSummary(adopted.mode, current, adopted.lines),
@@ -579,7 +593,7 @@ export async function applySkuCatalogCosts(sku: string, actorName: string, scope
       total: current.total,
       history: [
         {
-          id: `evt_${randomUUID().slice(0, 8)}`,
+          id: newHistoryEventId(),
           at: bogotaNow(),
           actorName,
           summary,
@@ -650,7 +664,7 @@ export async function saveFreight(
     ...next,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName,
         summary: `${notes.join(" ")} El total guardado no cambió. No es dinero cobrado.`,
@@ -678,7 +692,7 @@ export async function saveProviderRef(id: string, raw: string | null, actorName:
       ...cleared,
       history: [
         {
-          id: `evt_${randomUUID().slice(0, 8)}`,
+          id: newHistoryEventId(),
           at: bogotaNow(),
           actorName,
           summary: keptTotalNote("Quitó el número de Dropi anotado a mano. La cola vuelve a quedar bloqueada, sin envío."),
@@ -699,7 +713,7 @@ export async function saveProviderRef(id: string, raw: string | null, actorName:
     providerRef: checked.value,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName,
         summary: keptTotalNote(`Anotó el número de Dropi cargado a mano: ${checked.value}. Desde aquí no se envió el pedido y la cola no lo reintentará.`),
@@ -728,7 +742,7 @@ export async function saveClosedDepartment(id: string, raw: string, actorName: s
     department,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName,
         summary: keptTotalNote("Anotó el departamento. El texto para Dropi lo lleva. El estado no cambia y Dropi no está conectado: no se entera desde aquí."),
@@ -771,7 +785,7 @@ export async function saveDelivery(id: string, input: DeliveryDraft, actorName: 
     document: next.document || undefined,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName,
         summary: keptTotalNote("Actualizó los datos de entrega. Dropi no está conectado: no se entera desde aquí."),
@@ -846,7 +860,7 @@ export async function saveOrderLines(
     total,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName,
         summary: `${lead} ${total === current.total ? "El total guardado no cambió." : `El total guardado quedó en ${formatCop(total)}.`} No es dinero cobrado. El precio guardado de cada línea que sigue no cambió. El catálogo no cambió. Dropi no está conectado: no se entera desde aquí.`,
@@ -914,7 +928,7 @@ export async function addOrderLine(
     total,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName,
         summary: `Agregó ${lineName(line)}. Copió el precio de la ficha de hoy. El catálogo no cambió. El total guardado quedó en ${formatCop(total)}. No es dinero cobrado. Dropi no está conectado: no se entera desde aquí.`,
@@ -945,7 +959,7 @@ export async function saveInternalNote(id: string, raw: string, actorName: strin
     ...stored,
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName,
         summary: keptTotalNote(nextNote ? (previous ? "Actualizó la nota interna." : "Anotó una nota interna.") : "Quitó la nota interna."),
@@ -970,7 +984,7 @@ export async function markCustomerNotice(id: string, intent: "avisar" | "quitar"
       ...cleared,
       history: [
         {
-          id: `evt_${randomUUID().slice(0, 8)}`,
+          id: newHistoryEventId(),
           at: bogotaNow(),
           actorName,
           summary: keptTotalNote("Quitó la marca de aviso al cliente."),
@@ -988,7 +1002,7 @@ export async function markCustomerNotice(id: string, intent: "avisar" | "quitar"
     customerNotifiedAt: bogotaNow(),
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName,
         summary: keptTotalNote("Marcó que avisó al cliente. Desde aquí no se envió el mensaje."),
@@ -1016,7 +1030,7 @@ export async function markBuyerNoteSeen(id: string, intent: "leer" | "quitar", a
       ...cleared,
       history: [
         {
-          id: `evt_${randomUUID().slice(0, 8)}`,
+          id: newHistoryEventId(),
           at: bogotaNow(),
           actorName,
           summary: keptTotalNote("Quitó la marca de lectura del aviso del comprador."),
@@ -1034,7 +1048,7 @@ export async function markBuyerNoteSeen(id: string, intent: "leer" | "quitar", a
     buyerNoteSeenAt: bogotaNow(),
     history: [
       {
-        id: `evt_${randomUUID().slice(0, 8)}`,
+        id: newHistoryEventId(),
         at: bogotaNow(),
         actorName,
         summary: keptTotalNote("Marcó que leyó el aviso del comprador. El aviso sigue en el pedido."),

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { dropiAdapter, emptyDropiQueue, type DropiEnqueueState, type DropiQueueSnapshot, type DropiQueuedJob } from "@/lib/dropi-provider";
-import { awaitsDropiNumber, validateProviderRef } from "@/lib/store-order";
+import { awaitsDropiNumber, isStoreOrderId, validateProviderRef } from "@/lib/store-order";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { appendOrderHistory, getOrder, listOrders } from "@/server/order-store";
 import { assertPanelAccess } from "@/server/panel-auth";
@@ -242,7 +242,7 @@ export async function enqueueDropiSend(_state: DropiEnqueueState, formData: Form
   }
 
   const orderId = String(formData.get("orderId") ?? "").trim();
-  if (!/^ord_[0-9a-f]{8}$/i.test(orderId)) {
+  if (!isStoreOrderId(orderId)) {
     return { error: "No encontré ese pedido. El total guardado no cambió.", message: null };
   }
 
@@ -396,7 +396,7 @@ export async function recordOperationalNotice(_state: DropiEnqueueState, formDat
   const access = await assertPanelAccess();
   if (!access) return { error: "Entra al panel para dejar el aviso.", message: null };
   const orderId = String(formData.get("orderId") ?? "").trim();
-  if (!/^ord_[0-9a-f]{8}$/i.test(orderId)) {
+  if (!isStoreOrderId(orderId)) {
     return { error: "No encontré ese pedido. El total guardado no cambió.", message: null };
   }
   const order = await getOrder(orderId);
