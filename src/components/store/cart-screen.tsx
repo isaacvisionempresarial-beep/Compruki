@@ -63,7 +63,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
           <div className="relative isolate mx-auto w-full max-w-[14rem] sm:mx-0 sm:justify-self-end" aria-hidden="true">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/store/cart-hero.jpg"
+              src="/store/cart-hero.jpg?v=2"
               alt=""
               width={640}
               height={360}
