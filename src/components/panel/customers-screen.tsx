@@ -12,6 +12,7 @@ import {
 import { formatDay } from "@/lib/format";
 import { orderFocusHref, whatsAppHref } from "@/lib/store-order";
 import type { FollowupPriority } from "@/server/agent-followup-priority";
+import type { RegisteredStoreAccount } from "@/server/customer-auth";
 import type { FollowupTask } from "@/server/followups";
 import {
   createFollowupAction,
@@ -22,6 +23,7 @@ import {
 } from "@/server/followup-actions";
 
 export function CustomersScreen({
+  accounts = [],
   contacts,
   openTasks,
   tableReady,
@@ -32,6 +34,7 @@ export function CustomersScreen({
   error = null,
   policyError = null,
 }: {
+  accounts?: RegisteredStoreAccount[];
   contacts: CrmContact[];
   openTasks: FollowupTask[];
   tableReady: boolean;
@@ -49,8 +52,8 @@ export function CustomersScreen({
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Operación</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Clientes</h1>
       <p className="mt-1 max-w-2xl text-sm text-muted">
-        CRM lite con pipeline: Nuevo → Contactar → En espera. Contactos desde pedidos (AG-07). Abrir WhatsApp es a
-        mano; Compruki no envía.
+        Cuentas registradas en la tienda (con o sin pedido) y CRM lite de seguimientos. Abrir WhatsApp es a mano;
+        Compruki no envía.
       </p>
 
       {!tableReady ? (
@@ -83,7 +86,50 @@ export function CustomersScreen({
         </p>
       ) : null}
 
-      <section className="mt-5" aria-labelledby="pipeline">
+      <section className="mt-5" aria-labelledby="cuentas-tienda">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tienda</p>
+        <h2 id="cuentas-tienda" className="mt-0.5 text-base font-bold">
+          Cuentas registradas
+        </h2>
+        <p className="mt-1 text-sm text-muted">
+          {accounts.length} cuenta{accounts.length === 1 ? "" : "s"} · incluye quien solo se registró y aún no pidió.
+        </p>
+        {accounts.length === 0 ? (
+          <div className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+            <p className="mt-0.5 text-sm text-muted">Todavía no hay compradores registrados en la tienda.</p>
+          </div>
+        ) : (
+          <ul className="mt-3 divide-y divide-line overflow-hidden rounded-[14px] border border-line bg-card">
+            {accounts.map((account) => (
+              <li key={account.userId} className="flex flex-wrap items-start justify-between gap-3 px-4 py-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold">{account.displayName}</p>
+                  <p className="mt-0.5 break-all text-xs text-muted">{account.email}</p>
+                  <p className="mt-1 text-xs text-muted">
+                    {account.provider}
+                    {account.phone ? ` · ${account.phone}` : " · Sin celular"}
+                    {" · "}
+                    {account.orderCount === 0
+                      ? "Sin pedidos"
+                      : `${account.orderCount} pedido${account.orderCount === 1 ? "" : "s"}`}
+                    {account.createdAt ? ` · ${formatDay(account.createdAt.slice(0, 10))}` : ""}
+                  </p>
+                </div>
+                <span
+                  className={`shrink-0 rounded-[8px] px-2 py-0.5 text-[10px] font-bold tracking-[0.06em] uppercase ${
+                    account.orderCount > 0 ? "bg-accent/15 text-accent-strong" : "bg-subtle text-muted"
+                  }`}
+                >
+                  {account.orderCount > 0 ? "Con pedido" : "Solo cuenta"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="mt-6" aria-labelledby="pipeline">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pipeline</p>
         <h2 id="pipeline" className="mt-0.5 text-base font-bold">
           Seguimientos abiertos

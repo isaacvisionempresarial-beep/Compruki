@@ -3,6 +3,7 @@ import { CustomersScreen } from "@/components/panel/customers-screen";
 import { buildCrmContacts } from "@/lib/crm-contacts";
 import { getFollowupPriorityPreview } from "@/server/agent-followup-priority";
 import { evaluateAgentPolicy } from "@/server/agent-policy";
+import { listRegisteredStoreAccounts } from "@/server/customer-auth";
 import {
   countOpenFollowupsByPhone,
   listOpenFollowups,
@@ -14,7 +15,7 @@ import { requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
   title: "Clientes",
-  description: "CRM lite con pipeline de seguimientos. WhatsApp no está conectado.",
+  description: "Cuentas de tienda y CRM lite con seguimientos. WhatsApp no está conectado.",
 };
 
 export const dynamic = "force-dynamic";
@@ -35,13 +36,14 @@ export default async function ClientesPage({
   const params = await searchParams;
   await requirePanelAccess();
 
-  const [orders, openTasks, openByPhone, tableReady, pipelineReady, policy] = await Promise.all([
+  const [orders, openTasks, openByPhone, tableReady, pipelineReady, policy, accounts] = await Promise.all([
     listOrders(),
     listOpenFollowups(),
     countOpenFollowupsByPhone(),
     probeFollowupsTable(),
     probeFollowupPipeline(),
     evaluateAgentPolicy("AG-07"),
+    listRegisteredStoreAccounts(),
   ]);
 
   const contacts = buildCrmContacts(orders, openByPhone);
@@ -58,6 +60,7 @@ export default async function ClientesPage({
 
   return (
     <CustomersScreen
+      accounts={accounts}
       contacts={contacts}
       openTasks={openTasks}
       tableReady={tableReady}
