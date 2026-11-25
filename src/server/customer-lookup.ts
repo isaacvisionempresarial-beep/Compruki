@@ -9,7 +9,7 @@ import { clientAddress, takePublicAttempt } from "@/server/public-guard";
 
 async function customerChangePaused() {
   const address = await clientAddress();
-  return takePublicAttempt("customer-write", address, CUSTOMER_WRITE_RULE) ? null : CUSTOMER_BURST_ERROR;
+  return (await takePublicAttempt("customer-write", address, CUSTOMER_WRITE_RULE)) ? null : CUSTOMER_BURST_ERROR;
 }
 
 export type LookupOrderState = { error: string | null };
@@ -19,14 +19,17 @@ export async function lookupOrderAction(_state: LookupOrderState, formData: Form
   const phone = normalizePhone(String(formData.get("phone") ?? ""));
   const address = await clientAddress();
   if (!/^P-\d{4,6}$/.test(number)) {
-    if (!takePublicAttempt("lookup-ip", address, LOOKUP_IP_RULE)) return { error: LOOKUP_BURST_ERROR };
+    if (!(await takePublicAttempt("lookup-ip", address, LOOKUP_IP_RULE))) return { error: LOOKUP_BURST_ERROR };
     return { error: "Escribe el número del pedido, por ejemplo P-2001." };
   }
   if (!/^3\d{9}$/.test(phone)) {
-    if (!takePublicAttempt("lookup-ip", address, LOOKUP_IP_RULE)) return { error: LOOKUP_BURST_ERROR };
+    if (!(await takePublicAttempt("lookup-ip", address, LOOKUP_IP_RULE))) return { error: LOOKUP_BURST_ERROR };
     return { error: "Escribe el celular de 10 dígitos que dejaste en el pedido." };
   }
-  if (!takePublicAttempt("lookup-ip", address, LOOKUP_IP_RULE) || !takePublicAttempt("lookup-phone", phone, LOOKUP_PHONE_RULE)) {
+  if (
+    !(await takePublicAttempt("lookup-ip", address, LOOKUP_IP_RULE)) ||
+    !(await takePublicAttempt("lookup-phone", phone, LOOKUP_PHONE_RULE))
+  ) {
     return { error: LOOKUP_BURST_ERROR };
   }
 

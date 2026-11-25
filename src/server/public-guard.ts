@@ -1,5 +1,7 @@
+import { createHash } from "node:crypto";
 import { headers } from "next/headers";
 import { recordAttempt, type AttemptRule } from "@/lib/attempt-budget";
+import { createAdminSupabase } from "@/lib/supabase/admin";
 
 const books = new Map<string, number[]>();
 const MAX_KEYS = 400;
@@ -15,7 +17,6 @@ export function isPlausibleIp(value: string) {
       return Number.isInteger(n) && n >= 0 && n <= 255;
     });
   }
-  // IPv6 comprimido o completo (sin zona).
   if (text.includes(":") && /^[0-9a-fA-F:]+$/.test(text)) return true;
   return false;
 }
@@ -45,7 +46,11 @@ export async function clientAddress() {
   return resolveClientAddress(headerList.get("x-forwarded-for"), headerList.get("x-real-ip"));
 }
 
-export function takePublicAttempt(bucket: string, key: string, rule: AttemptRule, now = Date.now()) {
+export function hashRateKey(key: string) {
+  return createHash("sha256").update(key.trim().toLowerCase()).digest("hex");
+}
+
+function takeMemoryAttempt(bucket: string, key: string, rule: AttemptRule, now: number) {
   const id = `${bucket}\n${key}`;
   const result = recordAttempt(books.get(id) ?? [], now, rule);
   books.set(id, result.stamps);
@@ -57,6 +62,42 @@ export function takePublicAttempt(bucket: string, key: string, rule: AttemptRule
     }
   }
   return result.allowed;
+}
+
+/**
+ * Intenta el contador compartido en Supabase.
+ * `null` = tabla/RPC ausente o error → usar memoria local.
+ */
+export async function takeSharedPublicAttempt(
+  bucket: string,
+  key: string,
+  rule: AttemptRule,
+): Promise<boolean | null> {
+  try {
+    const supabase = createAdminSupabase();
+    const { data, error } = await supabase.rpc("take_public_rate_attempt", {
+      p_bucket: bucket,
+      p_key_hash: hashRateKey(`${bucket}:${key}`),
+      p_limit: rule.limit,
+      p_window_seconds: Math.max(1, Math.ceil(rule.windowMs / 1000)),
+    });
+    if (error) {
+      const message = error.message ?? "";
+      if (message.includes("schema cache") || message.includes("does not exist") || message.includes("Could not find the function")) {
+        return null;
+      }
+      return null;
+    }
+    return data === true;
+  } catch {
+    return null;
+  }
+}
+
+export async function takePublicAttempt(bucket: string, key: string, rule: AttemptRule, now = Date.now()) {
+  const shared = await takeSharedPublicAttempt(bucket, key, rule);
+  if (shared !== null) return shared;
+  return takeMemoryAttempt(bucket, key, rule, now);
 }
 
 /** Solo tests. */

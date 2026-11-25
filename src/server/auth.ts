@@ -9,8 +9,8 @@ export type SignInState = { error: string | null };
 
 async function authAttemptAllowed(email: string) {
   const address = await clientAddress();
-  if (!takePublicAttempt("auth-ip", address, AUTH_IP_RULE)) return false;
-  if (email && !takePublicAttempt("auth-email", email, AUTH_EMAIL_RULE)) return false;
+  if (!(await takePublicAttempt("auth-ip", address, AUTH_IP_RULE))) return false;
+  if (email && !(await takePublicAttempt("auth-email", email, AUTH_EMAIL_RULE))) return false;
   return true;
 }
 

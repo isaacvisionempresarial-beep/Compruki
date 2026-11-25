@@ -109,7 +109,7 @@ export async function placeOrder(input: CheckoutInput) {
   if (existing) return { error: null, order: existing, repeated: false };
 
   const address = await clientAddress();
-  if (!takePublicAttempt("checkout-try", address, CHECKOUT_TRY_RULE)) {
+  if (!(await takePublicAttempt("checkout-try", address, CHECKOUT_TRY_RULE))) {
     return { error: CHECKOUT_BURST_ERROR, order: null };
   }
 
@@ -189,7 +189,7 @@ export async function placeOrder(input: CheckoutInput) {
     ],
   };
 
-  if (!takePublicAttempt("checkout-create", address, CHECKOUT_CREATE_RULE)) {
+  if (!(await takePublicAttempt("checkout-create", address, CHECKOUT_CREATE_RULE))) {
     return { error: CHECKOUT_BURST_ERROR, order: null };
   }
 

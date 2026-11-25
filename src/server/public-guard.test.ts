@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isPlausibleIp, resolveClientAddress } from "@/server/public-guard";
+import { hashRateKey, isPlausibleIp, resolveClientAddress } from "@/server/public-guard";
 
 describe("resolveClientAddress", () => {
   it("prefiere x-real-ip", () => {
@@ -13,5 +13,13 @@ describe("resolveClientAddress", () => {
   it("rechaza basura", () => {
     expect(isPlausibleIp("not an ip")).toBe(false);
     expect(resolveClientAddress("evil, also-bad", null)).toBe("sin-ip");
+  });
+});
+
+describe("hashRateKey", () => {
+  it("normaliza y no deja el valor en claro", () => {
+    expect(hashRateKey(" 3001234567 ")).toBe(hashRateKey("3001234567"));
+    expect(hashRateKey("3001234567")).not.toContain("300");
+    expect(hashRateKey("3001234567")).toHaveLength(64);
   });
 });

@@ -22,7 +22,7 @@ export async function sendProductQuestionAction(
   formData: FormData,
 ): Promise<SendProductQuestionState> {
   const address = await clientAddress();
-  if (!takePublicAttempt("product-question", address, PRODUCT_QUESTION_RULE)) {
+  if (!(await takePublicAttempt("product-question", address, PRODUCT_QUESTION_RULE))) {
     return { error: PRODUCT_QUESTION_BURST_ERROR, message: null };
   }
 
