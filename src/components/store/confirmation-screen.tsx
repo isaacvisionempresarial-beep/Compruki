@@ -79,149 +79,156 @@ export function ConfirmationScreen({
     if (justPlaced || repeated) clear();
   }, [clear, justPlaced, repeated]);
 
+  const heroEyebrow = repeated ? "Pedido ya pendiente" : justPlaced ? "Pedido registrado" : "Tu pedido";
+  const heroNote = repeated
+    ? "Ya estaba pendiente con estos productos y esta dirección. No se creó otro. El total guardado no cambió."
+    : `Lo dejaste el ${formatDay(order.createdAt.slice(0, 10))}. El total guardado no cambia.`;
+
   return (
-    <div>
+    <div className="space-y-2.5">
       <section
-        className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line px-4 py-4 sm:px-5"
+        className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line bg-card"
         style={{ animationDelay: "40ms" }}
       >
-        <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">
-          {repeated ? "Pedido ya pendiente" : justPlaced ? "Pedido registrado" : "Tu pedido"}
-        </p>
-        <h1 className="store-display mt-2 text-[1.75rem] leading-tight font-extrabold tracking-[-0.03em]">{order.number}</h1>
-        <p className="mt-1 text-sm font-semibold">{STATUS_LABEL[order.status]}</p>
-        <p className="mt-1 text-sm text-muted">
-          {repeated
-            ? "Ya estaba pendiente con estos productos y esta dirección. No se creó otro. El total guardado no cambió. Nadie cobra en la tienda."
-            : `Lo dejaste el ${formatDay(order.createdAt.slice(0, 10))}. El total guardado no cambia.`}
-        </p>
+        <div className="absolute inset-0 bg-gradient-to-r from-card via-card to-[#e8eef5]" aria-hidden="true" />
+        <div className="store-hero-glow pointer-events-none absolute inset-0 opacity-45" aria-hidden="true" />
+        <div className="relative z-10 grid items-center gap-3 p-3.5 sm:grid-cols-[minmax(0,1fr)_minmax(8.5rem,12.5rem)] sm:gap-4 sm:p-4">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">{heroEyebrow}</p>
+            <h1 className="store-display mt-1 text-[1.7rem] leading-tight font-extrabold tracking-[-0.03em]">{order.number}</h1>
+            <p className="mt-1.5 inline-flex items-center rounded-[8px] bg-accent/15 px-2 py-0.5 text-xs font-bold text-accent-strong">
+              {STATUS_LABEL[order.status]}
+            </p>
+            <p className="mt-1.5 text-sm leading-5 text-muted">{heroNote}</p>
+          </div>
+          <div className="relative isolate mx-auto w-full max-w-[12.5rem] sm:mx-0 sm:justify-self-end" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/store/order-hero.jpg?v=1"
+              alt=""
+              width={640}
+              height={360}
+              decoding="async"
+              className="h-24 w-full rounded-[14px] object-cover object-center ring-1 ring-line/80 sm:h-28"
+            />
+          </div>
+        </div>
       </section>
+
       <section
-        className="store-rise elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-2"
-        style={{ animationDelay: "110ms" }}
+        className="store-rise elevate-1 rounded-[14px] border border-line bg-card px-3 py-2.5"
+        style={{ animationDelay: "90ms" }}
         aria-labelledby="siguiente-paso"
       >
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Ahora</p>
-        <h2 id="siguiente-paso" className="mt-0.5 text-sm font-semibold">
-          Siguiente paso
-        </h2>
-        <p className="mt-1 text-sm leading-5 text-ink">{nextStepCopy(order)}</p>
-        <p className="mt-1 text-xs leading-5 text-muted">{deliveryFollowUp(order.status, Boolean(contactHref))}</p>
-        {contactHref ? (
-          <nav aria-label="Contacto" className="mt-2 flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Contacto</span>
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Ahora</p>
+            <h2 id="siguiente-paso" className="mt-0.5 text-sm font-semibold">
+              Siguiente paso
+            </h2>
+            <p className="mt-1 text-sm leading-5 text-ink">{nextStepCopy(order)}</p>
+            <p className="mt-1 text-xs leading-5 text-muted">{deliveryFollowUp(order.status, Boolean(contactHref))}</p>
+          </div>
+          {contactHref ? (
             <a
               href={contactHref}
               target="_blank"
               rel="noopener noreferrer"
               title="Abre WhatsApp a mano. Compruki no envía. El total guardado no cambia."
-              className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+              className="inline-flex h-9 shrink-0 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
             >
-              Escribir por WhatsApp
+              WhatsApp
             </a>
-          </nav>
-        ) : null}
+          ) : null}
+        </div>
       </section>
 
-      <div className="store-rise mt-3 space-y-3" style={{ animationDelay: "180ms" }}>
-        <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="pedido-resumen-tienda">
-          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
-          <h2 id="pedido-resumen-tienda" className="mt-0.5 text-sm font-semibold">Resumen</h2>
-          <ul className="mt-2 space-y-2">
-            {order.lines.map((line) => {
-              const photos = photosOf(images, line.sku);
-              return (
-                <li key={`${line.sku}:${line.variant ?? ""}`} className="text-xs">
-                  <LinePhotos sku={line.sku} title={line.title} images={photos} />
-                  <div className={`flex items-start gap-2 ${photos.length > 1 ? "mt-2" : ""}`}>
-                    <ProductThumb sku={line.sku} show={photos.length === 1} />
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold leading-5">{lineName(line)}</span>
-                      <span className="mt-0.5 block text-muted">
-                        {line.quantity} × {formatCop(line.unitPrice)}
-                      </span>
-                    </span>
-                    <span className="text-sm font-semibold tabular-nums">{formatCop(line.unitPrice * line.quantity)}</span>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="mt-3 flex items-baseline justify-between gap-2 border-t border-line pt-3">
-            <p className="text-xs text-muted">{payableTotalLabel(order.status)}</p>
-            <p className="text-lg font-extrabold tabular-nums">{formatCop(order.total)}</p>
-          </div>
-          <p className="mt-2 text-xs leading-5 text-muted">
-            {customerPayLine(order.status, order.collected)}
-            Sin guía ni fecha exacta.
-          </p>
-          <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-            <Link
-              href="/tienda"
-              title="Volver no cobra. El total guardado no cambia."
-              className="inline-flex h-9 sm:w-auto sm:min-w-56 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
-            >
-              Volver a la tienda
-            </Link>
-          </nav>
-          <p className="mt-2 text-xs leading-5 text-muted">Volver no cobra. El total guardado no cambia.</p>
+      <div className="store-rise space-y-2.5" style={{ animationDelay: "140ms" }}>
+        <OrderProgress order={order} sizes={sizes} />
 
-        </section>
-
-        <div className="space-y-2">
-          <OrderProgress order={order} sizes={sizes} />
+        <div className="grid gap-2.5 lg:grid-cols-2">
           {order.status === "pendiente_confirmacion" && token ? (
             <CustomerDelivery order={order} token={token} />
           ) : (
-            <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 text-sm leading-5">
+            <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2.5 text-sm leading-5">
               <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Destino</p>
               <h2 className="mt-0.5 text-sm font-semibold">Entrega</h2>
-              <p className="mt-1">{order.customerName}</p>
-              <p>{order.phone}</p>
-              {order.document ? <p>Cédula {order.document}</p> : null}
-              <p>
-                {order.address}
-                {order.reference ? ` · ${order.reference}` : ""}
+              <dl className="mt-2 space-y-1">
+                <div>
+                  <dt className="sr-only">Nombre</dt>
+                  <dd className="font-semibold">{order.customerName}</dd>
+                </div>
+                <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-muted">
+                  <dd>{order.phone}</dd>
+                  {order.document ? <dd>Cédula {order.document}</dd> : null}
+                </div>
+                <div>
+                  <dt className="sr-only">Dirección</dt>
+                  <dd>
+                    {order.address}
+                    {order.reference ? ` · ${order.reference}` : ""}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="sr-only">Ciudad</dt>
+                  <dd className="text-muted">
+                    {order.city}
+                    {order.department ? ` · ${order.department}` : ""}
+                  </dd>
+                </div>
+              </dl>
+              <p className="mt-2 inline-flex rounded-[8px] border border-line bg-canvas px-2 py-1 text-xs font-semibold">
+                Pago contra entrega
               </p>
-              <p>
-                {order.city}
-                {order.department ? ` · ${order.department}` : ""}
-              </p>
-              <p className="mt-1.5 font-semibold">Pago contra entrega</p>
             </section>
           )}
+
           {order.status === "pendiente_confirmacion" && token ? (
             <CustomerProducts order={order} token={token} images={images} sizes={sizes} />
           ) : (
             <ProductList order={order} images={images} />
           )}
-          {order.status === "pendiente_confirmacion" && token ? (
-            <details className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
-              <summary className="cursor-pointer">
-                <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cuidado</span>
-                <span className="mt-0.5 block text-sm font-semibold text-ink">Aviso para la tienda y cancelar</span>
-              </summary>
-              <div className="mt-2 space-y-2">
-                <CustomerBuyerNote orderId={order.id} token={token} note={order.buyerNote} />
-                <CustomerCancel order={order} token={token} />
-              </div>
-            </details>
-          ) : order.buyerNote ? (
-            <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 text-sm leading-5">
-              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Aviso</p>
-              <h2 className="mt-0.5 text-sm font-semibold">Aviso para la tienda</h2>
-              <p className="mt-1">{order.buyerNote}</p>
-            </section>
-          ) : null}
-          <nav aria-label="Vista" className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-            <Link href="/tienda/condiciones" title="Leerlas no cobra. El total guardado no cambia." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
-              Condiciones de la compra
-            </Link>
-          </nav>
-          <p className="text-xs leading-5 text-muted">Leerlas no cobra. El total guardado no cambia.</p>
         </div>
+
+        <p className="px-0.5 text-xs leading-5 text-muted">
+          {customerPayLine(order.status, order.collected)} Sin guía ni fecha exacta.
+        </p>
+
+        {order.status === "pendiente_confirmacion" && token ? (
+          <details className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
+            <summary className="cursor-pointer">
+              <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cuidado</span>
+              <span className="mt-0.5 block text-sm font-semibold text-ink">Aviso para la tienda y cancelar</span>
+            </summary>
+            <div className="mt-2 space-y-2">
+              <CustomerBuyerNote orderId={order.id} token={token} note={order.buyerNote} />
+              <CustomerCancel order={order} token={token} />
+            </div>
+          </details>
+        ) : order.buyerNote ? (
+          <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2 text-sm leading-5">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Aviso</p>
+            <h2 className="mt-0.5 text-sm font-semibold">Aviso para la tienda</h2>
+            <p className="mt-1">{order.buyerNote}</p>
+          </section>
+        ) : null}
+
+        <nav aria-label="Vista" className="flex flex-wrap items-center gap-2 pt-0.5">
+          <Link
+            href="/tienda"
+            title="Volver no cobra. El total guardado no cambia."
+            className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark"
+          >
+            Volver a la tienda
+          </Link>
+          <Link
+            href="/tienda/condiciones"
+            title="Leerlas no cobra. El total guardado no cambia."
+            className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+          >
+            Condiciones
+          </Link>
+        </nav>
       </div>
     </div>
   );
@@ -274,36 +281,47 @@ function OrderProgress({ order, sizes }: { order: CustomerOrder; sizes: Customer
   if (!steps) {
     const missing = customerMissingReasonNote(order);
     return (
-      <section aria-label="Avance" className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
-        <h2 className="mt-0.5 text-sm font-semibold">Avance</h2>
-        <p className="mt-2 text-sm leading-5 text-muted">
+      <section aria-label="Avance" className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2.5">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Avance</p>
+        <p className="mt-1.5 text-sm leading-5 text-muted">
           {customerStatusNote(order.status, order.customerReason, order.cancelledByCustomer, order.collected)}
         </p>
-        {missing ? <p className="mt-2 text-sm leading-5 font-semibold">{missing}</p> : null}
+        {missing ? <p className="mt-1.5 text-sm leading-5 font-semibold">{missing}</p> : null}
       </section>
     );
   }
   const hold = order.status === "pendiente_confirmacion" ? customerSizeHoldNote(order.lines, sizes) : "";
   const note = customerProgressNote(order.status, order.collected);
   return (
-    <section aria-label="Avance" className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
-      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pasos</p>
-      <h2 className="mt-0.5 text-sm font-semibold">Avance</h2>
-      <ol className="mt-2 space-y-1.5">
+    <section aria-label="Avance" className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2.5">
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Avance</p>
+        <p className="text-[10px] font-bold tracking-[0.06em] text-accent-strong uppercase">{STATUS_LABEL[order.status]}</p>
+      </div>
+      <ol className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-5">
         {steps.map((step) => (
           <li
             key={step.label}
-            className="flex items-baseline justify-between gap-3 text-sm"
+            className={`rounded-[10px] border px-2 py-1.5 text-center ${
+              step.state === "ahora"
+                ? "border-accent/40 bg-accent/10"
+                : step.state === "hecho"
+                  ? "border-line bg-canvas"
+                  : "border-transparent bg-subtle/60"
+            }`}
             aria-current={step.state === "ahora" ? "step" : undefined}
           >
-            <span className={step.state === "despues" ? "text-muted" : "font-semibold"}>{step.label}</span>
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{STEP_WORD[step.state]}</span>
+            <span className={`block text-[10px] font-bold tracking-[0.06em] uppercase ${step.state === "despues" ? "text-muted" : "text-accent-strong"}`}>
+              {STEP_WORD[step.state]}
+            </span>
+            <span className={`mt-0.5 block text-xs leading-4 ${step.state === "despues" ? "text-muted" : "font-semibold"}`}>
+              {step.label}
+            </span>
           </li>
         ))}
       </ol>
-      {hold ? <p className="mt-3 text-sm leading-5 font-semibold">{hold}</p> : null}
-      {note ? <p className="mt-3 text-sm leading-5 text-muted">{note}</p> : null}
+      {hold ? <p className="mt-2 text-sm leading-5 font-semibold">{hold}</p> : null}
+      {note ? <p className="mt-2 text-xs leading-5 text-muted">{note}</p> : null}
     </section>
   );
 }
@@ -508,27 +526,29 @@ function Field({ label, htmlFor, hint, children }: { label: string; htmlFor: str
 
 function ProductList({ order, images }: { order: CustomerOrder; images: CustomerImages[] }) {
   return (
-    <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2">
-      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Líneas</p>
-      <h2 className="mt-0.5 text-sm font-semibold">Productos</h2>
+    <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2.5">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Productos</p>
       <ul className="mt-2 space-y-2 text-sm">
         {order.lines.map((line) => {
           const photos = photosOf(images, line.sku);
           return (
-          <li key={`${line.sku}:${line.variant ?? ""}`}>
-            <LinePhotos sku={line.sku} title={line.title} images={photos} />
-            <div className={`flex items-center gap-3 ${photos.length > 1 ? "mt-2" : ""}`}>
-            <ProductThumb sku={line.sku} show={photos.length === 1} />
-            <span className="min-w-0 flex-1">
-              {lineName(line)} · {line.quantity}
-            </span>
-            <span className="tabular-nums">{formatCop(line.unitPrice * line.quantity)}</span>
-            </div>
-          </li>
+            <li key={`${line.sku}:${line.variant ?? ""}`}>
+              <LinePhotos sku={line.sku} title={line.title} images={photos} />
+              <div className={`flex items-center gap-2.5 ${photos.length > 1 ? "mt-2" : ""}`}>
+                <ProductThumb sku={line.sku} show={photos.length === 1} />
+                <span className="min-w-0 flex-1 leading-5">
+                  <span className="font-semibold">{lineName(line)}</span>
+                  <span className="mt-0.5 block text-xs text-muted">
+                    {line.quantity} × {formatCop(line.unitPrice)}
+                  </span>
+                </span>
+                <span className="font-semibold tabular-nums">{formatCop(line.unitPrice * line.quantity)}</span>
+              </div>
+            </li>
           );
         })}
       </ul>
-      <p className="mt-2 flex justify-between border-t border-line pt-2.5 text-sm font-extrabold">
+      <p className="mt-2.5 flex justify-between border-t border-line pt-2.5 text-sm font-extrabold">
         <span>{payableTotalLabel(order.status)}</span>
         <span className="tabular-nums">{formatCop(order.total)}</span>
       </p>
