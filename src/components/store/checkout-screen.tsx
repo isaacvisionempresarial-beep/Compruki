@@ -171,10 +171,10 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
             <h2 id="entrega-titulo" className="mt-0.5 text-sm font-semibold">
               Quién recibe
             </h2>
-            <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-2 sm:grid-cols-6">
-              <p className="col-span-2 text-[10px] font-bold tracking-[0.08em] text-muted uppercase sm:col-span-6">Persona</p>
-              <div className="col-span-2 sm:col-span-6">
-                <Field label="Nombre" htmlFor="customerName" hint="Quien recibe. No es un pago.">
+            <div className="mt-2 grid grid-cols-12 gap-x-2 gap-y-2">
+              <p className="col-span-12 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Persona</p>
+              <div className="col-span-12">
+                <Field label="Nombre" htmlFor="customerName">
                   <input
                     id="customerName"
                     title="Escribirlo no confirma el pedido ni cobra."
@@ -187,8 +187,8 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                   />
                 </Field>
               </div>
-              <div className="col-span-1 sm:col-span-3">
-                <Field label="Celular" htmlFor="phone" hint="10 dígitos, inicia en 3.">
+              <div className="col-span-6 sm:col-span-4 lg:col-span-3">
+                <Field label="Celular" htmlFor="phone" hint="10 dígitos · inicia en 3">
                   <input
                     id="phone"
                     title="Escribirlo no confirma el pedido ni cobra."
@@ -198,12 +198,12 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                     autoComplete="tel"
                     value={phone}
                     onChange={(event) => setPhone(event.target.value)}
-                    className={inputClass}
+                    className={inputCompactClass}
                   />
                 </Field>
               </div>
-              <div className="col-span-1 sm:col-span-3">
-                <Field label="Cédula" htmlFor="document" hint="Opcional. 6 a 10 dígitos.">
+              <div className="col-span-6 sm:col-span-4 lg:col-span-3">
+                <Field label="Cédula" htmlFor="document" hint="Opcional">
                   <input
                     id="document"
                     title="Escribirlo no confirma el pedido ni cobra."
@@ -212,14 +212,14 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                     autoComplete="off"
                     value={documentId}
                     onChange={(event) => setDocumentId(event.target.value)}
-                    className={inputClass}
+                    className={inputCompactClass}
                   />
                 </Field>
               </div>
 
-              <p className="col-span-2 text-[10px] font-bold tracking-[0.08em] text-muted uppercase sm:col-span-6">Dónde</p>
-              <div className="col-span-1 sm:col-span-3">
-                <Field label="Departamento" htmlFor="department" hint="Elige de la lista.">
+              <p className="col-span-12 mt-1 text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Dónde</p>
+              <div className="col-span-6 sm:col-span-4 lg:col-span-3">
+                <Field label="Departamento" htmlFor="department">
                   <select
                     id="department"
                     title="Elegirlo no confirma el pedido ni cobra."
@@ -231,9 +231,9 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                       setDepartment(event.target.value);
                       setCity("");
                     }}
-                    className={selectClass}
+                    className={selectCompactClass}
                   >
-                    <option value="">Departamento</option>
+                    <option value="">Elegir</option>
                     {colombiaDepartments.map((name) => (
                       <option key={name} value={name}>
                         {name}
@@ -242,8 +242,8 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                   </select>
                 </Field>
               </div>
-              <div className="col-span-1 sm:col-span-3">
-                <Field label="Ciudad" htmlFor="city" hint={department ? "Según el departamento." : "Primero el departamento."}>
+              <div className="col-span-6 sm:col-span-4 lg:col-span-3">
+                <Field label="Ciudad" htmlFor="city">
                   <select
                     id="city"
                     title="Elegirla no confirma el pedido ni cobra."
@@ -253,9 +253,9 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                     value={city}
                     disabled={!department || cities.length === 0}
                     onChange={(event) => setCity(event.target.value)}
-                    className={selectClass}
+                    className={selectCompactClass}
                   >
-                    <option value="">{department ? "Ciudad o municipio" : "Elige departamento"}</option>
+                    <option value="">{department ? "Elegir" : "Departamento primero"}</option>
                     {cities.map((name) => (
                       <option key={name} value={name}>
                         {name}
@@ -264,8 +264,8 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                   </select>
                 </Field>
               </div>
-              <div className="col-span-2 sm:col-span-4">
-                <Field label="Dirección" htmlFor="address" hint="Calle, carrera o detalle de entrega.">
+              <div className="col-span-12 sm:col-span-8 lg:col-span-7">
+                <Field label="Dirección" htmlFor="address">
                   <input
                     id="address"
                     title="Escribirla no confirma el pedido ni cobra."
@@ -278,8 +278,8 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                   />
                 </Field>
               </div>
-              <div className="col-span-2 sm:col-span-2">
-                <Field label="Barrio / ref." htmlFor="reference" hint="Opcional.">
+              <div className="col-span-12 sm:col-span-4 lg:col-span-5">
+                <Field label="Barrio / ref." htmlFor="reference" hint="Opcional">
                   <input
                     id="reference"
                     title="Escribirla no confirma el pedido ni cobra."
@@ -411,5 +411,8 @@ function Field({
 const inputClass =
   "h-9 w-full rounded-[10px] border border-line bg-canvas px-2.5 text-sm focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none";
 
-const selectClass =
-  `${inputClass} disabled:cursor-not-allowed disabled:opacity-55`;
+const inputCompactClass =
+  "h-8 w-full rounded-[8px] border border-line bg-canvas px-2 text-sm tabular-nums focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none";
+
+const selectCompactClass =
+  `${inputCompactClass} disabled:cursor-not-allowed disabled:opacity-55`;

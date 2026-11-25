@@ -6,11 +6,8 @@ import type { PublicProduct } from "@/server/catalog-store";
 import { sizeChoiceLabel, variantFits } from "@/lib/catalog";
 import { LinePhotos, ProductThumb } from "@/components/store/product-thumb";
 import { useCart } from "@/components/store/cart-state";
-import { cx } from "@/lib/cx";
 import { formatCop } from "@/lib/format";
 import { orderTotal } from "@/lib/store-order";
-
-const cartGrid = "md:grid-cols-[minmax(0,1.5fr)_6.5rem_9.5rem_5rem]";
 
 export function CartScreen({ products }: { products: PublicProduct[] }) {
   const cart = useCart();
@@ -54,129 +51,135 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
       >
         <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Este navegador</p>
         <h1 className="store-display mt-2 text-[1.75rem] leading-tight font-extrabold tracking-[-0.03em]">Carrito</h1>
-        <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
-          Precios publicados. Se guarda aquí. Pagas al recibir · Envío aparte. Todavía no es un pedido.
+        <p className="mt-1.5 max-w-xl text-sm leading-5 text-muted">
+          Precios publicados · Pagas al recibir · Envío aparte. Todavía no es un pedido.
         </p>
       </section>
-      <div className="store-rise mt-3 space-y-3" style={{ animationDelay: "120ms" }}>
-      <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="carrito-resumen">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
-            <h2 id="carrito-resumen" className="mt-0.5 text-sm font-semibold">Resumen</h2>
-            <div className="mt-2 flex items-baseline justify-between gap-2">
-              <p className="text-xs text-muted">Total al recibir</p>
-              <p className="text-lg font-extrabold tabular-nums">{formatCop(total)}</p>
-            </div>
-            <p className="mt-2 text-xs leading-5 text-muted">
-              {rows.length === 0
-                ? "Cuando agregues productos, el total al recibir aparece aquí."
-                : "Pagas al recibir. Envío aparte. Todavía no es dinero cobrado."}
-            </p>
-            <p className="mt-1.5 text-xs leading-5 text-muted">
-              El pedido se crea al confirmar en el pago y no cobra.
-            </p>
-            {canContinue ? (
-              <>
-                <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-                  <Link
-                    href="/tienda/pagar"
-                    title="Continuar no confirma el pedido ni cobra."
-                    className="inline-flex h-9 sm:min-w-56 items-center justify-center rounded-[10px] bg-accent px-3 text-sm font-extrabold text-primary-dark"
-                  >
-                    Continuar · pagas al recibir
-                  </Link>
-                </nav>
-                <p className="mt-2 text-xs leading-5 text-muted">Continuar no confirma el pedido ni cobra.</p>
-              </>
-            ) : rows.length > 0 ? (
-              <div className="mt-3">
-                <nav aria-label="Herramientas" className="flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-                  <button
-                    type="button"
-                    disabled
-                    className="inline-flex h-9 sm:min-w-56 cursor-not-allowed items-center justify-center rounded-[10px] bg-accent px-3 text-sm font-extrabold text-primary-dark opacity-55"
-                    title="Continuar no confirma el pedido ni cobra."
-                  >
-                    Continuar · pagas al recibir
-                  </button>
-                </nav>
-                <p className="mt-2 text-sm leading-5 text-coral-strong">{blockedHint}</p>
-                <p className="mt-2 text-xs leading-5 text-muted">Continuar no confirma el pedido ni cobra.</p>
-              </div>
-            ) : (
-              <>
-                <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
-                  <Link
-                    href="/tienda"
-                    title="Verlos no cambia los precios publicados ni crea un pedido."
-                    className="inline-flex h-9 sm:min-w-56 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark"
-                  >
-                    Ver productos
-                  </Link>
-                </nav>
-                <p className="mt-2 text-xs leading-5 text-muted">Ver productos no registra pedido ni cobra.</p>
-              </>
-            )}
 
-      </section>
+      <div className="store-rise mt-3 space-y-3" style={{ animationDelay: "120ms" }}>
+        <section
+          className="elevate-1 overflow-hidden rounded-[16px] border border-line bg-card"
+          aria-labelledby="carrito-resumen"
+        >
+          <div className="flex flex-col gap-3 border-b border-line bg-gradient-to-br from-accent-tint/70 via-card to-card px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Resumen</p>
+              <h2 id="carrito-resumen" className="sr-only">
+                Resumen del carrito
+              </h2>
+              <p className="mt-0.5 text-xs text-muted">
+                {rows.length === 0
+                  ? "Sin productos aún"
+                  : `${payable.length} de ${rows.length} ${rows.length === 1 ? "producto" : "productos"} listos`}
+              </p>
+              <p className="mt-1 flex items-baseline gap-2">
+                <span className="text-xs font-semibold text-muted">Total al recibir</span>
+                <span className="store-display text-2xl font-extrabold tracking-tight tabular-nums">{formatCop(total)}</span>
+              </p>
+              <p className="mt-1 text-[11px] leading-4 text-muted">Envío aparte. Confirmar en el pago no cobra.</p>
+            </div>
+            <div className="shrink-0 sm:text-right">
+              {canContinue ? (
+                <Link
+                  href="/tienda/pagar"
+                  title="Continuar no confirma el pedido ni cobra."
+                  className="inline-flex h-10 w-full items-center justify-center rounded-[12px] bg-accent px-4 text-sm font-extrabold text-primary-dark shadow-[0_10px_24px_-14px_rgb(37_199_165/0.9)] transition-transform hover:-translate-y-0.5 sm:w-auto sm:min-w-52"
+                >
+                  Continuar · pagas al recibir
+                </Link>
+              ) : rows.length > 0 ? (
+                <button
+                  type="button"
+                  disabled
+                  className="inline-flex h-10 w-full cursor-not-allowed items-center justify-center rounded-[12px] bg-accent px-4 text-sm font-extrabold text-primary-dark opacity-55 sm:w-auto sm:min-w-52"
+                  title="Continuar no confirma el pedido ni cobra."
+                >
+                  Continuar · pagas al recibir
+                </button>
+              ) : (
+                <Link
+                  href="/tienda"
+                  title="Verlos no cambia los precios publicados ni crea un pedido."
+                  className="inline-flex h-10 w-full items-center justify-center rounded-[12px] bg-primary px-4 text-sm font-semibold text-on-dark sm:w-auto sm:min-w-52"
+                >
+                  Ver productos
+                </Link>
+              )}
+              {rows.length > 0 && !canContinue ? (
+                <p className="mt-2 text-sm leading-5 text-coral-strong sm:max-w-xs sm:ml-auto">{blockedHint}</p>
+              ) : (
+                <p className="mt-1.5 text-[11px] leading-4 text-muted">
+                  {rows.length === 0 ? "Ver productos no registra pedido ni cobra." : "Continuar no confirma el pedido ni cobra."}
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
 
         {rows.length === 0 ? (
-          <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3">
-            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
-            <p className="mt-0.5 text-sm leading-5 text-muted">El carrito está vacío. Vacío no registra pedido ni cobra.</p>
+          <section className="elevate-1 rounded-[14px] border border-dashed border-line bg-card/80 px-4 py-8 text-center">
+            <p className="store-display text-base font-bold tracking-tight">Carrito vacío</p>
+            <p className="mt-1 text-sm leading-5 text-muted">Agrega algo desde la tienda. Vacío no registra pedido ni cobra.</p>
           </section>
         ) : (
           <section aria-labelledby="carrito-lineas">
-            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Líneas</p>
-            <h2 id="carrito-lineas" className="mt-0.5 text-base font-bold">En este carrito</h2>
-            <p className="mt-0.5 text-xs leading-5 text-muted">Cambiar la cantidad o quitar no registra pedido ni cobra.</p>
-            <div className="elevate-1 mt-3 overflow-hidden rounded-[14px] border border-line bg-card">
-            <div
-              className={cx(
-                "hidden items-end gap-4 border-b border-line bg-canvas px-3 py-2 text-[11px] font-semibold tracking-[0.08em] text-muted uppercase md:grid",
-                cartGrid,
-              )}
-            >
-              <span>Producto</span>
-              <span>Cantidad</span>
-              <span className="text-right">Total al recibir</span>
-              <span>Quitar</span>
+            <div className="mb-2 flex items-end justify-between gap-2">
+              <div>
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Productos</p>
+                <h2 id="carrito-lineas" className="mt-0.5 text-base font-bold">
+                  En este carrito
+                </h2>
+              </div>
+              <p className="text-[11px] leading-4 text-muted">Cambiar o quitar no cobra.</p>
             </div>
-            <ul className="divide-y divide-line">
-              {rows.map(({ line, product }) => {
+            <ul className="space-y-2">
+              {rows.map(({ line, product }, index) => {
                 const payableLine = Boolean(product?.available && variantFits(product.variants, line.variant));
-                const lineTotal = payableLine && product ? product.price * line.quantity : null;
+                const unit = payableLine && product ? product.price : null;
+                const lineTotal = unit === null ? null : unit * line.quantity;
                 return (
-                  <li key={`${line.sku}:${line.variant}`} className="px-3 py-2">
+                  <li
+                    key={`${line.sku}:${line.variant}`}
+                    className="store-rise elevate-1 overflow-hidden rounded-[14px] border border-line bg-card"
+                    style={{ animationDelay: `${Math.min(index, 6) * 40}ms` }}
+                  >
                     <LinePhotos sku={line.sku} title={product?.title ?? line.sku} images={product?.images ?? []} />
-                    <div className={cx("grid items-start gap-3 md:gap-4", cartGrid, (product?.images.length ?? 0) > 1 ? "mt-3" : "")}>
-                      <div className="min-w-0">
-                        <div className="flex items-start gap-3">
-                          <ProductThumb sku={line.sku} show={product?.images.length === 1} />
+                    <div className={`flex gap-3 p-3 ${(product?.images.length ?? 0) > 1 ? "pt-2" : ""}`}>
+                      <ProductThumb sku={line.sku} show={product?.images.length === 1} />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0">
                             {product ? (
                               <Link
                                 href={`/tienda/producto/${product.sku}`}
                                 title="Abrirla no cambia el precio publicado ni crea un pedido."
-                                className="font-semibold text-ink underline-offset-2 hover:text-accent-strong hover:underline"
+                                className="text-sm font-bold text-ink underline-offset-2 hover:text-accent-strong hover:underline"
                               >
                                 {product.title}
                               </Link>
                             ) : (
-                              <p className="font-semibold">Ya no está en la tienda</p>
+                              <p className="text-sm font-bold">Ya no está en la tienda</p>
                             )}
-                            {line.variant ? (
-                              <p className="text-sm font-semibold">
-                                {sizeChoiceLabel(line.sizeKind ?? product?.sizeKind ?? undefined, line.variant)}
-                              </p>
-                            ) : null}
-                            <p className="text-xs text-muted">SKU {line.sku}</p>
+                            <p className="mt-0.5 text-[11px] text-muted">
+                              SKU {line.sku}
+                              {line.variant
+                                ? ` · ${sizeChoiceLabel(line.sizeKind ?? product?.sizeKind ?? undefined, line.variant)}`
+                                : ""}
+                              {unit !== null ? ` · ${formatCop(unit)} c/u` : ""}
+                            </p>
                           </div>
+                          <button
+                            type="button"
+                            title="Quitarla no registra pedido ni cobra."
+                            className="shrink-0 rounded-[8px] px-2 py-1 text-xs font-semibold text-muted hover:bg-subtle hover:text-danger"
+                            onClick={() => cart.remove(line.sku, line.variant)}
+                          >
+                            Quitar
+                          </button>
                         </div>
+
                         {product?.available && product.variants.length > 0 && product.sizeKind ? (
-                          <label className="mt-3 block text-sm font-semibold">
+                          <label className="mt-2 block text-xs font-semibold">
                             {product.sizeKind === "tamano" ? "Tamaño" : "Talla"}
                             <select
                               value={product.variants.includes(line.variant) ? line.variant : ""}
@@ -188,7 +191,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                               onChange={(event) =>
                                 cart.setVariant(line.sku, line.variant, event.target.value, product.sizeKind ?? undefined)
                               }
-                              className="mt-1 h-10 w-full rounded-[10px] border border-line bg-card px-3 text-sm font-semibold"
+                              className="mt-1 h-8 w-full max-w-[12rem] rounded-[8px] border border-line bg-canvas px-2 text-sm font-semibold"
                             >
                               {product.variants.includes(line.variant) ? null : (
                                 <option value="">{product.sizeKind === "tamano" ? "Elige el tamaño" : "Elige la talla"}</option>
@@ -199,73 +202,49 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
                                 </option>
                               ))}
                             </select>
-                            <span className="mt-1 block text-xs font-normal leading-5 text-muted">
-                              {product.sizeKind === "tamano"
-                                ? "Elegirlo no cambia el precio ni registra pedido."
-                                : "Elegirla no cambia el precio ni registra pedido."}
-                            </span>
                           </label>
                         ) : null}
+
                         {!payableLine ? (
                           <p className="mt-2 text-sm text-coral-strong">
                             {product?.available && product.variants.length > 0
                               ? product.sizeKind === "tamano"
-                                ? "Elige el tamaño para continuar. No cambia el precio ni registra pedido."
-                                : "Elige la talla para continuar. No cambia el precio ni registra pedido."
-                              : "Ya no se puede pedir. Quítalo para continuar. No entra en el total al recibir ni registra pedido."}
+                                ? "Elige el tamaño para continuar."
+                                : "Elige la talla para continuar."
+                              : "Ya no se puede pedir. Quítalo para continuar."}
                           </p>
                         ) : null}
-                      </div>
-                      <div className="md:pt-0.5">
-                        <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">
-                          Cantidad
-                        </span>
-                        {payableLine && product ? (
-                          <CartQuantity
-                            title={product.title}
-                            variantLabel={
-                              line.variant
-                                ? sizeChoiceLabel(line.sizeKind ?? product.sizeKind ?? undefined, line.variant)
-                                : ""
-                            }
-                            quantity={line.quantity}
-                            onQuantity={(amount) => cart.setQuantity(line.sku, line.variant, amount)}
-                          />
-                        ) : (
-                          <p className="text-sm text-muted">—</p>
-                        )}
-                      </div>
-                      <div className="md:pt-0.5 md:text-right">
-                        <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">
-                          Total al recibir
-                        </span>
-                        <p className="text-base font-extrabold tabular-nums">
-                          {lineTotal === null ? "—" : formatCop(lineTotal)}
-                        </p>
-                      </div>
-                      <div className="md:pt-0.5">
-                        <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">
-                          Quitar
-                        </span>
-                        <nav aria-label="Línea" className="flex flex-wrap items-center gap-2">
-                          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Línea</span>
-                          <button
-                            type="button"
-                            title="Quitarla no registra pedido ni cobra."
-                            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
-                            onClick={() => cart.remove(line.sku, line.variant)}
-                          >
-                            Quitar
-                          </button>
-                        </nav>
-                        <p className="mt-1 text-xs leading-5 text-muted">No registra pedido ni cobra.</p>
+
+                        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-line/80 pt-2.5">
+                          {payableLine && product ? (
+                            <CartQuantity
+                              title={product.title}
+                              variantLabel={
+                                line.variant
+                                  ? sizeChoiceLabel(line.sizeKind ?? product.sizeKind ?? undefined, line.variant)
+                                  : ""
+                              }
+                              quantity={line.quantity}
+                              onQuantity={(amount) => cart.setQuantity(line.sku, line.variant, amount)}
+                            />
+                          ) : (
+                            <p className="text-sm text-muted">Cantidad —</p>
+                          )}
+                          <p className="text-right">
+                            <span className="block text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
+                              Total línea
+                            </span>
+                            <span className="text-base font-extrabold tabular-nums">
+                              {lineTotal === null ? "—" : formatCop(lineTotal)}
+                            </span>
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </li>
                 );
               })}
             </ul>
-            </div>
           </section>
         )}
       </div>
@@ -294,12 +273,18 @@ function CartQuantity({
   const valid = draft.trim() !== "" && Number.isInteger(parsed) && parsed >= 1 && parsed <= 5;
 
   return (
-    <div>
-      <label className="text-sm">
-        <span className="sr-only">
-          Cantidad de {title}
-          {variantLabel ? `, ${variantLabel}` : ""}
-        </span>
+    <div className="inline-flex items-center gap-2">
+      <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Cant.</span>
+      <div className="inline-flex h-8 items-stretch overflow-hidden rounded-[8px] border border-line bg-canvas">
+        <button
+          type="button"
+          className="inline-flex w-8 items-center justify-center text-sm text-muted hover:bg-accent-tint"
+          aria-label={`Disminuir cantidad de ${title}${variantLabel ? `, ${variantLabel}` : ""}`}
+          title="Cambiarla no registra pedido ni cobra."
+          onClick={() => onQuantity(Math.max(1, quantity - 1))}
+        >
+          −
+        </button>
         <input
           type="text"
           inputMode="numeric"
@@ -313,14 +298,21 @@ function CartQuantity({
             if (next !== "" && Number.isInteger(amount) && amount >= 1 && amount <= 5) onQuantity(amount);
           }}
           onBlur={() => setDraft(String(quantity))}
-          className="h-9 w-14 rounded-[10px] border border-line bg-card px-2 text-center text-sm font-bold tabular-nums outline-none [appearance:textfield] focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)]"
+          className="w-8 border-0 bg-transparent text-center text-sm font-bold tabular-nums outline-none"
           title="Cambiarla no registra pedido ni cobra."
+          aria-label={`Cantidad de ${title}${variantLabel ? `, ${variantLabel}` : ""}`}
         />
-      </label>
-      <p className="mt-1 text-xs leading-5 text-muted">Cambiarla no registra pedido ni cobra.</p>
-      {valid ? null : (
-        <p className="mt-2 text-sm leading-5 text-ink">De 1 a 5. Vacío o cero no quita el producto: usa Quitar.</p>
-      )}
+        <button
+          type="button"
+          className="inline-flex w-8 items-center justify-center text-sm text-muted hover:bg-accent-tint"
+          aria-label={`Aumentar cantidad de ${title}${variantLabel ? `, ${variantLabel}` : ""}`}
+          title="Cambiarla no registra pedido ni cobra."
+          onClick={() => onQuantity(Math.min(5, quantity + 1))}
+        >
+          +
+        </button>
+      </div>
+      {valid ? null : <span className="text-[11px] text-muted">1 a 5</span>}
     </div>
   );
 }
