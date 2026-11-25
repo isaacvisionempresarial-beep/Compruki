@@ -76,7 +76,7 @@ export function StoreHome({
         <div className="relative grid gap-5 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] sm:items-stretch sm:gap-6 sm:p-5 lg:gap-8">
           <div className="flex min-w-0 flex-col justify-center">
             <div id="tienda-marca">
-              <BrandLogo className="h-9 max-w-[12rem] sm:h-10 sm:max-w-[14rem]" priority />
+              <BrandLogo className="h-11 max-w-[15rem] sm:h-12 sm:max-w-[17rem]" priority />
             </div>
             <p className="mt-2 text-sm font-semibold text-ink">{identity.name}</p>
             <h1 className="store-display mt-2.5 max-w-[12ch] text-[2.35rem] leading-[0.98] font-extrabold tracking-[-0.045em] text-ink sm:text-[3rem]">

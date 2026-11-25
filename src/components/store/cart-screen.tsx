@@ -69,9 +69,8 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
         </div>
         <div className="relative z-10 flex flex-col gap-4 p-4 sm:flex-row sm:items-end sm:justify-between sm:p-5">
           <div className="min-w-0 max-w-md">
-            <BrandLogo className="h-8 max-w-[11rem]" />
-            <p className="mt-2 text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Tu selección</p>
-            <h1 className="store-display mt-1 text-[1.85rem] leading-tight font-extrabold tracking-[-0.03em]">Carrito</h1>
+            <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Tu selección</p>
+            <h1 className="store-display mt-1.5 text-[1.85rem] leading-tight font-extrabold tracking-[-0.03em]">Carrito</h1>
             <p className="mt-1.5 text-sm leading-5 text-muted">
               Precios publicados · Pagas al recibir · Envío aparte. Todavía no es un pedido.
             </p>
@@ -99,21 +98,21 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Resumen</p>
             <p className="mt-0.5 text-base font-bold">Lo que llevas</p>
           </div>
-          <div className="flex items-end justify-between gap-2 px-0.5">
+          <div className="flex items-end justify-between gap-3 px-0.5">
             <div>
               <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Productos</p>
               <h2 className="mt-0.5 text-base font-bold">En este carrito</h2>
             </div>
-            <p className="text-[11px] leading-4 text-muted">Cambiar o quitar no cobra.</p>
+            <BrandLogo className="h-10 max-w-[13.5rem] object-right" />
           </div>
         </div>
 
-        <div className="mb-2 flex items-end justify-between gap-2 px-0.5 lg:hidden">
+        <div className="mb-2 flex items-end justify-between gap-3 px-0.5 lg:hidden">
           <div>
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Carrito</p>
             <h2 className="mt-0.5 text-base font-bold">Resumen y productos</h2>
           </div>
-          <p className="text-[11px] leading-4 text-muted">Cambiar o quitar no cobra.</p>
+          <BrandLogo className="h-9 max-w-[12rem] object-right" />
         </div>
 
         <div className="grid gap-3 lg:grid-cols-[minmax(15rem,17.5rem)_minmax(0,1fr)] lg:items-start">

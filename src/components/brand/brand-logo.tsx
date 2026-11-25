@@ -5,16 +5,19 @@ export function BrandLogo({
   className,
   priority = false,
   title,
+  onDark = false,
 }: {
   className?: string;
   priority?: boolean;
   title?: string;
+  /** Versión clara para fondos oscuros (panel). */
+  onDark?: boolean;
 }) {
   return (
     // Logo estático local; next/image no aporta aquí frente a control fino de altura.
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/brand/compruki-logo.png"
+      src={onDark ? "/brand/compruki-logo-on-dark.png" : "/brand/compruki-logo.png"}
       alt="COMPRUKÍ"
       title={title}
       width={1024}

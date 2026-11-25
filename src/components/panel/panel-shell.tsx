@@ -11,7 +11,7 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
-import { Wordmark } from "@/components/brand/wordmark";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { Icon, type IconName } from "@/components/icons";
 import { cx } from "@/lib/cx";
 import { useRouteFocus } from "@/lib/use-route-focus";
@@ -276,7 +276,7 @@ function Sidebar({
           className="rounded-[10px]"
           onCloseMenu={onCloseMenu}
         >
-          <Wordmark onDark badge />
+          <BrandLogo onDark className="h-8 max-w-[11rem]" />
         </PanelMenuLink>
         {showClose ? (
           <button
