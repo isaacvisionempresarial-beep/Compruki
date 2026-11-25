@@ -1,5 +1,5 @@
-﻿# Empuja main a origin (upstream) y al fork de Railway (paternina1978).
-# Uso: pwsh scripts/ship-remotes.ps1
+﻿# Empuja main a origin (upstream). Intenta el fork de Railway si hay permiso.
+# Uso: powershell -NoProfile -File scripts/ship-remotes.ps1
 
 $ErrorActionPreference = "Stop"
 Set-Location (Split-Path $PSScriptRoot -Parent)
@@ -23,7 +23,17 @@ if (-not $hasFork) {
 }
 
 Write-Host "→ fork (paternina1978/Compruki) para Railway"
-git push fork HEAD:main
-git push fork HEAD:principal 2>$null
+$forkOk = $true
+git push fork HEAD:main 2>&1 | ForEach-Object { $_ }
+if ($LASTEXITCODE -ne 0) { $forkOk = $false }
+git push fork HEAD:principal 2>&1 | Out-Null
 
-Write-Host "Listo. Si Railway apunta al fork, redeploya o espera el auto-deploy."
+if (-not $forkOk) {
+  Write-Host ""
+  Write-Host "Sin permiso de push al fork. En GitHub (cuenta paternina1978):"
+  Write-Host "  paternina1978/Compruki → Sync fork → Update branch"
+  Write-Host "Luego Railway redeploya solo."
+  exit 0
+}
+
+Write-Host "Listo. Origin y fork actualizados."
