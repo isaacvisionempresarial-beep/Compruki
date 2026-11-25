@@ -112,10 +112,7 @@ function LoginForm({
   otherStore?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(signIn, initialState);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
-  const canEnter = Boolean(email.trim() && email.includes("@") && password);
 
   return (
     <>
@@ -148,8 +145,7 @@ function LoginForm({
             autoCorrect="off"
             spellCheck={false}
             required
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            defaultValue=""
             aria-invalid={state.error ? true : undefined}
             aria-describedby={state.error ? "login-error" : undefined}
             className={inputClass}
@@ -165,8 +161,7 @@ function LoginForm({
               type={visible ? "text" : "password"}
               autoComplete="current-password"
               required
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              defaultValue=""
               aria-invalid={state.error ? true : undefined}
               aria-describedby={state.error ? "login-error" : undefined}
               className={`${inputClass} pr-20`}
@@ -195,7 +190,7 @@ function LoginForm({
           className={`mt-2 inline-flex h-11 w-full items-center justify-center rounded-[12px] bg-primary text-sm font-semibold text-on-dark transition-colors hover:bg-primary-soft active:bg-primary-dark ${
             pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed disabled:opacity-55"
           }`}
-          disabled={pending || !canEnter}
+          disabled={pending}
         >
           {pending ? "Entrando…" : "Entrar al panel"}
         </button>
