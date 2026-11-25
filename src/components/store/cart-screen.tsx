@@ -68,9 +68,8 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
               width={640}
               height={360}
               decoding="async"
-              className="h-28 w-full rounded-[16px] object-cover object-right sm:h-32"
+              className="h-28 w-full rounded-[16px] object-cover object-center ring-1 ring-line/80 sm:h-32"
             />
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-10 rounded-l-[16px] bg-gradient-to-r from-card/90 to-transparent sm:w-12" />
           </div>
         </div>
       </section>
