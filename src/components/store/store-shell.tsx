@@ -14,9 +14,12 @@ import { useRouteFocus } from "@/lib/use-route-focus";
 export function StoreShell({
   children,
   identity = null,
+  accountLabel = null,
 }: {
   children: ReactNode;
   identity?: StoreIdentity | null;
+  /** Primer nombre o usuario si hay sesión de comprador. */
+  accountLabel?: string | null;
 }) {
   const contactHref =
     identity?.whatsapp && identity.name
@@ -92,10 +95,20 @@ export function StoreShell({
             <Link
               href="/tienda/cuenta"
               target="_self"
-              title="Entrar o ver tu cuenta. No cobra."
-              className="inline-flex h-10 items-center rounded-[12px] border border-line bg-canvas/90 px-3 text-sm font-semibold transition-colors hover:border-accent/40 hover:bg-card"
+              title={accountLabel ? `Sesión de ${accountLabel}. Ver cuenta. No cobra.` : "Entrar o ver tu cuenta. No cobra."}
+              aria-label={accountLabel ? `Cuenta, ${accountLabel}` : "Cuenta"}
+              className="inline-flex h-10 max-w-[9.5rem] items-center gap-1.5 rounded-[12px] border border-line bg-canvas/90 px-3 text-sm font-semibold transition-colors hover:border-accent/40 hover:bg-card sm:max-w-[12rem]"
             >
-              Cuenta
+              {accountLabel ? (
+                <>
+                  <span className="hidden text-[10px] font-bold tracking-[0.06em] text-accent-strong uppercase sm:inline">
+                    Sesión
+                  </span>
+                  <span className="truncate">{accountLabel}</span>
+                </>
+              ) : (
+                "Cuenta"
+              )}
             </Link>
             <Link
               href="/tienda/carrito"

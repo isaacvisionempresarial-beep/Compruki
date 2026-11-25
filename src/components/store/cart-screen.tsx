@@ -10,7 +10,13 @@ import { useCart } from "@/components/store/cart-state";
 import { formatCop } from "@/lib/format";
 import { orderTotal } from "@/lib/store-order";
 
-export function CartScreen({ products }: { products: PublicProduct[] }) {
+export function CartScreen({
+  products,
+  buyerName = null,
+}: {
+  products: PublicProduct[];
+  buyerName?: string | null;
+}) {
   const cart = useCart();
   const rows = cart.lines.map((line) => {
     const product = products.find((item) => item.sku === line.sku) ?? null;
@@ -59,6 +65,11 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
             <p className="mt-1.5 text-sm leading-5 text-muted">
               Precios publicados · Pagas al recibir · Envío aparte. Todavía no es un pedido.
             </p>
+            {buyerName ? (
+              <p className="mt-2 text-sm font-semibold text-accent-strong">
+                Sesión: {buyerName}
+              </p>
+            ) : null}
           </div>
           <div className="relative isolate mx-auto w-full max-w-[14rem] sm:mx-0 sm:justify-self-end" aria-hidden="true">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -149,7 +160,9 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
               <p className="text-[11px] leading-4 text-muted">
                 {rows.length === 0
                   ? "Ver productos no registra pedido ni cobra."
-                  : "Para pagar necesitas entrar con tu cuenta. Continuar no confirma ni cobra."}
+                  : buyerName
+                    ? `Entraste como ${buyerName}. Continuar no confirma ni cobra.`
+                    : "Para pagar necesitas entrar con tu cuenta. Continuar no confirma ni cobra."}
               </p>
               <Link
                 href="/tienda"

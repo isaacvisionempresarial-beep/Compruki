@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CartScreen } from "@/components/store/cart-screen";
 import { listPublicProducts } from "@/server/catalog-store";
+import { getCustomerSession } from "@/server/customer-auth";
 
 export const metadata: Metadata = {
   title: "Carrito",
@@ -10,5 +11,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function CartPage() {
-  return <CartScreen products={await listPublicProducts()} />;
+  const [products, session] = await Promise.all([listPublicProducts(), getCustomerSession()]);
+  const buyerName = session?.profile.displayName.trim() || session?.profile.email || null;
+  return <CartScreen products={products} buyerName={buyerName} />;
 }
