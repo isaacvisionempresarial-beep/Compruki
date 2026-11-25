@@ -45,40 +45,77 @@ export function AccountScreen({
   const [mode, setMode] = useState<Mode>(initialMode);
 
   if (signedIn) {
+    const firstName = (displayName ?? "").trim().split(/\s+/).filter(Boolean)[0] || "tu cuenta";
     return (
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
-        <ProfileCard
-          displayName={displayName ?? ""}
-          email={email ?? ""}
-          phone={phone ?? ""}
-          emailOrderUpdates={emailOrderUpdates !== false}
+      <div className="space-y-3">
+        <AccountHero
+          eyebrow="Tu cuenta"
+          title={firstName}
+          note="Perfil, avisos del pedido y tus compras en un solo lugar. Nadie cobra aquí."
         />
-        <OrdersCard orders={orders ?? []} />
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+          <ProfileCard
+            displayName={displayName ?? ""}
+            email={email ?? ""}
+            phone={phone ?? ""}
+            emailOrderUpdates={emailOrderUpdates !== false}
+          />
+          <OrdersCard orders={orders ?? []} />
+        </div>
       </div>
     );
   }
 
-  return (
-    <section className="elevate-1 mx-auto max-w-md rounded-[18px] border border-line bg-card px-4 py-5 sm:px-6">
-      <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Cuenta</p>
-      <h1 className="store-display mt-1 text-2xl font-extrabold tracking-tight">
-        {mode === "register" ? "Crear cuenta" : mode === "recovery" ? "Recuperar clave" : mode === "nueva-clave" ? "Nueva clave" : "Entrar"}
-      </h1>
-      <p className="mt-1.5 text-sm leading-5 text-muted">
-        Para pedir necesitas cuenta. Guarda el carrito y recibe avisos del pedido. No cobra.
-      </p>
-      {bootError ? (
-        <p role="alert" className="mt-3 text-sm font-semibold text-danger">
-          {bootError}
-        </p>
-      ) : null}
+  const authTitle =
+    mode === "register" ? "Crear cuenta" : mode === "recovery" ? "Recuperar clave" : mode === "nueva-clave" ? "Nueva clave" : "Entrar";
 
-      {mode === "login" ? (
-        <AuthLogin nextPath={nextPath} onRegister={() => setMode("register")} onRecover={() => setMode("recovery")} />
-      ) : null}
-      {mode === "register" ? <AuthRegister nextPath={nextPath} onLogin={() => setMode("login")} /> : null}
-      {mode === "recovery" ? <AuthRecover onBack={() => setMode("login")} /> : null}
-      {mode === "nueva-clave" ? <AuthNewPassword /> : null}
+  return (
+    <div className="mx-auto max-w-lg space-y-3">
+      <AccountHero
+        eyebrow="Cuenta"
+        title={authTitle}
+        note="Para pedir necesitas cuenta. Guarda el carrito y recibe avisos del pedido. No cobra."
+      />
+      <section className="elevate-1 rounded-[18px] border border-line bg-card px-4 py-4 sm:px-5">
+        {bootError ? (
+          <p role="alert" className="mb-3 text-sm font-semibold text-danger">
+            {bootError}
+          </p>
+        ) : null}
+        {mode === "login" ? (
+          <AuthLogin nextPath={nextPath} onRegister={() => setMode("register")} onRecover={() => setMode("recovery")} />
+        ) : null}
+        {mode === "register" ? <AuthRegister nextPath={nextPath} onLogin={() => setMode("login")} /> : null}
+        {mode === "recovery" ? <AuthRecover onBack={() => setMode("login")} /> : null}
+        {mode === "nueva-clave" ? <AuthNewPassword /> : null}
+      </section>
+    </div>
+  );
+}
+
+function AccountHero({ eyebrow, title, note }: { eyebrow: string; title: string; note: string }) {
+  return (
+    <section className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line bg-card">
+      <div className="absolute inset-0 bg-gradient-to-r from-card via-card to-[#e8eef5]" aria-hidden="true" />
+      <div className="store-hero-glow pointer-events-none absolute inset-0 opacity-45" aria-hidden="true" />
+      <div className="relative z-10 grid items-center gap-3 p-3.5 sm:grid-cols-[minmax(0,1fr)_minmax(8.5rem,12.5rem)] sm:gap-4 sm:p-4">
+        <div className="min-w-0">
+          <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">{eyebrow}</p>
+          <h1 className="store-display mt-1 text-[1.7rem] leading-tight font-extrabold tracking-[-0.03em]">{title}</h1>
+          <p className="mt-1.5 text-sm leading-5 text-muted">{note}</p>
+        </div>
+        <div className="relative isolate mx-auto w-full max-w-[12.5rem] sm:mx-0 sm:justify-self-end" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/store/account-hero.jpg?v=1"
+            alt=""
+            width={640}
+            height={360}
+            decoding="async"
+            className="h-24 w-full rounded-[14px] object-cover object-center ring-1 ring-line/80 sm:h-28"
+          />
+        </div>
+      </div>
     </section>
   );
 }
@@ -267,11 +304,18 @@ function ProfileCard({
   }, [displayName, phone, emailOrderUpdates]);
 
   return (
-    <section className="elevate-1 rounded-[18px] border border-line bg-card px-4 py-4">
-      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Perfil</p>
-      <h2 className="mt-0.5 text-base font-bold">Tu cuenta</h2>
-      <p className="mt-1 text-sm text-muted">{email}</p>
-      <form action={action} className="mt-3 grid gap-3">
+    <section className="elevate-1 rounded-[18px] border border-line bg-card px-3.5 py-3.5 sm:px-4">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Perfil</p>
+          <h2 className="mt-0.5 text-base font-bold">Datos de contacto</h2>
+          <p className="mt-1 truncate text-sm text-muted">{email}</p>
+        </div>
+        <span className="shrink-0 rounded-[8px] bg-accent/15 px-2 py-0.5 text-[10px] font-bold tracking-[0.06em] text-accent-strong uppercase">
+          Sesión
+        </span>
+      </div>
+      <form action={action} className="mt-3 grid gap-2.5">
         <Field label="Nombre" htmlFor="prof-name">
           <input
             id="prof-name"
@@ -291,13 +335,13 @@ function ProfileCard({
             className={fieldClass}
           />
         </Field>
-        <label className="flex items-start gap-2 text-sm">
+        <label className="flex items-start gap-2 rounded-[10px] border border-line bg-canvas px-3 py-2.5 text-sm">
           <input
             type="checkbox"
             name="emailOrderUpdates"
             checked={notifyMail}
             onChange={(event) => setNotifyMail(event.target.checked)}
-            className="mt-1"
+            className="mt-0.5"
           />
           <span>Avisarme por correo cuando cambie el estado del pedido.</span>
         </label>
@@ -314,51 +358,68 @@ function ProfileCard({
         <button
           type="submit"
           disabled={pending}
-          className="inline-flex h-10 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold disabled:cursor-wait"
+          className="inline-flex h-10 items-center justify-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark disabled:cursor-wait"
         >
           Guardar
         </button>
       </form>
-      <form action={customerSignOutAction} className="mt-3">
-        <button type="submit" className="text-sm font-semibold text-muted underline-offset-2 hover:underline">
-          Cerrar sesión
-        </button>
-      </form>
-      <p className="mt-3 text-xs leading-5 text-muted">
-        <Link href="/tienda/pagar" className="font-semibold text-accent-strong underline-offset-2 hover:underline">
-          Ir a pagar
-        </Link>
-        {" · "}
-        <Link href="/tienda/carrito" className="font-semibold underline-offset-2 hover:underline">
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line pt-3 text-sm">
+        <form action={customerSignOutAction}>
+          <button type="submit" className="font-semibold text-muted underline-offset-2 hover:underline">
+            Cerrar sesión
+          </button>
+        </form>
+        <Link href="/tienda/carrito" className="font-semibold text-accent-strong underline-offset-2 hover:underline">
           Carrito
         </Link>
-      </p>
+        <Link href="/tienda/pagar" className="font-semibold underline-offset-2 hover:underline">
+          Ir a pagar
+        </Link>
+      </div>
     </section>
   );
 }
 
 function OrdersCard({ orders }: { orders: CustomerOrderSummary[] }) {
   return (
-    <section className="elevate-1 rounded-[18px] border border-line bg-card px-4 py-4">
-      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedidos</p>
-      <h2 className="mt-0.5 text-base font-bold">Mis pedidos</h2>
+    <section className="elevate-1 rounded-[18px] border border-line bg-card px-3.5 py-3.5 sm:px-4">
+      <div className="flex items-baseline justify-between gap-2">
+        <div>
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pedidos</p>
+          <h2 className="mt-0.5 text-base font-bold">Mis pedidos</h2>
+        </div>
+        {orders.length > 0 ? (
+          <p className="text-xs font-semibold text-muted tabular-nums">{orders.length}</p>
+        ) : null}
+      </div>
       {orders.length === 0 ? (
-        <p className="mt-2 text-sm text-muted">Todavía no tienes pedidos con esta cuenta.</p>
+        <div className="mt-3 rounded-[12px] border border-dashed border-line bg-canvas/80 px-3 py-6 text-center">
+          <p className="text-sm font-semibold">Todavía no hay pedidos</p>
+          <p className="mt-1 text-xs leading-5 text-muted">Cuando confirmes uno, aparece aquí con su estado.</p>
+          <Link
+            href="/tienda"
+            className="mt-3 inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
+          >
+            Ver tienda
+          </Link>
+        </div>
       ) : (
-        <ul className="mt-3 divide-y divide-line">
+        <ul className="mt-3 space-y-2">
           {orders.map((order) => (
-            <li key={order.id} className="flex items-center justify-between gap-3 py-2.5">
-              <div className="min-w-0">
-                <p className="text-sm font-semibold">{order.number}</p>
-                <p className="text-xs text-muted">
-                  {order.statusLabel} · {order.totalLabel}
-                </p>
-              </div>
+            <li key={order.id}>
               <Link
                 href={`/tienda/pedido/${order.id}?t=${order.viewToken}`}
-                className="shrink-0 text-sm font-semibold text-accent-strong underline-offset-2 hover:underline"
+                className="flex items-center justify-between gap-3 rounded-[12px] border border-line bg-canvas px-3 py-2.5 transition-colors hover:border-accent/40 hover:bg-card"
               >
-                Ver
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold">{order.number}</p>
+                  <p className="mt-0.5 text-xs text-muted">
+                    <span className="font-semibold text-accent-strong">{order.statusLabel}</span>
+                    {" · "}
+                    {order.totalLabel}
+                  </p>
+                </div>
+                <span className="shrink-0 text-sm font-semibold text-accent-strong">Ver</span>
               </Link>
             </li>
           ))}
