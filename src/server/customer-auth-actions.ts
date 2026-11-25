@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { AUTH_BURST_ERROR, AUTH_EMAIL_RULE, AUTH_IP_RULE } from "@/lib/public-limits";
+import { publicSiteOrigin, siteOrigin as configuredSiteOrigin } from "@/lib/site-url";
 import { createServerSupabase } from "@/lib/supabase/server";
 import {
   ensureCustomerProfile,
@@ -31,13 +32,11 @@ function safeNext(raw: string | null | undefined) {
 }
 
 async function siteOrigin() {
-  const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
-  if (fromEnv) return fromEnv;
   const headerList = await headers();
-  const host = headerList.get("x-forwarded-host") ?? headerList.get("host");
-  const proto = headerList.get("x-forwarded-proto") ?? "https";
-  if (host) return `${proto}://${host}`;
-  return "http://localhost:3010";
+  return publicSiteOrigin({
+    headers: headerList,
+    url: `${configuredSiteOrigin()}/`,
+  });
 }
 
 export async function customerSignUpAction(

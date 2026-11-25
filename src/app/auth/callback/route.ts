@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { publicSiteOrigin } from "@/lib/site-url";
 import { supabaseAnonKey, supabaseUrl } from "@/lib/supabase/env";
 import { ensureCustomerProfile, userHasPanelMembership } from "@/server/customer-auth";
 
@@ -11,7 +12,8 @@ function safeNext(raw: string | null) {
 
 /** Intercambia el código OAuth / recovery y enruta panel vs comprador. */
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
+  const origin = publicSiteOrigin(request);
   const code = searchParams.get("code");
   const nextParam = safeNext(searchParams.get("next"));
 
