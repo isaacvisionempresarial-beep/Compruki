@@ -4,6 +4,7 @@ import { ConfirmationScreen } from "@/components/store/confirmation-screen";
 import { toCustomerOrder } from "@/lib/store-order";
 import { listPublicProducts } from "@/server/catalog-store";
 import { getOrder } from "@/server/order-store";
+import { getStoreIdentity } from "@/server/store-identity";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ export default async function OrderPage({
   const { t, nuevo, ya } = await searchParams;
   const order = await getOrder(id);
   if (!order || !t || order.viewToken !== t) notFound();
-  const published = await listPublicProducts();
+  const [published, identity] = await Promise.all([listPublicProducts(), getStoreIdentity()]);
   const images = published
     .filter((product) => product.images.length > 0)
     .map((product) => ({ sku: product.sku, images: product.images }));
@@ -45,6 +46,8 @@ export default async function OrderPage({
       images={images}
       sizes={sizes}
       token={t}
+      storeName={identity.name}
+      storeWhatsapp={identity.whatsapp}
     />
   );
 }

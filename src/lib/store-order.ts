@@ -2850,6 +2850,12 @@ export function whatsAppHref(phone: string, text: string) {
   return `https://wa.me/57${phone}?text=${encodeURIComponent(text)}`;
 }
 
+/** Texto manual wa.me del comprador hacia la tienda (Compruki no envía). */
+export function orderWhatsAppText(orderNumber: string, storeName: string) {
+  const name = storeName.trim() || "la tienda";
+  return `Hola. Escribo por mi pedido ${orderNumber} en ${name}.`;
+}
+
 export function toCustomerOrder(order: StoreOrder): CustomerOrder {
   return {
     id: order.id,

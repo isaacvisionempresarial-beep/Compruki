@@ -19,6 +19,8 @@ import {
   payableTotalLabel,
   validateBuyerNote,
   validateDelivery,
+  orderWhatsAppText,
+  whatsAppHref,
   type CustomerOrder,
 } from "@/lib/store-order";
 import {
@@ -53,6 +55,8 @@ export function ConfirmationScreen({
   images = [],
   sizes = [],
   token = "",
+  storeName = "",
+  storeWhatsapp = "",
 }: {
   order: CustomerOrder;
   justPlaced: boolean;
@@ -60,8 +64,13 @@ export function ConfirmationScreen({
   images?: CustomerImages[];
   sizes?: CustomerSizeChoice[];
   token?: string;
+  storeName?: string;
+  storeWhatsapp?: string;
 }) {
   const { clear } = useCart();
+  const contactHref = storeWhatsapp
+    ? whatsAppHref(storeWhatsapp, orderWhatsAppText(order.number, storeName))
+    : null;
 
   useEffect(() => {
     if (justPlaced || repeated) clear();
@@ -94,7 +103,21 @@ export function ConfirmationScreen({
           Siguiente paso
         </h2>
         <p className="mt-1 text-sm leading-5 text-ink">{nextStepCopy(order)}</p>
-        <p className="mt-1 text-xs leading-5 text-muted">{deliveryFollowUp(order.status)}</p>
+        <p className="mt-1 text-xs leading-5 text-muted">{deliveryFollowUp(order.status, Boolean(contactHref))}</p>
+        {contactHref ? (
+          <nav aria-label="Contacto" className="mt-2 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Contacto</span>
+            <a
+              href={contactHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Abre WhatsApp a mano. Compruki no envía. El total guardado no cambia."
+              className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+            >
+              Escribir por WhatsApp
+            </a>
+          </nav>
+        ) : null}
       </section>
 
       <div className="store-rise mt-3 space-y-3" style={{ animationDelay: "180ms" }}>
@@ -230,12 +253,17 @@ function nextStepCopy(order: CustomerOrder) {
   return "Consulta el avance abajo.";
 }
 
-function deliveryFollowUp(status: CustomerOrder["status"]) {
-  if (status === "pendiente_confirmacion") return "No hay chat ni WhatsApp conectado.";
-  if (status === "confirmado" || status === "en_preparacion" || status === "en_transporte" || status === "incidencia") {
-    return "Si hay que cambiar la dirección, la tienda te escribe a este celular.";
+function deliveryFollowUp(status: CustomerOrder["status"], hasWhatsApp: boolean) {
+  if (hasWhatsApp) {
+    if (status === "confirmado" || status === "en_preparacion" || status === "en_transporte" || status === "incidencia") {
+      return "Si hay que cambiar la dirección, la tienda te escribe a este celular. También puedes escribirle tú por WhatsApp: se abre a mano y Compruki no envía.";
+    }
+    return "Puedes escribirle a la tienda por WhatsApp. Se abre a mano: Compruki no envía el mensaje. El total guardado no cambia.";
   }
-  return "No hay chat ni WhatsApp conectado.";
+  if (status === "confirmado" || status === "en_preparacion" || status === "en_transporte" || status === "incidencia") {
+    return "Si hay que cambiar la dirección, la tienda te escribe a este celular. No hay WhatsApp público configurado.";
+  }
+  return "No hay chat ni WhatsApp público configurado.";
 }
 
 function OrderProgress({ order, sizes }: { order: CustomerOrder; sizes: CustomerSizeChoice[] }) {
