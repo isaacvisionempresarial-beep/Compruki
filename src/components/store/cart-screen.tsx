@@ -301,19 +301,19 @@ function CartQuantity({
           {variantLabel ? `, ${variantLabel}` : ""}
         </span>
         <input
-          type="number"
-          min={1}
-          max={5}
+          type="text"
           inputMode="numeric"
+          pattern="[1-5]"
+          autoComplete="off"
           value={draft}
           onChange={(event) => {
-            const next = event.target.value;
+            const next = event.target.value.replace(/\D/g, "").slice(0, 1);
             setDraft(next);
             const amount = Number(next);
-            if (next.trim() !== "" && Number.isInteger(amount) && amount >= 1 && amount <= 5) onQuantity(amount);
+            if (next !== "" && Number.isInteger(amount) && amount >= 1 && amount <= 5) onQuantity(amount);
           }}
           onBlur={() => setDraft(String(quantity))}
-          className="h-10 w-20 rounded-[10px] border border-line bg-card px-2 tabular-nums focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
+          className="h-9 w-14 rounded-[10px] border border-line bg-card px-2 text-center text-sm font-bold tabular-nums outline-none [appearance:textfield] focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)]"
           title="Cambiarla no registra pedido ni cobra."
         />
       </label>

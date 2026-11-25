@@ -294,10 +294,10 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                   <label className="mb-1.5 block text-xs font-extrabold" htmlFor="cantidad">
                     Cantidad
                   </label>
-                  <div className="flex h-10 overflow-hidden rounded-[10px] border border-line bg-card focus-within:border-accent focus-within:shadow-[0_0_0_3px_rgba(37,199,165,0.12)]">
+                  <div className="inline-flex h-9 items-stretch overflow-hidden rounded-[10px] border border-line bg-card focus-within:border-accent focus-within:shadow-[0_0_0_3px_rgba(37,199,165,0.12)]">
                     <button
                       type="button"
-                      className="h-full w-10 border-0 bg-card text-xl text-muted hover:bg-accent-tint focus-visible:bg-accent-tint"
+                      className="inline-flex w-9 shrink-0 items-center justify-center border-0 bg-card text-base leading-none text-muted hover:bg-accent-tint focus-visible:bg-accent-tint"
                       aria-label="Disminuir cantidad"
                       title="Cambiarla no registra pedido ni cobra."
                       onClick={() => setQuantity((current) => Math.max(1, current - 1))}
@@ -307,16 +307,28 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                     <input
                       id="cantidad"
                       title="Cambiarla no registra pedido ni cobra."
-                      type="number"
-                      min={1}
-                      max={5}
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[1-5]"
+                      autoComplete="off"
                       value={quantity}
-                      onChange={(event) => setQuantity(Math.min(5, Math.max(1, Number(event.target.value) || 1)))}
-                      className="w-11 border-0 bg-card text-center text-sm font-bold tabular-nums outline-none"
+                      onChange={(event) => {
+                        const digits = event.target.value.replace(/\D/g, "");
+                        if (!digits) {
+                          setQuantity(1);
+                          return;
+                        }
+                        setQuantity(Math.min(5, Math.max(1, Number(digits.slice(-1)) || 1)));
+                      }}
+                      className="w-8 shrink-0 border-0 bg-card text-center text-sm font-bold tabular-nums outline-none [appearance:textfield]"
+                      aria-valuemin={1}
+                      aria-valuemax={5}
+                      aria-valuenow={quantity}
+                      role="spinbutton"
                     />
                     <button
                       type="button"
-                      className="h-full w-10 border-0 bg-card text-xl text-muted hover:bg-accent-tint focus-visible:bg-accent-tint"
+                      className="inline-flex w-9 shrink-0 items-center justify-center border-0 bg-card text-base leading-none text-muted hover:bg-accent-tint focus-visible:bg-accent-tint"
                       aria-label="Aumentar cantidad"
                       title="Cambiarla no registra pedido ni cobra."
                       onClick={() => setQuantity((current) => Math.min(5, current + 1))}
