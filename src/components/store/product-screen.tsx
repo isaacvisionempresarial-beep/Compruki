@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { flushSync } from "react-dom";
 import { useRouter } from "next/navigation";
 import type { PublicProduct } from "@/server/catalog-store";
 import { useCart } from "@/components/store/cart-state";
@@ -142,8 +143,10 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
       setVariantError(true);
       return;
     }
-    cart.add(product.sku, quantity, variant, product.sizeKind ?? undefined);
-    setAdded(true);
+    flushSync(() => {
+      cart.add(product.sku, quantity, variant, product.sizeKind ?? undefined);
+      setAdded(true);
+    });
     router.push("/tienda/carrito");
   }
 
@@ -152,8 +155,10 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
       setVariantError(true);
       return;
     }
-    cart.add(product.sku, quantity, variant, product.sizeKind ?? undefined);
-    setAdded(true);
+    flushSync(() => {
+      cart.add(product.sku, quantity, variant, product.sizeKind ?? undefined);
+      setAdded(true);
+    });
     router.push("/tienda/pagar");
   }
 
@@ -228,6 +233,7 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
               className="mt-2 space-y-2"
               onSubmit={(event) => {
                 event.preventDefault();
+                event.stopPropagation();
                 addToCart();
               }}
             >
@@ -356,7 +362,10 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                   disabled={!canBuy}
                   title="Pedirlo lleva al pago. No confirma el pedido ni cobra."
                   className="inline-flex h-9 w-full items-center justify-center sm:w-auto sm:min-w-56 rounded-[10px] bg-primary px-4 text-sm font-extrabold text-on-dark transition-colors enabled:hover:bg-primary-soft disabled:cursor-not-allowed disabled:opacity-55"
-                  onClick={goCheckout}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    goCheckout();
+                  }}
                 >
                   {needsSizeChoice
                     ? product.sizeKind === "tamano"
@@ -365,10 +374,14 @@ export function ProductScreen({ product, fromCampaign = false }: { product: Publ
                     : "Pedir · pagas al recibir"}
                 </button>
                 <button
-                  type="submit"
+                  type="button"
                   disabled={!canBuy}
                   title="Agregarlo no registra pedido ni cobra."
                   className="inline-flex h-9 w-full items-center justify-center sm:w-auto sm:min-w-56 rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink transition-colors enabled:hover:border-accent enabled:hover:bg-accent-tint disabled:cursor-not-allowed disabled:opacity-55"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    addToCart();
+                  }}
                 >
                   Agregar al carrito
                 </button>

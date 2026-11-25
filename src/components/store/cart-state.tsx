@@ -28,6 +28,14 @@ function readStoredLines(): CartLine[] {
   }
 }
 
+function writeStoredLines(lines: CartLine[]) {
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(lines));
+  } catch {
+    /* modo privado / storage lleno: el carrito sigue en memoria */
+  }
+}
+
 type CartApi = {
   lines: CartLine[];
   ready: boolean;
@@ -55,26 +63,34 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!ready) return;
-    localStorage.setItem(storageKey, JSON.stringify(lines));
+    writeStoredLines(lines);
   }, [lines, ready]);
 
   const add = useCallback((sku: string, quantity = 1, variant = "", sizeKind?: SizeKind) => {
     setLines((current) => {
       const found = current.find((line) => sameLine(line, sku, variant));
       const kind = isSizeKind(sizeKind) ? sizeKind : undefined;
-      if (!found) return [...current, { sku, variant, quantity: Math.min(5, quantity), ...(kind ? { sizeKind: kind } : {}) }];
-      return current.map((line) =>
-        sameLine(line, sku, variant) ? { ...line, quantity: Math.min(5, line.quantity + quantity), ...(kind ? { sizeKind: kind } : {}) } : line,
-      );
+      const next = !found
+        ? [...current, { sku, variant, quantity: Math.min(5, quantity), ...(kind ? { sizeKind: kind } : {}) }]
+        : current.map((line) =>
+            sameLine(line, sku, variant)
+              ? { ...line, quantity: Math.min(5, line.quantity + quantity), ...(kind ? { sizeKind: kind } : {}) }
+              : line,
+          );
+      writeStoredLines(next);
+      return next;
     });
   }, []);
 
   const setQuantity = useCallback((sku: string, variant: string, quantity: number) => {
-    setLines((current) =>
-      quantity < 1
-        ? current.filter((line) => !sameLine(line, sku, variant))
-        : current.map((line) => (sameLine(line, sku, variant) ? { ...line, quantity: Math.min(5, quantity) } : line)),
-    );
+    setLines((current) => {
+      const next =
+        quantity < 1
+          ? current.filter((line) => !sameLine(line, sku, variant))
+          : current.map((line) => (sameLine(line, sku, variant) ? { ...line, quantity: Math.min(5, quantity) } : line));
+      writeStoredLines(next);
+      return next;
+    });
   }, []);
 
   const setVariant = useCallback((sku: string, from: string, to: string, sizeKind?: SizeKind) => {
@@ -84,23 +100,34 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (!source) return current;
       const kind = isSizeKind(sizeKind) ? sizeKind : source.sizeKind;
       const target = current.find((line) => sameLine(line, sku, to));
-      if (!target) {
-        return current.map((line) =>
-          sameLine(line, sku, from) ? { ...line, variant: to, ...(kind ? { sizeKind: kind } : {}) } : line,
-        );
-      }
-      const quantity = Math.min(5, source.quantity + target.quantity);
-      return current
-        .filter((line) => !sameLine(line, sku, from))
-        .map((line) => (sameLine(line, sku, to) ? { ...line, quantity, ...(kind ? { sizeKind: kind } : {}) } : line));
+      const next = !target
+        ? current.map((line) =>
+            sameLine(line, sku, from) ? { ...line, variant: to, ...(kind ? { sizeKind: kind } : {}) } : line,
+          )
+        : current
+            .filter((line) => !sameLine(line, sku, from))
+            .map((line) =>
+              sameLine(line, sku, to)
+                ? { ...line, quantity: Math.min(5, source.quantity + target.quantity), ...(kind ? { sizeKind: kind } : {}) }
+                : line,
+            );
+      writeStoredLines(next);
+      return next;
     });
   }, []);
 
   const remove = useCallback((sku: string, variant: string) => {
-    setLines((current) => current.filter((line) => !sameLine(line, sku, variant)));
+    setLines((current) => {
+      const next = current.filter((line) => !sameLine(line, sku, variant));
+      writeStoredLines(next);
+      return next;
+    });
   }, []);
 
-  const clear = useCallback(() => setLines([]), []);
+  const clear = useCallback(() => {
+    writeStoredLines([]);
+    setLines([]);
+  }, []);
 
   const count = lines.reduce((sum, line) => sum + line.quantity, 0);
 
