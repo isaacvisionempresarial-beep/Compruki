@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState, type ReactNode } from "react";
+import { useActionState, useEffect, useState, type ReactNode } from "react";
 import {
   customerGoogleSignInAction,
   customerRecoverAction,
@@ -256,6 +256,16 @@ function ProfileCard({
   emailOrderUpdates: boolean;
 }) {
   const [state, action, pending] = useActionState(customerSaveProfileAction, initial);
+  const [nameValue, setNameValue] = useState(displayName);
+  const [phoneValue, setPhoneValue] = useState(phone);
+  const [notifyMail, setNotifyMail] = useState(emailOrderUpdates);
+
+  useEffect(() => {
+    setNameValue(displayName);
+    setPhoneValue(phone);
+    setNotifyMail(emailOrderUpdates);
+  }, [displayName, phone, emailOrderUpdates]);
+
   return (
     <section className="elevate-1 rounded-[18px] border border-line bg-card px-4 py-4">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Perfil</p>
@@ -263,13 +273,32 @@ function ProfileCard({
       <p className="mt-1 text-sm text-muted">{email}</p>
       <form action={action} className="mt-3 grid gap-3">
         <Field label="Nombre" htmlFor="prof-name">
-          <input id="prof-name" name="name" defaultValue={displayName} className={fieldClass} />
+          <input
+            id="prof-name"
+            name="name"
+            value={nameValue}
+            onChange={(event) => setNameValue(event.target.value)}
+            className={fieldClass}
+          />
         </Field>
         <Field label="Celular" htmlFor="prof-phone" hint="10 dígitos, opcional.">
-          <input id="prof-phone" name="phone" inputMode="tel" defaultValue={phone} className={fieldClass} />
+          <input
+            id="prof-phone"
+            name="phone"
+            inputMode="tel"
+            value={phoneValue}
+            onChange={(event) => setPhoneValue(event.target.value)}
+            className={fieldClass}
+          />
         </Field>
         <label className="flex items-start gap-2 text-sm">
-          <input type="checkbox" name="emailOrderUpdates" defaultChecked={emailOrderUpdates} className="mt-1" />
+          <input
+            type="checkbox"
+            name="emailOrderUpdates"
+            checked={notifyMail}
+            onChange={(event) => setNotifyMail(event.target.checked)}
+            className="mt-1"
+          />
           <span>Avisarme por correo cuando cambie el estado del pedido.</span>
         </label>
         {state.error ? (

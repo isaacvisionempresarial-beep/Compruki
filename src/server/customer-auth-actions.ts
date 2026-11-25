@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
 import { AUTH_BURST_ERROR, AUTH_EMAIL_RULE, AUTH_IP_RULE } from "@/lib/public-limits";
 import { createServerSupabase } from "@/lib/supabase/server";
 import {
@@ -188,10 +189,12 @@ export async function customerSaveProfileAction(
   if (!user || (await userHasPanelMembership(user.id))) {
     return { error: "Entra con tu cuenta de comprador.", message: null };
   }
+  await ensureCustomerProfile(user);
   const displayName = String(formData.get("name") ?? "");
   const phone = String(formData.get("phone") ?? "");
   const emailOrderUpdates = formData.get("emailOrderUpdates") === "on";
   const result = await updateCustomerProfile(user.id, { displayName, phone, emailOrderUpdates });
   if (result.error) return { error: "No se pudo guardar el perfil.", message: null };
+  revalidatePath("/tienda/cuenta");
   return { error: null, message: "Perfil guardado. No cambia pedidos ni cobra." };
 }

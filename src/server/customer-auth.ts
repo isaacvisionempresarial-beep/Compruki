@@ -132,8 +132,30 @@ export async function updateCustomerProfile(
   if (patch.displayName !== undefined) row.display_name = patch.displayName.trim().replace(/\s+/g, " ").slice(0, 80);
   if (patch.phone !== undefined) row.phone = patch.phone.replace(/\D/g, "").slice(0, 10);
   if (patch.emailOrderUpdates !== undefined) row.email_order_updates = patch.emailOrderUpdates;
-  const { error } = await supabase.from("customer_profiles").update(row).eq("user_id", userId);
+
+  const { data, error } = await supabase
+    .from("customer_profiles")
+    .update(row)
+    .eq("user_id", userId)
+    .select("user_id, phone")
+    .maybeSingle();
+
   if (error) return { error: error.message };
+  if (!data?.user_id) {
+    const tenantId = await getPilotTenantId();
+    const { error: upsertError } = await supabase.from("customer_profiles").upsert(
+      {
+        user_id: userId,
+        tenant_id: tenantId,
+        display_name: typeof row.display_name === "string" ? row.display_name : "",
+        phone: typeof row.phone === "string" ? row.phone : "",
+        email_order_updates: typeof row.email_order_updates === "boolean" ? row.email_order_updates : true,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" },
+    );
+    if (upsertError) return { error: upsertError.message };
+  }
   return { error: null };
 }
 
