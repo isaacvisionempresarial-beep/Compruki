@@ -26,9 +26,6 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
   );
   const sizeKinds = new Set(sizeGaps.map(({ product }) => product!.sizeKind));
   const canContinue = payable.length === rows.length && payable.length > 0;
-  const visualProducts = rows
-    .map(({ product }) => product)
-    .filter((product): product is PublicProduct => Boolean(product?.images.length));
   const blockedHint =
     sizeGaps.length > 0
       ? sizeKinds.size === 1 && sizeKinds.has("tamano")
@@ -50,24 +47,12 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
   return (
     <div>
       <section
-        className="store-hero store-rise relative overflow-hidden rounded-[20px] border border-line"
+        className="store-hero store-rise relative overflow-hidden rounded-[20px] border border-line bg-card"
         style={{ animationDelay: "40ms" }}
       >
-        <div className="absolute inset-0">
-          {visualProducts[0] ? (
-            <CatalogPhoto
-              sku={visualProducts[0].sku}
-              alt=""
-              query={visualProducts[0].images[0] ? `m=${visualProducts[0].images[0].id}` : undefined}
-              frameClassName="h-full w-full"
-              imgClassName="store-hero-photo store-hero-photo-live h-full w-full object-cover opacity-35"
-            />
-          ) : (
-            <div className="h-full w-full bg-gradient-to-br from-primary via-[#2a3148] to-accent/40" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-r from-card via-card/92 to-card/55" />
-        </div>
-        <div className="relative z-10 flex flex-col gap-4 p-4 sm:flex-row sm:items-end sm:justify-between sm:p-5">
+        <div className="absolute inset-0 bg-gradient-to-r from-card via-card to-[#e8eef5]" aria-hidden="true" />
+        <div className="store-hero-glow pointer-events-none absolute inset-0 opacity-50" aria-hidden="true" />
+        <div className="relative z-10 grid items-center gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(9rem,14rem)] sm:gap-4 sm:p-5">
           <div className="min-w-0 max-w-md">
             <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Tu selección</p>
             <h1 className="store-display mt-1.5 text-[1.85rem] leading-tight font-extrabold tracking-[-0.03em]">Carrito</h1>
@@ -75,20 +60,18 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
               Precios publicados · Pagas al recibir · Envío aparte. Todavía no es un pedido.
             </p>
           </div>
-          {visualProducts.length > 0 ? (
-            <div className="flex -space-x-3" aria-hidden="true">
-              {visualProducts.slice(0, 4).map((product, index) => (
-                <CatalogPhoto
-                  key={`${product.sku}:${index}`}
-                  sku={product.sku}
-                  alt=""
-                  query={product.images[0] ? `m=${product.images[0].id}` : undefined}
-                  frameClassName="h-14 w-14 rounded-[14px] border-2 border-card shadow-[0_10px_24px_-12px_rgb(23_26_40/0.45)]"
-                  imgClassName="h-full w-full object-cover"
-                />
-              ))}
-            </div>
-          ) : null}
+          <div className="relative isolate mx-auto w-full max-w-[14rem] sm:mx-0 sm:justify-self-end" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/store/cart-hero.jpg"
+              alt=""
+              width={640}
+              height={360}
+              decoding="async"
+              className="h-28 w-full rounded-[16px] object-cover object-right sm:h-32"
+            />
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-10 rounded-l-[16px] bg-gradient-to-r from-card/90 to-transparent sm:w-12" />
+          </div>
         </div>
       </section>
 
