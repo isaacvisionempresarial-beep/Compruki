@@ -39,7 +39,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
 
   if (!cart.ready) {
     return (
-      <section className="elevate-1 mx-auto max-w-5xl rounded-[14px] border border-line bg-card px-3 py-3" aria-busy="true">
+      <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3" aria-busy="true">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
         <p className="mt-0.5 text-sm text-muted">Cargando el carrito… No registra pedido ni cobra.</p>
       </section>
@@ -47,7 +47,7 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
   }
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div>
       <section
         className="store-hero store-rise relative overflow-hidden rounded-[20px] border border-line"
         style={{ animationDelay: "40ms" }}
