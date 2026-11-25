@@ -33,8 +33,8 @@ export function StoreShell({
     pathname.startsWith("/tienda/condiciones");
   const cart = pathname.startsWith("/tienda/carrito") || pathname.startsWith("/tienda/pagar");
   const productPage = pathname.startsWith("/tienda/producto");
-  /** Carrito/pago van más recogidos: header y contenido comparten el mismo eje. */
-  const shellWidth = cart ? "max-w-5xl" : "max-w-7xl";
+  /** Inicio, carrito y pago: mismo eje que las tarjetas. */
+  const shellWidth = home || cart ? "max-w-5xl" : "max-w-7xl";
 
   useEffect(() => {
     const root = document.documentElement;
