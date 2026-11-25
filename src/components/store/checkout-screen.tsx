@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState, type ReactNode } from "react";
+import { useActionState, useMemo, useState, type ReactNode } from "react";
 import type { PublicProduct } from "@/server/catalog-store";
 import { readCampaignSkus } from "@/lib/campaign";
 import { variantFits } from "@/lib/catalog";
+import { citiesForDepartment, listColombiaDepartments } from "@/lib/colombia-places";
 import { LinePhotos, ProductThumb } from "@/components/store/product-thumb";
 import { useCart } from "@/components/store/cart-state";
 import { formatCop } from "@/lib/format";
@@ -12,6 +13,7 @@ import { customerDeliveryPreviewText, lineName, normalizePhone, orderTotal, vali
 import { placeOrderAction, type PlaceOrderState } from "@/server/store-actions";
 
 const initialState: PlaceOrderState = { error: null };
+const colombiaDepartments = listColombiaDepartments();
 
 export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
   const cart = useCart();
@@ -26,6 +28,7 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
   const [address, setAddress] = useState("");
   const [reference, setReference] = useState("");
   const [accepted, setAccepted] = useState(false);
+  const cities = useMemo(() => citiesForDepartment(department), [department]);
   const rows = cart.lines.map((line) => ({
     line,
     product: products.find((item) => item.sku === line.sku) ?? null,
@@ -168,10 +171,10 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
             <h2 id="entrega-titulo" className="mt-0.5 text-sm font-semibold">
               Quién recibe
             </h2>
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase sm:col-span-2">Persona</p>
-              <div className="sm:col-span-2">
-                <Field label="Nombre de quien recibe" htmlFor="customerName" hint="No es un pago. Al confirmar, el pedido queda pendiente.">
+            <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-2 sm:grid-cols-6">
+              <p className="col-span-2 text-[10px] font-bold tracking-[0.08em] text-muted uppercase sm:col-span-6">Persona</p>
+              <div className="col-span-2 sm:col-span-6">
+                <Field label="Nombre" htmlFor="customerName" hint="Quien recibe. No es un pago.">
                   <input
                     id="customerName"
                     title="Escribirlo no confirma el pedido ni cobra."
@@ -184,65 +187,88 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                   />
                 </Field>
               </div>
-              <Field label="Celular" htmlFor="phone" hint="10 dígitos, empieza por 3. Sirve para coordinar la entrega. No es un pago.">
-                <input
-                  id="phone"
-                  title="Escribirlo no confirma el pedido ni cobra."
-                  name="phone"
-                  required
-                  inputMode="tel"
-                  autoComplete="tel"
-                  value={phone}
-                  onChange={(event) => setPhone(event.target.value)}
-                  className={inputClass}
-                />
-              </Field>
-              <Field
-                label="Cédula de quien recibe"
-                htmlFor="document"
-                hint="Opcional. De 6 a 10 dígitos, sin puntos. La pide la transportadora. No es un pago."
-              >
-                <input
-                  id="document"
-                  title="Escribirlo no confirma el pedido ni cobra."
-                  name="document"
-                  inputMode="numeric"
-                  autoComplete="off"
-                  value={documentId}
-                  onChange={(event) => setDocumentId(event.target.value)}
-                  className={inputClass}
-                />
-              </Field>
-              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase sm:col-span-2">Dónde</p>
-              <Field label="Departamento" htmlFor="department" hint="Por ejemplo, Sucre o Antioquia. No es la ciudad. No es un pago.">
-                <input
-                  id="department"
-                  title="Escribirlo no confirma el pedido ni cobra."
-                  name="department"
-                  required
-                  autoComplete="address-level1"
-                  value={department}
-                  onChange={(event) => setDepartment(event.target.value)}
-                  className={inputClass}
-                />
-              </Field>
-              <Field label="Ciudad" htmlFor="city" hint="No es un pago.">
-                <input
-                  id="city"
-                  title="Escribirlo no confirma el pedido ni cobra."
-                  name="city"
-                  required
-                  autoComplete="address-level2"
-                  value={city}
-                  onChange={(event) => setCity(event.target.value)}
-                  className={inputClass}
-                />
-              </Field>
-              <div className="sm:col-span-2">
-                <Field label="Dirección" htmlFor="address" hint="No es un pago. Al confirmar, el pedido queda pendiente.">
+              <div className="col-span-1 sm:col-span-3">
+                <Field label="Celular" htmlFor="phone" hint="10 dígitos, inicia en 3.">
+                  <input
+                    id="phone"
+                    title="Escribirlo no confirma el pedido ni cobra."
+                    name="phone"
+                    required
+                    inputMode="tel"
+                    autoComplete="tel"
+                    value={phone}
+                    onChange={(event) => setPhone(event.target.value)}
+                    className={inputClass}
+                  />
+                </Field>
+              </div>
+              <div className="col-span-1 sm:col-span-3">
+                <Field label="Cédula" htmlFor="document" hint="Opcional. 6 a 10 dígitos.">
+                  <input
+                    id="document"
+                    title="Escribirlo no confirma el pedido ni cobra."
+                    name="document"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    value={documentId}
+                    onChange={(event) => setDocumentId(event.target.value)}
+                    className={inputClass}
+                  />
+                </Field>
+              </div>
+
+              <p className="col-span-2 text-[10px] font-bold tracking-[0.08em] text-muted uppercase sm:col-span-6">Dónde</p>
+              <div className="col-span-1 sm:col-span-3">
+                <Field label="Departamento" htmlFor="department" hint="Elige de la lista.">
+                  <select
+                    id="department"
+                    title="Elegirlo no confirma el pedido ni cobra."
+                    name="department"
+                    required
+                    autoComplete="address-level1"
+                    value={department}
+                    onChange={(event) => {
+                      setDepartment(event.target.value);
+                      setCity("");
+                    }}
+                    className={selectClass}
+                  >
+                    <option value="">Departamento</option>
+                    {colombiaDepartments.map((name) => (
+                      <option key={name} value={name}>
+                        {name}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              </div>
+              <div className="col-span-1 sm:col-span-3">
+                <Field label="Ciudad" htmlFor="city" hint={department ? "Según el departamento." : "Primero el departamento."}>
+                  <select
+                    id="city"
+                    title="Elegirla no confirma el pedido ni cobra."
+                    name="city"
+                    required
+                    autoComplete="address-level2"
+                    value={city}
+                    disabled={!department || cities.length === 0}
+                    onChange={(event) => setCity(event.target.value)}
+                    className={selectClass}
+                  >
+                    <option value="">{department ? "Ciudad o municipio" : "Elige departamento"}</option>
+                    {cities.map((name) => (
+                      <option key={name} value={name}>
+                        {name}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              </div>
+              <div className="col-span-2 sm:col-span-4">
+                <Field label="Dirección" htmlFor="address" hint="Calle, carrera o detalle de entrega.">
                   <input
                     id="address"
-                    title="Escribirlo no confirma el pedido ni cobra."
+                    title="Escribirla no confirma el pedido ni cobra."
                     name="address"
                     required
                     autoComplete="street-address"
@@ -252,11 +278,11 @@ export function CheckoutScreen({ products }: { products: PublicProduct[] }) {
                   />
                 </Field>
               </div>
-              <div className="sm:col-span-2">
-                <Field label="Barrio o referencia" htmlFor="reference" hint="Opcional. No es un pago.">
+              <div className="col-span-2 sm:col-span-2">
+                <Field label="Barrio / ref." htmlFor="reference" hint="Opcional.">
                   <input
                     id="reference"
-                    title="Escribirlo no confirma el pedido ni cobra."
+                    title="Escribirla no confirma el pedido ni cobra."
                     name="reference"
                     autoComplete="off"
                     value={reference}
@@ -372,15 +398,18 @@ function Field({
   children: ReactNode;
 }) {
   return (
-    <div>
-      <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-semibold">
+    <div className="min-w-0">
+      <label htmlFor={htmlFor} className="mb-1 block text-xs font-semibold">
         {label}
       </label>
       {children}
-      {hint ? <p className="mt-1 text-xs text-muted">{hint}</p> : null}
+      {hint ? <p className="mt-1 text-[11px] leading-4 text-muted">{hint}</p> : null}
     </div>
   );
 }
 
 const inputClass =
-  "h-10 w-full rounded-[10px] border border-line bg-canvas px-3 text-sm focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none";
+  "h-9 w-full rounded-[10px] border border-line bg-canvas px-2.5 text-sm focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none";
+
+const selectClass =
+  `${inputClass} disabled:cursor-not-allowed disabled:opacity-55`;
