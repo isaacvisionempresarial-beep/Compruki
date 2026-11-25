@@ -1,5 +1,6 @@
 import { formatCop } from "@/lib/format";
 import {
+  needsBuyerNoteReview,
   orderDetailSectionHref,
   readyToCollect,
   readyToDeliver,
@@ -103,6 +104,18 @@ const AGENT_LABEL: Record<RoutedAgent, string> = {
 
 /** Pedidos que AG-01 muestra en la bandeja (atención + colas de operación). */
 export function pendingOrderApprovals(orders: StoreOrder[]): PendingApproval[] {
+  const buyerNotes = orders
+    .filter((order) => needsBuyerNoteReview(order))
+    .slice(0, 8)
+    .map((order) => ({
+      id: `aviso-${order.id}`,
+      kind: "pedido" as const,
+      label: order.number,
+      detail: `${order.customerName} · aviso del comprador sin leer (AG-07)`,
+      href: orderDetailSectionHref(order.number, "pedido-entrega"),
+      actionable: false,
+    }));
+
   const attention = orders
     .filter((order) => order.status === "pendiente_confirmacion" || order.status === "incidencia")
     .slice(0, 8)
@@ -169,7 +182,7 @@ export function pendingOrderApprovals(orders: StoreOrder[]): PendingApproval[] {
       actionable: false,
     }));
 
-  return [...attention, ...prepare, ...dispatch, ...deliver, ...collect];
+  return [...buyerNotes, ...attention, ...prepare, ...dispatch, ...deliver, ...collect];
 }
 
 /** AG-01 · list_pending_approvals (pedidos + borradores + corridas + preguntas + seguimientos). */

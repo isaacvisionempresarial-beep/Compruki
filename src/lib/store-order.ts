@@ -44,6 +44,8 @@ export type StoreOrder = {
   internalNote?: string;
   customerReason?: string;
   buyerNote?: string;
+  /** Cuándo el panel marcó que leyó el aviso del comprador. Se limpia si el cliente actualiza el aviso. */
+  buyerNoteSeenAt?: string;
   customerNotifiedAt?: string;
   actualShipping?: number;
   returnFreight?: number;
@@ -653,6 +655,7 @@ export function attentionQueueOrderHref(queueId: string, orderNumber: string) {
     "cola-motivo": "pedido-avisos",
     "cola-devolucion": "pedido-avisos",
     "cola-aviso": "pedido-avisos",
+    "cola-aviso-comprador": "pedido-entrega",
     "cola-resolver": "pedido-posventa",
     "cola-talla": "pedido-productos",
     "cola-departamento": "pedido-entrega",
@@ -1954,6 +1957,15 @@ export function attentionQueues(
     note: (order: StoreOrder) => string;
   }> = [
     {
+      id: "cola-aviso-comprador",
+      title: "Aviso del comprador",
+      hint: "El cliente dejó un texto en el pedido. Léelo y márcalo. No envía mensaje ni cambia el estado. El total guardado no cambia.",
+      short: "aviso comprador",
+      cta: "Marqué leído",
+      match: needsBuyerNoteReview,
+      note: (order) => buyerNoteQueueNote(order),
+    },
+    {
       id: "cola-confirmar",
       title: "Se pueden confirmar",
       hint: "Pendientes listos para confirmar. Puede faltar departamento o costo; no bloquean la confirmación. El total guardado no cambia.",
@@ -2187,6 +2199,9 @@ export function attentionSheetText(
     "Por atender · un pedido, un siguiente paso",
     "Esta lista no se recorta por fecha. Copiarla no cobra, no envía el mensaje y no cambia pedidos. Dropi no está conectado: desde aquí no se crea el pedido.",
   ];
+  if (queues.some((queue) => queue.rows.some((row) => row.cta === "Marqué leído"))) {
+    lines.push("Si el paso es leer el aviso del comprador, el texto va en ese pedido. Marcarlo no envía mensaje.");
+  }
   if (queues.some((queue) => queue.rows.some((row) => row.cta === "Marcar aviso"))) {
     lines.push("Si el paso es avisar, el mensaje va en ese pedido. Copiarlo no lo envía.");
   }
@@ -2226,6 +2241,10 @@ export function attentionSheetText(
         const costAside = attentionCostAside(row.note, row.order, costGuides, canManageOrderMoney);
         if (costAside) lines.push(costAside);
         lines.push(`Siguiente paso: ${row.cta}.`);
+        if (row.cta === "Marqué leído" && row.order.buyerNote?.trim()) {
+          lines.push("Aviso del comprador:");
+          lines.push(row.order.buyerNote.trim());
+        }
         if (row.cta === "Marcar aviso") {
           lines.push("Mensaje para copiar. Copiarlo no lo envía:");
           lines.push(customerMessage(row.order));
@@ -2743,6 +2762,24 @@ export function needsCustomerNotice(order: { status: OrderStatus; customerNotifi
   if (order.customerNotifiedAt) return false;
   if (cancelledByCustomer(order)) return false;
   return NOTICE_STATUS.includes(order.status);
+}
+
+/** Hay aviso del comprador sin marca de lectura en el panel. */
+export function needsBuyerNoteReview(
+  order: Pick<StoreOrder, "status" | "buyerNote" | "buyerNoteSeenAt" | "history">,
+) {
+  if (!order.buyerNote?.trim()) return false;
+  if (order.buyerNoteSeenAt) return false;
+  if (order.status === "cancelado") return false;
+  if (cancelledByCustomer(order)) return false;
+  return true;
+}
+
+export function buyerNoteQueueNote(order: Pick<StoreOrder, "buyerNote">) {
+  const text = order.buyerNote?.trim() ?? "";
+  if (!text) return "El cliente dejó un aviso. Léelo en el pedido. El total guardado no cambia.";
+  const clipped = text.length > 120 ? `${text.slice(0, 117).trimEnd()}…` : text;
+  return `${clipped} El total guardado no cambia.`;
 }
 
 const CUSTOMER_PATH: Array<{ status: OrderStatus; label: string }> = [

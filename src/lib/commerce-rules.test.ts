@@ -33,6 +33,7 @@ import {
   attentionQueues,
   attentionSheetText,
   attentionCostAside,
+  needsBuyerNoteReview,
   closePhrase,
   closeSheetText,
   ordersInSpan,
@@ -477,6 +478,27 @@ describe("cierre de pedidos", () => {
     });
     expect(attentionSheetText([blocked], [], true)).not.toContain("Hola Ana.");
   });
+
+  it("cola del aviso del comprador va primero y se marca leído", () => {
+    const withNote = order({
+      status: "pendiente_confirmacion",
+      number: "P-2030",
+      id: "ffffffff-ffff-4fff-8fff-ffffffffffff",
+      buyerNote: "Llamarme después de las 6",
+    });
+    expect(needsBuyerNoteReview(withNote)).toBe(true);
+    const queues = attentionQueues([withNote], [], true);
+    expect(queues[0]?.id).toBe("cola-aviso-comprador");
+    expect(queues[0]?.rows[0]?.cta).toBe("Marqué leído");
+    const sheet = attentionSheetText([withNote], [], true);
+    expect(sheet).toContain("Aviso del comprador (1)");
+    expect(sheet).toContain("Llamarme después de las 6");
+    expect(sheet).toContain("Siguiente paso: Marqué leído.");
+
+    const seen = order({ ...withNote, buyerNoteSeenAt: "2026-11-24T18:00:00.000Z" });
+    expect(needsBuyerNoteReview(seen)).toBe(false);
+    expect(attentionQueues([seen], [], true).some((queue) => queue.id === "cola-aviso-comprador")).toBe(false);
+  });
 });
 
 describe("precio de la ficha", () => {
@@ -511,7 +533,7 @@ describe("precio de la ficha", () => {
       id: "abababab-abab-4bab-8bab-abababababab",
     });
     const countedSheet = attentionSheetText([countedPrice], [], true, [{ sku: "SKU-1", price: 90_000 }]);
-    expect(countedSheet).toContain("Siguiente paso: Preparar.");
+    expect(countedSheet).toContain("Siguiente paso: Preparar paquete.");
     expect(countedSheet).toContain("No hay botón para reescribir ese precio");
     expect(countedSheet).toContain("Este pedido ya cuenta: el margen estimado y la utilidad siguen con el precio guardado.");
     expect(countedSheet).not.toContain("3001234567");
@@ -781,7 +803,7 @@ describe("precio de la ficha", () => {
       id: "66666666-6666-4666-8666-666666666666",
     });
     const mixed = attentionSheetText([ready], [], true, [], todayCost);
-    expect(mixed).toContain("Siguiente paso: Preparar.");
+    expect(mixed).toContain("Siguiente paso: Preparar paquete.");
     expect(mixed).toContain("También: costo de hoy.");
     expect(mixed).toContain("Si el costo va en También, no es el siguiente paso");
     expect(mixed).toContain("Ese costo no es el siguiente paso");
@@ -799,7 +821,7 @@ describe("precio de la ficha", () => {
       lines: [{ sku: "SKU-1", title: "Faja", unitPrice: 80_000, quantity: 1, unitShipping: 8_000, unitCommissions: 2_000 }],
     });
     const laterSheet = attentionSheetText([later], [], true, [], halfGuide);
-    expect(laterSheet).toContain("Siguiente paso: Preparar.");
+    expect(laterSheet).toContain("Siguiente paso: Preparar paquete.");
     expect(laterSheet).toContain("También: costo y cifras, costo de hoy.");
     expect(laterSheet).toContain("Ese costo no es el siguiente paso");
     expect(laterSheet).toContain("anotas lo que falta y reemplazas lo que ya no coincide");

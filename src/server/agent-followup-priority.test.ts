@@ -54,6 +54,20 @@ describe("buildFollowupPriorityTemplate", () => {
     expect(pack.via).toBe("plantilla");
     expect(pack.suggestions.some((item) => item.orderNumber === "PED-1001")).toBe(true);
   });
+
+  it("prioriza aviso del comprador sin leer", () => {
+    const withNote = [
+      {
+        ...orders[0],
+        status: "pendiente_confirmacion" as const,
+        buyerNote: "Preferencia de horario",
+      },
+      ...orders.slice(1),
+    ] as StoreOrder[];
+    const pack = buildFollowupPriorityTemplate(withNote);
+    const first = pack.suggestions.find((item) => item.orderNumber === "PED-1001");
+    expect(first?.reason).toMatch(/aviso/i);
+  });
 });
 
 describe("parseOpenAIFollowupPriority", () => {

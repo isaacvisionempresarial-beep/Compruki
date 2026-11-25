@@ -7,7 +7,7 @@ import { parsePesos } from "@/lib/catalog";
 import { assertPanelAccess } from "@/server/panel-auth";
 import { normalizePhone, ownerOnlyOrderIntent, type OrderAction } from "@/lib/store-order";
 import { syncQueueWithOrderIncident } from "@/server/dropi-connection";
-import { addOrderLine, applyCatalogCosts, applySkuCatalogCosts, markCustomerNotice, placeOrder, saveClosedDepartment, saveDelivery, saveFreight, saveIncidenceReason, saveInternalNote, saveOrderLines, saveProviderRef, saveReturnReason, updateOrder } from "@/server/order-store";
+import { addOrderLine, applyCatalogCosts, applySkuCatalogCosts, markBuyerNoteSeen, markCustomerNotice, placeOrder, saveClosedDepartment, saveDelivery, saveFreight, saveIncidenceReason, saveInternalNote, saveOrderLines, saveProviderRef, saveReturnReason, updateOrder } from "@/server/order-store";
 
 function refreshOrderScreens() {
   revalidatePath("/panel/pedidos");
@@ -403,6 +403,24 @@ export async function markCustomerNoticeAction(_state: UpdateOrderState, formDat
   const result = await markCustomerNotice(orderId, intent, access.actorName);
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudo anotar el aviso.", orderId };
+  }
+
+  refreshOrderScreens();
+  revalidatePath("/panel");
+  return { error: null, orderId };
+}
+
+export async function markBuyerNoteSeenAction(_state: UpdateOrderState, formData: FormData): Promise<UpdateOrderState> {
+  const orderId = String(formData.get("orderId") ?? "");
+  const access = await assertPanelAccess();
+  if (!access) {
+    return { error: "Tu sesión no permite anotar en este pedido.", orderId };
+  }
+
+  const intent = formData.get("intent") === "quitar" ? "quitar" : "leer";
+  const result = await markBuyerNoteSeen(orderId, intent, access.actorName);
+  if (result.error || !result.order) {
+    return { error: result.error ?? "No se pudo marcar el aviso del comprador.", orderId };
   }
 
   refreshOrderScreens();

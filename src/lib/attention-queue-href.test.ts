@@ -11,6 +11,7 @@ describe("attentionQueueOrderHref", () => {
     expect(attentionQueueOrderHref("cola-preparacion", "PED-2")).toContain("#pedido-preparar");
     expect(attentionQueueOrderHref("cola-resolver", "PED-2")).toContain("#pedido-posventa");
     expect(attentionQueueOrderHref("cola-motivo", "PED-2")).toContain("#pedido-avisos");
+    expect(attentionQueueOrderHref("cola-aviso-comprador", "PED-2")).toContain("#pedido-entrega");
   });
 
   it("cae en herramientas para despacho y cobro", () => {

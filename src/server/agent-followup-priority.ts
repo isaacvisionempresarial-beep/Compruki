@@ -1,6 +1,6 @@
 import { STATUS_LABEL } from "@/lib/demo-data";
 import type { StoreOrder } from "@/lib/store-order";
-import { needsCustomerNotice, needsIncidenceReason } from "@/lib/store-order";
+import { needsBuyerNoteReview, needsCustomerNotice, needsIncidenceReason } from "@/lib/store-order";
 import { listOrders } from "@/server/order-store";
 
 export type FollowupPrioritySource = "plantilla" | "openai";
@@ -46,7 +46,9 @@ function candidates(orders: StoreOrder[]): FollowupSuggestion[] {
   for (const order of orders) {
     if (["cancelado", "devuelto"].includes(order.status)) continue;
     let reason = "";
-    if (order.status === "incidencia") {
+    if (needsBuyerNoteReview(order)) {
+      reason = "El comprador dejó un aviso sin leer en el pedido.";
+    } else if (order.status === "incidencia") {
       reason = needsIncidenceReason(order)
         ? "Incidencia sin motivo anotado: conviene contactar."
         : "Incidencia abierta: avisar avance al cliente.";
@@ -131,6 +133,7 @@ export async function generateFollowupPriority(): Promise<FollowupPriority> {
         statusLabel: STATUS_LABEL[order.status],
         name: order.customerName.trim().slice(0, 40),
         needsNotice: needsCustomerNotice(order),
+        buyerNotePending: needsBuyerNoteReview(order),
         incidence: order.status === "incidencia",
       }));
 

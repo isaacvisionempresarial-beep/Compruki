@@ -449,6 +449,7 @@ export async function saveBuyerNoteByCustomer(id: string, token: string, raw: st
   };
   if (checked.value) order.buyerNote = checked.value;
   else delete order.buyerNote;
+  delete order.buyerNoteSeenAt;
   await writeOrders(orders.map((item) => (item.id === id ? order : item)));
   return { error: null, order };
 }
@@ -999,6 +1000,52 @@ export async function markCustomerNotice(id: string, intent: "avisar" | "quitar"
   return { error: null, order };
 }
 
+export async function markBuyerNoteSeen(id: string, intent: "leer" | "quitar", actorName: string) {
+  const orders = await readOrders();
+  const current = orders.find((order) => order.id === id);
+  if (!current) return { error: "No encontré ese pedido.", order: null };
+  if (!current.buyerNote?.trim()) {
+    return { error: "Este pedido no tiene aviso del comprador.", order: null };
+  }
+
+  if (intent === "quitar") {
+    if (!current.buyerNoteSeenAt) return { error: null, order: current };
+    const cleared: StoreOrder = { ...current };
+    delete cleared.buyerNoteSeenAt;
+    const order: StoreOrder = {
+      ...cleared,
+      history: [
+        {
+          id: `evt_${randomUUID().slice(0, 8)}`,
+          at: bogotaNow(),
+          actorName,
+          summary: keptTotalNote("Quitó la marca de lectura del aviso del comprador."),
+        },
+        ...current.history,
+      ],
+    };
+    await writeOrders(orders.map((item) => (item.id === id ? order : item)));
+    return { error: null, order };
+  }
+
+  if (current.buyerNoteSeenAt) return { error: null, order: current };
+  const order: StoreOrder = {
+    ...current,
+    buyerNoteSeenAt: bogotaNow(),
+    history: [
+      {
+        id: `evt_${randomUUID().slice(0, 8)}`,
+        at: bogotaNow(),
+        actorName,
+        summary: keptTotalNote("Marcó que leyó el aviso del comprador. El aviso sigue en el pedido."),
+      },
+      ...current.history,
+    ],
+  };
+  await writeOrders(orders.map((item) => (item.id === id ? order : item)));
+  return { error: null, order };
+}
+
 function invalidPesos(value: number | null) {
   return value !== null && (!Number.isInteger(value) || value < 0 || value > 5_000_000);
 }
@@ -1019,6 +1066,10 @@ async function readOrders() {
     buyerNote:
       typeof order.buyerNote === "string" && order.buyerNote.trim() && order.buyerNote.trim().replace(/\s+/g, " ").length <= 160
         ? order.buyerNote.trim().replace(/\s+/g, " ")
+        : undefined,
+    buyerNoteSeenAt:
+      typeof order.buyerNoteSeenAt === "string" && /^\d{4}-\d{2}-\d{2}T/.test(order.buyerNoteSeenAt)
+        ? order.buyerNoteSeenAt
         : undefined,
     customerNotifiedAt: typeof order.customerNotifiedAt === "string" && /^\d{4}-\d{2}-\d{2}T/.test(order.customerNotifiedAt) ? order.customerNotifiedAt : undefined,
     history: Array.isArray(order.history) ? order.history : [],

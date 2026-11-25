@@ -50,6 +50,7 @@ import {
   missingSizeNote,
   missingSizeQueueNote,
   needsCatalogCost,
+  needsBuyerNoteReview,
   needsCustomerNotice,
   needsClosedDropiNumber,
   needsIncidenceDropiNumber,
@@ -104,7 +105,7 @@ import {
   type SizeGuide,
 } from "@/lib/store-order";
 import type { OrderableProduct } from "@/server/catalog-store";
-import { addOrderLineAction, applyCatalogCostAction, markCustomerNoticeAction, saveClosedDepartmentAction, saveDeliveryAction, saveFreightAction, saveIncidenceReasonAction, saveInternalNoteAction, saveOrderLinesAction, saveReturnReasonAction, updateOrderAction, type UpdateOrderState } from "@/server/store-actions";
+import { addOrderLineAction, applyCatalogCostAction, markBuyerNoteSeenAction, markCustomerNoticeAction, saveClosedDepartmentAction, saveDeliveryAction, saveFreightAction, saveIncidenceReasonAction, saveInternalNoteAction, saveOrderLinesAction, saveReturnReasonAction, updateOrderAction, type UpdateOrderState } from "@/server/store-actions";
 
 const initialState: UpdateOrderState = { error: null, orderId: null };
 
@@ -921,12 +922,7 @@ export function OrderEditor({
             </ul>
           </div>
         ) : null}
-        {order.buyerNote ? (
-          <p className="mt-3 text-sm leading-5">
-            <span className="font-semibold">Aviso del cliente. </span>
-            {order.buyerNote}
-          </p>
-        ) : null}
+        {order.buyerNote ? <BuyerNoteReview order={order} /> : null}
         {canEditDelivery(order) ? <DeliveryForm order={order} /> : null}
         {needsClosedDepartment(order) ? <ClosedDepartmentForm order={order} /> : null}
       </section>
@@ -1116,7 +1112,7 @@ function StatusFilter({
 
 function matchesOrder(order: StoreOrder, query: string, guides: SizeGuide[], priceGuides: PriceGuide[] = [], costGuides: CostGuide[] = []) {
   if (!query) return true;
-  return [orderPriceStayNote(order, priceGuides), costDriftNote(costDrift(order, costGuides)), orderCostCopyNote(order, costGuides), priceDrift(order, priceGuides).length > 0 || costDrift(order, costGuides).length > 0 ? accountHoldNote(order.status) : "", order.number, order.customerName, order.city, order.department ?? "", order.phone, order.document ?? "", order.address, order.reference, order.providerRef ?? "", order.internalNote ?? "", order.customerReason ?? "", order.buyerNote ?? "", order.customerNotifiedAt ? "avisé" : "", order.campaignEntry ? "campaña" : "", awaitsDropiNumber(order) || needsClosedDropiNumber(order) || needsIncidenceDropiNumber(order) ? "dropi" : "", needsDepartment(order) || needsClosedDepartment(order) ? "departamento" : "", missingSizeNote(order, guides), catalogCostQueueNote(order), collectedWithoutCost(order) ? "utilidad" : "", needsCustomerNotice(order) ? "avisar aviso" : "", needsIncidenceReason(order) ? "motivo incidencia" : "", needsReturnReason(order) ? "motivo devolución" : "", needsReturnFreight(order) ? "flete devolución" : "", readyToConfirm(order, guides) ? "confirmar" : "", readyToPrepare(order) ? "preparación preparar" : "", readyToDispatch(order) ? "despacho preparación" : "", ...order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""])].some(
+  return [orderPriceStayNote(order, priceGuides), costDriftNote(costDrift(order, costGuides)), orderCostCopyNote(order, costGuides), priceDrift(order, priceGuides).length > 0 || costDrift(order, costGuides).length > 0 ? accountHoldNote(order.status) : "", order.number, order.customerName, order.city, order.department ?? "", order.phone, order.document ?? "", order.address, order.reference, order.providerRef ?? "", order.internalNote ?? "", order.customerReason ?? "", order.buyerNote ?? "", order.customerNotifiedAt ? "avisé" : "", order.buyerNoteSeenAt ? "leí aviso" : "", order.campaignEntry ? "campaña" : "", awaitsDropiNumber(order) || needsClosedDropiNumber(order) || needsIncidenceDropiNumber(order) ? "dropi" : "", needsDepartment(order) || needsClosedDepartment(order) ? "departamento" : "", missingSizeNote(order, guides), catalogCostQueueNote(order), collectedWithoutCost(order) ? "utilidad" : "", needsBuyerNoteReview(order) ? "aviso comprador cliente" : "", needsCustomerNotice(order) ? "avisar aviso" : "", needsIncidenceReason(order) ? "motivo incidencia" : "", needsReturnReason(order) ? "motivo devolución" : "", needsReturnFreight(order) ? "flete devolución" : "", readyToConfirm(order, guides) ? "confirmar" : "", readyToPrepare(order) ? "preparación preparar" : "", readyToDispatch(order) ? "despacho preparación" : "", ...order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""])].some(
     (value) => value.toLocaleLowerCase("es").includes(query),
   );
 }
@@ -2238,6 +2234,50 @@ function InternalNoteForm({ order }: { order: StoreOrder }) {
         </button>
       </FormTools>
     </form>
+  );
+}
+
+function BuyerNoteReview({ order }: { order: StoreOrder }) {
+  const [state, action, pending] = useActionState(markBuyerNoteSeenAction, initialState);
+  const seen = Boolean(order.buyerNoteSeenAt);
+  return (
+    <div className="mt-3 grid gap-2 rounded-[10px] border border-line bg-canvas px-3 py-2">
+      <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Comprador</p>
+      <p className="text-sm leading-5">
+        <span className="font-semibold">Aviso del cliente. </span>
+        {order.buyerNote}
+      </p>
+      <form action={action} className="grid gap-2">
+        <input type="hidden" name="orderId" value={order.id} />
+        <input type="hidden" name="intent" value={seen ? "quitar" : "leer"} />
+        {seen ? (
+          <p className="text-sm leading-5 text-ink">
+            Lo marcaste leído el {formatDay(order.buyerNoteSeenAt?.slice(0, 10) ?? "")}. Si quitas la marca, vuelve a Por
+            atender. No envía mensaje. El total guardado no cambia.
+          </p>
+        ) : (
+          <p className="text-sm leading-5 text-ink">
+            Márcalo cuando lo hayas leído. Sale de Por atender. No envía mensaje ni cambia el estado. El total guardado
+            no cambia.
+          </p>
+        )}
+        {state.orderId === order.id && state.error ? (
+          <p role="alert" className="text-sm font-semibold text-danger">
+            {state.error}
+          </p>
+        ) : null}
+        <FormTools>
+          <button
+            type="submit"
+            title="No envía mensaje ni cobra. El total guardado no cambia."
+            disabled={pending}
+            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold disabled:cursor-wait"
+          >
+            {seen ? "Quitar lectura" : "Marqué leído"}
+          </button>
+        </FormTools>
+      </form>
+    </div>
   );
 }
 
