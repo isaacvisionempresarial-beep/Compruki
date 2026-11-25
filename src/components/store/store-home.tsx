@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { PublicProduct } from "@/server/catalog-store";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { PhotoCarousel } from "@/components/photo-carousel";
 import { CatalogPhoto } from "@/components/store/product-thumb";
 import { formatCop } from "@/lib/format";
@@ -74,13 +75,10 @@ export function StoreHome({
         <div className="store-hero-glow" aria-hidden="true" />
         <div className="relative grid gap-5 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] sm:items-stretch sm:gap-6 sm:p-5 lg:gap-8">
           <div className="flex min-w-0 flex-col justify-center">
-            <p
-              id="tienda-marca"
-              className="store-display text-[12px] font-bold tracking-[0.14em] text-accent-strong uppercase"
-            >
-              COMPRUKI
-            </p>
-            <p className="mt-1.5 text-sm font-semibold text-ink">{identity.name}</p>
+            <div id="tienda-marca">
+              <BrandLogo className="h-9 max-w-[12rem] sm:h-10 sm:max-w-[14rem]" priority />
+            </div>
+            <p className="mt-2 text-sm font-semibold text-ink">{identity.name}</p>
             <h1 className="store-display mt-2.5 max-w-[12ch] text-[2.35rem] leading-[0.98] font-extrabold tracking-[-0.045em] text-ink sm:text-[3rem]">
               Pagas al recibir
             </h1>

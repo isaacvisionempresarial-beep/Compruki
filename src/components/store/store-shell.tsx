@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { Wordmark } from "@/components/brand/wordmark";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { Icon } from "@/components/icons";
 import { useCart } from "@/components/store/cart-state";
 import { cx } from "@/lib/cx";
@@ -54,9 +54,9 @@ export function StoreShell({
             target="_self"
             title="Ir al inicio no registra pedido ni cobra."
             className="min-w-0 rounded-[10px]"
-            aria-label="COMPRUKI, inicio de la tienda"
+            aria-label="COMPRUKÍ, inicio de la tienda"
           >
-            <Wordmark className="[&_span]:store-display [&_span]:text-[15px]" />
+            <BrandLogo className="h-8 max-w-[10.5rem]" priority />
             {identity?.name ? (
               <span className="mt-0.5 block truncate text-[11px] font-semibold text-muted">{identity.name}</span>
             ) : null}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { PublicProduct } from "@/server/catalog-store";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { sizeChoiceLabel, variantFits } from "@/lib/catalog";
 import { CatalogPhoto } from "@/components/store/product-thumb";
 import { useCart } from "@/components/store/cart-state";
@@ -68,8 +69,9 @@ export function CartScreen({ products }: { products: PublicProduct[] }) {
         </div>
         <div className="relative z-10 flex flex-col gap-4 p-4 sm:flex-row sm:items-end sm:justify-between sm:p-5">
           <div className="min-w-0 max-w-md">
-            <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Tu selección</p>
-            <h1 className="store-display mt-1.5 text-[1.85rem] leading-tight font-extrabold tracking-[-0.03em]">Carrito</h1>
+            <BrandLogo className="h-8 max-w-[11rem]" />
+            <p className="mt-2 text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Tu selección</p>
+            <h1 className="store-display mt-1 text-[1.85rem] leading-tight font-extrabold tracking-[-0.03em]">Carrito</h1>
             <p className="mt-1.5 text-sm leading-5 text-muted">
               Precios publicados · Pagas al recibir · Envío aparte. Todavía no es un pedido.
             </p>
