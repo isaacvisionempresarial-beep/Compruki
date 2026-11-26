@@ -1,7 +1,39 @@
 "use client";
 
-import { useState } from "react";
-import { attentionSheetText, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import {
+  attentionQueueOrderHref,
+  attentionQueues,
+  attentionRowCopyText,
+  attentionSheetText,
+  type CostGuide,
+  type PriceGuide,
+  type SizeGuide,
+  type StoreOrder,
+} from "@/lib/store-order";
+
+async function copyText(text: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    try {
+      const area = document.createElement("textarea");
+      area.value = text;
+      area.setAttribute("readonly", "");
+      area.style.position = "fixed";
+      area.style.left = "-9999px";
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(area);
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+}
 
 export function AttentionSheet({
   orders,
@@ -16,73 +48,143 @@ export function AttentionSheet({
   costGuides?: CostGuide[];
   canManageOrderMoney: boolean;
 }) {
-  const text = attentionSheetText(orders, guides, canManageOrderMoney, priceGuides, costGuides);
-  const [copied, setCopied] = useState<"ok" | "fail" | null>(null);
+  const queues = useMemo(
+    () => attentionQueues(orders, guides, canManageOrderMoney, costGuides),
+    [orders, guides, canManageOrderMoney, costGuides],
+  );
+  const fullText = useMemo(
+    () => attentionSheetText(orders, guides, canManageOrderMoney, priceGuides, costGuides),
+    [orders, guides, canManageOrderMoney, priceGuides, costGuides],
+  );
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [failedId, setFailedId] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
 
-  function copy() {
-    const node = document.getElementById("hoja-atender");
-    if (!(node instanceof HTMLTextAreaElement)) return;
-    node.focus();
-    node.select();
-    let copiedByCommand = false;
-    try {
-      copiedByCommand = document.execCommand("copy");
-    } catch {
-      copiedByCommand = false;
-    }
-    if (copiedByCommand) {
-      setCopied("ok");
-      return;
-    }
-    void navigator.clipboard.writeText(text).then(
-      () => setCopied("ok"),
-      () => setCopied("fail"),
-    );
+  async function copy(id: string, text: string) {
+    const ok = await copyText(text);
+    setCopiedId(ok ? id : null);
+    setFailedId(ok ? null : id);
   }
+
+  const totalRows = queues.reduce((sum, queue) => sum + queue.rows.length, 0);
 
   return (
     <section className="mt-3" aria-labelledby="hoja-atender-titulo">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Copia</p>
       <h3 id="hoja-atender-titulo" className="mt-0.5 text-sm font-semibold">
-        Por atender para copiar
+        Por atender · copiar a mano
       </h3>
       <p className="mt-0.5 text-xs leading-5 text-muted">
-        La misma cola, sin recorte de fecha. Si el paso es avisar, trae el mensaje. Si es anotar el número o el despacho, trae el texto para Dropi, con celular y dirección. Si la ficha de hoy no es el precio guardado, van los dos montos. Si el paso es usar las cifras de hoy, copiar esta lista no las guarda. Copiarla no envía el mensaje, no reescribe el precio y no crea el pedido.
+        Esto no es la lista de trabajo (esa está arriba). Aquí solo preparas texto para pegar en WhatsApp o Dropi.
+        Copia <span className="font-semibold text-ink">un pedido</span> o, si lo necesitas, toda la cola.
+        No envía mensajes ni crea el pedido en Dropi.
       </p>
-      <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
-        <label className="text-sm font-semibold" htmlFor="hoja-atender">
-          Texto de la cola
-          <textarea
-            id="hoja-atender"
-            title="Leerlo no envía el mensaje ni cambia el total guardado."
-            readOnly
-            rows={8}
-            value={text}
-            className="mt-1 min-h-32 w-full rounded-[10px] border border-line bg-canvas px-3 py-2 text-sm leading-5 font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
-          />
-        </label>
-        <nav aria-label="Consulta" className="mt-2 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
-          <button
-            type="button"
-            title="Copiar no envía el mensaje ni cambia el total guardado. No crea el pedido en Dropi."
-            className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
-            onClick={copy}
-          >
-            {copied === "ok" ? "Cola copiada" : "Copiar cola"}
-          </button>
-        </nav>
-        {copied === "ok" ? (
-          <p role="status" className="mt-2 text-sm text-accent-strong">
-            Lista para pegarla a mano. No envía el mensaje. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
-          </p>
-        ) : null}
-        {copied === "fail" ? (
-          <p role="alert" className="mt-2 text-sm font-semibold text-danger">
-            No se pudo copiar. El texto queda seleccionado. No cobra. El total guardado no cambia.
-          </p>
-        ) : null}
-      </div>
+
+      {totalRows === 0 ? (
+        <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vacío</p>
+          <p className="mt-0.5 text-sm text-muted">No hay pedidos esperando un dato o una herramienta.</p>
+        </div>
+      ) : (
+        <div className="mt-2 space-y-3">
+          {queues.map((queue) => (
+            <div key={queue.id} className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2.5">
+              <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Paso</p>
+              <p className="mt-0.5 text-sm font-semibold">
+                {queue.title} ({queue.rows.length})
+              </p>
+              <ul className="mt-2 space-y-2">
+                {queue.rows.map((row) => {
+                  const id = `${queue.id}:${row.order.id}`;
+                  const text = attentionRowCopyText(
+                    queue.title,
+                    row,
+                    canManageOrderMoney,
+                    priceGuides,
+                    costGuides,
+                  );
+                  return (
+                    <li
+                      key={id}
+                      className="rounded-[12px] border border-line bg-canvas px-3 py-2.5"
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-sm font-bold">{row.order.number}</p>
+                          <p className="mt-0.5 text-sm font-semibold">{row.order.customerName}</p>
+                          <p className="mt-0.5 text-xs text-muted">
+                            {[row.order.city, row.order.department].filter(Boolean).join(" · ")}
+                          </p>
+                          <p className="mt-1.5 text-xs leading-5 text-warning">{row.note}</p>
+                          <p className="mt-1 text-xs font-semibold text-primary">Siguiente: {row.cta}</p>
+                        </div>
+                        <div className="flex shrink-0 flex-wrap gap-2">
+                          <Link
+                            href={attentionQueueOrderHref(queue.id, row.order.number)}
+                            className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold hover:bg-subtle"
+                          >
+                            Abrir
+                          </Link>
+                          <button
+                            type="button"
+                            title="Copia solo este pedido. No envía ni crea Dropi."
+                            className="inline-flex h-9 items-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark"
+                            onClick={() => void copy(id, text)}
+                          >
+                            {copiedId === id ? "Copiado" : "Copiar este"}
+                          </button>
+                        </div>
+                      </div>
+                      {failedId === id ? (
+                        <p role="alert" className="mt-2 text-sm font-semibold text-danger">
+                          No se pudo copiar. Intenta de nuevo.
+                        </p>
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+
+          <div className="elevate-1 rounded-[14px] border border-dashed border-line bg-card px-3 py-2.5">
+            <p className="text-sm font-semibold">¿Necesitas pegar toda la cola de una vez?</p>
+            <p className="mt-0.5 text-xs leading-5 text-muted">
+              Solo si vas a pegar el listado completo en otro lado. Con muchos pedidos conviene copiar uno por uno.
+            </p>
+            <nav aria-label="Cola completa" className="mt-2 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold hover:bg-subtle"
+                onClick={() => void copy("all", fullText)}
+              >
+                {copiedId === "all" ? "Cola completa copiada" : "Copiar cola completa"}
+              </button>
+              <button
+                type="button"
+                className="inline-flex h-9 items-center rounded-[10px] px-3 text-sm font-semibold text-muted underline-offset-2 hover:underline"
+                onClick={() => setShowAll((value) => !value)}
+              >
+                {showAll ? "Ocultar texto" : "Ver texto completo"}
+              </button>
+            </nav>
+            {showAll ? (
+              <textarea
+                readOnly
+                rows={8}
+                value={fullText}
+                title="Leerlo no envía el mensaje ni cambia el total guardado."
+                className="mt-2 min-h-32 w-full rounded-[10px] border border-line bg-canvas px-3 py-2 text-sm leading-5 text-ink focus:border-accent focus:outline-none"
+              />
+            ) : null}
+            {failedId === "all" ? (
+              <p role="alert" className="mt-2 text-sm font-semibold text-danger">
+                No se pudo copiar. Intenta de nuevo.
+              </p>
+            ) : null}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

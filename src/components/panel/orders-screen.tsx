@@ -1128,39 +1128,32 @@ function emptyListMessage(query: string, status: OrderStatus | "todos", span: Or
 function DispatchSheet({ orders, moved }: { orders: StoreOrder[]; moved: boolean }) {
   const rows = dispatchSheetOrders(orders);
   const text = dispatchSheetText(rows);
-  const [copied, setCopied] = useState<"ok" | "fail" | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [failedId, setFailedId] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
 
-  function copy() {
-    const node = document.getElementById("hoja-despacho");
-    if (!(node instanceof HTMLTextAreaElement)) return;
-    node.focus();
-    node.select();
-    let copiedByCommand = false;
+  async function copy(id: string, value: string) {
     try {
-      copiedByCommand = document.execCommand("copy");
+      await navigator.clipboard.writeText(value);
+      setCopiedId(id);
+      setFailedId(null);
     } catch {
-      copiedByCommand = false;
+      setCopiedId(null);
+      setFailedId(id);
     }
-    if (copiedByCommand) {
-      setCopied("ok");
-      return;
-    }
-    void navigator.clipboard.writeText(text).then(
-      () => setCopied("ok"),
-      () => setCopied("fail"),
-    );
   }
 
   return (
     <section className="mt-5" aria-labelledby="hoja-despacho-titulo">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Despacho</p>
       <h2 id="hoja-despacho-titulo" className="mt-0.5 text-base font-bold">
-        Hoja para copiar ({rows.length})
+        Datos para Dropi ({rows.length})
       </h2>
       <p className="mt-0.5 text-xs leading-5 text-muted">
         {moved
-          ? "Confirmados, en preparación o en despacho que se movieron en este período. El total guardado es el del pedido. Copiarla no crea el pedido en Dropi ni lo cambia."
-          : "Confirmados, en preparación o en despacho de este período. Copiarla no crea el pedido en Dropi ni cambia el total guardado."}
+          ? "Confirmados, en preparación o en despacho movidos en este período. Copia un pedido (nombre, celular, dirección) para pegarlo en Dropi a mano."
+          : "Confirmados, en preparación o en despacho de este período. Copia un pedido para pegarlo en Dropi a mano."}{" "}
+        No crea el pedido en Dropi ni cambia el total guardado.
       </p>
       {rows.length === 0 ? (
         <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
@@ -1170,39 +1163,89 @@ function DispatchSheet({ orders, moved }: { orders: StoreOrder[]; moved: boolean
           </p>
         </div>
       ) : (
-        <div className="elevate-1 mt-2 rounded-[14px] border border-line bg-card px-3 py-2">
-          <label className="text-sm font-semibold" htmlFor="hoja-despacho">
-            Texto de {rows.length === 1 ? "1 pedido" : `${rows.length} pedidos`}
-            <textarea
-              id="hoja-despacho"
-              title="Leerlo no envía el pedido ni cobra. El total guardado no cambia."
-              readOnly
-              rows={8}
-              value={text}
-              className="mt-1 min-h-32 w-full rounded-[10px] border border-line bg-canvas px-3 py-2 text-sm leading-5 font-normal text-ink focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,199,165,0.12)] focus:outline-none"
-            />
-          </label>
-          <nav aria-label="Consulta" className="mt-2 flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</span>
-            <button
-              type="button"
-              title="Copiar no crea el pedido en Dropi ni cambia el total guardado."
-              className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
-              onClick={copy}
-            >
-              {copied === "ok" ? "Hoja copiada" : "Copiar hoja"}
-            </button>
-          </nav>
-          {copied === "ok" ? (
-            <p role="status" className="mt-2 text-sm text-accent-strong">
-              Lista para pegarla a mano. Dropi no está conectado: desde aquí no se crea el pedido ni cambia el total guardado.
+        <div className="mt-2 space-y-2">
+          <ul className="space-y-2">
+            {rows.map((order) => {
+              const handoff = dropiHandoffText(order);
+              return (
+                <li key={order.id} className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2.5">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold">{order.number}</p>
+                      <p className="mt-0.5 text-sm font-semibold">{order.customerName}</p>
+                      <p className="mt-0.5 text-xs text-muted">
+                        {order.phone}
+                        {" · "}
+                        {[order.city, order.department].filter(Boolean).join(" · ")}
+                      </p>
+                      <p className="mt-1 text-xs leading-5 text-muted">
+                        {order.address}
+                        {order.reference ? ` · ${order.reference}` : ""}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                      <Link
+                        href={orderFocusHref(order.number)}
+                        className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold hover:bg-subtle"
+                      >
+                        Abrir
+                      </Link>
+                      <button
+                        type="button"
+                        title="Copia datos de este pedido para Dropi. No crea el pedido."
+                        className="inline-flex h-9 items-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark"
+                        onClick={() => void copy(order.id, handoff)}
+                      >
+                        {copiedId === order.id ? "Copiado" : "Copiar este"}
+                      </button>
+                    </div>
+                  </div>
+                  {failedId === order.id ? (
+                    <p role="alert" className="mt-2 text-sm font-semibold text-danger">
+                      No se pudo copiar. Intenta de nuevo.
+                    </p>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+          <div className="elevate-1 rounded-[14px] border border-dashed border-line bg-card px-3 py-2.5">
+            <p className="text-sm font-semibold">¿Pegar todos juntos?</p>
+            <p className="mt-0.5 text-xs leading-5 text-muted">
+              Opcional. Con muchos pedidos es más claro copiar uno por uno.
             </p>
-          ) : null}
-          {copied === "fail" ? (
-            <p role="alert" className="mt-2 text-sm font-semibold text-danger">
-              No se pudo copiar. El texto queda seleccionado. No cobra. El total guardado no cambia.
-            </p>
-          ) : null}
+            <nav aria-label="Hoja completa" className="mt-2 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold hover:bg-subtle"
+                onClick={() => void copy("all", text)}
+              >
+                {copiedId === "all" ? "Hoja completa copiada" : "Copiar todos"}
+              </button>
+              <button
+                type="button"
+                className="inline-flex h-9 items-center rounded-[10px] px-3 text-sm font-semibold text-muted underline-offset-2 hover:underline"
+                onClick={() => setShowAll((value) => !value)}
+              >
+                {showAll ? "Ocultar texto" : "Ver texto completo"}
+              </button>
+            </nav>
+            {showAll ? (
+              <textarea
+                id="hoja-despacho"
+                readOnly
+                rows={8}
+                value={text}
+                title="Leerlo no envía el pedido ni cobra. El total guardado no cambia."
+                className="mt-2 min-h-32 w-full rounded-[10px] border border-line bg-canvas px-3 py-2 text-sm leading-5 text-ink focus:border-accent focus:outline-none"
+              />
+            ) : null}
+            {failedId === "all" ? (
+              <p role="alert" className="mt-2 text-sm font-semibold text-danger">
+                No se pudo copiar. Intenta de nuevo.
+              </p>
+            ) : null}
+          </div>
         </div>
       )}
     </section>

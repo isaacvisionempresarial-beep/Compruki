@@ -2243,36 +2243,51 @@ export function attentionSheetText(
     for (const queue of queues) {
       lines.push(`${queue.title} (${queue.rows.length})`);
       for (const row of queue.rows) {
-        const place = [row.order.city, row.order.department].filter(Boolean).join(" · ");
-        lines.push(`${row.order.number} · ${row.order.customerName}${place ? ` · ${place}` : ""}`);
-        lines.push(row.note);
-        if (row.also.length > 0) lines.push(`También: ${row.also.join(", ")}.`);
-        const costAside = attentionCostAside(row.note, row.order, costGuides, canManageOrderMoney);
-        if (costAside) lines.push(costAside);
-        lines.push(`Siguiente paso: ${row.cta}.`);
-        if (row.cta === "Marqué leído" && row.order.buyerNote?.trim()) {
-          lines.push("Aviso del comprador:");
-          lines.push(row.order.buyerNote.trim());
-        }
-        if (row.cta === "Marcar aviso") {
-          lines.push("Mensaje para copiar. Copiarlo no lo envía:");
-          lines.push(customerMessage(row.order));
-        }
-        if (row.cta === "Anotar número" || row.cta === "Anotar despacho") {
-          lines.push("Texto para Dropi. Copiarlo no crea el pedido:");
-          lines.push(dropiHandoffText(row.order));
-        }
-        const drift = orderPriceStayNote(row.order, priceGuides);
-        if (drift) lines.push(drift);
-        const costNote = costDriftNote(costDrift(row.order, costGuides));
-        if (costNote) lines.push(costNote);
-        if ((drift || costNote) && accountHoldNote(row.order.status)) lines.push(accountHoldNote(row.order.status));
+        lines.push(attentionRowCopyText(queue.title, row, canManageOrderMoney, priceGuides, costGuides));
+        lines.push("");
       }
-      lines.push("");
     }
   }
   lines.push("Copiar no cobra. El total guardado no cambia. No envía el mensaje.");
   return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+/** Texto de un solo pedido de la cola Por atender, para copiar a mano. */
+export function attentionRowCopyText(
+  queueTitle: string,
+  row: { order: StoreOrder; note: string; also: string[]; cta: string },
+  canManageOrderMoney = true,
+  priceGuides: PriceGuide[] = [],
+  costGuides: CostGuide[] = [],
+) {
+  const place = [row.order.city, row.order.department].filter(Boolean).join(" · ");
+  const lines = [
+    queueTitle,
+    `${row.order.number} · ${row.order.customerName}${place ? ` · ${place}` : ""}`,
+    row.note,
+  ];
+  if (row.also.length > 0) lines.push(`También: ${row.also.join(", ")}.`);
+  const costAside = attentionCostAside(row.note, row.order, costGuides, canManageOrderMoney);
+  if (costAside) lines.push(costAside);
+  lines.push(`Siguiente paso: ${row.cta}.`);
+  if (row.cta === "Marqué leído" && row.order.buyerNote?.trim()) {
+    lines.push("Aviso del comprador:");
+    lines.push(row.order.buyerNote.trim());
+  }
+  if (row.cta === "Marcar aviso") {
+    lines.push("Mensaje para copiar. Copiarlo no lo envía:");
+    lines.push(customerMessage(row.order));
+  }
+  if (row.cta === "Anotar número" || row.cta === "Anotar despacho") {
+    lines.push("Texto para Dropi. Copiarlo no crea el pedido:");
+    lines.push(dropiHandoffText(row.order));
+  }
+  const drift = orderPriceStayNote(row.order, priceGuides);
+  if (drift) lines.push(drift);
+  const costNote = costDriftNote(costDrift(row.order, costGuides));
+  if (costNote) lines.push(costNote);
+  if ((drift || costNote) && accountHoldNote(row.order.status)) lines.push(accountHoldNote(row.order.status));
+  return lines.join("\n").trim();
 }
 
 const RESULT_PERIODS: Period[] = ["hoy", "7d", "30d"];
