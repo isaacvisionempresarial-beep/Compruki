@@ -388,6 +388,9 @@ function ProfileCard({
         <Link href="/tienda/pagar" className="font-semibold underline-offset-2 hover:underline">
           Ir a pagar
         </Link>
+        <Link href="/tienda/privacidad" className="font-semibold underline-offset-2 hover:underline">
+          Privacidad
+        </Link>
       </div>
     </section>
   );

@@ -136,6 +136,13 @@ export function LookupScreen() {
           >
             Condiciones
           </Link>
+          <Link
+            href="/tienda/privacidad"
+            title="Leerla no registra pedido ni cobra."
+            className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+          >
+            Privacidad
+          </Link>
         </nav>
     </div>
   );
