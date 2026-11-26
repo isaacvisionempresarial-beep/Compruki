@@ -17,6 +17,8 @@ export type TeamMember = {
   roleId: string | null;
   roleKey: string;
   roleLabel: string;
+  inviteStatus: "pending" | "active";
+  invitedAt: string | null;
   createdAt: string;
 };
 
@@ -71,12 +73,29 @@ export async function listTeamMembers(tenantId: string): Promise<TeamMember[]> {
   const admin = createAdminSupabase();
   const { data, error } = await admin
     .from("memberships")
-    .select("id, user_id, role, role_id, created_at")
+    .select("id, user_id, role, role_id, created_at, invite_status, invited_email, invited_at")
     .eq("tenant_id", tenantId)
     .order("created_at", { ascending: true });
-  if (error) throw new Error(error.message);
+  if (error) {
+    // Sin columnas 021: select legacy
+    const legacy = await admin
+      .from("memberships")
+      .select("id, user_id, role, role_id, created_at")
+      .eq("tenant_id", tenantId)
+      .order("created_at", { ascending: true });
+    if (legacy.error) throw new Error(legacy.error.message);
+    return mapMembers(tenantId, legacy.data ?? [], true);
+  }
 
-  const rows = data ?? [];
+  return mapMembers(tenantId, data ?? [], false);
+}
+
+async function mapMembers(
+  tenantId: string,
+  rows: Array<Record<string, unknown>>,
+  legacy: boolean,
+): Promise<TeamMember[]> {
+  const admin = createAdminSupabase();
   const roles = await listTeamRoles(tenantId);
   const roleById = new Map(roles.map((role) => [role.id, role]));
   const roleByKey = new Map(roles.map((role) => [role.key, role]));
@@ -90,14 +109,28 @@ export async function listTeamMembers(tenantId: string): Promise<TeamMember[]> {
       (row.role_id ? roleById.get(String(row.role_id)) : null) ||
       roleByKey.get(row.role === "owner" ? "owner" : "operator") ||
       null;
+    const emailConfirmed = Boolean(user?.email_confirmed_at || user?.last_sign_in_at);
+    const storedStatus = String(row.invite_status || "active");
+    let inviteStatus: "pending" | "active" =
+      !legacy && storedStatus === "pending" && !emailConfirmed ? "pending" : "active";
+    if (!legacy && storedStatus === "pending" && emailConfirmed) {
+      inviteStatus = "active";
+      try {
+        await admin.from("memberships").update({ invite_status: "active" }).eq("id", String(row.id));
+      } catch {
+        /* ignore */
+      }
+    }
     members.push({
       membershipId: String(row.id),
       userId,
-      email: user?.email ?? "",
-      name: user ? panelActorName(user) : "Usuario",
+      email: user?.email || String(row.invited_email || ""),
+      name: user ? panelActorName(user) : String(row.invited_email || "Invitado"),
       roleId: role?.id ?? (row.role_id ? String(row.role_id) : null),
       roleKey: role?.key ?? (row.role === "owner" ? "owner" : "operator"),
       roleLabel: role?.label ?? (row.role === "owner" ? "Propietario" : "Operador"),
+      inviteStatus,
+      invitedAt: row.invited_at ? String(row.invited_at) : null,
       createdAt: String(row.created_at),
     });
   }
@@ -262,21 +295,89 @@ export async function inviteTeamMember(
   }
 
   const mirrorRole = role.key === "owner" ? "owner" : "operator";
-  const { data: membership, error: membershipError } = await admin
-    .from("memberships")
-    .insert({
-      tenant_id: tenantId,
-      user_id: userId,
-      role: mirrorRole,
-      role_id: role.id,
-    })
-    .select("id")
-    .maybeSingle();
+  const inviteStatus = invited ? "pending" : "active";
+  const basePayload = {
+    tenant_id: tenantId,
+    user_id: userId,
+    role: mirrorRole,
+    role_id: role.id,
+  };
+  let membership: { id: string } | null = null;
+  let membershipError: { message: string } | null = null;
+  {
+    const withInvite = await admin
+      .from("memberships")
+      .insert({
+        ...basePayload,
+        invite_status: inviteStatus,
+        invited_email: email,
+        invited_at: new Date().toISOString(),
+      })
+      .select("id")
+      .maybeSingle();
+    if (withInvite.error && /invite_status|invited_email|schema cache|column/i.test(withInvite.error.message)) {
+      const legacy = await admin.from("memberships").insert(basePayload).select("id").maybeSingle();
+      membership = legacy.data;
+      membershipError = legacy.error;
+    } else {
+      membership = withInvite.data;
+      membershipError = withInvite.error;
+    }
+  }
   if (membershipError || !membership) {
     throw new Error(membershipError?.message || "No se pudo crear la membresía.");
   }
 
   return { invited, membershipId: String(membership.id), userId };
+}
+
+export async function resendTeamInvite(tenantId: string, membershipId: string) {
+  const admin = createAdminSupabase();
+  const { data: membership, error } = await admin
+    .from("memberships")
+    .select("id, user_id, invited_email")
+    .eq("tenant_id", tenantId)
+    .eq("id", membershipId)
+    .maybeSingle();
+  if (error || !membership) throw new Error("Miembro no encontrado.");
+
+  const { data: userData } = await admin.auth.admin.getUserById(String(membership.user_id));
+  const email = (userData.user?.email || String(membership.invited_email || "")).trim().toLowerCase();
+  if (!email.includes("@")) throw new Error("No hay correo para reenviar la invitación.");
+
+  const { error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
+    redirectTo: siteUrl("/auth/callback?next=/panel"),
+  });
+  if (inviteError) {
+    // Usuario ya confirmado: generar enlace de recuperación como alternativa.
+    const { error: linkError } = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email,
+      options: { redirectTo: siteUrl("/auth/callback?next=/panel") },
+    });
+    if (linkError) {
+      throw new Error(
+        inviteError.message.includes("already") || inviteError.message.includes("registered")
+          ? `La cuenta ya existe. Pídele que entre en ${siteUrl("/ingresar")}. (${linkError.message})`
+          : inviteError.message,
+      );
+    }
+  }
+
+  try {
+    await admin
+      .from("memberships")
+      .update({
+        invite_status: "pending",
+        invited_email: email,
+        invited_at: new Date().toISOString(),
+      })
+      .eq("id", membershipId);
+  } catch {
+    /* columnas 021 opcionales */
+  }
+
+  return { email };
 }
 
 export async function updateMemberRole(tenantId: string, membershipId: string, roleId: string) {

@@ -46,6 +46,11 @@ export default async function SettingsPage() {
       hint: "Migración supabase/migrations/018_whatsapp_meta.sql. Sin ella no se guarda estado ni mensajes.",
     },
     {
+      key: "whatsappInbox",
+      label: "whatsapp_conversations (Inbox)",
+      hint: "Migración supabase/migrations/021_whatsapp_inbox_crm.sql. Sin ella /panel/inbox y reenviar invitación quedan limitados.",
+    },
+    {
       key: "whatsappMetaEnv",
       label: "META_WA_* (Railway)",
       hint: "Token, Phone Number ID, verify token y app secret. Panel: /panel/whatsapp.",

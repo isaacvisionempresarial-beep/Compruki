@@ -87,7 +87,8 @@ function buildNavGroups(canManageUsers: boolean) {
       label: "Operación",
       items: [
         { id: "sincronizacion", label: "Sincronización", icon: "sync", href: "/panel/sincronizacion" },
-        { id: "whatsapp", label: "WhatsApp", icon: "chat", href: "/panel/whatsapp" },
+        { id: "inbox", label: "Inbox", icon: "chat", href: "/panel/inbox" },
+        { id: "whatsapp", label: "WhatsApp", icon: "link", href: "/panel/whatsapp" },
         { id: "conexiones", label: "Conexiones", icon: "link", href: "/panel/conexiones" },
       ],
     },

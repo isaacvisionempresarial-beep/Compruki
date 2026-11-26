@@ -15,7 +15,7 @@ describe("normalizeFollowupStage", () => {
 
 describe("nextFollowupStages", () => {
   it("ofrece avances desde nuevo", () => {
-    expect(nextFollowupStages("nuevo")).toEqual(["contactar", "espera"]);
+    expect(nextFollowupStages("nuevo")).toEqual(["contactar", "espera", "negociacion"]);
   });
 });
 

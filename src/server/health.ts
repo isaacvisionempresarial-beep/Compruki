@@ -5,6 +5,7 @@ import { openAIKeyConfigured, probeOpenAI } from "@/server/openai-client";
 import { probeProductQuestionsTable } from "@/server/product-questions";
 import { probeWhatsAppTables } from "@/server/whatsapp/connection";
 import { metaWaConfigured } from "@/server/whatsapp/env";
+import { probeInboxTables } from "@/server/whatsapp-inbox";
 
 export type HealthChecks = {
   siteUrl: boolean;
@@ -20,6 +21,8 @@ export type HealthChecks = {
   customerProfiles: boolean;
   /** Tablas WhatsApp Meta (018); no bloquea ok. */
   whatsappTables: boolean;
+  /** Conversaciones inbox + CRM (021); no bloquea ok. */
+  whatsappInbox: boolean;
   /** Credenciales META_WA_* presentes; no bloquea ok. */
   whatsappMetaEnv: boolean;
   /** Clave presente; el probe vivo va en openaiConnected. No bloquea ok. */
@@ -50,6 +53,7 @@ export async function getHealthSnapshot(): Promise<HealthSnapshot> {
     followupTasks: false,
     customerProfiles: false,
     whatsappTables: false,
+    whatsappInbox: false,
     whatsappMetaEnv: metaWaConfigured(),
     openaiKey: openAIKeyConfigured(),
   };
@@ -62,16 +66,19 @@ export async function getHealthSnapshot(): Promise<HealthSnapshot> {
     } catch {
       checks.tenantPilot = false;
     }
-    const [productQuestions, followupTasks, customerProfiles, whatsappTables] = await Promise.all([
-      probeProductQuestionsTable(),
-      probeFollowupsTable(),
-      probeCustomerProfilesTable(),
-      probeWhatsAppTables(),
-    ]);
+    const [productQuestions, followupTasks, customerProfiles, whatsappTables, whatsappInbox] =
+      await Promise.all([
+        probeProductQuestionsTable(),
+        probeFollowupsTable(),
+        probeCustomerProfilesTable(),
+        probeWhatsAppTables(),
+        probeInboxTables(),
+      ]);
     checks.productQuestions = productQuestions;
     checks.followupTasks = followupTasks;
     checks.customerProfiles = customerProfiles;
     checks.whatsappTables = whatsappTables;
+    checks.whatsappInbox = whatsappInbox;
   }
 
   const openaiProbe = await probeOpenAI();

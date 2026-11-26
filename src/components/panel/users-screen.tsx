@@ -6,6 +6,7 @@ import {
   createRoleAction,
   inviteTeamMemberAction,
   removeMemberAction,
+  resendInviteAction,
   updateMemberRoleAction,
   updateRoleAction,
   type TeamActionState,
@@ -26,6 +27,7 @@ export function UsersScreen({
   const [inviteState, inviteAction, inviting] = useActionState(inviteTeamMemberAction, emptyState);
   const [roleUpdateState, roleUpdateAction, updatingRole] = useActionState(updateMemberRoleAction, emptyState);
   const [removeState, removeAction, removing] = useActionState(removeMemberAction, emptyState);
+  const [resendState, resendAction, resending] = useActionState(resendInviteAction, emptyState);
   const [createState, createAction, creating] = useActionState(createRoleAction, emptyState);
   const [saveRoleState, saveRoleAction, savingRole] = useActionState(updateRoleAction, emptyState);
 
@@ -33,34 +35,40 @@ export function UsersScreen({
     inviteState.members.length ||
     roleUpdateState.members.length ||
     removeState.members.length ||
+    resendState.members.length ||
     createState.members.length ||
     saveRoleState.members.length
       ? saveRoleState.members.length
         ? saveRoleState.members
         : createState.members.length
           ? createState.members
-          : removeState.members.length
-            ? removeState.members
-            : roleUpdateState.members.length
-              ? roleUpdateState.members
-              : inviteState.members
+          : resendState.members.length
+            ? resendState.members
+            : removeState.members.length
+              ? removeState.members
+              : roleUpdateState.members.length
+                ? roleUpdateState.members
+                : inviteState.members
       : initialMembers;
 
   const roles =
     inviteState.roles.length ||
     roleUpdateState.roles.length ||
     removeState.roles.length ||
+    resendState.roles.length ||
     createState.roles.length ||
     saveRoleState.roles.length
       ? saveRoleState.roles.length
         ? saveRoleState.roles
         : createState.roles.length
           ? createState.roles
-          : removeState.roles.length
-            ? removeState.roles
-            : roleUpdateState.roles.length
-              ? roleUpdateState.roles
-              : inviteState.roles
+          : resendState.roles.length
+            ? resendState.roles
+            : removeState.roles.length
+              ? removeState.roles
+              : roleUpdateState.roles.length
+                ? roleUpdateState.roles
+                : inviteState.roles
       : initialRoles;
 
   const activeRoles = useMemo(() => roles.filter((role) => role.active), [roles]);
@@ -68,10 +76,16 @@ export function UsersScreen({
     inviteState.error ||
     roleUpdateState.error ||
     removeState.error ||
+    resendState.error ||
     createState.error ||
     saveRoleState.error;
   const feedbackOk =
-    inviteState.ok || roleUpdateState.ok || removeState.ok || createState.ok || saveRoleState.ok;
+    inviteState.ok ||
+    roleUpdateState.ok ||
+    removeState.ok ||
+    resendState.ok ||
+    createState.ok ||
+    saveRoleState.ok;
 
   const [selectedRoleId, setSelectedRoleId] = useState(activeRoles[0]?.id ?? roles[0]?.id ?? "");
   const selectedRole = roles.find((role) => role.id === selectedRoleId) ?? roles[0] ?? null;
@@ -103,7 +117,12 @@ export function UsersScreen({
                     <p className="font-semibold text-ink">{member.name}</p>
                     <p className="text-sm text-muted break-all">{member.email || member.userId}</p>
                     <p className="mt-1 text-[11px] text-muted">
-                      {member.roleLabel} · desde {new Date(member.createdAt).toLocaleDateString("es-CO")}
+                      {member.roleLabel} ·{" "}
+                      <span className={member.inviteStatus === "pending" ? "text-warning font-semibold" : "text-success"}>
+                        {member.inviteStatus === "pending" ? "Pendiente" : "Activo"}
+                      </span>
+                      {" · "}
+                      desde {new Date(member.createdAt).toLocaleDateString("es-CO")}
                       {member.userId === actorUserId ? " · tú" : ""}
                     </p>
                   </div>
@@ -133,6 +152,18 @@ export function UsersScreen({
                         Guardar
                       </button>
                     </form>
+                    {member.inviteStatus === "pending" || !member.email ? (
+                      <form action={resendAction}>
+                        <input type="hidden" name="membershipId" value={member.membershipId} />
+                        <button
+                          type="submit"
+                          disabled={resending}
+                          className="h-9 rounded-[10px] border border-line px-3 text-sm font-semibold hover:bg-subtle disabled:opacity-50"
+                        >
+                          Reenviar
+                        </button>
+                      </form>
+                    ) : null}
                     {member.userId !== actorUserId ? (
                       <form action={removeAction}>
                         <input type="hidden" name="membershipId" value={member.membershipId} />
@@ -159,7 +190,8 @@ export function UsersScreen({
           Nuevo acceso por correo
         </h2>
         <p className="mt-1 text-xs leading-5 text-muted">
-          Supabase envía el enlace de invitación. Si la cuenta ya existe, solo se agrega al equipo.
+          Supabase envía el enlace de invitación. Si no llega, revisa Authentication → SMTP y usa Reenviar en el
+          equipo. Si la cuenta ya existe, solo se agrega el acceso.
         </p>
         <form action={inviteAction} className="mt-3 grid gap-3 sm:grid-cols-[1fr_10rem_auto]">
           <label className="grid gap-1 text-sm sm:col-span-1">

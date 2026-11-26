@@ -52,8 +52,11 @@ export function CustomersScreen({
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Operación</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Clientes</h1>
       <p className="mt-1 max-w-2xl text-sm text-muted">
-        Cuentas registradas en la tienda (con o sin pedido) y CRM lite de seguimientos. Abrir WhatsApp es a mano;
-        Compruki no envía.
+        Cuentas registradas, seguimientos CRM con pipeline (Lead → Postventa) e Inbox WhatsApp en{" "}
+        <Link href="/panel/inbox" className="font-semibold text-accent-strong hover:underline">
+          /panel/inbox
+        </Link>
+        .
       </p>
 
       {!tableReady ? (

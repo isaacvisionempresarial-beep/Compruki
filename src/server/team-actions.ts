@@ -9,6 +9,7 @@ import {
   listTeamRoles,
   parsePermissionsForm,
   removeMember,
+  resendTeamInvite,
   updateMemberRole,
   updateTeamRole,
   type TeamMember,
@@ -94,6 +95,32 @@ export async function updateMemberRoleAction(
     const data = await snapshot(access.tenantId);
     return {
       error: error instanceof Error ? error.message : "No se pudo actualizar el rol.",
+      ok: null,
+      ...data,
+    };
+  }
+}
+
+export async function resendInviteAction(
+  _state: TeamActionState,
+  formData: FormData,
+): Promise<TeamActionState> {
+  const access = await assertPermission("users_manage");
+  if (!access) return { error: "No tienes permiso para reenviar invitaciones.", ok: null, members: [], roles: [] };
+
+  try {
+    const result = await resendTeamInvite(access.tenantId, String(formData.get("membershipId") || ""));
+    revalidatePath("/panel/usuarios");
+    const data = await snapshot(access.tenantId);
+    return {
+      error: null,
+      ok: `Invitación reenviada a ${result.email}. Si no llega, revisa SMTP en Supabase Auth.`,
+      ...data,
+    };
+  } catch (error) {
+    const data = await snapshot(access.tenantId);
+    return {
+      error: error instanceof Error ? error.message : "No se pudo reenviar.",
       ok: null,
       ...data,
     };

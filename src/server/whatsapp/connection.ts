@@ -194,6 +194,68 @@ export async function listRecentWhatsAppMessages(tenantId: string, limit = 20): 
   }
 }
 
+export async function upsertWhatsAppConversation(
+  tenantId: string,
+  input: {
+    phone: string;
+    contactName?: string;
+    preview: string;
+    direction: "inbound" | "outbound";
+    bumpUnread?: boolean;
+  },
+): Promise<string | null> {
+  const phone = input.phone.trim();
+  if (!phone) return null;
+  const supabase = createAdminSupabase();
+  const now = new Date().toISOString();
+  const { data: existing } = await supabase
+    .from("whatsapp_conversations")
+    .select("id, unread_count, contact_name")
+    .eq("tenant_id", tenantId)
+    .eq("phone", phone)
+    .maybeSingle();
+
+  if (existing?.id) {
+    const unread = input.bumpUnread ? Number(existing.unread_count || 0) + 1 : Number(existing.unread_count || 0);
+    await supabase
+      .from("whatsapp_conversations")
+      .update({
+        contact_name: input.contactName?.trim() || existing.contact_name || "",
+        last_message_at: now,
+        last_message_preview: input.preview.slice(0, 180),
+        last_direction: input.direction,
+        unread_count: unread,
+        status: "open",
+        updated_at: now,
+      })
+      .eq("id", existing.id);
+    return String(existing.id);
+  }
+
+  const { data, error } = await supabase
+    .from("whatsapp_conversations")
+    .insert({
+      tenant_id: tenantId,
+      phone,
+      contact_name: input.contactName?.trim() || "",
+      status: "open",
+      pipeline_stage: "nuevo",
+      last_message_at: now,
+      last_message_preview: input.preview.slice(0, 180),
+      last_direction: input.direction,
+      unread_count: input.bumpUnread ? 1 : 0,
+      updated_at: now,
+    })
+    .select("id")
+    .maybeSingle();
+  if (error) {
+    // Tabla 021 aún no aplicada: no bloquea Fase 1.
+    if (/whatsapp_conversations|schema cache|does not exist/i.test(error.message)) return null;
+    throw new Error(error.message);
+  }
+  return data?.id ? String(data.id) : null;
+}
+
 export async function insertWhatsAppMessage(
   tenantId: string,
   input: {
@@ -209,6 +271,17 @@ export async function insertWhatsAppMessage(
   },
 ) {
   const supabase = createAdminSupabase();
+  const isStatus = (input.messageType ?? "text") === "status";
+  const conversationId = isStatus
+    ? null
+    : await upsertWhatsAppConversation(tenantId, {
+        phone: input.phone,
+        contactName: input.contactName,
+        preview: input.body,
+        direction: input.direction,
+        bumpUnread: input.direction === "inbound",
+      });
+
   const { error } = await supabase.from("whatsapp_messages").upsert(
     {
       tenant_id: tenantId,
@@ -221,6 +294,7 @@ export async function insertWhatsAppMessage(
       delivery_status: input.deliveryStatus ?? (input.direction === "inbound" ? "received" : "sent"),
       delivery_detail: input.deliveryDetail ?? "",
       created_by: input.createdBy ?? "",
+      ...(conversationId ? { conversation_id: conversationId } : {}),
     },
     { onConflict: "tenant_id,wa_message_id", ignoreDuplicates: true },
   );
