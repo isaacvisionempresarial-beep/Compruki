@@ -122,7 +122,7 @@ function moneyStatusAction(id: string) {
 
 const orderGrid = "md:grid-cols-[6.75rem_minmax(0,1.5fr)_8.75rem_12.5rem_4.25rem]";
 const historyGrid = "md:grid-cols-[7rem_9rem_minmax(0,1fr)]";
-const queueGrid = "md:grid-cols-[6.75rem_minmax(0,1.2fr)_minmax(0,1.4fr)_4.25rem]";
+const queueGrid = "md:grid-cols-[6.5rem_minmax(0,1.1fr)_minmax(0,1.35fr)_minmax(8.75rem,auto)]";
 
 const ORDER_SPANS: Array<{ id: OrderSpan; label: string }> = [
   { id: "todo", label: "Todo" },
@@ -327,7 +327,7 @@ export function OrdersScreen({
                     <span>Pedido</span>
                     <span>Cliente</span>
                     <span>Siguiente paso</span>
-                    <span>Herramienta</span>
+                    <span className="whitespace-nowrap">Herramienta</span>
                   </div>
                   <ul className="divide-y divide-line">
                     {queue.rows.map((row) => (
@@ -352,7 +352,7 @@ export function OrdersScreen({
                               {row.order.department ? ` · ${row.order.department}` : ""}
                             </span>
                           </span>
-                          <span className="leading-5">
+                          <span className="min-w-0 leading-5">
                             <span className="mb-1 block text-[10px] font-bold tracking-[0.08em] text-muted uppercase md:hidden">
                               Siguiente paso
                             </span>
@@ -369,7 +369,7 @@ export function OrdersScreen({
                               <span className="mt-1 block text-xs leading-5 text-warning">{orderPriceStayNote(row.order, priceGuides)}</span>
                             ) : null}
                           </span>
-                          <span className="font-semibold text-primary md:pt-0.5">{row.cta}</span>
+                          <span className="whitespace-nowrap font-semibold text-primary md:pt-0.5">{row.cta}</span>
                         </a>
                       </li>
                     ))}
