@@ -13,6 +13,7 @@ import {
   updateInboxStageAction,
   type InboxActionState,
   type InboxAssignee,
+  type InboxTemplateOption,
 } from "@/server/whatsapp-inbox-actions";
 import type { InboxConversation, InboxMessage } from "@/server/whatsapp-inbox";
 
@@ -39,6 +40,7 @@ export function InboxScreen({
   initialActiveId,
   initialMessages,
   assignees,
+  templates = [],
   actorUserId,
   roleLabel,
   bootError,
@@ -48,6 +50,7 @@ export function InboxScreen({
   initialActiveId: string | null;
   initialMessages: InboxMessage[];
   assignees: InboxAssignee[];
+  templates?: InboxTemplateOption[];
   actorUserId: string;
   roleLabel: string;
   bootError: string | null;
@@ -59,6 +62,14 @@ export function InboxScreen({
   const [followState, followAction, following] = useActionState(createFollowupFromInboxAction, empty);
   const [openState, openAction, opening] = useActionState(openInboxByPhoneAction, empty);
   const [filter, setFilter] = useState<FilterId>("all");
+  const defaultTemplateKey = templates[0] ? `${templates[0].name}::${templates[0].language}` : "";
+  const [templateKey, setTemplateKey] = useState(defaultTemplateKey);
+
+  const selectedTemplate = useMemo(() => {
+    if (!templateKey) return null;
+    const [name, language] = templateKey.split("::");
+    return templates.find((item) => item.name === name && item.language === language) ?? null;
+  }, [templateKey, templates]);
 
   const conversations =
     openState.conversations.length ||
@@ -373,7 +384,6 @@ export function InboxScreen({
                     <textarea
                       name="body"
                       rows={1}
-                      required
                       placeholder="Mensaje (ventana 24 h)…"
                       className="min-h-8 max-h-24 flex-1 resize-y rounded-[8px] border border-line bg-canvas px-2.5 py-1.5 text-sm outline-none focus:border-ink"
                     />
@@ -382,14 +392,34 @@ export function InboxScreen({
                     </button>
                   </div>
                   <details className="text-xs text-muted">
-                    <summary className="cursor-pointer font-semibold hover:text-ink">Plantilla Meta</summary>
+                    <summary className="cursor-pointer font-semibold hover:text-ink">
+                      Plantilla Meta{templates.length ? ` (${templates.length})` : ""}
+                    </summary>
                     <div className="mt-1.5 flex flex-wrap gap-1">
-                      <input
-                        name="templateName"
-                        placeholder="Nombre"
-                        className={cx(ctrl, "w-[8rem]")}
-                      />
-                      <input name="language" defaultValue="en_US" className={cx(ctrl, "w-[4.5rem]")} />
+                      {templates.length > 0 ? (
+                        <>
+                          <select
+                            aria-label="Plantilla aprobada"
+                            value={templateKey}
+                            onChange={(event) => setTemplateKey(event.target.value)}
+                            className={cx(ctrl, "min-w-[12rem] flex-1")}
+                          >
+                            {templates.map((item) => (
+                              <option key={`${item.name}-${item.language}`} value={`${item.name}::${item.language}`}>
+                                {item.name} · {item.language}
+                                {item.category ? ` · ${item.category}` : ""}
+                              </option>
+                            ))}
+                          </select>
+                          <input type="hidden" name="templateName" value={selectedTemplate?.name || ""} />
+                          <input type="hidden" name="language" value={selectedTemplate?.language || "en_US"} />
+                        </>
+                      ) : (
+                        <>
+                          <input name="templateName" placeholder="Nombre" className={cx(ctrl, "w-[8rem]")} />
+                          <input name="language" defaultValue="en_US" className={cx(ctrl, "w-[4.5rem]")} />
+                        </>
+                      )}
                       <input
                         name="templateValues"
                         placeholder="Vars |"
@@ -399,6 +429,11 @@ export function InboxScreen({
                         Enviar plantilla
                       </button>
                     </div>
+                    {templates.length === 0 ? (
+                      <p className="mt-1 text-[11px] text-muted">
+                        Sin plantillas vía API (falta WABA ID/token). Puedes escribir el nombre a mano.
+                      </p>
+                    ) : null}
                   </details>
                 </form>
               </footer>

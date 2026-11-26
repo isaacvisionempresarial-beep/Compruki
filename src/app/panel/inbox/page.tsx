@@ -33,6 +33,7 @@ export default async function InboxPage({
       initialActiveId={data.activeId}
       initialMessages={data.messages}
       assignees={data.assignees}
+      templates={data.templates}
       actorUserId={data.actorUserId}
       roleLabel={data.roleLabel || access.roleLabel}
       bootError={data.bootError}

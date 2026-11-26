@@ -243,19 +243,38 @@ export async function ensureLeadFromInbound(input: {
   }
 }
 
-async function syncInboxStageByPhone(tenantId: string, phoneRaw: string, stage: FollowupStageId) {
+function phoneCandidates(phoneRaw: string): string[] {
   const waPhone = normalizeWaPhone(phoneRaw) || normalizeCrmPhone(phoneRaw);
-  if (!waPhone) return;
-  const supabase = createAdminSupabase();
-  const now = new Date().toISOString();
+  if (!waPhone) return [];
   const candidates = new Set<string>([waPhone]);
   if (waPhone.startsWith("57") && waPhone.length === 12) candidates.add(waPhone.slice(2));
   if (waPhone.length === 10 && waPhone.startsWith("3")) candidates.add(`57${waPhone}`);
+  return [...candidates];
+}
 
-  for (const phone of candidates) {
+async function syncInboxStageByPhone(tenantId: string, phoneRaw: string, stage: FollowupStageId) {
+  const phones = phoneCandidates(phoneRaw);
+  if (phones.length === 0) return;
+  const supabase = createAdminSupabase();
+  const now = new Date().toISOString();
+  for (const phone of phones) {
     await supabase
       .from("whatsapp_conversations")
       .update({ pipeline_stage: stage, updated_at: now })
+      .eq("tenant_id", tenantId)
+      .eq("phone", phone);
+  }
+}
+
+async function syncInboxAssigneeByPhone(tenantId: string, phoneRaw: string, assignedTo: string) {
+  const phones = phoneCandidates(phoneRaw);
+  if (phones.length === 0) return;
+  const supabase = createAdminSupabase();
+  const now = new Date().toISOString();
+  for (const phone of phones) {
+    await supabase
+      .from("whatsapp_conversations")
+      .update({ assigned_to: assignedTo, updated_at: now })
       .eq("tenant_id", tenantId)
       .eq("phone", phone);
   }
@@ -417,12 +436,14 @@ export async function updateFollowupMeta(input: {
   try {
     const tenantId = await getPilotTenantId();
     const supabase = createAdminSupabase();
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("followup_tasks")
       .update(patch)
       .eq("tenant_id", tenantId)
       .eq("id", id)
-      .eq("status", "open");
+      .eq("status", "open")
+      .select("phone")
+      .maybeSingle();
 
     if (error) {
       return {
@@ -432,6 +453,11 @@ export async function updateFollowupMeta(input: {
             ? "Falta followup_tasks. Ejecuta supabase/migrations/013_followup_tasks.sql."
             : error.message,
       };
+    }
+    if (data?.phone && input.assignedTo !== undefined) {
+      await syncInboxAssigneeByPhone(tenantId, String(data.phone), input.assignedTo.trim()).catch(
+        () => undefined,
+      );
     }
     return { error: null };
   } catch (error) {

@@ -20,11 +20,20 @@ import {
 import { normalizeCrmPhone } from "@/lib/crm-contacts";
 import { createFollowup } from "@/server/followups";
 import { listTeamMembers } from "@/server/team";
+import { metaWaConfigured, requireMetaWaEnv } from "@/server/whatsapp/env";
+import { listWhatsAppTemplates } from "@/server/whatsapp/meta-client";
 
 export type InboxAssignee = {
   userId: string;
   name: string;
   email: string;
+};
+
+export type InboxTemplateOption = {
+  name: string;
+  language: string;
+  status: string;
+  category: string;
 };
 
 export type InboxActionState = {
@@ -67,6 +76,7 @@ export async function loadInboxPanelData(opts?: {
       activeId: null as string | null,
       messages: [] as InboxMessage[],
       assignees: [] as InboxAssignee[],
+      templates: [] as InboxTemplateOption[],
       actorUserId: "",
       roleLabel: "",
       bootError: null as string | null,
@@ -81,6 +91,7 @@ export async function loadInboxPanelData(opts?: {
       activeId: null,
       messages: [],
       assignees: [],
+      templates: [],
       actorUserId: access.user.id,
       roleLabel: access.roleLabel,
       bootError: null,
@@ -103,9 +114,10 @@ export async function loadInboxPanelData(opts?: {
     }
   }
 
-  const [data, members] = await Promise.all([
+  const [data, members, templates] = await Promise.all([
     pack(access.tenantId, preferredId),
     listTeamMembers(access.tenantId).catch(() => []),
+    loadApprovedTemplates(),
   ]);
   const assignees: InboxAssignee[] = members.map((member) => ({
     userId: member.userId,
@@ -118,9 +130,34 @@ export async function loadInboxPanelData(opts?: {
     roleLabel: access.roleLabel,
     actorUserId: access.user.id,
     assignees,
+    templates,
     bootError,
     ...data,
   };
+}
+
+async function loadApprovedTemplates(): Promise<InboxTemplateOption[]> {
+  if (!metaWaConfigured()) return [];
+  try {
+    const env = requireMetaWaEnv();
+    if (!env.businessAccountId) return [];
+    const rows = await listWhatsAppTemplates(env);
+    return rows
+      .filter((row) => row.name && row.language)
+      .filter((row) => {
+        const status = String(row.status || "").toUpperCase();
+        return !status || status === "APPROVED";
+      })
+      .map((row) => ({
+        name: String(row.name),
+        language: String(row.language),
+        status: String(row.status || "APPROVED"),
+        category: String(row.category || ""),
+      }))
+      .slice(0, 40);
+  } catch {
+    return [];
+  }
 }
 
 export async function selectInboxConversationAction(
