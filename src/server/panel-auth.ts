@@ -105,17 +105,64 @@ export async function getPanelAccess(): Promise<PanelAccess | null> {
   const { data: auth, error } = await supabase.auth.getUser();
   if (error || !auth.user) return null;
 
-  const { data, error: membershipError } = await supabase
-    .from("memberships")
-    .select("role, role_id, tenant_id, tenants(id, name, slug)")
-    .eq("user_id", auth.user.id)
-    .order("created_at", { ascending: true })
-    .limit(1)
-    .maybeSingle();
+  // Primero con role_id (migración 019). Si la columna no existe o RLS falla, cae a legacy/admin.
+  let data: MembershipRow | null = null;
+  {
+    const withRoleId = await supabase
+      .from("memberships")
+      .select("role, role_id, tenant_id, tenants(id, name, slug)")
+      .eq("user_id", auth.user.id)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (!withRoleId.error && withRoleId.data) {
+      data = withRoleId.data as MembershipRow;
+    } else {
+      const legacy = await supabase
+        .from("memberships")
+        .select("role, tenant_id, tenants(id, name, slug)")
+        .eq("user_id", auth.user.id)
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (!legacy.error && legacy.data) {
+        data = { ...(legacy.data as Omit<MembershipRow, "role_id">), role_id: null };
+      }
+    }
 
-  if (membershipError || !data) return null;
+    // Último recurso: service role solo para este user_id ya autenticado.
+    if (!data) {
+      try {
+        const admin = createAdminSupabase();
+        const adminRow = await admin
+          .from("memberships")
+          .select("role, role_id, tenant_id, tenants(id, name, slug)")
+          .eq("user_id", auth.user.id)
+          .order("created_at", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+        if (!adminRow.error && adminRow.data) {
+          data = adminRow.data as MembershipRow;
+        } else {
+          const adminLegacy = await admin
+            .from("memberships")
+            .select("role, tenant_id, tenants(id, name, slug)")
+            .eq("user_id", auth.user.id)
+            .order("created_at", { ascending: true })
+            .limit(1)
+            .maybeSingle();
+          if (!adminLegacy.error && adminLegacy.data) {
+            data = { ...(adminLegacy.data as Omit<MembershipRow, "role_id">), role_id: null };
+          }
+        }
+      } catch {
+        /* sin service role / sin tablas */
+      }
+    }
+    if (!data) return null;
+  }
 
-  const row = data as MembershipRow;
+  const row = data;
   const tenant = Array.isArray(row.tenants) ? row.tenants[0] : row.tenants;
   if (!tenant?.id) return null;
 
