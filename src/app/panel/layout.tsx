@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { PanelShell } from "@/components/panel/panel-shell";
-import { requirePanelAccess } from "@/server/panel-auth";
+import { hasPermission, requirePanelAccess } from "@/server/panel-auth";
 
 const panelDescription =
-  "Panel de la tienda piloto. Catálogo, pedidos, sincronización y margen. Dropi no está conectado.";
+  "Panel de COMPRUKÍ. Catálogo, pedidos, sincronización y margen.";
 
 export const metadata: Metadata = {
   title: {
@@ -33,6 +33,7 @@ export default async function PanelLayout({ children }: { children: ReactNode })
       actorName={access.actorName}
       roleLabel={access.roleLabel}
       initials={access.initials}
+      canManageUsers={hasPermission(access, "users_manage")}
     >
       {children}
     </PanelShell>

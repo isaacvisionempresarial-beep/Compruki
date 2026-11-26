@@ -8,7 +8,7 @@ import { getSupportDraftPreview } from "@/server/agent-support-draft";
 import { evaluateAgentPolicy } from "@/server/agent-policy";
 import { listCostGuides, listOrderableProducts, listPriceGuides, listSizeGuides } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
-import { requirePanelAccess } from "@/server/panel-auth";
+import { hasPermission, requirePanelAccess } from "@/server/panel-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -69,7 +69,7 @@ export default async function OrderPage({
       sizeGuides={sizeGuides}
       priceGuides={priceGuides}
       costGuides={costGuides}
-      canManageOrderMoney={access.role === "owner"}
+      canManageOrderMoney={hasPermission(access, "orders_money")}
       orderReading={reading}
       orderReadingEnabled={policy06.ok}
       orderReadingError={!prepareFocused ? ag06Error : null}

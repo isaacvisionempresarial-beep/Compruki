@@ -7,7 +7,7 @@ import { getExplorerShortlistPreview, searchLocalCatalog } from "@/server/agent-
 import { getAgentCenterView } from "@/server/agent-gateway";
 import { getSaasGuidePreview } from "@/server/agent-saas-guide";
 import { getAnalystReadingPreview, getAnalystToolkit } from "@/server/agent-tools";
-import { requirePanelAccess } from "@/server/panel-auth";
+import { hasPermission, requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
   title: "Centro de agentes",
@@ -89,7 +89,7 @@ export default async function AgentsPage({
       saasGuide={saasGuide}
       central={{ route: central, defaultIntent: intent }}
       policyError={policyError}
-      canApproveCatalog={access.role === "owner"}
+      canApproveCatalog={hasPermission(access, "catalog_manage")}
       roleLabel={access.roleLabel}
     />
   );

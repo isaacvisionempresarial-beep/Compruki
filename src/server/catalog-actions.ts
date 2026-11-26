@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { MAX_PRODUCT_VIDEO_BYTES, parsePesos, parseVariants, sniffImage, sniffVideo, type CatalogProduct, type ProductDraft, type ProductImageType } from "@/lib/catalog";
-import { assertPanelAccess } from "@/server/panel-auth";
+import { assertPanelAccess, hasPermission } from "@/server/panel-auth";
 import { deactivateProduct, deleteProduct, getCatalogProductById, saveProduct, type MediaUpdate } from "@/server/catalog-store";
 import { countOrdersForSku } from "@/server/order-store";
 
@@ -54,14 +54,14 @@ export async function saveProductAction(_state: SaveProductState, formData: Form
   const before = draft.id ? await getCatalogProductById(draft.id) : null;
   if (draft.id && !before) return { error: "Ese producto ya no está en el catálogo.", productId: null, message: null };
 
-  if (access.role !== "owner") {
+  if (!hasPermission(access, "catalog_manage")) {
     if (!before) {
-      return { error: "Solo el propietario puede crear productos.", productId: null, message: null };
+      return { error: "Tu rol no permite crear productos.", productId: null, message: null };
     }
     const blocked = commercialChanges(before, draft);
     if (blocked.length > 0) {
       return {
-        error: `Solo el propietario puede cambiar ${blocked.join(", ")}.`,
+        error: `Tu rol no permite cambiar ${blocked.join(", ")}.`,
         productId: null,
         message: null,
       };
@@ -99,8 +99,8 @@ export async function deleteProductAction(
       return { error: "Tu sesión no permite cambiar el catálogo.", message: null };
     }
 
-  if (access.role !== "owner") {
-    return { error: "Solo el propietario puede eliminar productos.", message: null };
+  if (!hasPermission(access, "catalog_manage")) {
+    return { error: "Tu rol no permite eliminar productos.", message: null };
   }
 
   const id = String(formData.get("id") ?? "").trim();

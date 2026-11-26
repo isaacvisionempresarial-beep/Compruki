@@ -1,5 +1,13 @@
 import { redirect } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
+import {
+  normalizePermissions,
+  permissionsForRoleKey,
+  roleKeyFromLegacy,
+  type PanelPermission,
+  type PanelPermissions,
+} from "@/lib/panel-permissions";
+import { createAdminSupabase } from "@/lib/supabase/admin";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getPilotTenantId } from "@/server/tenant";
 
@@ -10,15 +18,20 @@ export type PanelAccess = {
   tenantId: string;
   tenantName: string;
   tenantSlug: string;
+  /** Compat: owner si tiene users_manage + store_settings tipicos; si no operator. */
   role: PanelRole;
-  actorName: string;
+  roleId: string | null;
+  roleKey: string;
   roleLabel: string;
+  permissions: PanelPermissions;
+  actorName: string;
   email: string;
   initials: string;
 };
 
 type MembershipRow = {
   role: string;
+  role_id: string | null;
   tenant_id: string;
   tenants:
     | { id: string; name: string; slug: string }
@@ -33,6 +46,59 @@ export async function getPanelUser(): Promise<User | null> {
   return data.user;
 }
 
+async function loadRolePermissions(
+  tenantId: string,
+  roleId: string | null,
+  legacyRole: string,
+): Promise<{ roleId: string | null; roleKey: string; roleLabel: string; permissions: PanelPermissions }> {
+  const legacyKey = roleKeyFromLegacy(legacyRole);
+  const fallback = {
+    roleId,
+    roleKey: legacyKey,
+    roleLabel: legacyKey === "owner" ? "Propietario" : "Operador",
+    permissions: permissionsForRoleKey(legacyKey),
+  };
+
+  try {
+    const admin = createAdminSupabase();
+    if (roleId) {
+      const { data } = await admin
+        .from("panel_roles")
+        .select("id, key, label, permissions, active")
+        .eq("id", roleId)
+        .eq("tenant_id", tenantId)
+        .maybeSingle();
+      if (data?.active !== false && data?.key) {
+        return {
+          roleId: String(data.id),
+          roleKey: String(data.key),
+          roleLabel: String(data.label || data.key),
+          permissions: normalizePermissions(data.permissions),
+        };
+      }
+    }
+
+    const { data: byKey } = await admin
+      .from("panel_roles")
+      .select("id, key, label, permissions, active")
+      .eq("tenant_id", tenantId)
+      .eq("key", legacyKey)
+      .maybeSingle();
+    if (byKey?.id) {
+      return {
+        roleId: String(byKey.id),
+        roleKey: String(byKey.key),
+        roleLabel: String(byKey.label || byKey.key),
+        permissions: normalizePermissions(byKey.permissions),
+      };
+    }
+  } catch {
+    /* tablas 019 aún no aplicadas */
+  }
+
+  return fallback;
+}
+
 /** Sesión Auth + membresía en un tenant. Sin membresía no hay acceso al panel. */
 export async function getPanelAccess(): Promise<PanelAccess | null> {
   const supabase = await createServerSupabase();
@@ -41,7 +107,7 @@ export async function getPanelAccess(): Promise<PanelAccess | null> {
 
   const { data, error: membershipError } = await supabase
     .from("memberships")
-    .select("role, tenant_id, tenants(id, name, slug)")
+    .select("role, role_id, tenant_id, tenants(id, name, slug)")
     .eq("user_id", auth.user.id)
     .order("created_at", { ascending: true })
     .limit(1)
@@ -53,16 +119,21 @@ export async function getPanelAccess(): Promise<PanelAccess | null> {
   const tenant = Array.isArray(row.tenants) ? row.tenants[0] : row.tenants;
   if (!tenant?.id) return null;
 
-  const role: PanelRole = row.role === "operator" ? "operator" : "owner";
+  const roleInfo = await loadRolePermissions(tenant.id, row.role_id, row.role);
+  const role: PanelRole = roleInfo.roleKey === "owner" ? "owner" : "operator";
   const actorName = panelActorName(auth.user);
+
   return {
     user: auth.user,
     tenantId: tenant.id,
     tenantName: tenant.name,
     tenantSlug: tenant.slug,
     role,
+    roleId: roleInfo.roleId,
+    roleKey: roleInfo.roleKey,
+    roleLabel: roleInfo.roleLabel,
+    permissions: roleInfo.permissions,
     actorName,
-    roleLabel: role === "owner" ? "Propietario" : "Operador",
     email: auth.user.email ?? "",
     initials: panelInitials(actorName),
   };
@@ -102,6 +173,18 @@ export async function assertPanelAccess(): Promise<PanelAccess | null> {
   const access = await getPanelAccess();
   if (!access) return null;
   if (!(await isPilotMember(access))) return null;
+  return access;
+}
+
+export function hasPermission(access: PanelAccess, permission: PanelPermission): boolean {
+  if (access.roleKey === "owner") return true;
+  return Boolean(access.permissions[permission]);
+}
+
+export async function assertPermission(permission: PanelPermission): Promise<PanelAccess | null> {
+  const access = await assertPanelAccess();
+  if (!access) return null;
+  if (!hasPermission(access, permission)) return null;
   return access;
 }
 

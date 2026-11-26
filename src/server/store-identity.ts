@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { normalizeCrmPhone } from "@/lib/crm-contacts";
 import type { StoreIdentity } from "@/lib/store-identity";
 import { createAdminSupabase } from "@/lib/supabase/admin";
-import { assertPanelAccess } from "@/server/panel-auth";
+import { assertPanelAccess, hasPermission } from "@/server/panel-auth";
 import { getPilotTenantId } from "@/server/tenant";
 
 export type { StoreIdentity };
@@ -79,8 +79,8 @@ export async function updateStoreIdentityAction(
 ): Promise<StoreIdentityState> {
   const access = await assertPanelAccess();
   if (!access) return { error: "Sesión vencida. Vuelve a ingresar.", message: null };
-  if (access.role !== "owner") {
-    return { error: "Solo el propietario guarda el nombre y el contacto públicos.", message: null };
+  if (!hasPermission(access, "store_settings")) {
+    return { error: "Tu rol no permite guardar el nombre y el contacto públicos.", message: null };
   }
 
   const name = String(formData.get("name") ?? "").trim().slice(0, 80);

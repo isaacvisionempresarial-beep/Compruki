@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { AGENT_ROLES } from "@/lib/agents/roles";
-import { assertPanelAccess } from "@/server/panel-auth";
+import { assertPanelAccess, hasPermission } from "@/server/panel-auth";
 import { getPilotTenantId } from "@/server/tenant";
 
 const editableIds = new Set(
@@ -27,8 +27,8 @@ export async function saveAgentConfigAction(
 ): Promise<SaveAgentConfigState> {
   const access = await assertPanelAccess();
   if (!access) return { error: "Tu sesión no permite guardar la configuración.", message: null };
-  if (access.role !== "owner") {
-    return { error: "Solo el propietario puede cambiar activación y presupuesto.", message: null };
+  if (!hasPermission(access, "agents_manage")) {
+    return { error: "Tu rol no permite cambiar activación y presupuesto.", message: null };
   }
 
   const agentId = String(formData.get("agentId") ?? "").trim().toUpperCase();

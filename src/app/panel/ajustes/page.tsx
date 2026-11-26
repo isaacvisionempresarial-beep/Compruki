@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { StoreIdentityForm } from "@/components/panel/store-identity-form";
 import { getHealthSnapshot } from "@/server/health";
-import { requirePanelAccess } from "@/server/panel-auth";
+import { hasPermission, requirePanelAccess } from "@/server/panel-auth";
 import { getStoreIdentity } from "@/server/store-identity";
 
 export const metadata: Metadata = {
@@ -87,18 +87,18 @@ export default async function SettingsPage() {
         </dl>
       </section>
 
-      <StoreIdentityForm identity={identity} canEdit={access.role === "owner"} />
+      <StoreIdentityForm identity={identity} canEdit={hasPermission(access, "store_settings")} />
 
       <section className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-4 py-3" aria-labelledby="alcance">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Permisos</p>
         <h2 id="alcance" className="mt-0.5 text-sm font-semibold">Qué puede esta sesión</h2>
         <p className="mt-1 text-sm text-muted">
-          Esta sesión solo abre {access.tenantName}. Pedidos, catálogo y agentes salen de esa tienda. Un identificador de otra tienda no se lee ni se escribe. En la tienda pública, consultas, cambios del cliente y pedidos seguidos se detienen un rato: no abren ni crean otro.
+          Esta sesión solo abre {access.tenantName} con el rol {access.roleLabel}. Pedidos, catálogo y agentes salen de esa tienda.
         </p>
         <p className="mt-2 text-sm text-muted">
-          {access.role === "owner"
-            ? "Puedes cambiar precios, publicación, alta y eliminación del catálogo; anotar el flete, el costo y la marca de cobro; y aprobar borradores y presupuestos. Nada de eso cobra en el sitio."
-            : "Puedes editar textos, fotos y disponibilidad, y seguir pedidos: estado, entrega, talla o tamaño y aviso. Precio, flete, costo, marca de cobro, alta, eliminación, aprobar borradores y presupuestos los guarda el propietario. Nada de eso cobra en el sitio."}
+          {hasPermission(access, "catalog_manage") || hasPermission(access, "orders_money")
+            ? "Según tu rol puedes gestionar catálogo crítico y/o dinero de pedidos. El detalle se parametriza en Usuarios."
+            : "Puedes seguir pedidos y operación diaria. Catálogo crítico, dinero y equipo los definen los roles en Usuarios."}
         </p>
       </section>
 
@@ -110,7 +110,7 @@ export default async function SettingsPage() {
         <p className="mt-1 text-sm text-muted">
           Copia de los pedidos y las fichas guardados en {access.tenantName}. El total guardado y el margen van en columnas distintas. No incluye el enlace secreto del cliente.No envía nada a Dropi.
         </p>
-        {access.role === "owner" ? (
+        {hasPermission(access, "backups") ? (
           <nav aria-label="Herramientas" className="mt-3 flex flex-wrap items-center gap-2">
             <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Herramientas</span>
             <a href="/panel/respaldo/pedidos" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
@@ -121,7 +121,7 @@ export default async function SettingsPage() {
             </a>
           </nav>
         ) : (
-          <p className="mt-3 text-sm text-muted">La descarga la hace el propietario.</p>
+          <p className="mt-3 text-sm text-muted">Tu rol no incluye descargas de respaldo.</p>
         )}
       </section>
 

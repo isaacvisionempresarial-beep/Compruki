@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { CatalogScreen } from "@/components/panel/catalog-screen";
 import { listProducts } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
-import { requirePanelAccess } from "@/server/panel-auth";
+import { hasPermission, requirePanelAccess } from "@/server/panel-auth";
 import { listOpenProductQuestionCountBySku } from "@/server/product-questions";
 
 export const metadata: Metadata = {
@@ -37,7 +37,7 @@ export default async function CatalogPage({
     <CatalogScreen
       products={products}
       orders={orders}
-      canManageCommerce={access.role === "owner"}
+      canManageCommerce={hasPermission(access, "catalog_manage")}
       openQuestionCounts={openQuestionCounts}
       initialFilter={initialFilter}
     />

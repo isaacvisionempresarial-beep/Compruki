@@ -3,7 +3,7 @@ import { ProfitabilityScreen } from "@/components/panel/profitability-screen";
 import { bogotaNow } from "@/lib/catalog";
 import { listProducts } from "@/server/catalog-store";
 import { listOrders } from "@/server/order-store";
-import { requirePanelAccess } from "@/server/panel-auth";
+import { hasPermission, requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
   title: "Rentabilidad",
@@ -21,7 +21,7 @@ export default async function ProfitabilityPage() {
       products={products}
       orders={orders}
       today={today}
-      canManageOrderMoney={access.role === "owner"}
+      canManageOrderMoney={hasPermission(access, "orders_money")}
     />
   );
 }

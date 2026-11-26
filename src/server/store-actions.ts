@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { campaignSkusInOrder } from "@/lib/campaign";
 import { parsePesos } from "@/lib/catalog";
-import { assertPanelAccess } from "@/server/panel-auth";
+import { assertPanelAccess, hasPermission } from "@/server/panel-auth";
 import { normalizePhone, ownerOnlyOrderIntent, type OrderAction } from "@/lib/store-order";
 import { syncQueueWithOrderIncident } from "@/server/dropi-connection";
 import { assertCustomerSession } from "@/server/customer-auth";
@@ -105,8 +105,8 @@ export async function updateOrderAction(_state: UpdateOrderState, formData: Form
   if (!ORDER_ACTIONS.includes(intent as OrderAction)) {
     return { error: "Esa acción no existe.", orderId };
   }
-  if (ownerOnlyOrderIntent(intent) && access.role !== "owner") {
-    return { error: "Solo el propietario puede marcar o quitar el cobro.", orderId };
+  if (ownerOnlyOrderIntent(intent) && !hasPermission(access, "orders_money")) {
+    return { error: "Tu rol no permite marcar o quitar el cobro.", orderId };
   }
 
   const result = await updateOrder(orderId, intent as OrderAction, access.actorName, String(formData.get("customerReason") ?? ""));
@@ -141,8 +141,8 @@ export async function saveFreightAction(_state: UpdateOrderState, formData: Form
   if (!access) {
     return { error: "Tu sesión no permite anotar el flete.", orderId };
   }
-  if (access.role !== "owner") {
-    return { error: "Solo el propietario puede anotar el flete y el recaudo.", orderId };
+  if (!hasPermission(access, "orders_money")) {
+    return { error: "Tu rol no permite anotar el flete y el recaudo.", orderId };
   }
 
   const shipping = readPesos(String(formData.get("actualShipping") ?? ""), "el flete");
@@ -174,8 +174,8 @@ export async function applyCatalogCostAction(_state: UpdateOrderState, formData:
   if (!access) {
     return { error: "Tu sesión no permite anotar el costo.", orderId };
   }
-  if (access.role !== "owner") {
-    return { error: "Solo el propietario puede copiar el costo de la ficha a este pedido.", orderId };
+  if (!hasPermission(access, "orders_money")) {
+    return { error: "Tu rol no permite copiar el costo de la ficha a este pedido.", orderId };
   }
 
   const result = await applyCatalogCosts(orderId, access.actorName);
@@ -196,7 +196,9 @@ export async function applySkuCatalogCostAction(_state: SkuCostState, formData: 
   const scope = formData.get("scope") === "fuera" ? "fuera" : formData.get("scope") === "cuentan" ? "cuentan" : null;
   const access = await assertPanelAccess();
   if (!access) return { error: "Tu sesión no permite copiar el costo.", saved: 0, scope };
-  if (access.role !== "owner") return { error: "Solo el propietario puede copiar el costo de la ficha a los pedidos.", saved: 0, scope };
+  if (!hasPermission(access, "orders_money")) {
+    return { error: "Tu rol no permite copiar el costo de la ficha a los pedidos.", saved: 0, scope };
+  }
   if (!scope) return { error: "Elige si copias los que ya cuentan o los que siguen fuera.", saved: 0, scope: null };
   const result = await applySkuCatalogCosts(sku, access.actorName, scope);
   if (result.error) return { error: result.error, saved: 0, scope };
@@ -304,7 +306,7 @@ export async function saveOrderLinesAction(_state: UpdateOrderState, formData: F
   if (!drafts) return { error: "No se pudieron leer los productos.", orderId };
 
   const result = await saveOrderLines(orderId, drafts, access.actorName, {
-    restrictMoney: access.role !== "owner",
+    restrictMoney: !hasPermission(access, "orders_money"),
   });
   if (result.error || !result.order) {
     return { error: result.error ?? "No se pudieron guardar las cantidades.", orderId };
@@ -324,8 +326,8 @@ export async function addOrderLineAction(_state: UpdateOrderState, formData: For
   if (!access) {
     return { error: "Tu sesión no permite corregir este pedido.", orderId };
   }
-  if (access.role !== "owner") {
-    return { error: "Solo el propietario puede agregar productos al pedido.", orderId };
+  if (!hasPermission(access, "orders_money")) {
+    return { error: "Tu rol no permite agregar productos al pedido.", orderId };
   }
 
   const result = await addOrderLine(

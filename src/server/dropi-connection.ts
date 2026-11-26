@@ -5,7 +5,7 @@ import { dropiAdapter, emptyDropiQueue, type DropiEnqueueState, type DropiQueueS
 import { awaitsDropiNumber, isStoreOrderId, validateProviderRef } from "@/lib/store-order";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { appendOrderHistory, getOrder, listOrders } from "@/server/order-store";
-import { assertPanelAccess } from "@/server/panel-auth";
+import { assertPanelAccess, hasPermission } from "@/server/panel-auth";
 import { getPilotTenantId } from "@/server/tenant";
 
 const QUEUE_NOTE =
@@ -237,8 +237,8 @@ export async function enqueueDropiSend(_state: DropiEnqueueState, formData: Form
   const denied = dropiAdapter.createOrder();
   const access = await assertPanelAccess();
   if (!access) return { error: "Entra al panel para dejar un pedido en la cola.", message: null };
-  if (access.role !== "owner") {
-    return { error: "Solo el propietario deja un pedido en la cola. No se envió ni se cobró.", message: null };
+  if (!hasPermission(access, "store_settings")) {
+    return { error: "Tu rol no permite dejar pedidos en la cola. No se envió ni se cobró.", message: null };
   }
 
   const orderId = String(formData.get("orderId") ?? "").trim();

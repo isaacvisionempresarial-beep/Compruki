@@ -5,7 +5,7 @@ import { listPendingApprovals } from "@/server/agent-central";
 import { getAgentHomeBrief } from "@/server/agent-gateway";
 import { listOrders } from "@/server/order-store";
 import { listCostGuides, listPriceGuides, listSizeGuides } from "@/server/catalog-store";
-import { requirePanelAccess } from "@/server/panel-auth";
+import { hasPermission, requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
   title: "Panel",
@@ -51,8 +51,8 @@ export default async function PanelPage() {
       costGuides={costGuides}
       today={today}
       greetingName={greetingName}
-      canManageOrderMoney={access.role === "owner"}
-      canApproveCatalog={access.role === "owner"}
+      canManageOrderMoney={hasPermission(access, "orders_money")}
+      canApproveCatalog={hasPermission(access, "catalog_manage")}
       agentPendingCount={pendingSummary.total}
       agentPendingSummary={pendingSummary}
       agentHome={agentHome}

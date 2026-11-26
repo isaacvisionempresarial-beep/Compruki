@@ -4,7 +4,7 @@ import { ProductEditorPage } from "@/components/panel/product-editor-page";
 import { getCatalogProduct } from "@/server/catalog-store";
 import { skuCostPreviewNote } from "@/lib/store-order";
 import { countOrdersForSku, listOrders, storedLinesForSku } from "@/server/order-store";
-import { requirePanelAccess } from "@/server/panel-auth";
+import { hasPermission, requirePanelAccess } from "@/server/panel-auth";
 import { listOpenProductQuestionsForSku } from "@/server/product-questions";
 
 export const dynamic = "force-dynamic";
@@ -36,7 +36,7 @@ export default async function CatalogProductPage({ params }: { params: Promise<{
       relatedOrderCount={relatedOrderCount}
       storedLines={storedLines}
       costPreview={costPreview}
-      canManageCommerce={access.role === "owner"}
+      canManageCommerce={hasPermission(access, "catalog_manage")}
       openQuestions={openQuestions}
     />
   );

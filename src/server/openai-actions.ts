@@ -1,6 +1,6 @@
 "use server";
 
-import { assertPanelAccess } from "@/server/panel-auth";
+import { assertPanelAccess, hasPermission } from "@/server/panel-auth";
 import { probeOpenAI, type OpenAIProbeResult } from "@/server/openai-client";
 
 export type ProbeOpenAIState = {
@@ -14,8 +14,8 @@ export async function probeOpenAIAction(
 ): Promise<ProbeOpenAIState> {
   const access = await assertPanelAccess();
   if (!access) return { error: "Tu sesión no permite probar OpenAI.", result: null };
-  if (access.role !== "owner") {
-    return { error: "Solo el propietario puede probar la conexión a OpenAI.", result: null };
+  if (!hasPermission(access, "agents_manage")) {
+    return { error: "Tu rol no permite probar la conexión a OpenAI.", result: null };
   }
 
   const result = await probeOpenAI({ force: true });

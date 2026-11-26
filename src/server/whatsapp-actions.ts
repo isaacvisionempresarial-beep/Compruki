@@ -1,6 +1,6 @@
 "use server";
 
-import { assertPanelAccess } from "@/server/panel-auth";
+import { assertPanelAccess, hasPermission } from "@/server/panel-auth";
 import {
   insertWhatsAppMessage,
   listRecentWhatsAppMessages,
@@ -63,6 +63,9 @@ export async function verifyWhatsAppConnectionAction(
 ): Promise<WhatsAppActionState> {
   const access = await assertPanelAccess();
   if (!access) return { ...emptyState(), error: "Tu sesión no permite verificar WhatsApp." };
+  if (!hasPermission(access, "whatsapp_manage")) {
+    return { ...emptyState(), error: "Tu rol no permite verificar WhatsApp." };
+  }
 
   if (!metaWaConfigured()) {
     const connection = await readWhatsAppConnection(access.tenantId);
@@ -162,6 +165,9 @@ export async function sendWhatsAppTestAction(
 ): Promise<WhatsAppActionState> {
   const access = await assertPanelAccess();
   if (!access) return { ...emptyState(), error: "Tu sesión no permite enviar WhatsApp." };
+  if (!hasPermission(access, "whatsapp_manage")) {
+    return { ...emptyState(), error: "Tu rol no permite enviar WhatsApp." };
+  }
 
   if (!metaWaConfigured()) {
     return {

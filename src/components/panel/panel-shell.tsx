@@ -67,36 +67,47 @@ export function usePanelQuery() {
   return useContext(PanelQueryContext);
 }
 
-const groups: Array<{ id: string; label: string; items: Array<{ id: string; label: string; icon: IconName; href: string }> }> = [
-  {
-    id: "tienda",
-    label: "Tienda",
-    items: [
-      { id: "panel", label: "Panel principal", icon: "panel", href: "/panel" },
-      { id: "pedidos", label: "Pedidos", icon: "orders", href: "/panel/pedidos" },
-      { id: "clientes", label: "Clientes", icon: "people", href: "/panel/clientes" },
-      { id: "catalogo", label: "Catálogo", icon: "catalog", href: "/panel/catalogo" },
-      { id: "rentabilidad", label: "Rentabilidad", icon: "chart", href: "/panel/rentabilidad" },
-    ],
-  },
-  {
-    id: "operacion",
-    label: "Operación",
-    items: [
-      { id: "sincronizacion", label: "Sincronización", icon: "sync", href: "/panel/sincronizacion" },
-      { id: "whatsapp", label: "WhatsApp", icon: "chat", href: "/panel/whatsapp" },
-      { id: "conexiones", label: "Conexiones", icon: "link", href: "/panel/conexiones" },
-    ],
-  },
-  {
-    id: "sistema",
-    label: "Sistema",
-    items: [
-      { id: "agentes", label: "Centro de agentes", icon: "spark", href: "/panel/agentes" },
-      { id: "ajustes", label: "Configuración", icon: "settings", href: "/panel/ajustes" },
-    ],
-  },
-];
+type NavItem = { id: string; label: string; icon: IconName; href: string; requiresUsersManage?: boolean };
+
+function buildNavGroups(canManageUsers: boolean) {
+  const groups: Array<{ id: string; label: string; items: NavItem[] }> = [
+    {
+      id: "tienda",
+      label: "Tienda",
+      items: [
+        { id: "panel", label: "Panel principal", icon: "panel", href: "/panel" },
+        { id: "pedidos", label: "Pedidos", icon: "orders", href: "/panel/pedidos" },
+        { id: "clientes", label: "Clientes", icon: "people", href: "/panel/clientes" },
+        { id: "catalogo", label: "Catálogo", icon: "catalog", href: "/panel/catalogo" },
+        { id: "rentabilidad", label: "Rentabilidad", icon: "chart", href: "/panel/rentabilidad" },
+      ],
+    },
+    {
+      id: "operacion",
+      label: "Operación",
+      items: [
+        { id: "sincronizacion", label: "Sincronización", icon: "sync", href: "/panel/sincronizacion" },
+        { id: "whatsapp", label: "WhatsApp", icon: "chat", href: "/panel/whatsapp" },
+        { id: "conexiones", label: "Conexiones", icon: "link", href: "/panel/conexiones" },
+      ],
+    },
+    {
+      id: "sistema",
+      label: "Sistema",
+      items: [
+        { id: "agentes", label: "Centro de agentes", icon: "spark", href: "/panel/agentes" },
+        { id: "usuarios", label: "Usuarios", icon: "people", href: "/panel/usuarios", requiresUsersManage: true },
+        { id: "ajustes", label: "Configuración", icon: "settings", href: "/panel/ajustes" },
+      ],
+    },
+  ];
+  return groups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => !item.requiresUsersManage || canManageUsers),
+    }))
+    .filter((group) => group.items.length > 0);
+}
 
 type PanelShellProps = {
   children: ReactNode;
@@ -104,9 +115,18 @@ type PanelShellProps = {
   actorName: string;
   roleLabel: string;
   initials: string;
+  canManageUsers?: boolean;
 };
 
-export function PanelShell({ children, storeName, actorName, roleLabel, initials }: PanelShellProps) {
+export function PanelShell({
+  children,
+  storeName,
+  actorName,
+  roleLabel,
+  initials,
+  canManageUsers = false,
+}: PanelShellProps) {
+  const groups = buildNavGroups(canManageUsers);
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -162,7 +182,7 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
     <PanelQueryContext.Provider value={query}>
       <div className="min-h-dvh bg-canvas">
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-[260px] lg:block">
-          <Sidebar storeName={storeName} />
+          <Sidebar storeName={storeName} groups={groups} />
         </aside>
 
         {open ? (
@@ -176,7 +196,7 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
               aria-modal="true"
               aria-label="Menú del panel"
             >
-              <Sidebar storeName={storeName} onCloseMenu={() => setOpen(false)} showClose />
+              <Sidebar storeName={storeName} groups={groups} onCloseMenu={() => setOpen(false)} showClose />
             </div>
           </div>
         ) : null}
@@ -260,10 +280,12 @@ export function PanelShell({ children, storeName, actorName, roleLabel, initials
 
 function Sidebar({
   storeName,
+  groups,
   onCloseMenu,
   showClose = false,
 }: {
   storeName: string;
+  groups: ReturnType<typeof buildNavGroups>;
   onCloseMenu?: () => void;
   showClose?: boolean;
 }) {

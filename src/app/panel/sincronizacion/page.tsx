@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SyncScreen } from "@/components/panel/sync-screen";
 import { readDropiQueue } from "@/server/dropi-connection";
 import { listOrders } from "@/server/order-store";
-import { requirePanelAccess } from "@/server/panel-auth";
+import { hasPermission, requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
   title: "Sincronización",
@@ -20,7 +20,7 @@ export default async function SyncPage() {
       jobs={queue.jobs}
       tableReady={queue.connection.tableReady}
       tableDetail={queue.connection.detail}
-      canEnqueue={access.role === "owner" && queue.connection.tableReady}
+      canEnqueue={hasPermission(access, "store_settings") && queue.connection.tableReady}
     />
   );
 }

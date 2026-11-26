@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ConnectionsScreen } from "@/components/panel/connections-screen";
 import { readDropiQueue } from "@/server/dropi-connection";
 import { getHealthSnapshot } from "@/server/health";
-import { requirePanelAccess } from "@/server/panel-auth";
+import { hasPermission, requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
   title: "Conexiones",
@@ -22,7 +22,7 @@ export default async function ConnectionsPage() {
       openaiKeyConfigured={health.checks.openaiKey}
       connection={queue.connection}
       jobs={queue.jobs}
-      canProbeOpenAI={access.role === "owner"}
+      canProbeOpenAI={hasPermission(access, "agents_manage")}
       siteUrl={siteUrl}
       plannedDomain="compruki.com"
     />
