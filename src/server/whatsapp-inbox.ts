@@ -60,6 +60,22 @@ export async function probeInboxTables(): Promise<boolean> {
   }
 }
 
+export async function countInboxUnread(tenantId: string): Promise<number> {
+  try {
+    const supabase = createAdminSupabase();
+    const { data, error } = await supabase
+      .from("whatsapp_conversations")
+      .select("unread_count")
+      .eq("tenant_id", tenantId)
+      .gt("unread_count", 0)
+      .limit(80);
+    if (error || !data) return 0;
+    return data.reduce((sum, row) => sum + Number(row.unread_count || 0), 0);
+  } catch {
+    return 0;
+  }
+}
+
 export async function listInboxConversations(tenantId: string, limit = 80): Promise<InboxConversation[]> {
   const supabase = createAdminSupabase();
   const { data, error } = await supabase

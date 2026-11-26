@@ -72,6 +72,7 @@ export default async function ClientesPage({
         userId: member.userId,
         name: member.name || member.email,
       }))}
+      actorUserId={access.user.id}
       tableReady={tableReady}
       pipelineReady={pipelineReady}
       crmProReady={crmProReady}

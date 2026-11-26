@@ -67,9 +67,16 @@ export function usePanelQuery() {
   return useContext(PanelQueryContext);
 }
 
-type NavItem = { id: string; label: string; icon: IconName; href: string; requiresUsersManage?: boolean };
+type NavItem = {
+  id: string;
+  label: string;
+  icon: IconName;
+  href: string;
+  requiresUsersManage?: boolean;
+  badge?: number;
+};
 
-function buildNavGroups(canManageUsers: boolean) {
+function buildNavGroups(canManageUsers: boolean, inboxUnread: number) {
   const groups: Array<{ id: string; label: string; items: NavItem[] }> = [
     {
       id: "tienda",
@@ -87,7 +94,13 @@ function buildNavGroups(canManageUsers: boolean) {
       label: "Operación",
       items: [
         { id: "sincronizacion", label: "Sincronización", icon: "sync", href: "/panel/sincronizacion" },
-        { id: "inbox", label: "Inbox", icon: "chat", href: "/panel/inbox" },
+        {
+          id: "inbox",
+          label: "Inbox",
+          icon: "chat",
+          href: "/panel/inbox",
+          badge: inboxUnread > 0 ? inboxUnread : undefined,
+        },
         { id: "whatsapp", label: "WhatsApp", icon: "link", href: "/panel/whatsapp" },
         { id: "conexiones", label: "Conexiones", icon: "link", href: "/panel/conexiones" },
       ],
@@ -117,6 +130,7 @@ type PanelShellProps = {
   roleLabel: string;
   initials: string;
   canManageUsers?: boolean;
+  inboxUnread?: number;
 };
 
 export function PanelShell({
@@ -126,8 +140,9 @@ export function PanelShell({
   roleLabel,
   initials,
   canManageUsers = false,
+  inboxUnread = 0,
 }: PanelShellProps) {
-  const groups = buildNavGroups(canManageUsers);
+  const groups = buildNavGroups(canManageUsers, inboxUnread);
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -338,7 +353,17 @@ function Sidebar({
                       }
                     >
                       <Icon name={item.icon} className={cx("h-4 w-4", active ? "text-accent-strong" : undefined)} />
-                      {item.label}
+                      <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                      {item.badge ? (
+                        <span
+                          className={cx(
+                            "rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums",
+                            active ? "bg-accent text-primary-dark" : "bg-coral text-on-dark",
+                          )}
+                        >
+                          {item.badge > 99 ? "99+" : item.badge}
+                        </span>
+                      ) : null}
                     </PanelMenuLink>
                   </li>
                 );

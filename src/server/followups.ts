@@ -198,6 +198,51 @@ export async function countOpenFollowupsByPhone(): Promise<Record<string, number
   return counts;
 }
 
+/** Crea Lead solo si no hay seguimiento abierto para ese celular (webhook Inbox → CRM). */
+export async function ensureLeadFromInbound(input: {
+  tenantId: string;
+  phone: string;
+  customerName?: string;
+  preview?: string;
+}): Promise<{ created: boolean }> {
+  const phone = normalizeCrmPhone(input.phone);
+  const waPhone = normalizeWaPhone(input.phone) || phone;
+  if (phone.length < 7 && (!waPhone || waPhone.length < 7)) return { created: false };
+
+  const candidates = new Set<string>();
+  if (phone) candidates.add(phone);
+  if (waPhone) {
+    candidates.add(waPhone);
+    if (waPhone.startsWith("57") && waPhone.length === 12) candidates.add(waPhone.slice(2));
+    if (waPhone.length === 10 && waPhone.startsWith("3")) candidates.add(`57${waPhone}`);
+  }
+
+  try {
+    const supabase = createAdminSupabase();
+    const { data: existing } = await supabase
+      .from("followup_tasks")
+      .select("id, phone")
+      .eq("tenant_id", input.tenantId)
+      .eq("status", "open")
+      .in("phone", [...candidates])
+      .limit(1);
+    if (existing && existing.length > 0) return { created: false };
+
+    const note = (input.preview?.trim() || "Mensaje entrante por WhatsApp").slice(0, 400);
+    const result = await createFollowup({
+      phone: phone.length >= 7 ? phone : waPhone!,
+      customerName: (input.customerName || "").trim().slice(0, 120),
+      note: note.length >= 4 ? note : "Mensaje entrante por WhatsApp",
+      stage: "nuevo",
+      priority: "normal",
+      createdBy: "whatsapp-inbound",
+    });
+    return { created: !result.error };
+  } catch {
+    return { created: false };
+  }
+}
+
 async function syncInboxStageByPhone(tenantId: string, phoneRaw: string, stage: FollowupStageId) {
   const waPhone = normalizeWaPhone(phoneRaw) || normalizeCrmPhone(phoneRaw);
   if (!waPhone) return;

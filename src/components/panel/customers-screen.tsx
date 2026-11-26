@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import type { CrmContact } from "@/lib/crm-contacts";
 import { FOLLOWUP_OPEN_STAGES, groupFollowupsByStage } from "@/lib/crm-pipeline";
+import { cx } from "@/lib/cx";
 import { formatDay } from "@/lib/format";
 import { orderFocusHref } from "@/lib/store-order";
 import type { FollowupPriority as AgentPriority } from "@/server/agent-followup-priority";
@@ -19,6 +21,8 @@ import {
 
 export type CrmAssignee = { userId: string; name: string };
 
+type BoardFilter = "all" | "mine" | "overdue" | "high";
+
 const ctrl =
   "h-8 w-full rounded-[8px] border border-line bg-canvas px-2 text-xs text-ink outline-none focus:border-ink";
 const btn =
@@ -31,6 +35,7 @@ export function CustomersScreen({
   contacts,
   openTasks,
   assignees = [],
+  actorUserId = "",
   tableReady,
   pipelineReady = true,
   crmProReady = false,
@@ -44,6 +49,7 @@ export function CustomersScreen({
   contacts: CrmContact[];
   openTasks: FollowupTask[];
   assignees?: CrmAssignee[];
+  actorUserId?: string;
   tableReady: boolean;
   pipelineReady?: boolean;
   crmProReady?: boolean;
@@ -53,7 +59,32 @@ export function CustomersScreen({
   error?: string | null;
   policyError?: string | null;
 }) {
-  const byStage = groupFollowupsByStage(openTasks);
+  const [boardFilter, setBoardFilter] = useState<BoardFilter>("all");
+  const today = new Date().toISOString().slice(0, 10);
+
+  const filteredTasks = useMemo(() => {
+    if (boardFilter === "mine") {
+      return openTasks.filter((task) => task.assignedTo && task.assignedTo === actorUserId);
+    }
+    if (boardFilter === "overdue") {
+      return openTasks.filter((task) => task.dueAt && task.dueAt.slice(0, 10) < today);
+    }
+    if (boardFilter === "high") {
+      return openTasks.filter((task) => task.priority === "high");
+    }
+    return openTasks;
+  }, [openTasks, boardFilter, actorUserId, today]);
+
+  const byStage = groupFollowupsByStage(filteredTasks);
+  const filterCounts = useMemo(
+    () => ({
+      all: openTasks.length,
+      mine: openTasks.filter((task) => task.assignedTo && task.assignedTo === actorUserId).length,
+      overdue: openTasks.filter((task) => task.dueAt && task.dueAt.slice(0, 10) < today).length,
+      high: openTasks.filter((task) => task.priority === "high").length,
+    }),
+    [openTasks, actorUserId, today],
+  );
   const assigneeLabel = (userId: string) =>
     userId ? assignees.find((item) => item.userId === userId)?.name || "Asignado" : "Libre";
 
@@ -99,13 +130,46 @@ export function CustomersScreen({
             <h2 id="pipeline" className="mt-0.5 text-base font-bold">
               Tablero de seguimientos
             </h2>
+            <p className="mt-0.5 text-xs text-muted">
+              Un mensaje nuevo en WhatsApp crea Lead si no había seguimiento. Mover etapa sincroniza Inbox.
+            </p>
           </div>
-          <p className="text-xs text-muted">Mover etapa también actualiza el chat en Inbox (mismo celular).</p>
+          <div className="flex flex-wrap gap-1" role="tablist" aria-label="Filtro del tablero">
+            {(
+              [
+                ["all", "Todos", filterCounts.all],
+                ["mine", "Míos", filterCounts.mine],
+                ["overdue", "Vencidos", filterCounts.overdue],
+                ["high", "Alta", filterCounts.high],
+              ] as const
+            ).map(([id, label, count]) => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={boardFilter === id}
+                onClick={() => setBoardFilter(id)}
+                className={cx(
+                  "inline-flex h-8 items-center gap-1 rounded-[8px] border px-2.5 text-xs font-semibold",
+                  boardFilter === id
+                    ? "border-ink bg-ink text-canvas"
+                    : "border-line bg-card text-ink hover:bg-subtle",
+                )}
+              >
+                {label}
+                <span className="tabular-nums opacity-80">{count}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {openTasks.length === 0 ? (
           <div className="elevate-1 mt-3 rounded-[12px] border border-line bg-card px-4 py-3">
-            <p className="text-sm text-muted">Sin abiertos. Crea uno desde un contacto abajo.</p>
+            <p className="text-sm text-muted">Sin abiertos. Escribe por WhatsApp o crea uno desde un contacto.</p>
+          </div>
+        ) : filteredTasks.length === 0 ? (
+          <div className="elevate-1 mt-3 rounded-[12px] border border-line bg-card px-4 py-3">
+            <p className="text-sm text-muted">Nada en este filtro.</p>
           </div>
         ) : (
           <div className="mt-3 -mx-1 overflow-x-auto pb-2">

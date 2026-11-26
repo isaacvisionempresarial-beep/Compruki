@@ -3,6 +3,7 @@ import {
   updateWhatsAppDelivery,
   upsertWhatsAppConnection,
 } from "@/server/whatsapp/connection";
+import { ensureLeadFromInbound } from "@/server/followups";
 import { getPilotTenantId } from "@/server/tenant";
 
 type InboundMessage = {
@@ -153,6 +154,12 @@ export async function processWhatsAppWebhook(payload: WebhookPayload): Promise<{
           messageType: extracted.messageType,
           deliveryStatus: "received",
         });
+        await ensureLeadFromInbound({
+          tenantId,
+          phone: message.from,
+          customerName: contactName,
+          preview: extracted.body,
+        }).catch(() => undefined);
         inbound += 1;
       }
     }
