@@ -6,17 +6,24 @@ const DEFAULT_TIMEOUT_MS = 12_000;
 
 export type MetaJson = {
   error?: { message?: string; code?: number };
+  success?: boolean;
   id?: string;
   display_phone_number?: string;
   verified_name?: string;
   quality_rating?: string;
   messages?: Array<{ id?: string }>;
-  data?: Array<{
-    name?: string;
-    language?: string;
-    status?: string;
-    category?: string;
-  }>;
+  data?:
+    | Array<{
+        name?: string;
+        language?: string;
+        status?: string;
+        category?: string;
+        object?: string;
+        callback_url?: string;
+        app_id?: string;
+        is_valid?: boolean;
+      }>
+    | { app_id?: string; is_valid?: boolean };
 };
 
 export class MetaApiError extends Error {
@@ -37,7 +44,9 @@ export async function metaRequest(
   path: string,
   method: "GET" | "POST",
   payload?: unknown,
+  accessToken = env.accessToken,
 ): Promise<MetaJson> {
+  const form = payload instanceof URLSearchParams;
   let lastNetworkError = false;
   for (let attempt = 0; attempt < 3; attempt += 1) {
     let response: Response;
@@ -45,10 +54,12 @@ export async function metaRequest(
       response = await fetch(`https://graph.facebook.com/${env.graphVersion}/${path}`, {
         method,
         headers: {
-          Authorization: `Bearer ${env.accessToken}`,
-          ...(payload ? { "Content-Type": "application/json" } : {}),
+          Authorization: `Bearer ${accessToken}`,
+          ...(payload
+            ? { "Content-Type": form ? "application/x-www-form-urlencoded" : "application/json" }
+            : {}),
         },
-        body: payload ? JSON.stringify(payload) : undefined,
+        body: payload ? (form ? payload : JSON.stringify(payload)) : undefined,
         signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
       });
     } catch {
@@ -146,12 +157,123 @@ export async function sendWhatsAppTemplate(
   return messageId;
 }
 
+function appAccessToken(appId: string, appSecret: string) {
+  return `${appId}|${appSecret}`;
+}
+
+async function resolveMetaAppId(env: MetaWaEnv): Promise<string | null> {
+  if (env.appId) return env.appId;
+  try {
+    const result = await metaRequest(
+      env,
+      `debug_token?input_token=${encodeURIComponent(env.accessToken)}`,
+      "GET",
+    );
+    const data = result.data;
+    if (data && !Array.isArray(data) && data.app_id) return String(data.app_id);
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+/**
+ * Hace que Meta entregue eventos de este número a Compruki.
+ * El botón "Verificar" solo leía el número; sin subscribed_apps y sin
+ * callback, Graph API envía pero Actividad no recibe webhooks.
+ * No pisa un callback de app que apunte a otro host (p. ej. ConexionIA):
+ * en ese caso solo registra el override de este phone number id.
+ */
+export async function ensureWhatsAppInbound(env: MetaWaEnv, callbackUrl: string): Promise<string> {
+  if (!env.businessAccountId) {
+    throw new MetaApiError(
+      422,
+      "Falta META_WA_WABA_ID. Sin la cuenta de WhatsApp, Meta no entrega webhooks.",
+    );
+  }
+
+  await metaRequest(env, `${env.businessAccountId}/subscribed_apps`, "POST");
+
+  const notes = ["App suscrita a la cuenta de WhatsApp"];
+  let callbackReady = false;
+  const appId = await resolveMetaAppId(env);
+  if (!appId) {
+    notes.push("Sin META_WA_APP_ID no registro el callback de la app");
+  } else {
+    const token = appAccessToken(appId, env.appSecret);
+    let currentUrl: string | null = null;
+    try {
+      const listed = await metaRequest(env, `${appId}/subscriptions`, "GET", undefined, token);
+      const rows = Array.isArray(listed.data) ? listed.data : [];
+      currentUrl =
+        rows.find((row) => row.object === "whatsapp_business_account")?.callback_url?.trim() || "";
+    } catch {
+      currentUrl = null;
+    }
+
+    if (currentUrl === null) {
+      notes.push("No pude leer el callback de la app; no lo reemplazo");
+    } else if (currentUrl && !sameCallback(currentUrl, callbackUrl)) {
+      notes.push("La app ya tiene otro callback; no lo reemplazo");
+    } else {
+      await metaRequest(
+        env,
+        `${appId}/subscriptions`,
+        "POST",
+        new URLSearchParams({
+          object: "whatsapp_business_account",
+          callback_url: callbackUrl,
+          verify_token: env.verifyToken,
+          fields: "messages",
+        }),
+        token,
+      );
+      notes.push("Callback de la app registrado");
+      callbackReady = true;
+    }
+  }
+
+  try {
+    await metaRequest(env, env.phoneNumberId, "POST", {
+      webhook_configuration: {
+        override_callback_uri: callbackUrl,
+        verify_token: env.verifyToken,
+      },
+    });
+    notes.push("Callback del número apuntando a Compruki");
+    callbackReady = true;
+  } catch (error) {
+    if (!callbackReady) throw error;
+    const message = error instanceof Error ? error.message : "el override del número falló";
+    notes.push(`Override del número no quedó: ${message}`);
+  }
+
+  if (!callbackReady) {
+    throw new MetaApiError(
+      422,
+      "La cuenta quedó suscrita, pero el callback no apunta a Compruki. Revisa META_WA_APP_ID y el verify token.",
+    );
+  }
+  return `${notes.join(". ")}.`;
+}
+
+function sameCallback(left: string, right: string) {
+  try {
+    const a = new URL(left);
+    const b = new URL(right);
+    const path = (url: URL) => url.pathname.replace(/\/$/, "") || "/";
+    return a.origin === b.origin && path(a) === path(b);
+  } catch {
+    return left === right;
+  }
+}
+
 export async function listWhatsAppTemplates(env: MetaWaEnv) {
-  if (!env.businessAccountId) return [] as NonNullable<MetaJson["data"]>;
+  if (!env.businessAccountId) return [];
   const result = await metaRequest(
     env,
     `${env.businessAccountId}/message_templates?limit=50&fields=name,language,status,category`,
     "GET",
   );
-  return result.data ?? [];
+  return Array.isArray(result.data) ? result.data : [];
 }

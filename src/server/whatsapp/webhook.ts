@@ -1,10 +1,8 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
 import {
   insertWhatsAppMessage,
   updateWhatsAppDelivery,
   upsertWhatsAppConnection,
 } from "@/server/whatsapp/connection";
-import { requireMetaWaEnv } from "@/server/whatsapp/env";
 import { getPilotTenantId } from "@/server/tenant";
 
 type InboundMessage = {
@@ -48,23 +46,6 @@ type WebhookPayload = {
     }>;
   }>;
 };
-
-export function verifyMetaSignature(appSecret: string, signatureHeader: string | null, rawBody: string) {
-  if (!signatureHeader?.startsWith("sha256=")) return false;
-  const provided = Buffer.from(signatureHeader.slice(7), "hex");
-  const expected = createHmac("sha256", appSecret).update(rawBody).digest();
-  return provided.length === expected.length && timingSafeEqual(provided, expected);
-}
-
-export function verifyWebhookChallenge(query: URLSearchParams): string | null {
-  const mode = query.get("hub.mode") || "";
-  const token = query.get("hub.verify_token") || "";
-  const challenge = query.get("hub.challenge") || "";
-  if (mode !== "subscribe" || !challenge || token.length < 8) return null;
-  const expected = requireMetaWaEnv().verifyToken;
-  if (token !== expected) return null;
-  return challenge;
-}
 
 function extractInboundBody(message: InboundMessage): { body: string; messageType: string } | null {
   if (message.type === "text" && message.text?.body?.trim()) {

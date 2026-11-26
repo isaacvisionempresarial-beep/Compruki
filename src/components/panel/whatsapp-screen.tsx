@@ -139,6 +139,7 @@ export function WhatsAppScreen({
               ["Verify token", connection.env.verifyToken],
               ["App secret", connection.env.appSecret],
               ["WABA ID", connection.env.businessAccountId],
+              ["App ID", connection.env.appId],
               ["Graph", true],
             ] as const
           ).map(([label, ok]) => (
@@ -171,8 +172,10 @@ export function WhatsAppScreen({
           URL para Meta Developer
         </h2>
         <p className="mt-1 text-xs leading-5 text-muted">
-          En la app de Meta → WhatsApp → Configuration → Callback URL. Verify token = el mismo
-          META_WA_VERIFY_TOKEN de Railway. Campo a suscribir: <code className="text-ink">messages</code>.
+          Verificar con Meta suscribe la cuenta y apunta este número a la URL de abajo. Verify
+          token = META_WA_VERIFY_TOKEN. Si la app de Meta todavía no tiene callback, también hace
+          falta META_WA_WABA_ID (y META_WA_APP_ID si el token no lo revela). Campo:{" "}
+          <code className="text-ink">messages</code>.
         </p>
         <p className="mt-2 break-all rounded-[10px] border border-line bg-canvas px-3 py-2 text-sm font-semibold tabular-nums">
           {webhookUrl}

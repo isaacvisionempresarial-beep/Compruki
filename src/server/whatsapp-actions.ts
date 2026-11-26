@@ -14,6 +14,7 @@ import { metaWaConfigured, requireMetaWaEnv } from "@/server/whatsapp/env";
 import {
   listWhatsAppTemplates,
   MetaApiError,
+  ensureWhatsAppInbound,
   sendWhatsAppTemplate,
   sendWhatsAppText,
   verifyMetaPhone,
@@ -75,16 +76,40 @@ export async function verifyWhatsAppConnectionAction(
   try {
     const env = requireMetaWaEnv();
     const verified = await verifyMetaPhone(env);
-    await upsertWhatsAppConnection(access.tenantId, {
-      status: "verificada",
+    const phonePatch = {
+      status: "verificada" as const,
       phoneNumberId: verified.phoneNumberId,
       businessAccountId: env.businessAccountId,
       displayPhoneNumber: verified.displayPhoneNumber,
       verifiedName: verified.verifiedName,
       qualityRating: verified.qualityRating,
       touchChecked: true,
+    };
+    let inboundNote = "";
+    try {
+      inboundNote = await ensureWhatsAppInbound(env, siteUrl("/api/whatsapp/webhook"));
+    } catch (error) {
+      const message =
+        error instanceof MetaApiError
+          ? error.message
+          : error instanceof Error
+            ? error.message
+            : "No se pudo suscribir el webhook.";
+      await upsertWhatsAppConnection(access.tenantId, {
+        ...phonePatch,
+        lastError: message,
+        detail: "Número verificado con Graph API. El webhook no quedó suscrito.",
+      });
+      const [connection, recent] = await Promise.all([
+        readWhatsAppConnection(access.tenantId),
+        listRecentWhatsAppMessages(access.tenantId, 25),
+      ]);
+      return { error: message, ok: null, connection, templates: [], recent };
+    }
+    await upsertWhatsAppConnection(access.tenantId, {
+      ...phonePatch,
       lastError: "",
-      detail: "Número verificado con Graph API.",
+      detail: `Número verificado con Graph API. ${inboundNote}`,
     });
 
     let templates: WhatsAppActionState["templates"] = [];

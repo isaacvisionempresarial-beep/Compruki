@@ -6,6 +6,8 @@ export type MetaWaEnv = {
   businessAccountId: string;
   verifyToken: string;
   appSecret: string;
+  /** Opcional. Si falta, se intenta leer del token con debug_token. */
+  appId: string;
   graphVersion: string;
 };
 
@@ -16,6 +18,7 @@ export function readMetaWaEnv(): Partial<MetaWaEnv> {
     businessAccountId: process.env.META_WA_WABA_ID?.trim() || undefined,
     verifyToken: process.env.META_WA_VERIFY_TOKEN?.trim() || undefined,
     appSecret: process.env.META_WA_APP_SECRET?.trim() || undefined,
+    appId: process.env.META_WA_APP_ID?.trim() || undefined,
     graphVersion: process.env.META_WA_GRAPH_VERSION?.trim() || "v22.0",
   };
 }
@@ -37,6 +40,7 @@ export function requireMetaWaEnv(): MetaWaEnv {
     businessAccountId: env.businessAccountId || "",
     verifyToken: env.verifyToken,
     appSecret: env.appSecret,
+    appId: env.appId || "",
     graphVersion: env.graphVersion || "v22.0",
   };
 }
@@ -48,6 +52,7 @@ export function metaWaEnvSummary(env: Partial<MetaWaEnv> = readMetaWaEnv()) {
     businessAccountId: Boolean(env.businessAccountId),
     verifyToken: Boolean(env.verifyToken),
     appSecret: Boolean(env.appSecret),
+    appId: Boolean(env.appId),
     graphVersion: env.graphVersion || "v22.0",
     ready: metaWaConfigured(env),
   };
