@@ -3,11 +3,16 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useMemo, useState } from "react";
-import { FOLLOWUP_OPEN_STAGES, followupStageLabel } from "@/lib/crm-pipeline";
+import {
+  FOLLOWUP_OPEN_STAGES,
+  followupStageLabel,
+  type FollowupStageId,
+} from "@/lib/crm-pipeline";
 import { cx } from "@/lib/cx";
 import {
   assignInboxConversationAction,
   createFollowupFromInboxAction,
+  markAllInboxReadAction,
   openInboxByPhoneAction,
   selectInboxConversationAction,
   sendInboxMessageAction,
@@ -26,7 +31,8 @@ const empty: InboxActionState = {
   messages: [],
 };
 
-type FilterId = "all" | "mine" | "unassigned";
+type FilterId = "all" | "mine" | "unassigned" | "unread";
+type StageFilter = "all" | FollowupStageId;
 
 const ctrl =
   "h-8 rounded-[8px] border border-line bg-canvas px-2 text-xs text-ink outline-none focus:border-ink";
@@ -62,7 +68,10 @@ export function InboxScreen({
   const [assignState, assignAction, assigning] = useActionState(assignInboxConversationAction, empty);
   const [followState, followAction, following] = useActionState(createFollowupFromInboxAction, empty);
   const [openState, openAction, opening] = useActionState(openInboxByPhoneAction, empty);
+  const [readState, readAction, markingRead] = useActionState(markAllInboxReadAction, empty);
   const [filter, setFilter] = useState<FilterId>("all");
+  const [stageFilter, setStageFilter] = useState<StageFilter>("all");
+  const [query, setQuery] = useState("");
   const defaultTemplateKey = templates[0] ? `${templates[0].name}::${templates[0].language}` : "";
   const [templateKey, setTemplateKey] = useState(defaultTemplateKey);
   const router = useRouter();
@@ -87,6 +96,7 @@ export function InboxScreen({
     stageState.conversations.length ||
     assignState.conversations.length ||
     followState.conversations.length ||
+    readState.conversations.length ||
     selectState.conversations.length
       ? openState.conversations.length
         ? openState.conversations
@@ -98,7 +108,9 @@ export function InboxScreen({
               ? assignState.conversations
               : followState.conversations.length
                 ? followState.conversations
-                : selectState.conversations
+                : readState.conversations.length
+                  ? readState.conversations
+                  : selectState.conversations
       : initialConversations;
 
   const activeId =
@@ -107,6 +119,7 @@ export function InboxScreen({
     stageState.activeId ||
     assignState.activeId ||
     followState.activeId ||
+    readState.activeId ||
     selectState.activeId ||
     initialActiveId;
 
@@ -116,6 +129,7 @@ export function InboxScreen({
     (stageState.activeId && stageState.messages) ||
     (assignState.activeId && assignState.messages) ||
     (followState.activeId && followState.messages) ||
+    (readState.activeId && readState.messages) ||
     (selectState.activeId && selectState.messages) ||
     initialMessages;
 
@@ -124,11 +138,23 @@ export function InboxScreen({
     return (userId: string) => (userId ? map.get(userId) || "Asignado" : "Libre");
   }, [assignees]);
 
+  const unreadTotal = useMemo(
+    () => conversations.reduce((sum, item) => sum + (item.unreadCount > 0 ? item.unreadCount : 0), 0),
+    [conversations],
+  );
+
   const visible = useMemo(() => {
-    if (filter === "mine") return conversations.filter((item) => item.assignedTo === actorUserId);
-    if (filter === "unassigned") return conversations.filter((item) => !item.assignedTo);
-    return conversations;
-  }, [conversations, filter, actorUserId]);
+    const q = query.trim().toLowerCase().replace(/\s+/g, "");
+    return conversations.filter((item) => {
+      if (filter === "mine" && item.assignedTo !== actorUserId) return false;
+      if (filter === "unassigned" && item.assignedTo) return false;
+      if (filter === "unread" && item.unreadCount <= 0) return false;
+      if (stageFilter !== "all" && item.pipelineStage !== stageFilter) return false;
+      if (!q) return true;
+      const hay = `${item.contactName} ${item.phone} ${item.lastMessagePreview}`.toLowerCase();
+      return hay.includes(q) || item.phone.replace(/\D/g, "").includes(q.replace(/\D/g, ""));
+    });
+  }, [conversations, filter, stageFilter, actorUserId, query]);
 
   const active = useMemo(
     () => conversations.find((item) => item.id === activeId) ?? null,
@@ -142,9 +168,10 @@ export function InboxScreen({
     stageState.error ||
     assignState.error ||
     followState.error ||
+    readState.error ||
     selectState.error;
   const feedbackOk =
-    openState.ok || sendState.ok || stageState.ok || assignState.ok || followState.ok;
+    openState.ok || sendState.ok || stageState.ok || assignState.ok || followState.ok || readState.ok;
 
   if (!tableReady) {
     return (
@@ -188,12 +215,20 @@ export function InboxScreen({
                 {opening ? "…" : "+"}
               </button>
             </form>
-            <div className="grid grid-cols-3 gap-0.5" role="tablist" aria-label="Filtro">
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Buscar nombre o celular…"
+              aria-label="Buscar conversaciones"
+              className={cx(ctrl, "w-full")}
+            />
+            <div className="grid grid-cols-4 gap-0.5" role="tablist" aria-label="Filtro">
               {(
                 [
                   ["all", "Todos"],
                   ["mine", "Míos"],
                   ["unassigned", "Libres"],
+                  ["unread", "Nuevos"],
                 ] as const
               ).map(([id, label]) => (
                 <button
@@ -211,12 +246,32 @@ export function InboxScreen({
                 </button>
               ))}
             </div>
+            <select
+              aria-label="Filtrar por etapa"
+              value={stageFilter}
+              onChange={(event) => setStageFilter(event.target.value as StageFilter)}
+              className={cx(ctrl, "w-full")}
+            >
+              <option value="all">Todas las etapas</option>
+              {FOLLOWUP_OPEN_STAGES.map((stage) => (
+                <option key={stage.id} value={stage.id}>
+                  {stage.label}
+                </option>
+              ))}
+            </select>
+            {unreadTotal > 0 ? (
+              <form action={readAction}>
+                <button type="submit" disabled={markingRead} className={cx(btn, "w-full")}>
+                  {markingRead ? "…" : `Marcar leídos (${unreadTotal})`}
+                </button>
+              </form>
+            ) : null}
           </div>
 
           <ul className="min-h-0 flex-1 overflow-y-auto">
             {visible.length === 0 ? (
               <li className="px-2.5 py-3 text-[11px] text-muted">
-                {conversations.length === 0 ? "Sin chats." : "Vacío en este filtro."}
+                {conversations.length === 0 ? "Sin chats." : "Nada con esa búsqueda/filtro."}
               </li>
             ) : (
               visible.map((item) => (

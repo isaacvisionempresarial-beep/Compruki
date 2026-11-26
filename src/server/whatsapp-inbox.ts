@@ -163,6 +163,18 @@ export async function markConversationRead(tenantId: string, conversationId: str
     .eq("id", conversationId);
 }
 
+export async function markAllInboxRead(tenantId: string): Promise<number> {
+  const supabase = createAdminSupabase();
+  const { data, error } = await supabase
+    .from("whatsapp_conversations")
+    .update({ unread_count: 0, updated_at: new Date().toISOString() })
+    .eq("tenant_id", tenantId)
+    .gt("unread_count", 0)
+    .select("id");
+  if (error) throw new Error(error.message);
+  return data?.length ?? 0;
+}
+
 export async function updateConversationPipeline(
   tenantId: string,
   conversationId: string,

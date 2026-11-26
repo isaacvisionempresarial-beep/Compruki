@@ -8,6 +8,7 @@ import {
   getInboxConversation,
   listInboxConversations,
   listInboxMessages,
+  markAllInboxRead,
   markConversationRead,
   openConversationByPhone,
   probeInboxTables,
@@ -231,6 +232,32 @@ export async function assignInboxConversationAction(
     const data = await pack(access.tenantId, conversationId || null);
     return {
       error: error instanceof Error ? error.message : "No se pudo asignar.",
+      ok: null,
+      ...data,
+    };
+  }
+}
+
+export async function markAllInboxReadAction(
+  _state: InboxActionState,
+  _formData: FormData,
+): Promise<InboxActionState> {
+  const access = await requireWhatsAppAccess();
+  if (!access) return { error: "Sin permiso WhatsApp.", ok: null, conversations: [], activeId: null, messages: [] };
+  try {
+    const cleared = await markAllInboxRead(access.tenantId);
+    revalidatePath("/panel/inbox");
+    revalidatePath("/panel");
+    const data = await pack(access.tenantId, null);
+    return {
+      error: null,
+      ok: cleared > 0 ? `${cleared} chat(s) marcados como leídos.` : "No había no leídos.",
+      ...data,
+    };
+  } catch (error) {
+    const data = await pack(access.tenantId, null);
+    return {
+      error: error instanceof Error ? error.message : "No se pudo marcar leídos.",
       ok: null,
       ...data,
     };
