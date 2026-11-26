@@ -6,8 +6,20 @@ import { generateFollowupPriority } from "@/server/agent-followup-priority";
 import { evaluateAgentPolicy } from "@/server/agent-policy";
 import { recordAgentRun } from "@/server/agent-runs";
 import { isFollowupStageId, normalizeFollowupStage } from "@/lib/crm-pipeline";
-import { createFollowup, moveFollowupStage, resolveFollowup } from "@/server/followups";
+import {
+  createFollowup,
+  moveFollowupStage,
+  resolveFollowup,
+  updateFollowupMeta,
+  type FollowupPriority,
+} from "@/server/followups";
 import { assertPanelAccess } from "@/server/panel-auth";
+
+function readPriority(raw: string): FollowupPriority {
+  const value = raw.trim().toLowerCase();
+  if (value === "low" || value === "high") return value;
+  return "normal";
+}
 
 function clientesRedirect(extra: Record<string, string> = {}) {
   const sp = new URLSearchParams(extra);
@@ -24,6 +36,9 @@ export async function createFollowupAction(formData: FormData) {
   const orderNumber = String(formData.get("orderNumber") ?? "").trim();
   const note = String(formData.get("note") ?? "").trim();
   const stage = normalizeFollowupStage(String(formData.get("stage") ?? "nuevo"));
+  const assignedTo = String(formData.get("assignedTo") ?? "").trim();
+  const dueAt = String(formData.get("dueAt") ?? "").trim() || null;
+  const priority = readPriority(String(formData.get("priority") ?? "normal"));
   const from = String(formData.get("from") ?? "").trim();
 
   const result = await createFollowup({
@@ -32,6 +47,9 @@ export async function createFollowupAction(formData: FormData) {
     orderNumber,
     note,
     stage,
+    assignedTo,
+    dueAt,
+    priority,
     createdBy: access.actorName,
   });
 
@@ -81,6 +99,27 @@ export async function moveFollowupStageAction(formData: FormData) {
   }
 
   const result = await moveFollowupStage({ id, stage: stageRaw });
+  if (result.error) {
+    redirect(clientesRedirect({ error: result.error.slice(0, 200) }));
+  }
+  redirect(clientesRedirect({ movido: "1" }));
+}
+
+export async function updateFollowupMetaAction(formData: FormData) {
+  const access = await assertPanelAccess();
+  if (!access) redirect("/ingresar");
+
+  const id = String(formData.get("id") ?? "").trim();
+  const assignedTo = String(formData.get("assignedTo") ?? "");
+  const dueAtRaw = String(formData.get("dueAt") ?? "").trim();
+  const priority = readPriority(String(formData.get("priority") ?? "normal"));
+
+  const result = await updateFollowupMeta({
+    id,
+    assignedTo,
+    dueAt: dueAtRaw || null,
+    priority,
+  });
   if (result.error) {
     redirect(clientesRedirect({ error: result.error.slice(0, 200) }));
   }

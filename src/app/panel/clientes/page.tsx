@@ -7,15 +7,17 @@ import { listRegisteredStoreAccounts } from "@/server/customer-auth";
 import {
   countOpenFollowupsByPhone,
   listOpenFollowups,
+  probeFollowupCrmPro,
   probeFollowupPipeline,
   probeFollowupsTable,
 } from "@/server/followups";
 import { listOrders } from "@/server/order-store";
 import { requirePanelAccess } from "@/server/panel-auth";
+import { listTeamMembers } from "@/server/team";
 
 export const metadata: Metadata = {
   title: "Clientes",
-  description: "Cuentas de tienda y CRM lite con seguimientos. WhatsApp no está conectado.",
+  description: "CRM con pipeline Lead → Postventa, cuentas de tienda e Inbox WhatsApp.",
 };
 
 export const dynamic = "force-dynamic";
@@ -34,17 +36,20 @@ export default async function ClientesPage({
   }>;
 }) {
   const params = await searchParams;
-  await requirePanelAccess();
+  const access = await requirePanelAccess();
 
-  const [orders, openTasks, openByPhone, tableReady, pipelineReady, policy, accounts] = await Promise.all([
-    listOrders(),
-    listOpenFollowups(),
-    countOpenFollowupsByPhone(),
-    probeFollowupsTable(),
-    probeFollowupPipeline(),
-    evaluateAgentPolicy("AG-07"),
-    listRegisteredStoreAccounts(),
-  ]);
+  const [orders, openTasks, openByPhone, tableReady, pipelineReady, crmProReady, policy, accounts, members] =
+    await Promise.all([
+      listOrders(),
+      listOpenFollowups(100),
+      countOpenFollowupsByPhone(),
+      probeFollowupsTable(),
+      probeFollowupPipeline(),
+      probeFollowupCrmPro(),
+      evaluateAgentPolicy("AG-07"),
+      listRegisteredStoreAccounts(),
+      listTeamMembers(access.tenantId).catch(() => []),
+    ]);
 
   const contacts = buildCrmContacts(orders, openByPhone);
   const priority = params.prioridad === "1" ? getFollowupPriorityPreview() : null;
@@ -55,7 +60,7 @@ export default async function ClientesPage({
       : params.cerrado === "1"
         ? "Seguimiento cerrado."
         : params.movido === "1"
-          ? "Etapa actualizada."
+          ? "Pipeline actualizado."
           : null;
 
   return (
@@ -63,8 +68,13 @@ export default async function ClientesPage({
       accounts={accounts}
       contacts={contacts}
       openTasks={openTasks}
+      assignees={members.map((member) => ({
+        userId: member.userId,
+        name: member.name || member.email,
+      }))}
       tableReady={tableReady}
       pipelineReady={pipelineReady}
+      crmProReady={crmProReady}
       priority={priority}
       ag07Enabled={policy.ok}
       flash={flash}

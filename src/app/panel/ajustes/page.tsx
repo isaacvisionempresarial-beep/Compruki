@@ -33,7 +33,7 @@ export default async function SettingsPage() {
     {
       key: "followupTasks",
       label: "followup_tasks (AG-07)",
-      hint: "Migración supabase/migrations/013_followup_tasks.sql. Sin ella no se guardan seguimientos CRM.",
+      hint: "013 + 014 + 022_crm_pipeline_pro.sql (asignación/vencimiento). Sin 013 no hay CRM.",
     },
     {
       key: "customerProfiles",
