@@ -3,20 +3,20 @@ import { redirect } from "next/navigation";
 import { LoginScreen } from "@/components/auth/login-screen";
 import { getAuthUser, userHasPanelMembership } from "@/server/customer-auth";
 
-const loginDescription = "Acceso al panel de la tienda piloto. Dropi no está conectado.";
+const loginDescription = "Entra al panel de COMPRUKÍ o visita la tienda online.";
 
 export const metadata: Metadata = {
   title: "Iniciar sesión",
   description: loginDescription,
   robots: { index: false, follow: false, nocache: true },
   openGraph: {
-    title: "Iniciar sesión · COMPRUKI",
+    title: "Iniciar sesión · COMPRUKÍ",
     description: loginDescription,
     url: "/ingresar",
   },
   twitter: {
     card: "summary",
-    title: "Iniciar sesión · COMPRUKI",
+    title: "Iniciar sesión · COMPRUKÍ",
     description: loginDescription,
   },
 };

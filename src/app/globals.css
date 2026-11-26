@@ -263,6 +263,17 @@ body {
   animation: store-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.login-form-panel {
+  background:
+    radial-gradient(720px 360px at 12% -8%, rgb(37 199 165 / 0.12), transparent 55%),
+    radial-gradient(560px 320px at 100% 8%, rgb(255 138 101 / 0.08), transparent 48%),
+    linear-gradient(180deg, #f7f9fd 0%, #eef2f8 52%, #f6f8fc 100%);
+}
+
+.login-store-cta {
+  animation: store-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+}
+
 @keyframes login-hero-drift {
   from {
     transform: scale(1.03) translate3d(0, 0, 0);

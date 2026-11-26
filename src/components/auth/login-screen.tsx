@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { useActionState } from "react";
-import { Wordmark } from "@/components/brand/wordmark";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import {
   requestPasswordReset,
   signIn,
@@ -45,26 +45,22 @@ export function LoginScreen({
         />
         <div className="login-hero-veil absolute inset-0" aria-hidden="true" />
         <div className="relative z-10 flex min-h-dvh w-full flex-col px-10 py-10 xl:px-14">
-          <Wordmark onDark badge />
+          <BrandLogo onDark className="h-9 max-w-[12.5rem]" priority />
           <div className="mt-auto max-w-md pb-2">
-            <p className="store-display text-[2.65rem] leading-[1.02] font-extrabold tracking-[-0.04em] text-balance">
-              Tu negocio, en modo venta.
+            <p className="store-display text-[2.75rem] leading-[1.02] font-extrabold tracking-[-0.04em] text-balance">
+              Vende claro. Atiende rápido.
             </p>
-            <p className="mt-3 max-w-[34ch] text-sm leading-6 text-on-dark/85">
-              Catálogo, pedidos y margen en un solo panel. Dropi no está conectado.
+            <p className="mt-3 max-w-[36ch] text-sm leading-6 text-on-dark/88">
+              Catálogo, pedidos, clientes y WhatsApp en un solo panel para tu comercio.
             </p>
-            <p className="mt-6 text-[11px] font-semibold tracking-[0.06em] text-on-dark-muted uppercase">
-              Colombia · piloto
+            <p className="mt-6 text-[11px] font-semibold tracking-[0.08em] text-on-dark-muted uppercase">
+              Colombia · COMPRUKÍ
             </p>
           </div>
         </div>
       </section>
 
-      <main
-        id="contenido"
-        tabIndex={-1}
-        className="relative flex min-h-dvh flex-col outline-none"
-      >
+      <main id="contenido" tabIndex={-1} className="relative flex min-h-dvh flex-col outline-none">
         <div className="login-mobile-hero relative h-44 overflow-hidden sm:h-52 lg:hidden">
           <Image
             src="/brand/login-hero.jpg"
@@ -76,24 +72,52 @@ export function LoginScreen({
           />
           <div className="login-hero-veil absolute inset-0" aria-hidden="true" />
           <div className="relative z-10 flex h-full flex-col justify-between px-5 py-5 text-on-dark">
-            <Wordmark onDark badge />
-            <p className="store-display max-w-[14ch] text-[1.65rem] leading-[1.05] font-extrabold tracking-[-0.03em]">
-              Tu negocio, en modo venta.
+            <BrandLogo onDark className="h-8 max-w-[11rem]" priority />
+            <p className="store-display max-w-[13ch] text-[1.7rem] leading-[1.05] font-extrabold tracking-[-0.03em]">
+              Vende claro. Atiende rápido.
             </p>
           </div>
         </div>
 
-        <div className="flex flex-1 items-start bg-canvas px-5 py-7 sm:px-8 sm:py-10 lg:items-center lg:px-12">
+        <div className="login-form-panel relative flex flex-1 items-start px-5 py-7 sm:px-8 sm:py-10 lg:items-center lg:px-12">
           <div className="login-form-rise mx-auto w-full max-w-[400px]">
-            <div className="rounded-[18px] border border-line/80 bg-card/95 px-5 py-6 shadow-[0_18px_40px_-28px_rgb(23_26_40/0.35)] sm:px-7 sm:py-7">
+            <div className="rounded-[20px] border border-line/70 bg-card/95 px-5 py-6 shadow-[0_22px_48px_-30px_rgb(23_26_40/0.42)] backdrop-blur-[2px] sm:px-7 sm:py-7">
               {mode === "login" ? (
                 <LoginForm onRecover={() => setMode("recovery")} accessDenied={accessDenied} otherStore={otherStore} />
               ) : null}
               {mode === "recovery" ? <RecoveryForm onBack={() => setMode("login")} linkError={linkError} /> : null}
               {mode === "nueva-clave" ? <NewPasswordForm onBack={() => setMode("login")} /> : null}
             </div>
+
+            <Link
+              href="/tienda"
+              target="_self"
+              className="login-store-cta group mt-4 block overflow-hidden rounded-[18px] border border-line/80 bg-card/90 shadow-[0_14px_32px_-28px_rgb(23_26_40/0.4)] transition-[transform,border-color,box-shadow] hover:-translate-y-0.5 hover:border-accent/45 hover:shadow-[0_18px_36px_-26px_rgb(37_199_165/0.45)]"
+              title="Abrir la tienda pública"
+            >
+              <span className="flex items-center gap-3 bg-[linear-gradient(120deg,#222638_0%,#2c334c_55%,#1f6f5c_140%)] px-4 py-3.5">
+                <BrandLogo onDark className="h-8 max-w-[10.5rem]" />
+                <span className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-primary-dark transition-transform group-hover:translate-x-0.5">
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+                    <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+              </span>
+              <span className="block px-4 py-3">
+                <span className="block text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">
+                  Tienda online
+                </span>
+                <span className="store-display mt-0.5 block text-[1.08rem] leading-tight font-extrabold tracking-[-0.02em] text-ink">
+                  Entrar a la tienda
+                </span>
+                <span className="mt-0.5 block text-xs leading-4 text-muted">
+                  Catálogo y compras para tus clientes. Sin entrar al panel.
+                </span>
+              </span>
+            </Link>
+
             <p className="mt-4 text-center text-xs leading-5 text-muted">
-              Entrar no cobra ni cambia pedidos.
+              El panel es para tu equipo. La tienda es para tus compradores.
             </p>
           </div>
         </div>
@@ -116,20 +140,22 @@ function LoginForm({
 
   return (
     <>
-      <p className="text-[10px] font-bold tracking-[0.1em] text-muted uppercase">Sesión</p>
-      <h1 className="store-display mt-1 text-[1.85rem] leading-tight font-extrabold tracking-[-0.03em]">Iniciar sesión</h1>
-      <p className="mt-1.5 text-sm leading-5 text-muted">Correo de tu comercio.</p>
+      <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Equipo COMPRUKÍ</p>
+      <h1 className="store-display mt-1 text-[1.9rem] leading-tight font-extrabold tracking-[-0.03em]">
+        Iniciar sesión
+      </h1>
+      <p className="mt-1.5 text-sm leading-5 text-muted">Entra al panel de tu tienda con tu correo.</p>
 
       {otherStore ? (
         <AccessAlert
-          message="Tu cuenta es de otra tienda. Este panel solo abre la tienda piloto."
+          message="Tu cuenta pertenece a otra tienda. Este panel solo abre COMPRUKÍ."
           actionLabel="Cerrar sesión"
         />
       ) : null}
 
       {accessDenied ? (
         <AccessAlert
-          message="Tu cuenta entró, pero no tiene membresía en la tienda piloto. Pide el enlace en Supabase (memberships) o cierra sesión."
+          message="Tu cuenta entró, pero aún no tiene membresía en COMPRUKÍ. Pide acceso al propietario o cierra sesión."
           actionLabel="Cerrar sesión"
         />
       ) : null}
@@ -227,8 +253,10 @@ function RecoveryForm({ onBack, linkError }: { onBack: () => void; linkError?: b
 
   return (
     <>
-      <p className="text-[10px] font-bold tracking-[0.1em] text-muted uppercase">Sesión</p>
-      <h1 className="store-display mt-1 text-[1.85rem] leading-tight font-extrabold tracking-[-0.03em]">Recuperar acceso</h1>
+      <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Equipo COMPRUKÍ</p>
+      <h1 className="store-display mt-1 text-[1.9rem] leading-tight font-extrabold tracking-[-0.03em]">
+        Recuperar acceso
+      </h1>
       <p className="mt-1.5 text-sm leading-5 text-muted">Te enviamos un enlace para elegir la nueva contraseña.</p>
 
       {linkError ? (
@@ -305,8 +333,10 @@ function NewPasswordForm({ onBack }: { onBack: () => void }) {
 
   return (
     <>
-      <p className="text-[10px] font-bold tracking-[0.1em] text-muted uppercase">Sesión</p>
-      <h1 className="store-display mt-1 text-[1.85rem] leading-tight font-extrabold tracking-[-0.03em]">Nueva contraseña</h1>
+      <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Equipo COMPRUKÍ</p>
+      <h1 className="store-display mt-1 text-[1.9rem] leading-tight font-extrabold tracking-[-0.03em]">
+        Nueva contraseña
+      </h1>
       <p className="mt-1.5 text-sm leading-5 text-muted">
         Con el enlace basta la clave nueva. Si no, escribe también la actual.
       </p>
