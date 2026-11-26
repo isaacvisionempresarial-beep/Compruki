@@ -3,6 +3,7 @@ import {
   type FollowupStageId,
 } from "@/lib/crm-pipeline";
 import { createAdminSupabase } from "@/lib/supabase/admin";
+import { syncOpenFollowupsFromConversation } from "@/server/followups";
 import {
   insertWhatsAppMessage,
   normalizeWaPhone,
@@ -169,7 +170,7 @@ export async function updateConversationPipeline(
   status?: "open" | "pending" | "closed",
 ) {
   const supabase = createAdminSupabase();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("whatsapp_conversations")
     .update({
       pipeline_stage: stage,
@@ -177,8 +178,17 @@ export async function updateConversationPipeline(
       updated_at: new Date().toISOString(),
     })
     .eq("tenant_id", tenantId)
-    .eq("id", conversationId);
+    .eq("id", conversationId)
+    .select("phone")
+    .maybeSingle();
   if (error) throw new Error(error.message);
+  if (data?.phone) {
+    await syncOpenFollowupsFromConversation({
+      tenantId,
+      phone: String(data.phone),
+      stage,
+    }).catch(() => undefined);
+  }
 }
 
 export async function assignConversation(
@@ -188,15 +198,24 @@ export async function assignConversation(
 ) {
   const supabase = createAdminSupabase();
   const value = assignedTo.trim();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("whatsapp_conversations")
     .update({
       assigned_to: value,
       updated_at: new Date().toISOString(),
     })
     .eq("tenant_id", tenantId)
-    .eq("id", conversationId);
+    .eq("id", conversationId)
+    .select("phone")
+    .maybeSingle();
   if (error) throw new Error(error.message);
+  if (data?.phone) {
+    await syncOpenFollowupsFromConversation({
+      tenantId,
+      phone: String(data.phone),
+      assignedTo: value,
+    }).catch(() => undefined);
+  }
 }
 
 export async function sendInboxText(input: {

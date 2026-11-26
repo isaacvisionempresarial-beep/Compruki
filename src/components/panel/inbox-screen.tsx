@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect, useMemo, useState } from "react";
 import { FOLLOWUP_OPEN_STAGES, followupStageLabel } from "@/lib/crm-pipeline";
 import { cx } from "@/lib/cx";
 import {
@@ -64,6 +65,15 @@ export function InboxScreen({
   const [filter, setFilter] = useState<FilterId>("all");
   const defaultTemplateKey = templates[0] ? `${templates[0].name}::${templates[0].language}` : "";
   const [templateKey, setTemplateKey] = useState(defaultTemplateKey);
+  const router = useRouter();
+
+  useEffect(() => {
+    const tick = () => {
+      if (document.visibilityState === "visible") router.refresh();
+    };
+    const id = window.setInterval(tick, 25_000);
+    return () => window.clearInterval(id);
+  }, [router]);
 
   const selectedTemplate = useMemo(() => {
     if (!templateKey) return null;
@@ -289,6 +299,20 @@ export function InboxScreen({
                       Asignar
                     </button>
                   </form>
+                  {active.assignedTo !== actorUserId ? (
+                    <form action={assignAction}>
+                      <input type="hidden" name="conversationId" value={active.id} />
+                      <input type="hidden" name="assignedTo" value={actorUserId} />
+                      <button
+                        type="submit"
+                        disabled={assigning}
+                        className={btnDark}
+                        title="Asignarme este chat y su seguimiento CRM"
+                      >
+                        Tomar
+                      </button>
+                    </form>
+                  ) : null}
 
                   <span className="hidden h-4 w-px bg-line sm:block" aria-hidden />
 

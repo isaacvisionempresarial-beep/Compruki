@@ -224,8 +224,9 @@ export async function assignInboxConversationAction(
   try {
     await assignConversation(access.tenantId, conversationId, String(formData.get("assignedTo") || ""));
     revalidatePath("/panel/inbox");
+    revalidatePath("/panel/clientes");
     const data = await pack(access.tenantId, conversationId);
-    return { error: null, ok: "Responsable actualizado.", ...data };
+    return { error: null, ok: "Responsable actualizado en Inbox y CRM.", ...data };
   } catch (error) {
     const data = await pack(access.tenantId, conversationId || null);
     return {

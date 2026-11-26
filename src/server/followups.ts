@@ -280,6 +280,39 @@ async function syncInboxAssigneeByPhone(tenantId: string, phoneRaw: string, assi
   }
 }
 
+/** Inbox → CRM: refleja responsable/etapa en seguimientos abiertos del mismo celular. */
+export async function syncOpenFollowupsFromConversation(input: {
+  tenantId: string;
+  phone: string;
+  assignedTo?: string;
+  stage?: FollowupStageId;
+}) {
+  const phones = phoneCandidates(input.phone);
+  if (phones.length === 0) return;
+
+  const patch: Record<string, unknown> = {};
+  if (input.assignedTo !== undefined) patch.assigned_to = input.assignedTo.trim().slice(0, 80);
+  if (input.stage && isFollowupStageId(input.stage)) patch.stage = input.stage;
+  if (Object.keys(patch).length === 0) return;
+
+  const supabase = createAdminSupabase();
+  const withPro = await supabase
+    .from("followup_tasks")
+    .update(patch)
+    .eq("tenant_id", input.tenantId)
+    .eq("status", "open")
+    .in("phone", phones);
+
+  if (withPro.error && missingCrmProColumn(withPro.error.message) && patch.stage) {
+    await supabase
+      .from("followup_tasks")
+      .update({ stage: patch.stage })
+      .eq("tenant_id", input.tenantId)
+      .eq("status", "open")
+      .in("phone", phones);
+  }
+}
+
 export async function createFollowup(input: {
   phone: string;
   customerName: string;
