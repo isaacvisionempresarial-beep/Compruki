@@ -5,7 +5,15 @@ import type { MetaWaEnv } from "@/server/whatsapp/env";
 const DEFAULT_TIMEOUT_MS = 12_000;
 
 export type MetaJson = {
-  error?: { message?: string; code?: number };
+  error?: {
+    message?: string;
+    type?: string;
+    code?: number;
+    error_subcode?: number;
+    error_user_title?: string;
+    error_user_msg?: string;
+    fbtrace_id?: string;
+  };
   success?: boolean;
   id?: string;
   display_phone_number?: string;
@@ -28,11 +36,37 @@ export type MetaJson = {
 
 export class MetaApiError extends Error {
   status: number;
-  constructor(status: number, message: string) {
+  metaCode: number | null;
+  constructor(status: number, message: string, metaCode: number | null = null) {
     super(message);
     this.name = "MetaApiError";
     this.status = status;
+    this.metaCode = metaCode;
   }
+}
+
+function formatMetaReject(error: MetaJson["error"] | undefined): string {
+  const code = typeof error?.code === "number" ? error.code : null;
+  const raw = (error?.error_user_msg || error?.message || "").replace(/\s+/g, " ").trim();
+  const lower = raw.toLowerCase();
+  const authLike =
+    code === 190 ||
+    code === 102 ||
+    /authentication|access token|expired|invalid.*token|oauth/i.test(lower);
+
+  if (authLike) {
+    return (
+      "Token de Meta inválido o vencido. En Meta Developers → App → WhatsApp → API Setup " +
+      "copia un token nuevo (mejor System User permanente), pégalo en Railway como " +
+      "META_WA_ACCESS_TOKEN, redeploy, y en /panel/whatsapp pulsa Verificar con Meta." +
+      (code ? ` (código ${code})` : "")
+    );
+  }
+
+  const detail = raw.slice(0, 240);
+  return detail
+    ? `Meta rechazó la solicitud: ${detail}${code ? ` (${code})` : ""}`
+    : "Meta rechazó la solicitud. Revisa token e IDs en Railway.";
 }
 
 async function sleepMs(ms: number) {
@@ -77,12 +111,9 @@ export async function metaRequest(
       continue;
     }
     if (!response.ok) {
-      const detail = data.error?.message?.replace(/\s+/g, " ").trim().slice(0, 240);
       const status = response.status >= 400 && response.status < 500 ? 422 : 502;
-      throw new MetaApiError(
-        status,
-        detail ? `Meta rechazó la solicitud: ${detail}` : "Meta rechazó la solicitud. Revisa token e IDs.",
-      );
+      const metaCode = typeof data.error?.code === "number" ? data.error.code : null;
+      throw new MetaApiError(status, formatMetaReject(data.error), metaCode);
     }
     return data;
   }
