@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { isFollowupStageId } from "@/lib/crm-pipeline";
 import { assertPanelAccess, hasPermission } from "@/server/panel-auth";
 import {
+  assignConversation,
   getInboxConversation,
   listInboxConversations,
   listInboxMessages,
@@ -18,6 +19,13 @@ import {
 } from "@/server/whatsapp-inbox";
 import { normalizeCrmPhone } from "@/lib/crm-contacts";
 import { createFollowup } from "@/server/followups";
+import { listTeamMembers } from "@/server/team";
+
+export type InboxAssignee = {
+  userId: string;
+  name: string;
+  email: string;
+};
 
 export type InboxActionState = {
   error: string | null;
@@ -45,7 +53,11 @@ async function pack(tenantId: string, activeId: string | null): Promise<Omit<Inb
   return { conversations, activeId: selected, messages };
 }
 
-export async function loadInboxPanelData(activeId?: string | null) {
+export async function loadInboxPanelData(opts?: {
+  activeId?: string | null;
+  phone?: string | null;
+  contactName?: string | null;
+}) {
   const access = await requireWhatsAppAccess();
   if (!access) {
     return {
@@ -54,7 +66,10 @@ export async function loadInboxPanelData(activeId?: string | null) {
       conversations: [] as InboxConversation[],
       activeId: null as string | null,
       messages: [] as InboxMessage[],
+      assignees: [] as InboxAssignee[],
+      actorUserId: "",
       roleLabel: "",
+      bootError: null as string | null,
     };
   }
   const tableReady = await probeInboxTables();
@@ -65,11 +80,47 @@ export async function loadInboxPanelData(activeId?: string | null) {
       conversations: [],
       activeId: null,
       messages: [],
+      assignees: [],
+      actorUserId: access.user.id,
       roleLabel: access.roleLabel,
+      bootError: null,
     };
   }
-  const data = await pack(access.tenantId, activeId ?? null);
-  return { canManage: true, tableReady: true, roleLabel: access.roleLabel, ...data };
+
+  let bootError: string | null = null;
+  let preferredId = opts?.activeId ?? null;
+  const phoneRaw = opts?.phone?.trim() || "";
+  if (phoneRaw) {
+    try {
+      const opened = await openConversationByPhone(
+        access.tenantId,
+        phoneRaw,
+        opts?.contactName?.trim() || "",
+      );
+      preferredId = opened.id;
+    } catch (error) {
+      bootError = error instanceof Error ? error.message : "No se pudo abrir el chat.";
+    }
+  }
+
+  const [data, members] = await Promise.all([
+    pack(access.tenantId, preferredId),
+    listTeamMembers(access.tenantId).catch(() => []),
+  ]);
+  const assignees: InboxAssignee[] = members.map((member) => ({
+    userId: member.userId,
+    name: member.name,
+    email: member.email,
+  }));
+  return {
+    canManage: true,
+    tableReady: true,
+    roleLabel: access.roleLabel,
+    actorUserId: access.user.id,
+    assignees,
+    bootError,
+    ...data,
+  };
 }
 
 export async function selectInboxConversationAction(
@@ -120,6 +171,28 @@ export async function sendInboxMessageAction(
     const data = await pack(access.tenantId, conversationId || null);
     return {
       error: error instanceof Error ? error.message : "No se pudo enviar.",
+      ok: null,
+      ...data,
+    };
+  }
+}
+
+export async function assignInboxConversationAction(
+  _state: InboxActionState,
+  formData: FormData,
+): Promise<InboxActionState> {
+  const access = await requireWhatsAppAccess();
+  if (!access) return { error: "Sin permiso WhatsApp.", ok: null, conversations: [], activeId: null, messages: [] };
+  const conversationId = String(formData.get("conversationId") || "");
+  try {
+    await assignConversation(access.tenantId, conversationId, String(formData.get("assignedTo") || ""));
+    revalidatePath("/panel/inbox");
+    const data = await pack(access.tenantId, conversationId);
+    return { error: null, ok: "Responsable actualizado.", ...data };
+  } catch (error) {
+    const data = await pack(access.tenantId, conversationId || null);
+    return {
+      error: error instanceof Error ? error.message : "No se pudo asignar.",
       ok: null,
       ...data,
     };

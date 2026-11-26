@@ -1,16 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useMemo } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { FOLLOWUP_OPEN_STAGES, followupStageLabel } from "@/lib/crm-pipeline";
 import { cx } from "@/lib/cx";
 import {
+  assignInboxConversationAction,
   createFollowupFromInboxAction,
   openInboxByPhoneAction,
   selectInboxConversationAction,
   sendInboxMessageAction,
   updateInboxStageAction,
   type InboxActionState,
+  type InboxAssignee,
 } from "@/server/whatsapp-inbox-actions";
 import type { InboxConversation, InboxMessage } from "@/server/whatsapp-inbox";
 
@@ -22,29 +24,40 @@ const empty: InboxActionState = {
   messages: [],
 };
 
+type FilterId = "all" | "mine" | "unassigned";
+
 export function InboxScreen({
   tableReady,
   initialConversations,
   initialActiveId,
   initialMessages,
+  assignees,
+  actorUserId,
   roleLabel,
+  bootError,
 }: {
   tableReady: boolean;
   initialConversations: InboxConversation[];
   initialActiveId: string | null;
   initialMessages: InboxMessage[];
+  assignees: InboxAssignee[];
+  actorUserId: string;
   roleLabel: string;
+  bootError: string | null;
 }) {
   const [selectState, selectAction] = useActionState(selectInboxConversationAction, empty);
   const [sendState, sendAction, sending] = useActionState(sendInboxMessageAction, empty);
   const [stageState, stageAction, staging] = useActionState(updateInboxStageAction, empty);
+  const [assignState, assignAction, assigning] = useActionState(assignInboxConversationAction, empty);
   const [followState, followAction, following] = useActionState(createFollowupFromInboxAction, empty);
   const [openState, openAction, opening] = useActionState(openInboxByPhoneAction, empty);
+  const [filter, setFilter] = useState<FilterId>("all");
 
   const conversations =
     openState.conversations.length ||
     sendState.conversations.length ||
     stageState.conversations.length ||
+    assignState.conversations.length ||
     followState.conversations.length ||
     selectState.conversations.length
       ? openState.conversations.length
@@ -53,15 +66,18 @@ export function InboxScreen({
           ? sendState.conversations
           : stageState.conversations.length
             ? stageState.conversations
-            : followState.conversations.length
-              ? followState.conversations
-              : selectState.conversations
+            : assignState.conversations.length
+              ? assignState.conversations
+              : followState.conversations.length
+                ? followState.conversations
+                : selectState.conversations
       : initialConversations;
 
   const activeId =
     openState.activeId ||
     sendState.activeId ||
     stageState.activeId ||
+    assignState.activeId ||
     followState.activeId ||
     selectState.activeId ||
     initialActiveId;
@@ -70,9 +86,21 @@ export function InboxScreen({
     (openState.activeId && openState.messages) ||
     (sendState.activeId && sendState.messages) ||
     (stageState.activeId && stageState.messages) ||
+    (assignState.activeId && assignState.messages) ||
     (followState.activeId && followState.messages) ||
     (selectState.activeId && selectState.messages) ||
     initialMessages;
+
+  const assigneeName = useMemo(() => {
+    const map = new Map(assignees.map((item) => [item.userId, item.name || item.email]));
+    return (userId: string) => (userId ? map.get(userId) || "Asignado" : "Sin asignar");
+  }, [assignees]);
+
+  const visible = useMemo(() => {
+    if (filter === "mine") return conversations.filter((item) => item.assignedTo === actorUserId);
+    if (filter === "unassigned") return conversations.filter((item) => !item.assignedTo);
+    return conversations;
+  }, [conversations, filter, actorUserId]);
 
   const active = useMemo(
     () => conversations.find((item) => item.id === activeId) ?? null,
@@ -80,8 +108,15 @@ export function InboxScreen({
   );
 
   const feedbackError =
-    openState.error || sendState.error || stageState.error || followState.error || selectState.error;
-  const feedbackOk = openState.ok || sendState.ok || stageState.ok || followState.ok;
+    bootError ||
+    openState.error ||
+    sendState.error ||
+    stageState.error ||
+    assignState.error ||
+    followState.error ||
+    selectState.error;
+  const feedbackOk =
+    openState.ok || sendState.ok || stageState.ok || assignState.ok || followState.ok;
 
   if (!tableReady) {
     return (
@@ -103,7 +138,7 @@ export function InboxScreen({
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Operación</p>
           <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">Inbox WhatsApp</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted">
-            Conversaciones Meta Cloud · pipeline CRM · acceso {roleLabel}.
+            Conversaciones Meta Cloud · pipeline CRM · asignación a operadores · acceso {roleLabel}.
           </p>
         </div>
         <Link
@@ -138,16 +173,44 @@ export function InboxScreen({
         </button>
       </form>
 
+      <div className="mt-3 flex flex-wrap gap-2" role="tablist" aria-label="Filtro de conversaciones">
+        {(
+          [
+            ["all", "Todos"],
+            ["mine", "Míos"],
+            ["unassigned", "Sin asignar"],
+          ] as const
+        ).map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={filter === id}
+            onClick={() => setFilter(id)}
+            className={cx(
+              "h-8 rounded-[10px] border px-3 text-xs font-semibold",
+              filter === id ? "border-ink bg-ink text-canvas" : "border-line bg-card text-ink hover:bg-subtle",
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(260px,0.95fr)_minmax(0,1.35fr)]">
         <section className="elevate-1 rounded-[14px] border border-line bg-card overflow-hidden">
           <div className="border-b border-line px-3 py-2">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Conversaciones</p>
           </div>
-          {conversations.length === 0 ? (
-            <p className="px-3 py-4 text-sm text-muted">Aún no hay chats. Escribe desde un celular o abre uno arriba.</p>
+          {visible.length === 0 ? (
+            <p className="px-3 py-4 text-sm text-muted">
+              {conversations.length === 0
+                ? "Aún no hay chats. Escribe desde un celular o abre uno arriba."
+                : "Ninguna conversación en este filtro."}
+            </p>
           ) : (
             <ul className="max-h-[70vh] overflow-y-auto">
-              {conversations.map((item) => (
+              {visible.map((item) => (
                 <li key={item.id} className="border-b border-line last:border-b-0">
                   <form action={selectAction}>
                     <input type="hidden" name="conversationId" value={item.id} />
@@ -170,7 +233,7 @@ export function InboxScreen({
                       </div>
                       <p className="mt-0.5 truncate text-xs text-muted">{item.lastMessagePreview || "—"}</p>
                       <p className="mt-1 text-[10px] font-semibold tracking-[0.06em] text-muted uppercase">
-                        {followupStageLabel(item.pipelineStage)} · {item.status}
+                        {followupStageLabel(item.pipelineStage)} · {assigneeName(item.assignedTo)}
                       </p>
                     </button>
                   </form>
@@ -189,11 +252,40 @@ export function InboxScreen({
                 <p className="text-sm font-semibold text-ink">{active.contactName || active.phone}</p>
                 <p className="text-xs text-muted tabular-nums">{active.phone}</p>
                 <div className="mt-2 flex flex-wrap gap-2">
+                  <form action={assignAction} className="flex flex-wrap items-center gap-2">
+                    <input type="hidden" name="conversationId" value={active.id} />
+                    <label className="sr-only" htmlFor="inbox-assignee">
+                      Responsable
+                    </label>
+                    <select
+                      id="inbox-assignee"
+                      name="assignedTo"
+                      defaultValue={active.assignedTo}
+                      key={`${active.id}-${active.assignedTo}`}
+                      className="h-9 rounded-[10px] border border-line bg-canvas px-2 text-sm"
+                    >
+                      <option value="">Sin asignar</option>
+                      {assignees.map((person) => (
+                        <option key={person.userId} value={person.userId}>
+                          {person.name || person.email}
+                          {person.userId === actorUserId ? " (tú)" : ""}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="submit"
+                      disabled={assigning}
+                      className="h-9 rounded-[10px] border border-line px-3 text-sm font-semibold hover:bg-subtle disabled:opacity-50"
+                    >
+                      Asignar
+                    </button>
+                  </form>
                   <form action={stageAction} className="flex flex-wrap items-center gap-2">
                     <input type="hidden" name="conversationId" value={active.id} />
                     <select
                       name="stage"
                       defaultValue={active.pipelineStage}
+                      key={`${active.id}-stage-${active.pipelineStage}`}
                       className="h-9 rounded-[10px] border border-line bg-canvas px-2 text-sm"
                     >
                       {FOLLOWUP_OPEN_STAGES.map((stage) => (
@@ -205,6 +297,7 @@ export function InboxScreen({
                     <select
                       name="status"
                       defaultValue={active.status}
+                      key={`${active.id}-status-${active.status}`}
                       className="h-9 rounded-[10px] border border-line bg-canvas px-2 text-sm"
                     >
                       <option value="open">Abierta</option>

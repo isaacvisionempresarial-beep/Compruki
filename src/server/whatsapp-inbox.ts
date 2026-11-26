@@ -165,6 +165,24 @@ export async function updateConversationPipeline(
   if (error) throw new Error(error.message);
 }
 
+export async function assignConversation(
+  tenantId: string,
+  conversationId: string,
+  assignedTo: string,
+) {
+  const supabase = createAdminSupabase();
+  const value = assignedTo.trim();
+  const { error } = await supabase
+    .from("whatsapp_conversations")
+    .update({
+      assigned_to: value,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("tenant_id", tenantId)
+    .eq("id", conversationId);
+  if (error) throw new Error(error.message);
+}
+
 export async function sendInboxText(input: {
   tenantId: string;
   conversationId: string;

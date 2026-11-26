@@ -432,15 +432,26 @@ function PipelineCard({ task, pipelineReady }: { task: FollowupTask; pipelineRea
             Descartar
           </button>
         </form>
+        {task.phone ? (
+          <Link
+            href={`/panel/inbox?phone=${encodeURIComponent(task.phone)}${
+              task.customerName ? `&name=${encodeURIComponent(task.customerName)}` : ""
+            }`}
+            title="Abre o crea el chat en Inbox Meta."
+            className="inline-flex h-8 items-center rounded-[10px] border border-line bg-card px-2.5 text-xs font-semibold text-ink hover:bg-subtle"
+          >
+            Inbox
+          </Link>
+        ) : null}
         {waHref ? (
           <a
             href={waHref}
             target="_blank"
             rel="noopener noreferrer"
-            title="Abre WhatsApp con una nota. Compruki no envía."
+            title="Abre WhatsApp Web/app con una nota. No usa Meta Cloud."
             className="inline-flex h-8 items-center rounded-[10px] border border-line bg-card px-2.5 text-xs font-semibold text-ink hover:bg-subtle"
           >
-            WhatsApp
+            wa.me
           </a>
         ) : null}
         {task.orderNumber ? (
