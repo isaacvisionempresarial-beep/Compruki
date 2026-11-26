@@ -14,13 +14,16 @@ export const dynamic = "force-dynamic";
 export default async function InboxPage({
   searchParams,
 }: {
-  searchParams: Promise<{ c?: string; phone?: string; name?: string }>;
+  searchParams: Promise<{ c?: string; phone?: string; name?: string; f?: string }>;
 }) {
   const access = await requirePanelAccess();
   if (!hasPermission(access, "whatsapp_manage")) {
     redirect("/panel/whatsapp");
   }
   const params = await searchParams;
+  const filterRaw = (params.f ?? "").trim().toLowerCase();
+  const initialFilter =
+    filterRaw === "mine" || filterRaw === "unassigned" || filterRaw === "unread" ? filterRaw : "all";
   const data = await loadInboxPanelData({
     activeId: params.c ?? null,
     phone: params.phone ?? null,
@@ -37,6 +40,7 @@ export default async function InboxPage({
       actorUserId={data.actorUserId}
       roleLabel={data.roleLabel || access.roleLabel}
       bootError={data.bootError}
+      initialFilter={initialFilter}
     />
   );
 }

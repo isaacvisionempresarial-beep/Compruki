@@ -33,10 +33,16 @@ export default async function ClientesPage({
     error?: string;
     agente?: string;
     agenteError?: string;
+    f?: string;
   }>;
 }) {
   const params = await searchParams;
   const access = await requirePanelAccess();
+  const filterRaw = (params.f ?? "").trim().toLowerCase();
+  const initialBoardFilter =
+    filterRaw === "mine" || filterRaw === "overdue" || filterRaw === "high" || filterRaw === "all"
+      ? filterRaw
+      : "all";
 
   const [orders, openTasks, openByPhone, tableReady, pipelineReady, crmProReady, policy, accounts, members] =
     await Promise.all([
@@ -73,6 +79,7 @@ export default async function ClientesPage({
         name: member.name || member.email,
       }))}
       actorUserId={access.user.id}
+      initialBoardFilter={initialBoardFilter}
       tableReady={tableReady}
       pipelineReady={pipelineReady}
       crmProReady={crmProReady}

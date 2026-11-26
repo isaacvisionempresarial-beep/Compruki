@@ -36,6 +36,7 @@ export function CustomersScreen({
   openTasks,
   assignees = [],
   actorUserId = "",
+  initialBoardFilter = "all",
   tableReady,
   pipelineReady = true,
   crmProReady = false,
@@ -50,6 +51,7 @@ export function CustomersScreen({
   openTasks: FollowupTask[];
   assignees?: CrmAssignee[];
   actorUserId?: string;
+  initialBoardFilter?: BoardFilter;
   tableReady: boolean;
   pipelineReady?: boolean;
   crmProReady?: boolean;
@@ -59,7 +61,7 @@ export function CustomersScreen({
   error?: string | null;
   policyError?: string | null;
 }) {
-  const [boardFilter, setBoardFilter] = useState<BoardFilter>("all");
+  const [boardFilter, setBoardFilter] = useState<BoardFilter>(initialBoardFilter);
   const today = new Date().toISOString().slice(0, 10);
 
   const filteredTasks = useMemo(() => {

@@ -11,6 +11,7 @@ import { STATUS_LABEL, type Period } from "@/lib/demo-data";
 import { cx } from "@/lib/cx";
 import { formatCop, formatDay } from "@/lib/format";
 import { accountHoldNote, attentionCostAside, attentionQueueIsOwnerMoney, attentionQueues, awaitsDropiNumber, closePhrase, lineName, needsClosedDropiNumber, needsIncidenceDropiNumber, orderFocusHref, costDrift, costDriftNote, ordersInSpan, priceDrift, orderPriceStayNote, resultDriftNote, resultsByProduct, samePhoneMatches, orderCostCopyNote, outsideCostCopyNote, periodCostShiftNote, skuCostPreviewNote, storedSkuLines, summarizeStoreOrders, syncSectionHref, widerPeriodWithResults, type CloseBasis, type CostGuide, type PriceGuide, type SizeGuide, type StoreOrder } from "@/lib/store-order";
+import type { OpsSnapshot } from "@/server/ops-snapshot";
 
 function outsideCopyNote(all: StoreOrder[], sku: string, guides: CostGuide[]) {
   const guide = guides.find((item) => item.sku === sku);
@@ -62,6 +63,7 @@ export function Dashboard({
   agentPendingCount = 0,
   agentPendingSummary = null,
   agentHome = null,
+  ops = null,
 }: {
   storeOrders: StoreOrder[];
   sizeGuides: SizeGuide[];
@@ -74,6 +76,7 @@ export function Dashboard({
   agentPendingCount?: number;
   agentPendingSummary?: AgentPendingSummary | null;
   agentHome?: AgentHomeBriefView | null;
+  ops?: OpsSnapshot | null;
 }) {
   const [storePeriod, setStorePeriod] = useState<Period>("7d");
   const [basis, setBasis] = useState<CloseBasis>("creados");
@@ -151,6 +154,47 @@ export function Dashboard({
     { label: "Cobrados", ...storeSummary.collected, hint: "Marcados cobrados. No es utilidad." },
   ];
 
+  const opsCards = ops
+    ? [
+        {
+          label: "WA sin leer",
+          value: ops.unread,
+          href: "/panel/inbox?f=unread",
+          tone: ops.unread > 0 ? "warn" : "ok",
+        },
+        {
+          label: "Chats libres",
+          value: ops.freeChats,
+          href: "/panel/inbox?f=unassigned",
+          tone: ops.freeChats > 0 ? "warn" : "ok",
+        },
+        {
+          label: "CRM abiertos",
+          value: ops.openFollowups,
+          href: "/panel/clientes?f=all",
+          tone: "ok",
+        },
+        {
+          label: "CRM vencidos",
+          value: ops.overdueFollowups,
+          href: "/panel/clientes?f=overdue",
+          tone: ops.overdueFollowups > 0 ? "danger" : "ok",
+        },
+        {
+          label: "CRM alta",
+          value: ops.highFollowups,
+          href: "/panel/clientes?f=high",
+          tone: ops.highFollowups > 0 ? "warn" : "ok",
+        },
+        {
+          label: "Míos CRM",
+          value: ops.myFollowups,
+          href: "/panel/clientes?f=mine",
+          tone: "ok",
+        },
+      ]
+    : [];
+
   return (
     <div className="mx-auto max-w-[1600px] pb-8">
       <header className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3 sm:px-4">
@@ -175,11 +219,26 @@ export function Dashboard({
                 ) : null}
               </Link>
               <Link
+                href="/panel/inbox"
+                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold whitespace-nowrap text-ink hover:bg-subtle"
+              >
+                Inbox
+                {ops && ops.unread > 0 ? (
+                  <span className="ml-2 rounded-[8px] bg-coral/15 px-1.5 py-0.5 text-xs font-bold text-coral tabular-nums">
+                    {ops.unread}
+                  </span>
+                ) : null}
+              </Link>
+              <Link
                 href="/panel/clientes"
                 className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold whitespace-nowrap text-ink hover:bg-subtle"
               >
-                Cuentas
-                {agentPendingSummary && agentPendingSummary.seguimientos > 0 ? (
+                CRM
+                {ops && ops.overdueFollowups > 0 ? (
+                  <span className="ml-2 rounded-[8px] bg-coral/15 px-1.5 py-0.5 text-xs font-bold text-coral tabular-nums">
+                    {ops.overdueFollowups}
+                  </span>
+                ) : agentPendingSummary && agentPendingSummary.seguimientos > 0 ? (
                   <span className="ml-2 rounded-[8px] bg-accent-tint px-1.5 py-0.5 text-xs font-bold text-accent-strong tabular-nums">
                     {agentPendingSummary.seguimientos}
                   </span>
@@ -213,6 +272,34 @@ export function Dashboard({
           </div>
         </div>
       </header>
+
+      {opsCards.length > 0 ? (
+        <section className="mt-3" aria-label="WhatsApp y CRM">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+            {opsCards.map((card) => (
+              <Link
+                key={card.label}
+                href={card.href}
+                className="elevate-1 rounded-[12px] border border-line bg-card px-3 py-2.5 hover:bg-subtle"
+              >
+                <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{card.label}</p>
+                <p
+                  className={cx(
+                    "mt-1 text-xl font-extrabold tabular-nums",
+                    card.tone === "danger"
+                      ? "text-danger"
+                      : card.tone === "warn"
+                        ? "text-warning"
+                        : "text-ink",
+                  )}
+                >
+                  {card.value}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {agentHome ? (
         <section

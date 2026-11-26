@@ -51,6 +51,7 @@ export function InboxScreen({
   actorUserId,
   roleLabel,
   bootError,
+  initialFilter = "all",
 }: {
   tableReady: boolean;
   initialConversations: InboxConversation[];
@@ -61,6 +62,7 @@ export function InboxScreen({
   actorUserId: string;
   roleLabel: string;
   bootError: string | null;
+  initialFilter?: FilterId;
 }) {
   const [selectState, selectAction] = useActionState(selectInboxConversationAction, empty);
   const [sendState, sendAction, sending] = useActionState(sendInboxMessageAction, empty);
@@ -69,7 +71,7 @@ export function InboxScreen({
   const [followState, followAction, following] = useActionState(createFollowupFromInboxAction, empty);
   const [openState, openAction, opening] = useActionState(openInboxByPhoneAction, empty);
   const [readState, readAction, markingRead] = useActionState(markAllInboxReadAction, empty);
-  const [filter, setFilter] = useState<FilterId>("all");
+  const [filter, setFilter] = useState<FilterId>(initialFilter);
   const [stageFilter, setStageFilter] = useState<StageFilter>("all");
   const [query, setQuery] = useState("");
   const defaultTemplateKey = templates[0] ? `${templates[0].name}::${templates[0].language}` : "";

@@ -5,6 +5,7 @@ import { listPendingApprovals } from "@/server/agent-central";
 import { getAgentHomeBrief } from "@/server/agent-gateway";
 import { listOrders } from "@/server/order-store";
 import { listCostGuides, listPriceGuides, listSizeGuides } from "@/server/catalog-store";
+import { getOpsSnapshot } from "@/server/ops-snapshot";
 import { hasPermission, requirePanelAccess } from "@/server/panel-auth";
 
 export const metadata: Metadata = {
@@ -18,14 +19,16 @@ export default async function PanelPage() {
   const access = await requirePanelAccess();
   const today = bogotaNow().slice(0, 10);
   const greetingName = access.actorName.split(/\s+/)[0] || access.actorName;
-  const [storeOrders, sizeGuides, priceGuides, costGuides, pendingApprovals, agentHome] = await Promise.all([
-    listOrders(),
-    listSizeGuides(),
-    listPriceGuides(),
-    listCostGuides(),
-    listPendingApprovals(),
-    getAgentHomeBrief(),
-  ]);
+  const [storeOrders, sizeGuides, priceGuides, costGuides, pendingApprovals, agentHome, ops] =
+    await Promise.all([
+      listOrders(),
+      listSizeGuides(),
+      listPriceGuides(),
+      listCostGuides(),
+      listPendingApprovals(),
+      getAgentHomeBrief(),
+      getOpsSnapshot(access.tenantId, access.user.id),
+    ]);
 
   const pendingSummary = {
     total: pendingApprovals.length,
@@ -56,6 +59,7 @@ export default async function PanelPage() {
       agentPendingCount={pendingSummary.total}
       agentPendingSummary={pendingSummary}
       agentHome={agentHome}
+      ops={ops}
     />
   );
 }
