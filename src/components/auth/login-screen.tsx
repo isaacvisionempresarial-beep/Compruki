@@ -44,16 +44,20 @@ export function LoginScreen({
           className="login-hero-photo object-cover"
         />
         <div className="login-hero-veil absolute inset-0" aria-hidden="true" />
-        <div className="relative z-10 flex min-h-dvh w-full flex-col px-10 py-10 xl:px-14">
-          <BrandLogo onDark className="h-9 max-w-[12.5rem]" priority />
-          <div className="mt-auto max-w-md pb-2">
-            <p className="store-display text-[2.75rem] leading-[1.02] font-extrabold tracking-[-0.04em] text-balance">
+        <div className="relative z-10 flex min-h-dvh w-full flex-col items-center justify-center px-10 py-12 text-center xl:px-14">
+          <BrandLogo
+            onDark
+            priority
+            className="login-hero-logo h-[4.75rem] max-w-[min(88%,28rem)] object-center drop-shadow-[0_12px_28px_rgb(0_0_0/0.35)] xl:h-[5.5rem] xl:max-w-[32rem]"
+          />
+          <div className="mt-8 max-w-lg">
+            <p className="store-display text-[2.35rem] leading-[1.05] font-extrabold tracking-[-0.04em] text-balance xl:text-[2.65rem]">
               Vende claro. Atiende rápido.
             </p>
-            <p className="mt-3 max-w-[36ch] text-sm leading-6 text-on-dark/88">
+            <p className="mx-auto mt-3 max-w-[38ch] text-sm leading-6 text-on-dark/88">
               Catálogo, pedidos, clientes y WhatsApp en un solo panel para tu comercio.
             </p>
-            <p className="mt-6 text-[11px] font-semibold tracking-[0.08em] text-on-dark-muted uppercase">
+            <p className="mt-5 text-[11px] font-semibold tracking-[0.08em] text-on-dark-muted uppercase">
               Colombia · COMPRUKÍ
             </p>
           </div>
@@ -61,7 +65,7 @@ export function LoginScreen({
       </section>
 
       <main id="contenido" tabIndex={-1} className="relative flex min-h-dvh flex-col outline-none">
-        <div className="login-mobile-hero relative h-44 overflow-hidden sm:h-52 lg:hidden">
+        <div className="login-mobile-hero relative h-52 overflow-hidden sm:h-60 lg:hidden">
           <Image
             src="/brand/login-hero.jpg"
             alt=""
@@ -71,9 +75,13 @@ export function LoginScreen({
             className="object-cover"
           />
           <div className="login-hero-veil absolute inset-0" aria-hidden="true" />
-          <div className="relative z-10 flex h-full flex-col justify-between px-5 py-5 text-on-dark">
-            <BrandLogo onDark className="h-8 max-w-[11rem]" priority />
-            <p className="store-display max-w-[13ch] text-[1.7rem] leading-[1.05] font-extrabold tracking-[-0.03em]">
+          <div className="relative z-10 flex h-full flex-col items-center justify-center px-5 py-5 text-center text-on-dark">
+            <BrandLogo
+              onDark
+              priority
+              className="login-hero-logo h-12 max-w-[min(86%,18rem)] object-center drop-shadow-[0_10px_22px_rgb(0_0_0/0.35)] sm:h-14 sm:max-w-[20rem]"
+            />
+            <p className="store-display mt-4 max-w-[16ch] text-[1.45rem] leading-[1.08] font-extrabold tracking-[-0.03em] sm:text-[1.6rem]">
               Vende claro. Atiende rápido.
             </p>
           </div>
