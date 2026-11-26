@@ -36,6 +36,7 @@ type WebhookPayload = {
         statuses?: Array<{
           id?: string;
           status?: string;
+          recipient_id?: string;
           errors?: Array<{
             code?: number;
             title?: string;
@@ -141,6 +142,17 @@ export async function processWhatsAppWebhook(payload: WebhookPayload): Promise<{
         if (error?.code === 131042) {
           detail = "Configura país, moneda y método de pago en Meta Business.";
         }
+        // Si el envío fue desde Meta (no desde el panel), igual dejamos rastro en Actividad.
+        await insertWhatsAppMessage(tenantId, {
+          waMessageId: status.id,
+          direction: "outbound",
+          phone: status.recipient_id || "",
+          body: `Estado Meta: ${status.status}${detail ? ` · ${detail}` : ""}`,
+          messageType: "status",
+          deliveryStatus: status.status,
+          deliveryDetail: detail,
+          createdBy: "meta-webhook",
+        });
         await updateWhatsAppDelivery(tenantId, status.id, status.status, detail);
         statuses += 1;
       }
@@ -165,19 +177,21 @@ export async function processWhatsAppWebhook(payload: WebhookPayload): Promise<{
     }
   }
 
-  if (inbound > 0) {
-    await upsertWhatsAppConnection(tenantId, {
-      status: "verificada",
-      touchInbound: true,
-      detail: "Webhook recibiendo mensajes de Meta.",
-      lastError: "",
-    });
-  }
+  const receivedSomething = inbound > 0 || statuses > 0;
+  await upsertWhatsAppConnection(tenantId, {
+    status: "verificada",
+    touchInbound: inbound > 0,
+    touchChecked: true,
+    detail: receivedSomething
+      ? `Webhook OK · entrantes ${inbound} · estados ${statuses} · ${new Date().toISOString()}`
+      : `Webhook recibido sin mensajes/estados · ${new Date().toISOString()}`,
+    lastError: "",
+  });
 
   return {
     accepted: true,
     inbound,
     statuses,
-    ignored: inbound === 0 && statuses === 0,
+    ignored: !receivedSomething,
   };
 }

@@ -104,6 +104,22 @@ export function WhatsAppScreen({
             <dd className="mt-0.5 font-semibold">{connection.verifiedName || "—"}</dd>
           </div>
           <div className="rounded-[10px] border border-line px-3 py-2">
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Último webhook / check</dt>
+            <dd className="mt-0.5 font-semibold tabular-nums">
+              {connection.lastCheckedAt
+                ? new Date(connection.lastCheckedAt).toLocaleString("es-CO")
+                : "Aún no llega ningún POST de Meta"}
+            </dd>
+          </div>
+          <div className="rounded-[10px] border border-line px-3 py-2">
+            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Último entrante</dt>
+            <dd className="mt-0.5 font-semibold tabular-nums">
+              {connection.lastInboundAt
+                ? new Date(connection.lastInboundAt).toLocaleString("es-CO")
+                : "Ninguno (escribe un hola desde el celular al +1 555…)"}
+            </dd>
+          </div>
+          <div className="rounded-[10px] border border-line px-3 py-2">
             <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Phone Number ID</dt>
             <dd className="mt-0.5 font-semibold break-all tabular-nums">
               {connection.phoneNumberId || "—"}
