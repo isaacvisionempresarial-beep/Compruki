@@ -25,7 +25,7 @@ function periodCostPreview(shown: StoreOrder[], all: StoreOrder[], sku: string, 
   return skuCostPreviewNote(shown, sku, guide, "este período", all.filter((order) => !seen.has(order.number)));
 }
 
-const homeProductGrid = "md:grid-cols-[minmax(0,1.5fr)_8.75rem_8.75rem_8.75rem]";
+const homeProductGrid = "md:grid-cols-[minmax(0,1.4fr)_minmax(7.5rem,1fr)_minmax(7.5rem,1fr)_minmax(7.5rem,1fr)]";
 
 export type AgentPendingSummary = {
   total: number;
@@ -159,39 +159,26 @@ export function Dashboard({
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Panel</p>
             <h1 className="mt-0.5 text-xl leading-6 font-extrabold tracking-tight sm:text-[22px]">Hola {greetingName}</h1>
             <p className="mt-0.5 text-sm text-muted">
-              Modo venta · cifras del período y cola por atender.
-              {canManageOrderMoney ? "" : " Flete, costo, cobro y precios los guarda el propietario."}
+              Atiende la cola, revisa cifras y cuentas de la tienda.
+              {canManageOrderMoney ? "" : " Flete, costo y cobro los guarda el propietario."}
             </p>
           </div>
           <div className="flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto pb-0.5">
-            <nav aria-label="Herramientas" className="flex shrink-0 items-center gap-2">
-              <span className="sr-only">Herramientas</span>
+            <nav aria-label="Accesos" className="flex shrink-0 items-center gap-2">
               <Link
                 href="/panel/pedidos#por-atender"
                 className="inline-flex h-9 items-center justify-center rounded-[10px] bg-primary px-3.5 text-sm font-semibold whitespace-nowrap text-on-dark hover:bg-primary-soft"
               >
-                Atender pedidos
+                Atender
                 {orderWork.yours > 0 ? (
                   <span className="ml-2 rounded-[8px] bg-on-dark/15 px-1.5 py-0.5 text-xs font-bold tabular-nums">{orderWork.yours}</span>
-                ) : null}
-              </Link>
-            </nav>
-            <nav aria-label="Vista" className="flex shrink-0 items-center gap-2">
-              <span className="sr-only">Vista</span>
-              <Link
-                href={agentPendingCount > 0 ? "/panel/agentes#pendientes-humanos" : "/panel/agentes"}
-                className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold whitespace-nowrap text-ink hover:bg-subtle"
-              >
-                Agentes
-                {agentPendingCount > 0 ? (
-                  <span className="ml-2 rounded-[8px] bg-coral/15 px-1.5 py-0.5 text-xs font-bold text-coral tabular-nums">{agentPendingCount}</span>
                 ) : null}
               </Link>
               <Link
                 href="/panel/clientes"
                 className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold whitespace-nowrap text-ink hover:bg-subtle"
               >
-                Clientes
+                Cuentas
                 {agentPendingSummary && agentPendingSummary.seguimientos > 0 ? (
                   <span className="ml-2 rounded-[8px] bg-accent-tint px-1.5 py-0.5 text-xs font-bold text-accent-strong tabular-nums">
                     {agentPendingSummary.seguimientos}
@@ -199,11 +186,20 @@ export function Dashboard({
                 ) : null}
               </Link>
               <Link
-                href="/panel/agentes?intent=margen%20LAM-MES-01"
+                href="/panel/catalogo"
                 className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold whitespace-nowrap text-ink hover:bg-subtle"
               >
-                Probar Central
+                Catálogo
               </Link>
+              {agentPendingCount > 0 ? (
+                <Link
+                  href="/panel/agentes#pendientes-humanos"
+                  className="inline-flex h-9 items-center justify-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold whitespace-nowrap text-ink hover:bg-subtle"
+                >
+                  Agentes
+                  <span className="ml-2 rounded-[8px] bg-coral/15 px-1.5 py-0.5 text-xs font-bold text-coral tabular-nums">{agentPendingCount}</span>
+                </Link>
+              ) : null}
               {syncWorkCount > 0 ? (
                 <Link
                   href={syncSectionHref("sync-crear")}

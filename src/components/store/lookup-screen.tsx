@@ -16,62 +16,53 @@ export function LookupScreen() {
   const canSearch = /^P-\d{4,6}$/.test(orderNumber) && /^3\d{9}$/.test(phoneNumber);
 
   return (
-    <div>
+    <div className="mx-auto max-w-xl space-y-3">
       <section
-        className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line px-4 py-4 sm:px-5"
+        className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line bg-card"
         style={{ animationDelay: "40ms" }}
       >
-        <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Pedido</p>
-        <h1 className="store-display mt-2 text-[1.75rem] leading-tight font-extrabold tracking-[-0.03em]">Consultar pedido</h1>
-        <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Seguimiento. Número del pedido y celular de la entrega. Varios intentos seguidos se detienen un rato y no abren el pedido. Consultar no cobra ni cambia el total guardado.
-        </p>
-      </section>
-
-      <section
-        className="store-rise elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3"
-        style={{ animationDelay: "110ms" }}
-        aria-labelledby="que-necesitas"
-      >
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Datos</p>
-        <h2 id="que-necesitas" className="mt-0.5 text-sm font-semibold">Qué necesitas</h2>
-        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-          <li>
-            <span className="font-semibold text-sm">Número</span>
-            <span className="mt-0.5 block text-xs leading-5 text-muted">Empieza por P- y los dígitos al confirmar.</span>
-          </li>
-          <li>
-            <span className="font-semibold text-sm">Celular</span>
-            <span className="mt-0.5 block text-xs leading-5 text-muted">10 dígitos, empieza por 3. Debe coincidir.</span>
-          </li>
-        </ul>
-        <p className="mt-3 text-xs leading-5 text-muted">
-          Solo estado en la tienda. Si sigue en curso, pagas al recibir y nadie cobra aquí. Si está cancelado, devuelto o en incidencia, ya no se paga al recibir. Anotar el cobro, el flete o el recaudo no es dinero cobrado aquí. Consultar no cambia el total guardado. Sin guía ni fecha exacta.
-        </p>
-        <p className="mt-2 text-xs leading-5 text-muted">
-          Corregir la entrega, la talla o un aviso no cobra aquí. El total guardado no cambia. Agregar o quitar un producto sí puede cambiar ese total, y tampoco es dinero cobrado.
-        </p>
-        <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-          <Link
-            href="/tienda/condiciones"
-            title="Leerlas no registra pedido ni cobra."
-            className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold"
-          >
-            Condiciones
-          </Link>
-        </nav>
-        <p className="mt-2 text-xs leading-5 text-muted">Leerlas no registra pedido ni cobra.</p>
+        <div className="absolute inset-0 bg-gradient-to-r from-card via-card to-[#e8eef5]" aria-hidden="true" />
+        <div className="store-hero-glow pointer-events-none absolute inset-0 opacity-45" aria-hidden="true" />
+        <div className="relative z-10 grid items-center gap-3 p-3.5 sm:grid-cols-[minmax(0,1fr)_minmax(8.5rem,12.5rem)] sm:gap-4 sm:p-4">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Pedido</p>
+            <h1 className="store-display mt-1 text-[1.7rem] leading-tight font-extrabold tracking-[-0.03em]">Consultar pedido</h1>
+            <p className="mt-1.5 text-sm leading-5 text-muted">
+              Con el número (P-…) y el celular de la entrega. Consultar no cobra ni cambia el total.
+            </p>
+          </div>
+          <div className="relative isolate mx-auto w-full max-w-[12.5rem] sm:mx-0 sm:justify-self-end" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/store/lookup-hero.jpg?v=1"
+              alt=""
+              width={640}
+              height={360}
+              decoding="async"
+              className="h-24 w-full rounded-[14px] object-cover object-center ring-1 ring-line/80 sm:h-28"
+            />
+          </div>
+        </div>
       </section>
 
       <form
         action={formAction}
-        className="store-rise elevate-1 mt-3 max-w-xl space-y-2 rounded-[14px] border border-line bg-card px-3 py-3"
-        style={{ animationDelay: "180ms" }}
+        className="store-rise elevate-1 space-y-2.5 rounded-[14px] border border-line bg-card px-3.5 py-3.5"
+        style={{ animationDelay: "110ms" }}
         aria-labelledby="consulta-pedido"
       >
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Consulta</p>
           <h2 id="consulta-pedido" className="mt-0.5 text-sm font-semibold">Número y celular</h2>
+          <ul className="grid gap-2 rounded-[10px] border border-line bg-canvas px-3 py-2 text-xs leading-5 text-muted sm:grid-cols-2">
+            <li>
+              <span className="font-semibold text-ink">Número</span>
+              <span className="mt-0.5 block">Empieza por P- (ej. P-2001).</span>
+            </li>
+            <li>
+              <span className="font-semibold text-ink">Celular</span>
+              <span className="mt-0.5 block">10 dígitos, inicia en 3. Debe coincidir.</span>
+            </li>
+          </ul>
           <div>
             <label htmlFor="number" className="mb-1 block text-sm font-semibold">
               Número del pedido
@@ -131,13 +122,19 @@ export function LookupScreen() {
             </button>
           </nav>
         </form>
-        <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
+        <nav aria-label="Vista" className="flex flex-wrap items-center gap-2">
           <Link
             href="/tienda"
-            className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+            className="inline-flex h-9 items-center rounded-[10px] bg-primary px-3 text-sm font-semibold text-on-dark"
           >
             Volver a la tienda
+          </Link>
+          <Link
+            href="/tienda/condiciones"
+            title="Leerlas no registra pedido ni cobra."
+            className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+          >
+            Condiciones
           </Link>
         </nav>
     </div>

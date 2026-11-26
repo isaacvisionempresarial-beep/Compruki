@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useActionState, useMemo, useState, type ReactNode } from "react";
 import type { PublicProduct } from "@/server/catalog-store";
-import { BrandLogo } from "@/components/brand/brand-logo";
 import { readCampaignSkus } from "@/lib/campaign";
 import { variantFits } from "@/lib/catalog";
 import { citiesForDepartment, listColombiaDepartments } from "@/lib/colombia-places";
@@ -107,20 +106,39 @@ export function CheckoutScreen({
   }
 
   return (
-    <div>
+    <div className="space-y-3">
       <section
-        className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line px-4 py-4 sm:px-5"
+        className="store-hero store-rise relative overflow-hidden rounded-[18px] border border-line bg-card"
         style={{ animationDelay: "40ms" }}
       >
-        <BrandLogo className="h-8 max-w-[11rem]" />
-        <p className="mt-2 text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Carrito</p>
-        <h1 className="store-display mt-1 text-[1.75rem] leading-tight font-extrabold tracking-[-0.03em]">Datos de entrega</h1>
-        <p className="mt-1 max-w-xl text-sm leading-5 text-muted">
-          Pago contra entrega. Al confirmar queda pendiente. Nadie cobra aquí. Pagas {formatCop(total)} al recibir.
-        </p>
+        <div className="absolute inset-0 bg-gradient-to-r from-card via-card to-[#e8eef5]" aria-hidden="true" />
+        <div className="store-hero-glow pointer-events-none absolute inset-0 opacity-45" aria-hidden="true" />
+        <div className="relative z-10 grid items-center gap-3 p-3.5 sm:grid-cols-[minmax(0,1fr)_minmax(8.5rem,12.5rem)] sm:gap-4 sm:p-4">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold tracking-[0.1em] text-accent-strong uppercase">Confirmar pedido</p>
+            <h1 className="store-display mt-1 text-[1.7rem] leading-tight font-extrabold tracking-[-0.03em]">Datos de entrega</h1>
+            <p className="mt-1.5 text-sm leading-5 text-muted">
+              Pago contra entrega. Al confirmar queda pendiente. Nadie cobra aquí.
+            </p>
+            <p className="mt-2 inline-flex rounded-[8px] bg-accent/15 px-2 py-0.5 text-xs font-bold text-accent-strong tabular-nums">
+              Total al recibir {formatCop(total)}
+            </p>
+          </div>
+          <div className="relative isolate mx-auto w-full max-w-[12.5rem] sm:mx-0 sm:justify-self-end" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/store/checkout-hero.jpg?v=1"
+              alt=""
+              width={640}
+              height={360}
+              decoding="async"
+              className="h-24 w-full rounded-[14px] object-cover object-center ring-1 ring-line/80 sm:h-28"
+            />
+          </div>
+        </div>
       </section>
 
-      <form action={formAction} className="store-rise mt-3 space-y-3" style={{ animationDelay: "120ms" }}>
+      <form action={formAction} className="store-rise grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)]" style={{ animationDelay: "120ms" }}>
         <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
         <input type="hidden" name="lines" value={JSON.stringify(payload)} />
         <input
@@ -129,9 +147,10 @@ export function CheckoutScreen({
           value={JSON.stringify(payload.filter((line) => campaignSkus.includes(line.sku)).map((line) => line.sku))}
         />
 
+        <div className="space-y-3 lg:order-2">
         <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-3" aria-labelledby="pago-resumen">
-          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
-          <h2 id="pago-resumen" className="mt-0.5 text-sm font-semibold">Resumen</h2>
+          <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Resumen</p>
+          <h2 id="pago-resumen" className="mt-0.5 text-sm font-semibold">Lo que pides</h2>
           <ul className="mt-2 space-y-2">
             {payable.map(({ line, product }) => (
               <li key={`${line.sku}:${line.variant}`} className="text-xs">
@@ -159,22 +178,19 @@ export function CheckoutScreen({
             <span className="text-xs text-muted">Total al recibir</span>
             <span className="text-lg font-extrabold tabular-nums">{formatCop(total)}</span>
           </p>
-          <p className="mt-2 text-xs leading-5 text-muted">Pagas al recibir. Envío aparte. Nadie cobra aquí.</p>
-          <p className="mt-1.5 text-xs leading-5 text-muted">
-            Confirmar registra en la tienda y no cobra. El envío se acuerda aparte.
-          </p>
-          <nav aria-label="Vista" className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Vista</span>
-            <Link href="/tienda/carrito" title="Volver no confirma el pedido ni cobra." className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle">
-              Volver al carrito
-            </Link>
-          </nav>
-          <p className="mt-2 text-xs leading-5 text-muted">Volver no confirma el pedido ni cobra.</p>
-
+          <p className="mt-2 text-xs leading-5 text-muted">Pagas al recibir · Envío aparte · Nadie cobra aquí.</p>
+          <Link
+            href="/tienda/carrito"
+            title="Volver no confirma el pedido ni cobra."
+            className="mt-3 inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold text-ink hover:bg-subtle"
+          >
+            Volver al carrito
+          </Link>
         </section>
+        </div>
 
-        <div className="space-y-2">
-          <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2" aria-labelledby="entrega-titulo">
+        <div className="space-y-3 lg:order-1">
+          <section className="elevate-1 rounded-[14px] border border-line bg-card px-3 py-2.5" aria-labelledby="entrega-titulo">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Entrega</p>
             <h2 id="entrega-titulo" className="mt-0.5 text-sm font-semibold">
               Quién recibe
