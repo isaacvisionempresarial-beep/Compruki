@@ -16,7 +16,8 @@ export type IconName =
   | "search"
   | "spark"
   | "bag"
-  | "sync";
+  | "sync"
+  | "chat";
 
 type IconProps = SVGProps<SVGSVGElement> & { name: IconName };
 
@@ -128,6 +129,12 @@ const paths: Record<IconName, ReactNode> = {
       <path d="M4 4.4v4h4" />
       <path d="M4 15.8a8 8 0 0 0 13.5 2" />
       <path d="M20 19.6v-4h-4" />
+    </>
+  ),
+  chat: (
+    <>
+      <path d="M5.2 5.2h13.6A1.6 1.6 0 0 1 20.4 6.8v8.2a1.6 1.6 0 0 1-1.6 1.6H10l-3.8 3.2V16.6H5.2A1.6 1.6 0 0 1 3.6 15V6.8A1.6 1.6 0 0 1 5.2 5.2Z" />
+      <path d="M8 9.4h8M8 12.4h5.2" />
     </>
   ),
 };

@@ -84,6 +84,7 @@ const groups: Array<{ id: string; label: string; items: Array<{ id: string; labe
     label: "Operación",
     items: [
       { id: "sincronizacion", label: "Sincronización", icon: "sync", href: "/panel/sincronizacion" },
+      { id: "whatsapp", label: "WhatsApp", icon: "chat", href: "/panel/whatsapp" },
       { id: "conexiones", label: "Conexiones", icon: "link", href: "/panel/conexiones" },
     ],
   },

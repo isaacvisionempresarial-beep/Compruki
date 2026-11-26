@@ -3,6 +3,8 @@ import { probeCustomerProfilesTable } from "@/server/customer-auth";
 import { probeFollowupsTable } from "@/server/followups";
 import { openAIKeyConfigured, probeOpenAI } from "@/server/openai-client";
 import { probeProductQuestionsTable } from "@/server/product-questions";
+import { probeWhatsAppTables } from "@/server/whatsapp/connection";
+import { metaWaConfigured } from "@/server/whatsapp/env";
 
 export type HealthChecks = {
   siteUrl: boolean;
@@ -16,6 +18,10 @@ export type HealthChecks = {
   followupTasks: boolean;
   /** Perfiles de comprador (017); no bloquea ok. */
   customerProfiles: boolean;
+  /** Tablas WhatsApp Meta (018); no bloquea ok. */
+  whatsappTables: boolean;
+  /** Credenciales META_WA_* presentes; no bloquea ok. */
+  whatsappMetaEnv: boolean;
   /** Clave presente; el probe vivo va en openaiConnected. No bloquea ok. */
   openaiKey: boolean;
 };
@@ -43,6 +49,8 @@ export async function getHealthSnapshot(): Promise<HealthSnapshot> {
     productQuestions: false,
     followupTasks: false,
     customerProfiles: false,
+    whatsappTables: false,
+    whatsappMetaEnv: metaWaConfigured(),
     openaiKey: openAIKeyConfigured(),
   };
 
@@ -54,14 +62,16 @@ export async function getHealthSnapshot(): Promise<HealthSnapshot> {
     } catch {
       checks.tenantPilot = false;
     }
-    const [productQuestions, followupTasks, customerProfiles] = await Promise.all([
+    const [productQuestions, followupTasks, customerProfiles, whatsappTables] = await Promise.all([
       probeProductQuestionsTable(),
       probeFollowupsTable(),
       probeCustomerProfilesTable(),
+      probeWhatsAppTables(),
     ]);
     checks.productQuestions = productQuestions;
     checks.followupTasks = followupTasks;
     checks.customerProfiles = customerProfiles;
+    checks.whatsappTables = whatsappTables;
   }
 
   const openaiProbe = await probeOpenAI();

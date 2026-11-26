@@ -40,6 +40,16 @@ export default async function SettingsPage() {
       label: "customer_profiles (tienda)",
       hint: "Migración supabase/migrations/017_customer_accounts.sql. Sin ella no hay cuentas de comprador.",
     },
+    {
+      key: "whatsappTables",
+      label: "whatsapp_* (Meta)",
+      hint: "Migración supabase/migrations/018_whatsapp_meta.sql. Sin ella no se guarda estado ni mensajes.",
+    },
+    {
+      key: "whatsappMetaEnv",
+      label: "META_WA_* (Railway)",
+      hint: "Token, Phone Number ID, verify token y app secret. Panel: /panel/whatsapp.",
+    },
   ];
 
   return (
@@ -140,7 +150,11 @@ export default async function SettingsPage() {
                 className={`mt-0.5 text-sm font-semibold ${
                   health.checks[item.key]
                     ? "text-ink"
-                    : item.key === "productQuestions" || item.key === "followupTasks" || item.key === "customerProfiles"
+                    : item.key === "productQuestions" ||
+                        item.key === "followupTasks" ||
+                        item.key === "customerProfiles" ||
+                        item.key === "whatsappTables" ||
+                        item.key === "whatsappMetaEnv"
                       ? "text-coral"
                       : "text-ink"
                 }`}
@@ -185,6 +199,9 @@ export default async function SettingsPage() {
         </Link>
         <Link href="/panel/agentes#saas" target="_self" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Guía de alta (AG-10)
+        </Link>
+        <Link href="/panel/whatsapp" target="_self" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
+          WhatsApp Meta
         </Link>
         <a href="/api/health" target="_self" className="inline-flex h-9 items-center rounded-[10px] border border-line bg-card px-3 text-sm font-semibold text-ink hover:bg-subtle">
           Ver /api/health
