@@ -309,7 +309,7 @@ export async function ensureWhatsAppInbound(env: MetaWaEnv, callbackUrl: string)
           object: "whatsapp_business_account",
           callback_url: callbackUrl,
           verify_token: env.verifyToken,
-          fields: "messages",
+          fields: "messages,message_template_status_update",
         }),
         token,
       );

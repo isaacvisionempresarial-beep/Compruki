@@ -113,6 +113,19 @@ export function WhatsAppScreen({
     ].sort((a, b) => a - b);
   }, [draftBody]);
 
+  const templateStats = useMemo(() => {
+    let approved = 0;
+    let pending = 0;
+    let rejected = 0;
+    for (const item of templates) {
+      const status = item.status.toUpperCase();
+      if (status === "APPROVED") approved += 1;
+      else if (status === "PENDING" || status === "IN_APPEAL") pending += 1;
+      else if (status === "REJECTED" || status === "DISABLED") rejected += 1;
+    }
+    return { approved, pending, rejected, total: templates.length };
+  }, [templates]);
+
   return (
     <div className="mx-auto max-w-[1100px] pb-8">
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Operación</p>
@@ -228,6 +241,13 @@ export function WhatsAppScreen({
               Misma lógica que ConextaIA: se crea en la WABA y Meta la revisa. Cuando esté APPROVED,
               úsala en el Inbox.
             </p>
+            {templateStats.total > 0 ? (
+              <p className="mt-1 text-[11px] font-semibold text-muted">
+                {templateStats.approved} aprobada(s)
+                {templateStats.pending ? ` · ${templateStats.pending} pendiente(s)` : ""}
+                {templateStats.rejected ? ` · ${templateStats.rejected} rechazada(s)` : ""}
+              </p>
+            ) : null}
           </div>
           <form action={listAction}>
             <button type="submit" disabled={listing || !connection.env.ready} className="rounded-[10px] border border-line bg-canvas px-3 py-2 text-xs font-semibold disabled:opacity-50">
@@ -312,14 +332,27 @@ export function WhatsAppScreen({
           <p className="mt-3 text-sm text-muted">Aún no hay plantillas en esta cuenta (o falta WABA ID).</p>
         ) : (
           <ul className="mt-3 space-y-1.5">
-            {templates.map((item) => (
+            {templates.map((item) => {
+              const status = item.status.toUpperCase();
+              const statusClassName =
+                status === "APPROVED"
+                  ? "text-success"
+                  : status === "REJECTED" || status === "DISABLED"
+                    ? "text-danger"
+                    : "text-warning";
+              return (
               <li
                 key={`${item.name}-${item.language}-${item.status}`}
                 className="rounded-[10px] border border-line px-3 py-2 text-sm"
               >
                 <p className="font-semibold">
                   {item.name} · {item.language}
-                  <span className="ml-2 text-[11px] font-bold tracking-wide text-muted uppercase">
+                  <span
+                    className={cx(
+                      "ml-2 text-[11px] font-bold tracking-wide uppercase",
+                      statusClassName,
+                    )}
+                  >
                     {item.status || "—"}
                     {item.category ? ` · ${item.category}` : ""}
                   </span>
@@ -329,7 +362,8 @@ export function WhatsAppScreen({
                   <p className="mt-0.5 text-xs text-danger">{item.rejectedReason}</p>
                 ) : null}
               </li>
-            ))}
+              );
+            })}
           </ul>
         )}
       </section>

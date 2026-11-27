@@ -29,6 +29,7 @@ type WebhookPayload = {
   object?: string;
   entry?: Array<{
     changes?: Array<{
+      field?: string;
       value?: {
         contacts?: Array<{ wa_id?: string; profile?: { name?: string } }>;
         messages?: InboundMessage[];
@@ -43,6 +44,11 @@ type WebhookPayload = {
             error_data?: { details?: string };
           }>;
         }>;
+        event?: string;
+        message_template_id?: string;
+        message_template_name?: string;
+        message_template_language?: string;
+        reason?: string;
       };
     }>;
   }>;
@@ -107,11 +113,30 @@ export async function processWhatsAppWebhook(payload: WebhookPayload): Promise<{
   const tenantId = await getPilotTenantId();
   let inbound = 0;
   let statuses = 0;
+  let templateEvents = 0;
+  const templateNotes: string[] = [];
 
   for (const entry of payload.entry || []) {
     for (const change of entry.changes || []) {
       const value = change.value;
       if (!value) continue;
+
+      if (
+        change.field === "message_template_status_update" &&
+        value.message_template_name
+      ) {
+        const event = String(value.event || "UPDATE").toUpperCase();
+        const name = String(value.message_template_name);
+        const language = String(value.message_template_language || "");
+        const reason = String(value.reason || "").trim();
+        templateNotes.push(
+          `Plantilla ${name}${language ? ` (${language})` : ""} → ${event}${
+            reason && reason !== "NONE" ? `: ${reason}` : ""
+          }`,
+        );
+        templateEvents += 1;
+        continue;
+      }
 
       for (const status of value.statuses || []) {
         if (!status.id || !status.status) continue;
@@ -167,14 +192,21 @@ export async function processWhatsAppWebhook(payload: WebhookPayload): Promise<{
     }
   }
 
-  const receivedSomething = inbound > 0 || statuses > 0;
+  const receivedSomething = inbound > 0 || statuses > 0 || templateEvents > 0;
+  const detailParts = [
+    receivedSomething
+      ? `Webhook OK · entrantes ${inbound} · estados ${statuses}${
+          templateEvents ? ` · plantillas ${templateEvents}` : ""
+        }`
+      : "Webhook recibido sin mensajes/estados",
+    ...templateNotes.slice(0, 3),
+    new Date().toISOString(),
+  ];
   await upsertWhatsAppConnection(tenantId, {
     status: "verificada",
     touchInbound: inbound > 0,
     touchChecked: true,
-    detail: receivedSomething
-      ? `Webhook OK · entrantes ${inbound} · estados ${statuses} · ${new Date().toISOString()}`
-      : `Webhook recibido sin mensajes/estados · ${new Date().toISOString()}`,
+    detail: detailParts.filter(Boolean).join(" · "),
     lastError: "",
   });
 
