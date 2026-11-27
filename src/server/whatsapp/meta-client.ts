@@ -257,23 +257,18 @@ async function resolveMetaAppId(env: MetaWaEnv): Promise<string | null> {
 export async function ensureWhatsAppInbound(env: MetaWaEnv, callbackUrl: string): Promise<string> {
   const notes: string[] = [];
   let callbackReady = false;
+  let wabaSubscribed = false;
 
   const wabaId = (await resolveWhatsAppBusinessAccountId(env)) || env.businessAccountId;
-  if (!wabaId) {
-    notes.push("Sin WABA ID: deja «Suscribir webhooks» ON en Meta y prueba un mensaje entrante");
-  } else {
-    if (env.businessAccountId && wabaId !== env.businessAccountId) {
-      notes.push(`WABA resuelto desde el número: ${wabaId} (Railway tenía ${env.businessAccountId})`);
-    }
+  if (wabaId) {
     try {
       await metaRequest(env, `${wabaId}/subscribed_apps`, "POST");
-      notes.push("App suscrita a la cuenta de WhatsApp");
-    } catch (error) {
-      // Token sin manage en WABA: Meta UI «Suscribir webhooks» suele bastar.
-      const detail = error instanceof Error ? error.message : "sin permiso WABA";
-      notes.push(`Suscripción WABA por API no quedó (${detail.slice(0, 120)})`);
+      wabaSubscribed = true;
+    } catch {
+      // Meta UI «Suscribir webhooks» + override del número suelen bastar.
     }
   }
+
   const appId = await resolveMetaAppId(env);
   if (!appId) {
     notes.push("Sin META_WA_APP_ID no registro el callback de la app");
@@ -306,7 +301,6 @@ export async function ensureWhatsAppInbound(env: MetaWaEnv, callbackUrl: string)
         }),
         token,
       );
-      notes.push("Callback de la app registrado");
       callbackReady = true;
     }
   }
@@ -318,20 +312,22 @@ export async function ensureWhatsAppInbound(env: MetaWaEnv, callbackUrl: string)
         verify_token: env.verifyToken,
       },
     });
-    notes.push("Callback del número apuntando a Compruki");
     callbackReady = true;
   } catch (error) {
     if (!callbackReady) throw error;
-    const message = error instanceof Error ? error.message : "el override del número falló";
-    notes.push(`Override del número no quedó: ${message}`);
+    notes.push("Override del número no quedó; el callback de la app sigue activo");
   }
 
-  if (!callbackReady) {
-    notes.push(
-      "Callback no confirmado por API; deja «Suscribir webhooks» ON en Meta y prueba un mensaje entrante a este número",
-    );
+  if (callbackReady) {
+    const parts = ["Webhook de Compruki activo"];
+    if (wabaSubscribed) parts.push("app suscrita a la cuenta");
+    return `${parts.join("; ")}${notes.length ? `. ${notes.join(". ")}` : ""}.`;
   }
-  return `${notes.join(". ")}.`;
+
+  return (
+    "Callback no confirmado por API. Deja «Suscribir webhooks» ON en Meta y prueba un mensaje entrante." +
+    (notes.length ? ` ${notes.join(". ")}.` : "")
+  );
 }
 
 function sameCallback(left: string, right: string) {

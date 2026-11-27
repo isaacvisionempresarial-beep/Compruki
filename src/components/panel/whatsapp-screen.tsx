@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import {
   sendWhatsAppTestAction,
@@ -8,6 +9,17 @@ import {
 } from "@/server/whatsapp-actions";
 import type { RecentWaMessage, WhatsAppConnectionState } from "@/server/whatsapp/connection";
 import { cx } from "@/lib/cx";
+
+/** Avisos técnicos que no deben pintar la conexión como rota. */
+function isSoftWaWarning(text: string) {
+  const t = text.toLowerCase();
+  return (
+    t.includes("suscripción waba") ||
+    t.includes("subscribed_apps") ||
+    t.includes("unsupported post request") ||
+    t.includes("missing permissions")
+  );
+}
 
 const verifyInitial: WhatsAppActionState = {
   error: null,
@@ -75,8 +87,11 @@ export function WhatsAppScreen({
       <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Operación</p>
       <h1 className="mt-0.5 text-[24px] leading-7 font-extrabold tracking-tight">WhatsApp</h1>
       <p className="mt-1 max-w-2xl text-sm leading-5 text-muted">
-        Meta Cloud API · Fase 1. Conexión, webhook y envío de prueba. El inbox completo llega en la
-        Fase 2. Acceso: {roleLabel}.
+        Meta Cloud API · conexión del número, webhook y prueba de envío. Conversaciones en{" "}
+        <Link href="/panel/inbox" className="font-semibold text-ink underline-offset-2 hover:underline">
+          Inbox
+        </Link>
+        . Acceso: {roleLabel}.
       </p>
 
       <section
@@ -88,8 +103,13 @@ export function WhatsAppScreen({
           {statusLabel(connection.status)}
         </h2>
         <p className="mt-1 text-xs leading-5 text-muted">{connection.detail || "—"}</p>
-        {connection.lastError ? (
+        {connection.lastError && !isSoftWaWarning(connection.lastError) ? (
           <p className="mt-1 text-xs leading-5 text-danger">{connection.lastError}</p>
+        ) : null}
+        {connection.status === "verificada" && connection.lastInboundAt ? (
+          <p className="mt-1 text-xs leading-5 text-success">
+            Entrantes y salientes listos. Usa el Inbox para atender chats.
+          </p>
         ) : null}
 
         <dl className="mt-3 grid gap-2 sm:grid-cols-2 text-sm">
@@ -116,7 +136,7 @@ export function WhatsAppScreen({
             <dd className="mt-0.5 font-semibold tabular-nums">
               {connection.lastInboundAt
                 ? new Date(connection.lastInboundAt).toLocaleString("es-CO")
-                : "Ninguno (escribe un hola desde el celular al +1 555…)"}
+                : "Ninguno (escribe un hola al número de Compruki)"}
             </dd>
           </div>
           <div className="rounded-[10px] border border-line px-3 py-2">
@@ -172,9 +192,8 @@ export function WhatsAppScreen({
           URL para Meta Developer
         </h2>
         <p className="mt-1 text-xs leading-5 text-muted">
-          Verificar con Meta suscribe la cuenta y apunta este número a la URL de abajo. Verify
-          token = META_WA_VERIFY_TOKEN. Si la app de Meta todavía no tiene callback, también hace
-          falta META_WA_WABA_ID (y META_WA_APP_ID si el token no lo revela). Campo:{" "}
+          Meta entrega los mensajes a esta URL. Verify token ={" "}
+          <code className="text-ink">META_WA_VERIFY_TOKEN</code>. Campo:{" "}
           <code className="text-ink">messages</code>.
         </p>
         <p className="mt-2 break-all rounded-[10px] border border-line bg-canvas px-3 py-2 text-sm font-semibold tabular-nums">
@@ -328,21 +347,21 @@ export function WhatsAppScreen({
           Número nuevo desde cero
         </h2>
         <ol className="mt-2 list-decimal space-y-2 pl-4 text-sm leading-5 text-muted">
-          <li>Crea o usa un Meta Business Manager y una app en developers.facebook.com.</li>
-          <li>Agrega el producto WhatsApp → API Setup. Elige o solicita un número Business nuevo.</li>
+          <li>App Compruki en Meta Developers + producto WhatsApp con el número Business.</li>
           <li>
-            Copia Phone Number ID, WhatsApp Business Account ID, genera un token permanente (System
-            User) y el App Secret.
+            Usuario del sistema con acceso a la app, la cuenta de WhatsApp y la cuenta de
+            mensajería (Control total en ambas).
           </li>
           <li>
-            En Railway define META_WA_ACCESS_TOKEN, META_WA_PHONE_NUMBER_ID, META_WA_WABA_ID,
-            META_WA_VERIFY_TOKEN (tú lo inventas, largo) y META_WA_APP_SECRET.
+            Token permanente con <code className="text-ink">whatsapp_business_messaging</code> y{" "}
+            <code className="text-ink">whatsapp_business_management</code>.
           </li>
           <li>
-            Ejecuta la migración 018 en Supabase. Configura el webhook con la URL de arriba y el
-            mismo verify token. Suscribe <code className="text-ink">messages</code>.
+            Railway: ACCESS_TOKEN, PHONE_NUMBER_ID, WABA_ID, VERIFY_TOKEN, APP_SECRET (y APP_ID).
           </li>
-          <li>Pulsa «Verificar con Meta» y prueba envío (plantilla hello_world o texto en ventana 24 h).</li>
+          <li>
+            Webhook = URL de arriba + el mismo verify token. «Verificar con Meta» y prueba en Inbox.
+          </li>
         </ol>
       </section>
     </div>
