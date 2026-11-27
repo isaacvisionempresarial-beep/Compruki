@@ -12,20 +12,24 @@ import {
 } from "@/server/whatsapp/connection";
 import { metaWaConfigured, requireMetaWaEnv } from "@/server/whatsapp/env";
 import {
+  createWhatsAppTemplate,
   listWhatsAppTemplates,
   MetaApiError,
   ensureWhatsAppInbound,
   sendWhatsAppTemplate,
   sendWhatsAppText,
   verifyMetaPhone,
+  type WhatsAppTemplateInfo,
 } from "@/server/whatsapp/meta-client";
 import { siteUrl } from "@/lib/site-url";
+
+export type WhatsAppTemplateRow = WhatsAppTemplateInfo;
 
 export type WhatsAppActionState = {
   error: string | null;
   ok: string | null;
   connection: WhatsAppConnectionState | null;
-  templates: Array<{ name: string; language: string; status: string; category: string }>;
+  templates: WhatsAppTemplateRow[];
   recent: RecentWaMessage[];
 };
 
@@ -33,9 +37,21 @@ function emptyState(): WhatsAppActionState {
   return { error: null, ok: null, connection: null, templates: [], recent: [] };
 }
 
+async function loadManagedTemplates(): Promise<WhatsAppTemplateRow[]> {
+  if (!metaWaConfigured()) return [];
+  try {
+    const env = requireMetaWaEnv();
+    if (!env.businessAccountId) return [];
+    return await listWhatsAppTemplates(env);
+  } catch {
+    return [];
+  }
+}
+
 export async function loadWhatsAppPanelData(): Promise<{
   connection: WhatsAppConnectionState;
   recent: RecentWaMessage[];
+  templates: WhatsAppTemplateRow[];
   webhookUrl: string;
 }> {
   const access = await assertPanelAccess();
@@ -43,16 +59,19 @@ export async function loadWhatsAppPanelData(): Promise<{
     return {
       connection: await readWhatsAppConnection(),
       recent: [],
+      templates: [],
       webhookUrl: siteUrl("/api/whatsapp/webhook"),
     };
   }
-  const [connection, recent] = await Promise.all([
+  const [connection, recent, templates] = await Promise.all([
     readWhatsAppConnection(access.tenantId),
     listRecentWhatsAppMessages(access.tenantId, 25),
+    loadManagedTemplates(),
   ]);
   return {
     connection,
     recent,
+    templates,
     webhookUrl: siteUrl("/api/whatsapp/webhook"),
   };
 }
@@ -111,15 +130,7 @@ export async function verifyWhatsAppConnectionAction(
 
     let templates: WhatsAppActionState["templates"] = [];
     try {
-      const rows = await listWhatsAppTemplates(env);
-      templates = rows
-        .filter((row) => row.name && row.language)
-        .map((row) => ({
-          name: String(row.name),
-          language: String(row.language),
-          status: String(row.status || ""),
-          category: String(row.category || ""),
-        }));
+      templates = await listWhatsAppTemplates(env);
     } catch {
       templates = [];
     }
@@ -257,6 +268,96 @@ export async function sendWhatsAppTestAction(
       ...emptyState(),
       error: message,
       connection: await readWhatsAppConnection(access.tenantId),
+      recent: await listRecentWhatsAppMessages(access.tenantId, 25),
+    };
+  }
+}
+
+export async function refreshWhatsAppTemplatesAction(
+  _state: WhatsAppActionState,
+  _formData: FormData,
+): Promise<WhatsAppActionState> {
+  const access = await assertPanelAccess();
+  if (!access) return { ...emptyState(), error: "Sin sesión." };
+  if (!hasPermission(access, "whatsapp_manage")) {
+    return { ...emptyState(), error: "Tu rol no permite administrar plantillas." };
+  }
+  if (!metaWaConfigured()) {
+    return { ...emptyState(), error: "Faltan META_WA_* en Railway." };
+  }
+  try {
+    const templates = await listWhatsAppTemplates(requireMetaWaEnv());
+    const [connection, recent] = await Promise.all([
+      readWhatsAppConnection(access.tenantId),
+      listRecentWhatsAppMessages(access.tenantId, 25),
+    ]);
+    return {
+      error: null,
+      ok: `${templates.length} plantilla(s) en Meta.`,
+      connection,
+      templates,
+      recent,
+    };
+  } catch (error) {
+    return {
+      ...emptyState(),
+      error: error instanceof Error ? error.message : "No se pudieron listar plantillas.",
+      connection: await readWhatsAppConnection(access.tenantId),
+    };
+  }
+}
+
+export async function submitWhatsAppTemplateAction(
+  _state: WhatsAppActionState,
+  formData: FormData,
+): Promise<WhatsAppActionState> {
+  const access = await assertPanelAccess();
+  if (!access) return { ...emptyState(), error: "Sin sesión." };
+  if (!hasPermission(access, "whatsapp_manage")) {
+    return { ...emptyState(), error: "Tu rol no permite crear plantillas." };
+  }
+  if (!metaWaConfigured()) {
+    return { ...emptyState(), error: "Faltan META_WA_* en Railway." };
+  }
+
+  const body = String(formData.get("body") || "");
+  const positions = [
+    ...new Set([...body.matchAll(/{{(\d+)}}/g)].map((match) => Number(match[1]))),
+  ].sort((a, b) => a - b);
+  const variables = positions.map((position) => ({
+    position,
+    example: String(formData.get(`example_${position}`) || "").trim(),
+  }));
+  const categoryRaw = String(formData.get("category") || "UTILITY").toUpperCase();
+  const category = categoryRaw === "MARKETING" ? "MARKETING" : "UTILITY";
+
+  try {
+    const created = await createWhatsAppTemplate(requireMetaWaEnv(), {
+      name: String(formData.get("name") || ""),
+      category,
+      language: String(formData.get("language") || "es"),
+      body,
+      variables,
+    });
+    const templates = await listWhatsAppTemplates(requireMetaWaEnv()).catch(() => []);
+    const [connection, recent] = await Promise.all([
+      readWhatsAppConnection(access.tenantId),
+      listRecentWhatsAppMessages(access.tenantId, 25),
+    ]);
+    return {
+      error: null,
+      ok: `Plantilla «${created.name}» enviada a Meta (pendiente de aprobación).`,
+      connection,
+      templates,
+      recent,
+    };
+  } catch (error) {
+    const templates = await loadManagedTemplates();
+    return {
+      error: error instanceof Error ? error.message : "No se pudo enviar la plantilla a Meta.",
+      ok: null,
+      connection: await readWhatsAppConnection(access.tenantId),
+      templates,
       recent: await listRecentWhatsAppMessages(access.tenantId, 25),
     };
   }

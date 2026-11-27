@@ -17,6 +17,7 @@ export default async function WhatsAppPage() {
     <WhatsAppScreen
       connection={data.connection}
       recent={data.recent}
+      templates={data.templates}
       webhookUrl={data.webhookUrl}
       roleLabel={access.roleLabel}
     />

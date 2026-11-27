@@ -27,6 +27,8 @@ export type MetaJson = {
         language?: string;
         status?: string;
         category?: string;
+        rejected_reason?: string;
+        components?: Array<{ type?: string; text?: string }>;
         object?: string;
         callback_url?: string;
         app_id?: string;
@@ -34,6 +36,16 @@ export type MetaJson = {
       }>
     | { app_id?: string; is_valid?: boolean };
   whatsapp_business_account?: { id?: string; name?: string };
+};
+
+export type WhatsAppTemplateInfo = {
+  id: string;
+  name: string;
+  language: string;
+  status: string;
+  category: string;
+  body: string;
+  rejectedReason: string;
 };
 
 export class MetaApiError extends Error {
@@ -341,12 +353,88 @@ function sameCallback(left: string, right: string) {
   }
 }
 
-export async function listWhatsAppTemplates(env: MetaWaEnv) {
+export async function listWhatsAppTemplates(env: MetaWaEnv): Promise<WhatsAppTemplateInfo[]> {
   if (!env.businessAccountId) return [];
   const result = await metaRequest(
     env,
-    `${env.businessAccountId}/message_templates?limit=50&fields=name,language,status,category`,
+    `${env.businessAccountId}/message_templates?limit=100&fields=id,name,language,status,category,rejected_reason,components`,
     "GET",
   );
-  return Array.isArray(result.data) ? result.data : [];
+  const rows = Array.isArray(result.data) ? result.data : [];
+  return rows
+    .filter((row) => row.name)
+    .map((row) => ({
+      id: String(row.id || ""),
+      name: String(row.name || ""),
+      language: String(row.language || ""),
+      status: String(row.status || ""),
+      category: String(row.category || ""),
+      body: row.components?.find((part) => part.type === "BODY")?.text || "",
+      rejectedReason: String(row.rejected_reason || ""),
+    }));
+}
+
+/**
+ * Envía una plantilla a revisión de Meta (misma lógica que ConexionIA).
+ * POST /{waba-id}/message_templates
+ */
+export async function createWhatsAppTemplate(
+  env: MetaWaEnv,
+  input: {
+    name: string;
+    category: "MARKETING" | "UTILITY";
+    language: string;
+    body: string;
+    variables: Array<{ position: number; example: string }>;
+  },
+): Promise<{ id: string | null; name: string; status: string }> {
+  if (!env.businessAccountId) {
+    throw new MetaApiError(422, "Falta META_WA_WABA_ID para crear plantillas.");
+  }
+  const name = input.name.trim().toLowerCase();
+  if (!/^[a-z0-9_]{2,512}$/.test(name)) {
+    throw new MetaApiError(
+      422,
+      "El nombre debe ser minúsculas, números o _ (ej. saludo_compruki).",
+    );
+  }
+  const body = input.body.trim();
+  if (!body) throw new MetaApiError(422, "Escribe el texto de la plantilla.");
+  if (body.replace(/{{\d+}}/g, "").includes("{{") || body.replace(/{{\d+}}/g, "").includes("}}")) {
+    throw new MetaApiError(422, "Usa variables numéricas con el formato {{1}}, {{2}}.");
+  }
+  if (/^{{\d+}}/.test(body) || /{{\d+}}$/.test(body)) {
+    throw new MetaApiError(
+      422,
+      "Meta no permite una variable al inicio o al final. Añade texto antes y después.",
+    );
+  }
+  const matches = [...body.matchAll(/{{(\d+)}}/g)].map((match) => Number(match[1]));
+  const positions = [...new Set(matches)].sort((a, b) => a - b);
+  if (positions.some((position, index) => position !== index + 1)) {
+    throw new MetaApiError(422, "Las variables deben comenzar en {{1}} y continuar sin saltos.");
+  }
+  const provided = [...input.variables].sort((a, b) => a.position - b.position);
+  if (
+    provided.length !== positions.length ||
+    provided.some((variable, index) => variable.position !== positions[index])
+  ) {
+    throw new MetaApiError(422, "Completa un ejemplo para cada variable {{n}} del texto.");
+  }
+  if (provided.some((variable) => !variable.example.trim())) {
+    throw new MetaApiError(422, "Los ejemplos de variable no pueden ir vacíos.");
+  }
+
+  const bodyComponent: Record<string, unknown> = { type: "BODY", text: body };
+  if (provided.length) {
+    bodyComponent.example = { body_text: [provided.map((variable) => variable.example.trim())] };
+  }
+  const result = await metaRequest(env, `${env.businessAccountId}/message_templates`, "POST", {
+    name,
+    language: input.language.trim() || "es",
+    category: input.category,
+    allow_category_change: true,
+    components: [bodyComponent],
+  });
+  return { id: result.id ? String(result.id) : null, name, status: "PENDING" };
 }

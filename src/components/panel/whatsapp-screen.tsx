@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import {
+  refreshWhatsAppTemplatesAction,
   sendWhatsAppTestAction,
+  submitWhatsAppTemplateAction,
   verifyWhatsAppConnectionAction,
   type WhatsAppActionState,
+  type WhatsAppTemplateRow,
 } from "@/server/whatsapp-actions";
 import type { RecentWaMessage, WhatsAppConnectionState } from "@/server/whatsapp/connection";
 import { cx } from "@/lib/cx";
@@ -58,11 +61,13 @@ function statusClass(status: WhatsAppConnectionState["status"]) {
 export function WhatsAppScreen({
   connection: initialConnection,
   recent: initialRecent,
+  templates: initialTemplates = [],
   webhookUrl,
   roleLabel,
 }: {
   connection: WhatsAppConnectionState;
   recent: RecentWaMessage[];
+  templates?: WhatsAppTemplateRow[];
   webhookUrl: string;
   roleLabel: string;
 }) {
@@ -71,16 +76,42 @@ export function WhatsAppScreen({
     verifyInitial,
   );
   const [sendState, sendAction, sending] = useActionState(sendWhatsAppTestAction, verifyInitial);
+  const [tplState, tplAction, tplBusy] = useActionState(submitWhatsAppTemplateAction, verifyInitial);
+  const [listState, listAction, listing] = useActionState(
+    refreshWhatsAppTemplatesAction,
+    verifyInitial,
+  );
+  const [draftBody, setDraftBody] = useState(
+    "Hola {{1}}, te escribimos desde Compruki. ¿En qué te ayudamos?",
+  );
 
-  const connection = sendState.connection ?? verifyState.connection ?? initialConnection;
+  const connection =
+    tplState.connection ??
+    listState.connection ??
+    sendState.connection ??
+    verifyState.connection ??
+    initialConnection;
   const recent = sendState.recent.length
     ? sendState.recent
     : verifyState.recent.length
       ? verifyState.recent
       : initialRecent;
-  const templates = verifyState.templates;
-  const feedbackError = sendState.error || verifyState.error;
-  const feedbackOk = sendState.ok || verifyState.ok;
+  const templates =
+    tplState.templates.length || listState.templates.length || verifyState.templates.length
+      ? tplState.templates.length
+        ? tplState.templates
+        : listState.templates.length
+          ? listState.templates
+          : verifyState.templates
+      : initialTemplates;
+  const feedbackError = tplState.error || listState.error || sendState.error || verifyState.error;
+  const feedbackOk = tplState.ok || listState.ok || sendState.ok || verifyState.ok;
+
+  const draftPositions = useMemo(() => {
+    return [
+      ...new Set([...draftBody.matchAll(/{{(\d+)}}/g)].map((match) => Number(match[1]))),
+    ].sort((a, b) => a - b);
+  }, [draftBody]);
 
   return (
     <div className="mx-auto max-w-[1100px] pb-8">
@@ -181,6 +212,126 @@ export function WhatsAppScreen({
             {verifying ? "Verificando…" : "Verificar con Meta"}
           </button>
         </form>
+      </section>
+
+      <section
+        className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3"
+        aria-labelledby="wa-plantillas"
+      >
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Plantillas</p>
+            <h2 id="wa-plantillas" className="mt-0.5 text-sm font-semibold">
+              Enviar a aprobación de Meta
+            </h2>
+            <p className="mt-1 text-xs leading-5 text-muted">
+              Misma lógica que ConextaIA: se crea en la WABA y Meta la revisa. Cuando esté APPROVED,
+              úsala en el Inbox.
+            </p>
+          </div>
+          <form action={listAction}>
+            <button type="submit" disabled={listing || !connection.env.ready} className="rounded-[10px] border border-line bg-canvas px-3 py-2 text-xs font-semibold disabled:opacity-50">
+              {listing ? "…" : "Actualizar lista"}
+            </button>
+          </form>
+        </div>
+
+        <form action={tplAction} className="mt-3 grid gap-2">
+          <div className="grid gap-2 sm:grid-cols-3">
+            <label className="grid gap-1 text-sm sm:col-span-1">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Nombre</span>
+              <input
+                name="name"
+                required
+                pattern="[a-z0-9_]{2,64}"
+                defaultValue="saludo_compruki"
+                placeholder="saludo_compruki"
+                className="rounded-[10px] border border-line bg-canvas px-3 py-2"
+              />
+            </label>
+            <label className="grid gap-1 text-sm">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Categoría</span>
+              <select name="category" defaultValue="UTILITY" className="rounded-[10px] border border-line bg-canvas px-3 py-2">
+                <option value="UTILITY">UTILITY</option>
+                <option value="MARKETING">MARKETING</option>
+              </select>
+            </label>
+            <label className="grid gap-1 text-sm">
+              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Idioma</span>
+              <select name="language" defaultValue="es" className="rounded-[10px] border border-line bg-canvas px-3 py-2">
+                <option value="es">es</option>
+                <option value="es_CO">es_CO</option>
+                <option value="en_US">en_US</option>
+              </select>
+            </label>
+          </div>
+          <label className="grid gap-1 text-sm">
+            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Texto</span>
+            <textarea
+              name="body"
+              required
+              rows={3}
+              value={draftBody}
+              onChange={(event) => setDraftBody(event.target.value)}
+              className="rounded-[10px] border border-line bg-canvas px-3 py-2"
+            />
+            <span className="text-[11px] text-muted">
+              Variables {"{{1}}"}, {"{{2}}"}… no al inicio ni al final del texto.
+            </span>
+          </label>
+          {draftPositions.length > 0 ? (
+            <div className="grid gap-2 sm:grid-cols-2">
+              {draftPositions.map((position) => (
+                <label key={position} className="grid gap-1 text-sm">
+                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
+                    Ejemplo {`{{${position}}}`}
+                  </span>
+                  <input
+                    name={`example_${position}`}
+                    required
+                    defaultValue={position === 1 ? "Leidy" : `Ejemplo ${position}`}
+                    className="rounded-[10px] border border-line bg-canvas px-3 py-2"
+                  />
+                </label>
+              ))}
+            </div>
+          ) : null}
+          <button
+            type="submit"
+            disabled={tplBusy || !connection.env.ready || !connection.env.businessAccountId}
+            className="w-fit rounded-[10px] bg-ink px-3 py-2 text-sm font-semibold text-canvas disabled:opacity-50"
+          >
+            {tplBusy ? "Enviando a Meta…" : "Enviar a aprobación"}
+          </button>
+          {tplState.error ? <p className="text-sm text-danger">{tplState.error}</p> : null}
+          {tplState.ok ? <p className="text-sm text-success">{tplState.ok}</p> : null}
+          {listState.ok ? <p className="text-sm text-success">{listState.ok}</p> : null}
+        </form>
+
+        {templates.length === 0 ? (
+          <p className="mt-3 text-sm text-muted">Aún no hay plantillas en esta cuenta (o falta WABA ID).</p>
+        ) : (
+          <ul className="mt-3 space-y-1.5">
+            {templates.map((item) => (
+              <li
+                key={`${item.name}-${item.language}-${item.status}`}
+                className="rounded-[10px] border border-line px-3 py-2 text-sm"
+              >
+                <p className="font-semibold">
+                  {item.name} · {item.language}
+                  <span className="ml-2 text-[11px] font-bold tracking-wide text-muted uppercase">
+                    {item.status || "—"}
+                    {item.category ? ` · ${item.category}` : ""}
+                  </span>
+                </p>
+                {item.body ? <p className="mt-0.5 text-xs text-muted">{item.body}</p> : null}
+                {item.rejectedReason ? (
+                  <p className="mt-0.5 text-xs text-danger">{item.rejectedReason}</p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section
