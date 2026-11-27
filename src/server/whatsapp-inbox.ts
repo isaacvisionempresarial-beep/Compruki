@@ -32,9 +32,43 @@ export type InboxMessage = {
   body: string;
   messageType: string;
   deliveryStatus: string;
+  deliveryDetail: string;
   createdBy: string;
   createdAt: string;
 };
+
+const CUSTOMER_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+function mapInboxMessage(row: Record<string, unknown>): InboxMessage {
+  return {
+    id: String(row.id),
+    waMessageId: String(row.wa_message_id),
+    direction: row.direction === "outbound" ? "outbound" : "inbound",
+    body: String(row.body ?? ""),
+    messageType: String(row.message_type ?? "text"),
+    deliveryStatus: String(row.delivery_status ?? ""),
+    deliveryDetail: String(row.delivery_detail ?? ""),
+    createdBy: String(row.created_by ?? ""),
+    createdAt: String(row.created_at),
+  };
+}
+
+/** Texto libre solo tras un entrante del contacto en las últimas 24 h. */
+export async function assertCustomerServiceWindow(tenantId: string, conversationId: string) {
+  const messages = await listInboxMessages(tenantId, conversationId, 80);
+  const lastInbound = [...messages].reverse().find((msg) => msg.direction === "inbound");
+  if (!lastInbound) {
+    throw new Error(
+      "Este contacto aún no te escribió al WhatsApp de Compruki. Meta bloquea el texto libre: usa una plantilla aprobada (abajo) o pídele un «hola» al 301 123 4236.",
+    );
+  }
+  const age = Date.now() - new Date(lastInbound.createdAt).getTime();
+  if (Number.isFinite(age) && age > CUSTOMER_WINDOW_MS) {
+    throw new Error(
+      "Pasaron más de 24 h desde su último mensaje. Usa una plantilla Meta para volver a contactarla.",
+    );
+  }
+}
 
 function mapConversation(row: Record<string, unknown>): InboxConversation {
   return {
@@ -110,9 +144,11 @@ export async function getInboxConversation(tenantId: string, conversationId: str
 
 export async function listInboxMessages(tenantId: string, conversationId: string, limit = 120): Promise<InboxMessage[]> {
   const supabase = createAdminSupabase();
+  const fields =
+    "id, wa_message_id, direction, body, message_type, delivery_status, delivery_detail, created_by, created_at";
   const { data, error } = await supabase
     .from("whatsapp_messages")
-    .select("id, wa_message_id, direction, body, message_type, delivery_status, created_by, created_at")
+    .select(fields)
     .eq("tenant_id", tenantId)
     .eq("conversation_id", conversationId)
     .neq("message_type", "status")
@@ -124,34 +160,16 @@ export async function listInboxMessages(tenantId: string, conversationId: string
     if (!conversation) return [];
     const byPhone = await supabase
       .from("whatsapp_messages")
-      .select("id, wa_message_id, direction, body, message_type, delivery_status, created_by, created_at")
+      .select(fields)
       .eq("tenant_id", tenantId)
       .eq("phone", conversation.phone)
       .neq("message_type", "status")
       .order("created_at", { ascending: true })
       .limit(limit);
     if (byPhone.error || !byPhone.data) return [];
-    return byPhone.data.map((row) => ({
-      id: String(row.id),
-      waMessageId: String(row.wa_message_id),
-      direction: row.direction === "outbound" ? "outbound" : "inbound",
-      body: String(row.body ?? ""),
-      messageType: String(row.message_type ?? "text"),
-      deliveryStatus: String(row.delivery_status ?? ""),
-      createdBy: String(row.created_by ?? ""),
-      createdAt: String(row.created_at),
-    }));
+    return byPhone.data.map((row) => mapInboxMessage(row as Record<string, unknown>));
   }
-  return (data ?? []).map((row) => ({
-    id: String(row.id),
-    waMessageId: String(row.wa_message_id),
-    direction: row.direction === "outbound" ? "outbound" : "inbound",
-    body: String(row.body ?? ""),
-    messageType: String(row.message_type ?? "text"),
-    deliveryStatus: String(row.delivery_status ?? ""),
-    createdBy: String(row.created_by ?? ""),
-    createdAt: String(row.created_at),
-  }));
+  return (data ?? []).map((row) => mapInboxMessage(row as Record<string, unknown>));
 }
 
 export async function markConversationRead(tenantId: string, conversationId: string) {
@@ -262,6 +280,7 @@ export async function sendInboxText(input: {
   if (!conversation) throw new Error("Conversación no encontrada.");
   const phone = normalizeWaPhone(conversation.phone);
   if (!phone) throw new Error("Teléfono de la conversación inválido.");
+  await assertCustomerServiceWindow(input.tenantId, input.conversationId);
 
   const env = requireMetaWaEnv();
   let messageId: string;

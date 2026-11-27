@@ -208,15 +208,28 @@ export function InboxScreen({
     followState.ok ||
     readState.ok;
 
-  function deliveryMark(status: string, outbound: boolean) {
+  function deliveryMark(status: string, outbound: boolean, detail = "") {
     if (!outbound) return null;
     const s = status.toLowerCase();
-    if (s === "failed") return { text: "!", title: "Falló el envío", className: "text-danger" };
+    if (s === "failed") {
+      return {
+        text: "!",
+        title: detail || "Falló el envío",
+        className: "text-[#fecaca]",
+      };
+    }
     if (s === "read") return { text: "✓✓", title: "Leído", className: "text-[#7dd3fc]" };
     if (s === "delivered") return { text: "✓✓", title: "Entregado", className: "text-on-dark/70" };
-    if (s === "sent") return { text: "✓", title: "Enviado", className: "text-on-dark/55" };
+    if (s === "sent") return { text: "✓", title: "Enviado a Meta…", className: "text-on-dark/55" };
     return status ? { text: status, title: status, className: "text-on-dark/55" } : null;
   }
+
+  const withinCustomerWindow = useMemo(() => {
+    const lastInbound = [...messages].reverse().find((msg) => msg.direction === "inbound");
+    if (!lastInbound) return false;
+    const age = Date.now() - new Date(lastInbound.createdAt).getTime();
+    return Number.isFinite(age) && age <= 24 * 60 * 60 * 1000;
+  }, [messages]);
 
   if (!tableReady) {
     return (
@@ -486,18 +499,28 @@ export function InboxScreen({
                   <p className="text-xs text-muted">Sin mensajes. Escribe abajo o manda una plantilla.</p>
                 ) : (
                   messages.map((msg) => {
-                    const mark = deliveryMark(msg.deliveryStatus, msg.direction === "outbound");
+                    const failed = msg.direction === "outbound" && msg.deliveryStatus === "failed";
+                    const mark = deliveryMark(
+                      msg.deliveryStatus,
+                      msg.direction === "outbound",
+                      msg.deliveryDetail,
+                    );
                     return (
                       <div
                         key={msg.id}
                         className={cx(
                           "max-w-[min(88%,26rem)] rounded-[10px] px-2.5 py-1.5 text-[13px] leading-snug",
                           msg.direction === "outbound"
-                            ? "ml-auto bg-primary text-on-dark"
+                            ? failed
+                              ? "ml-auto bg-[#7f1d1d] text-on-dark"
+                              : "ml-auto bg-primary text-on-dark"
                             : "mr-auto bg-card text-ink shadow-[0_0_0_1px_var(--color-line)]",
                         )}
                       >
                         <p className="whitespace-pre-wrap">{msg.body}</p>
+                        {failed && msg.deliveryDetail ? (
+                          <p className="mt-1 text-[11px] leading-4 text-[#fecaca]">{msg.deliveryDetail}</p>
+                        ) : null}
                         <p
                           className={cx(
                             "mt-0.5 flex items-center gap-1 text-[9px]",
@@ -530,24 +553,33 @@ export function InboxScreen({
               </div>
 
               <footer className="shrink-0 border-t border-line bg-card px-2.5 py-2">
+                {!withinCustomerWindow ? (
+                  <p className="mb-1.5 rounded-[8px] bg-warning-tint px-2 py-1.5 text-[11px] leading-4 text-warning">
+                    Fuera de ventana 24 h (o aún no te escribió). El texto libre no llega: abre{" "}
+                    <span className="font-semibold">Plantilla Meta</span> abajo o pídele un hola al
+                    301 123 4236.
+                  </p>
+                ) : null}
                 <form action={sendAction} className="flex flex-col gap-1.5">
                   <input type="hidden" name="conversationId" value={active.id} />
                   <input type="hidden" name="mode" value="text" />
-                  <div className="flex gap-1 overflow-x-auto pb-0.5">
-                    {INBOX_QUICK_REPLIES.map((item) => (
-                      <button
-                        key={item.id}
-                        type="button"
-                        className="shrink-0 rounded-[6px] border border-line bg-canvas px-2 py-1 text-[11px] font-semibold text-ink hover:bg-subtle"
-                        title={fillInboxQuickReply(item.text, active.contactName || "")}
-                        onClick={() =>
-                          setDraft(fillInboxQuickReply(item.text, active.contactName || ""))
-                        }
-                      >
-                        {item.label}
-                      </button>
-                    ))}
-                  </div>
+                  {withinCustomerWindow ? (
+                    <div className="flex gap-1 overflow-x-auto pb-0.5">
+                      {INBOX_QUICK_REPLIES.map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          className="shrink-0 rounded-[6px] border border-line bg-canvas px-2 py-1 text-[11px] font-semibold text-ink hover:bg-subtle"
+                          title={fillInboxQuickReply(item.text, active.contactName || "")}
+                          onClick={() =>
+                            setDraft(fillInboxQuickReply(item.text, active.contactName || ""))
+                          }
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
                   <div className="flex gap-1.5">
                     <textarea
                       key={`body-${active.id}-${composerKey}`}
@@ -555,15 +587,25 @@ export function InboxScreen({
                       rows={1}
                       value={draft}
                       onChange={(event) => setDraft(event.target.value)}
-                      placeholder="Mensaje… (Enter envía, Shift+Enter salto)"
+                      placeholder={
+                        withinCustomerWindow
+                          ? "Mensaje… (Enter envía, Shift+Enter salto)"
+                          : "Texto libre bloqueado — usa plantilla Meta"
+                      }
+                      disabled={!withinCustomerWindow}
                       onKeyDown={(event) => {
+                        if (!withinCustomerWindow) return;
                         if (event.key !== "Enter" || event.shiftKey) return;
                         event.preventDefault();
                         event.currentTarget.form?.requestSubmit();
                       }}
-                      className="min-h-8 max-h-24 flex-1 resize-y rounded-[8px] border border-line bg-canvas px-2.5 py-1.5 text-sm outline-none focus:border-ink"
+                      className="min-h-8 max-h-24 flex-1 resize-y rounded-[8px] border border-line bg-canvas px-2.5 py-1.5 text-sm outline-none focus:border-ink disabled:opacity-60"
                     />
-                    <button type="submit" disabled={sending || !draft.trim()} className={btnDark}>
+                    <button
+                      type="submit"
+                      disabled={sending || !withinCustomerWindow || !draft.trim()}
+                      className={btnDark}
+                    >
                       {sending ? "…" : "Enviar"}
                     </button>
                   </div>
@@ -573,9 +615,10 @@ export function InboxScreen({
                   {sendState.ok ? (
                     <p className="text-[11px] leading-4 text-success">{sendState.ok}</p>
                   ) : null}
-                  <details className="text-xs text-muted">
+                  <details className="text-xs text-muted" open={!withinCustomerWindow}>
                     <summary className="cursor-pointer font-semibold hover:text-ink">
                       Plantilla Meta{templates.length ? ` (${templates.length})` : ""}
+                      {!withinCustomerWindow ? " · requerida" : ""}
                     </summary>
                     <div className="mt-1.5 flex flex-wrap gap-1">
                       {templates.length > 0 ? (
