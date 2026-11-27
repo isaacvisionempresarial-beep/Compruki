@@ -156,6 +156,13 @@ export function PanelShell({
     setOpen(false);
   }
 
+  // Deep-link: /panel/pedidos?q=57300… precarga la búsqueda del panel.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const q = new URLSearchParams(window.location.search).get("q");
+    setQuery(q?.trim() || "");
+  }, [pathname]);
+
   useEffect(() => {
     if (!open) return;
     const menu = menuRef.current;

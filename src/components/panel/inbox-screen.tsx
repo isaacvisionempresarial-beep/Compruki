@@ -753,12 +753,22 @@ export function InboxScreen({
                   {(assigning || staging || renaming) && (
                     <span className="text-[10px] text-muted">Guardando…</span>
                   )}
-                  <Link
-                    href="/panel/clientes"
-                    className="ml-auto shrink-0 text-[11px] font-semibold text-accent-strong hover:underline"
-                  >
-                    CRM
-                  </Link>
+                  <div className="ml-auto flex shrink-0 items-center gap-2">
+                    <Link
+                      href={`/panel/pedidos?q=${encodeURIComponent(active.phone)}`}
+                      className="text-[11px] font-semibold text-accent-strong hover:underline"
+                      title="Ver pedidos de este celular"
+                    >
+                      Pedidos
+                    </Link>
+                    <Link
+                      href={`/panel/clientes?q=${encodeURIComponent(active.phone)}#contactos`}
+                      className="text-[11px] font-semibold text-accent-strong hover:underline"
+                      title="Ver contacto en CRM"
+                    >
+                      CRM
+                    </Link>
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-1">

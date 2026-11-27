@@ -7,6 +7,7 @@ import { FOLLOWUP_OPEN_STAGES, groupFollowupsByStage } from "@/lib/crm-pipeline"
 import { cx } from "@/lib/cx";
 import { formatDay } from "@/lib/format";
 import { orderFocusHref } from "@/lib/store-order";
+import { usePanelQuery } from "@/components/panel/panel-shell";
 import type { FollowupPriority as AgentPriority } from "@/server/agent-followup-priority";
 import type { RegisteredStoreAccount } from "@/server/customer-auth";
 import type { FollowupTask } from "@/server/followups";
@@ -63,19 +64,36 @@ export function CustomersScreen({
 }) {
   const [boardFilter, setBoardFilter] = useState<BoardFilter>(initialBoardFilter);
   const today = new Date().toISOString().slice(0, 10);
+  const panelQuery = usePanelQuery().trim().toLocaleLowerCase("es");
+  const panelDigits = panelQuery.replace(/\D/g, "");
+
+  const matchesPanelQuery = (phone: string, name: string) => {
+    if (!panelQuery) return true;
+    const hay = `${name} ${phone}`.toLocaleLowerCase("es");
+    if (hay.includes(panelQuery)) return true;
+    if (panelDigits && phone.replace(/\D/g, "").includes(panelDigits)) return true;
+    return false;
+  };
 
   const filteredTasks = useMemo(() => {
+    let list = openTasks;
     if (boardFilter === "mine") {
-      return openTasks.filter((task) => task.assignedTo && task.assignedTo === actorUserId);
+      list = list.filter((task) => task.assignedTo && task.assignedTo === actorUserId);
+    } else if (boardFilter === "overdue") {
+      list = list.filter((task) => task.dueAt && task.dueAt.slice(0, 10) < today);
+    } else if (boardFilter === "high") {
+      list = list.filter((task) => task.priority === "high");
     }
-    if (boardFilter === "overdue") {
-      return openTasks.filter((task) => task.dueAt && task.dueAt.slice(0, 10) < today);
+    if (panelQuery) {
+      list = list.filter((task) => matchesPanelQuery(task.phone, task.customerName));
     }
-    if (boardFilter === "high") {
-      return openTasks.filter((task) => task.priority === "high");
-    }
-    return openTasks;
-  }, [openTasks, boardFilter, actorUserId, today]);
+    return list;
+  }, [openTasks, boardFilter, actorUserId, today, panelQuery, panelDigits]);
+
+  const visibleContacts = useMemo(() => {
+    if (!panelQuery) return contacts;
+    return contacts.filter((contact) => matchesPanelQuery(contact.phone, contact.customerName));
+  }, [contacts, panelQuery, panelDigits]);
 
   const byStage = groupFollowupsByStage(filteredTasks);
   const filterCounts = useMemo(
@@ -275,9 +293,11 @@ export function CustomersScreen({
         </h2>
         {contacts.length === 0 ? (
           <p className="mt-2 text-sm text-muted">Aún no hay pedidos con teléfono.</p>
+        ) : visibleContacts.length === 0 ? (
+          <p className="mt-2 text-sm text-muted">Ningún contacto coincide con la búsqueda.</p>
         ) : (
           <ul className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-            {contacts.map((contact) => (
+            {visibleContacts.map((contact) => (
               <li key={contact.phone} className="elevate-1 rounded-[12px] border border-line bg-card px-3 py-2.5">
                 <p className="text-sm font-semibold">{contact.customerName}</p>
                 <p className="mt-0.5 text-[11px] text-muted">
