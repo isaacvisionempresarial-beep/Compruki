@@ -9,6 +9,7 @@ import {
   type FollowupStageId,
 } from "@/lib/crm-pipeline";
 import { cx } from "@/lib/cx";
+import { formatRelativeShort } from "@/lib/format";
 import { fillInboxQuickReply, INBOX_QUICK_REPLIES } from "@/lib/inbox-quick-replies";
 import {
   assignInboxConversationAction,
@@ -82,12 +83,28 @@ export function InboxScreen({
   const defaultTemplateKey = templates[0] ? `${templates[0].name}::${templates[0].language}` : "";
   const [templateKey, setTemplateKey] = useState(defaultTemplateKey);
   const [templateVarValues, setTemplateVarValues] = useState<Record<string, string>>({});
+  const [nowTick, setNowTick] = useState(() => Date.now());
   const router = useRouter();
 
   useEffect(() => {
     if (!defaultTemplateKey) return;
     setTemplateKey((current) => current || defaultTemplateKey);
   }, [defaultTemplateKey]);
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNowTick(Date.now()), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (filter === "all") url.searchParams.delete("f");
+    else url.searchParams.set("f", filter);
+    const next = `${url.pathname}${url.search}${url.hash}`;
+    const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (next !== current) window.history.replaceState(null, "", next);
+  }, [filter]);
 
   useEffect(() => {
     const tick = () => {
@@ -532,6 +549,14 @@ export function InboxScreen({
                             {item.unreadCount > 0 ? (
                               <span className="rounded-full bg-accent px-1 text-[10px] font-bold text-primary-dark">
                                 {item.unreadCount}
+                              </span>
+                            ) : null}
+                            {item.lastMessageAt ? (
+                              <span
+                                className="text-[9px] font-semibold text-muted tabular-nums"
+                                title={item.lastMessageAt}
+                              >
+                                {formatRelativeShort(item.lastMessageAt, nowTick)}
                               </span>
                             ) : null}
                           </span>
