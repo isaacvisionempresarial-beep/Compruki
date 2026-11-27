@@ -181,7 +181,9 @@ export async function sendInboxMessageAction(
   if (!access) return { error: "Sin permiso WhatsApp.", ok: null, conversations: [], activeId: null, messages: [] };
 
   const conversationId = String(formData.get("conversationId") || "");
-  const mode = String(formData.get("mode") || "text");
+  // Si hay hidden + botón submit, get() puede devolver el primero; preferimos el último.
+  const modeParts = formData.getAll("mode").map((part) => String(part));
+  const mode = modeParts[modeParts.length - 1] || "text";
   try {
     if (mode === "template") {
       await sendInboxTemplate({

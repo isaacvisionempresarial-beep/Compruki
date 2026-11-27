@@ -562,7 +562,6 @@ export function InboxScreen({
                 ) : null}
                 <form action={sendAction} className="flex flex-col gap-1.5">
                   <input type="hidden" name="conversationId" value={active.id} />
-                  <input type="hidden" name="mode" value="text" />
                   {withinCustomerWindow ? (
                     <div className="flex gap-1 overflow-x-auto pb-0.5">
                       {INBOX_QUICK_REPLIES.map((item) => (
@@ -603,6 +602,8 @@ export function InboxScreen({
                     />
                     <button
                       type="submit"
+                      name="mode"
+                      value="text"
                       disabled={sending || !withinCustomerWindow || !draft.trim()}
                       className={btnDark}
                     >
