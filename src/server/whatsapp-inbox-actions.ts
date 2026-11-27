@@ -202,7 +202,13 @@ export async function sendInboxMessageAction(
         actorName: access.actorName,
       });
     }
+    // Si nadie lo tenía, al responder queda en tu bandeja.
+    const conversation = await getInboxConversation(access.tenantId, conversationId);
+    if (conversation && !conversation.assignedTo && access.user.id) {
+      await assignConversation(access.tenantId, conversationId, access.user.id).catch(() => undefined);
+    }
     revalidatePath("/panel/inbox");
+    revalidatePath("/panel/clientes");
     const data = await pack(access.tenantId, conversationId);
     return { error: null, ok: "Mensaje enviado.", ...data };
   } catch (error) {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import {
   FOLLOWUP_OPEN_STAGES,
   followupStageLabel,
@@ -163,17 +163,39 @@ export function InboxScreen({
     [conversations, activeId],
   );
 
+  const threadRef = useRef<HTMLDivElement>(null);
+  const [composerKey, setComposerKey] = useState(0);
+
+  useEffect(() => {
+    const el = threadRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, [activeId, messages]);
+
+  useEffect(() => {
+    if (sendState.ok) setComposerKey((n) => n + 1);
+  }, [sendState.ok, sendState.messages.length]);
+
   const feedbackError =
+    sendState.error ||
     bootError ||
     openState.error ||
-    sendState.error ||
     stageState.error ||
     assignState.error ||
     followState.error ||
     readState.error ||
     selectState.error;
   const feedbackOk =
-    openState.ok || sendState.ok || stageState.ok || assignState.ok || followState.ok || readState.ok;
+    sendState.ok || openState.ok || stageState.ok || assignState.ok || followState.ok || readState.ok;
+
+  function deliveryLabel(status: string) {
+    const s = status.toLowerCase();
+    if (s === "sent") return "enviado";
+    if (s === "delivered") return "entregado";
+    if (s === "read") return "leído";
+    if (s === "failed") return "falló";
+    return status;
+  }
 
   if (!tableReady) {
     return (
@@ -198,8 +220,10 @@ export function InboxScreen({
         </Link>
       </div>
 
-      {feedbackError ? <p className="text-xs text-danger">{feedbackError}</p> : null}
-      {feedbackOk ? <p className="text-xs text-success">{feedbackOk}</p> : null}
+      {feedbackError && !sendState.error ? (
+        <p className="text-xs text-danger">{feedbackError}</p>
+      ) : null}
+      {feedbackOk && !sendState.ok ? <p className="text-xs text-success">{feedbackOk}</p> : null}
 
       <div className="grid min-h-[min(78vh,42rem)] gap-2 lg:grid-cols-[220px_minmax(0,1fr)]">
         <aside className="elevate-1 flex min-h-0 flex-col overflow-hidden rounded-[12px] border border-line bg-card">
@@ -423,9 +447,12 @@ export function InboxScreen({
                 </div>
               </header>
 
-              <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto bg-canvas/40 px-2.5 py-2.5">
+              <div
+                ref={threadRef}
+                className="min-h-0 flex-1 space-y-1.5 overflow-y-auto bg-canvas/40 px-2.5 py-2.5"
+              >
                 {messages.length === 0 ? (
-                  <p className="text-xs text-muted">Sin mensajes.</p>
+                  <p className="text-xs text-muted">Sin mensajes. Escribe abajo o manda una plantilla.</p>
                 ) : (
                   messages.map((msg) => (
                     <div
@@ -450,7 +477,7 @@ export function InboxScreen({
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
-                        {msg.deliveryStatus ? ` · ${msg.deliveryStatus}` : ""}
+                        {msg.deliveryStatus ? ` · ${deliveryLabel(msg.deliveryStatus)}` : ""}
                       </p>
                     </div>
                   ))
@@ -463,15 +490,27 @@ export function InboxScreen({
                   <input type="hidden" name="mode" value="text" />
                   <div className="flex gap-1.5">
                     <textarea
+                      key={`body-${active.id}-${composerKey}`}
                       name="body"
                       rows={1}
-                      placeholder="Mensaje (ventana 24 h)…"
+                      placeholder="Mensaje… (Enter envía, Shift+Enter salto)"
+                      onKeyDown={(event) => {
+                        if (event.key !== "Enter" || event.shiftKey) return;
+                        event.preventDefault();
+                        event.currentTarget.form?.requestSubmit();
+                      }}
                       className="min-h-8 max-h-24 flex-1 resize-y rounded-[8px] border border-line bg-canvas px-2.5 py-1.5 text-sm outline-none focus:border-ink"
                     />
                     <button type="submit" disabled={sending} className={btnDark}>
                       {sending ? "…" : "Enviar"}
                     </button>
                   </div>
+                  {sendState.error ? (
+                    <p className="text-[11px] leading-4 text-danger">{sendState.error}</p>
+                  ) : null}
+                  {sendState.ok ? (
+                    <p className="text-[11px] leading-4 text-success">{sendState.ok}</p>
+                  ) : null}
                   <details className="text-xs text-muted">
                     <summary className="cursor-pointer font-semibold hover:text-ink">
                       Plantilla Meta{templates.length ? ` (${templates.length})` : ""}
@@ -512,7 +551,7 @@ export function InboxScreen({
                     </div>
                     {templates.length === 0 ? (
                       <p className="mt-1 text-[11px] text-muted">
-                        Sin plantillas vía API (falta WABA ID/token). Puedes escribir el nombre a mano.
+                        Sin plantillas listadas aún. Escribe el nombre aprobado en Meta (ej. hello_world).
                       </p>
                     ) : null}
                   </details>
