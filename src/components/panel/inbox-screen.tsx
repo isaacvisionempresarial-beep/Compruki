@@ -373,10 +373,10 @@ export function InboxScreen({
       ) : null}
       {feedbackOk && !sendState.ok ? <p className="text-xs text-success">{feedbackOk}</p> : null}
 
-      <div className="grid min-h-[min(78vh,42rem)] gap-2 lg:grid-cols-[220px_minmax(0,1fr)]">
+      <div className="grid min-h-[min(78vh,42rem)] gap-2 lg:grid-cols-[240px_minmax(0,1fr)]">
         <aside className="elevate-1 flex min-h-0 flex-col overflow-hidden rounded-[12px] border border-line bg-card">
           <div className="shrink-0 space-y-1.5 border-b border-line p-2">
-            <form action={openAction} className="flex gap-1">
+            <form action={openAction} className="flex items-center gap-1">
               <input
                 name="phone"
                 required
@@ -385,7 +385,13 @@ export function InboxScreen({
                 className={cx(ctrl, "min-w-0 flex-1")}
               />
               <input type="hidden" name="contactName" value="" />
-              <button type="submit" disabled={opening} className={btnDark} title="Abrir chat">
+              <button
+                type="submit"
+                disabled={opening}
+                className={cx(btnDark, "w-8 px-0")}
+                title="Abrir chat"
+                aria-label="Abrir chat"
+              >
                 {opening ? "…" : "+"}
               </button>
             </form>
@@ -396,7 +402,7 @@ export function InboxScreen({
               aria-label="Buscar conversaciones"
               className={cx(ctrl, "w-full")}
             />
-            <div className="grid grid-cols-5 gap-0.5" role="tablist" aria-label="Filtro">
+            <div className="flex flex-wrap gap-1" role="tablist" aria-label="Filtro">
               {(
                 [
                   ["all", "Todos"],
@@ -414,7 +420,7 @@ export function InboxScreen({
                   onClick={() => setFilter(id)}
                   title={id === "awaiting" ? "Último mensaje entrante: te toca responder" : undefined}
                   className={cx(
-                    "h-7 rounded-[6px] text-[10px] font-semibold",
+                    "h-7 shrink-0 rounded-[6px] px-2 text-[10px] font-semibold",
                     filter === id ? "bg-ink text-canvas" : "bg-subtle text-muted hover:text-ink",
                   )}
                 >
@@ -497,9 +503,9 @@ export function InboxScreen({
             <p className="m-auto px-4 text-sm text-muted">Elige un chat.</p>
           ) : (
             <>
-              <header className="shrink-0 border-b border-line px-2.5 py-2">
-                <div className="flex items-center justify-between gap-2">
-                  <form action={renameAction} className="flex min-w-0 flex-1 items-center gap-1">
+              <header className="shrink-0 space-y-2 border-b border-line px-2.5 py-2">
+                <div className="flex items-center gap-2">
+                  <form action={renameAction} className="flex min-w-0 flex-1 items-center gap-1.5">
                     <input type="hidden" name="conversationId" value={active.id} />
                     <input
                       name="contactName"
@@ -508,12 +514,14 @@ export function InboxScreen({
                       placeholder="Nombre"
                       aria-label="Nombre del contacto"
                       maxLength={80}
-                      className={cx(ctrl, "min-w-0 flex-1 max-w-[12rem] font-semibold")}
+                      className={cx(ctrl, "w-[11rem] shrink-0 font-semibold sm:w-[14rem]")}
                     />
-                    <span className="truncate text-xs text-muted tabular-nums">{active.phone}</span>
-                    <button type="submit" disabled={renaming} className={btn} title="Guardar nombre">
-                      {renaming ? "…" : "OK"}
+                    <button type="submit" disabled={renaming} className={btn} aria-label="Guardar nombre">
+                      {renaming ? "…" : "Guardar"}
                     </button>
+                    <span className="min-w-0 truncate text-xs text-muted tabular-nums">
+                      {active.phone}
+                    </span>
                   </form>
                   <Link
                     href="/panel/clientes"
@@ -523,89 +531,86 @@ export function InboxScreen({
                   </Link>
                 </div>
 
-                {/* Barra CRM en una sola franja */}
-                <div className="mt-1.5 flex flex-wrap items-center gap-1">
-                  <form action={assignAction} className="flex items-center gap-1">
-                    <input type="hidden" name="conversationId" value={active.id} />
-                    <select
-                      name="assignedTo"
-                      defaultValue={active.assignedTo}
-                      key={`${active.id}-a-${active.assignedTo}`}
-                      aria-label="Responsable"
-                      title="Responsable"
-                      className={cx(ctrl, "max-w-[9.5rem]")}
-                    >
-                      <option value="">Sin asignar</option>
-                      {assignees.map((person) => (
-                        <option key={person.userId} value={person.userId}>
-                          {person.name || person.email}
-                          {person.userId === actorUserId ? " (tú)" : ""}
-                        </option>
-                      ))}
-                    </select>
-                    <button type="submit" disabled={assigning} className={btn}>
-                      Asignar
-                    </button>
-                  </form>
-                  {active.assignedTo !== actorUserId ? (
-                    <form action={assignAction}>
+                <div className="grid gap-1.5 sm:grid-cols-[minmax(0,1fr)_auto]">
+                  <div className="flex flex-wrap items-center gap-1">
+                    <form action={assignAction} className="flex items-center gap-1">
                       <input type="hidden" name="conversationId" value={active.id} />
-                      <input type="hidden" name="assignedTo" value={actorUserId} />
-                      <button
-                        type="submit"
-                        disabled={assigning}
-                        className={btnDark}
-                        title="Asignarme este chat y su seguimiento CRM"
+                      <select
+                        name="assignedTo"
+                        defaultValue={active.assignedTo}
+                        key={`${active.id}-a-${active.assignedTo}`}
+                        aria-label="Responsable"
+                        title="Responsable"
+                        className={cx(ctrl, "w-[10rem]")}
                       >
-                        Tomar
+                        <option value="">Sin asignar</option>
+                        {assignees.map((person) => (
+                          <option key={person.userId} value={person.userId}>
+                            {person.name || person.email}
+                            {person.userId === actorUserId ? " (tú)" : ""}
+                          </option>
+                        ))}
+                      </select>
+                      <button type="submit" disabled={assigning} className={btn}>
+                        Asignar
                       </button>
                     </form>
-                  ) : null}
+                    {active.assignedTo !== actorUserId ? (
+                      <form action={assignAction}>
+                        <input type="hidden" name="conversationId" value={active.id} />
+                        <input type="hidden" name="assignedTo" value={actorUserId} />
+                        <button
+                          type="submit"
+                          disabled={assigning}
+                          className={btnDark}
+                          title="Asignarme este chat y su seguimiento CRM"
+                        >
+                          Tomar
+                        </button>
+                      </form>
+                    ) : null}
 
-                  <span className="hidden h-4 w-px bg-line sm:block" aria-hidden />
+                    <form action={stageAction} className="flex items-center gap-1">
+                      <input type="hidden" name="conversationId" value={active.id} />
+                      <select
+                        name="stage"
+                        defaultValue={active.pipelineStage}
+                        key={`${active.id}-s-${active.pipelineStage}`}
+                        aria-label="Etapa"
+                        title="Etapa CRM"
+                        className={cx(ctrl, "w-[7.25rem]")}
+                      >
+                        {FOLLOWUP_OPEN_STAGES.map((stage) => (
+                          <option key={stage.id} value={stage.id}>
+                            {stage.label}
+                          </option>
+                        ))}
+                      </select>
+                      <select
+                        name="status"
+                        defaultValue={active.status}
+                        key={`${active.id}-st-${active.status}`}
+                        aria-label="Estado"
+                        title="Estado del chat"
+                        className={cx(ctrl, "w-[6.5rem]")}
+                      >
+                        <option value="open">Abierta</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="closed">Cerrada</option>
+                      </select>
+                      <button type="submit" disabled={staging} className={btn}>
+                        Guardar
+                      </button>
+                    </form>
+                  </div>
 
-                  <form action={stageAction} className="flex items-center gap-1">
-                    <input type="hidden" name="conversationId" value={active.id} />
-                    <select
-                      name="stage"
-                      defaultValue={active.pipelineStage}
-                      key={`${active.id}-s-${active.pipelineStage}`}
-                      aria-label="Etapa"
-                      title="Etapa CRM"
-                      className={cx(ctrl, "w-[7.25rem]")}
-                    >
-                      {FOLLOWUP_OPEN_STAGES.map((stage) => (
-                        <option key={stage.id} value={stage.id}>
-                          {stage.label}
-                        </option>
-                      ))}
-                    </select>
-                    <select
-                      name="status"
-                      defaultValue={active.status}
-                      key={`${active.id}-st-${active.status}`}
-                      aria-label="Estado"
-                      title="Estado del chat"
-                      className={cx(ctrl, "w-[6.5rem]")}
-                    >
-                      <option value="open">Abierta</option>
-                      <option value="pending">Pendiente</option>
-                      <option value="closed">Cerrada</option>
-                    </select>
-                    <button type="submit" disabled={staging} className={btn}>
-                      Guardar
-                    </button>
-                  </form>
-
-                  <span className="hidden h-4 w-px bg-line md:block" aria-hidden />
-
-                  <form action={followAction} className="flex min-w-[12rem] flex-1 items-center gap-1">
+                  <form action={followAction} className="flex min-w-0 items-center gap-1">
                     <input type="hidden" name="conversationId" value={active.id} />
                     <input
                       name="note"
                       placeholder="Nota CRM…"
                       aria-label="Nota para seguimiento"
-                      className={cx(ctrl, "min-w-0 flex-1")}
+                      className={cx(ctrl, "min-w-0 flex-1 sm:w-40")}
                     />
                     <button type="submit" disabled={following} className={btn}>
                       + Seg.
