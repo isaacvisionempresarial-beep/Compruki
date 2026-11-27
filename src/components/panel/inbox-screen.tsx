@@ -84,6 +84,15 @@ export function InboxScreen({
   const [templateKey, setTemplateKey] = useState(defaultTemplateKey);
   const [templateVarValues, setTemplateVarValues] = useState<Record<string, string>>({});
   const [nowTick, setNowTick] = useState(() => Date.now());
+  const [phoneCopied, setPhoneCopied] = useState(false);
+  const [arrivalNotice, setArrivalNotice] = useState<{
+    id: string;
+    name: string;
+    preview: string;
+  } | null>(null);
+  const prevUnreadRef = useRef<number | null>(null);
+  const activeStampRef = useRef("");
+  const prevActiveForStampRef = useRef<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -230,7 +239,6 @@ export function InboxScreen({
   }, [initialConversations, initialMessages, initialActiveId]);
 
   // Si el chat abierto recibe algo nuevo en el poll, recarga el hilo.
-  const prevActiveForStampRef = useRef<string | null>(null);
   useEffect(() => {
     const currentId = bundle.activeId;
     if (!currentId) return;
@@ -355,14 +363,6 @@ export function InboxScreen({
   const [composerKey, setComposerKey] = useState(0);
   const [draft, setDraft] = useState("");
   const [showFailed, setShowFailed] = useState(false);
-  const [phoneCopied, setPhoneCopied] = useState(false);
-  const [arrivalNotice, setArrivalNotice] = useState<{
-    id: string;
-    name: string;
-    preview: string;
-  } | null>(null);
-  const prevUnreadRef = useRef<number | null>(null);
-  const activeStampRef = useRef("");
 
   const failedCount = useMemo(
     () =>
