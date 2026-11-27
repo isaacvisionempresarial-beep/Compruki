@@ -106,16 +106,6 @@ export function InboxScreen({
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const url = new URL(window.location.href);
-    if (filter === "all") url.searchParams.delete("f");
-    else url.searchParams.set("f", filter);
-    const next = `${url.pathname}${url.search}${url.hash}`;
-    const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-    if (next !== current) window.history.replaceState(null, "", next);
-  }, [filter]);
-
-  useEffect(() => {
     const tick = () => {
       if (document.visibilityState === "visible") router.refresh();
     };
@@ -230,12 +220,24 @@ export function InboxScreen({
   }, [readState]);
 
   useEffect(() => {
-    setBundle((prev) => ({
-      conversations: initialConversations,
-      activeId: prev.activeId || initialActiveId,
-      messages:
-        prev.activeId && prev.activeId === initialActiveId ? initialMessages : prev.messages,
-    }));
+    setBundle((prev) => {
+      const nextActive = prev.activeId || initialActiveId;
+      const serverHasActive =
+        Boolean(nextActive) &&
+        (nextActive === initialActiveId ||
+          initialConversations.some((item) => item.id === nextActive));
+      return {
+        conversations: initialConversations,
+        activeId: nextActive,
+        // Con ?c= en URL, el refresh trae mensajes del hilo abierto.
+        messages:
+          serverHasActive && nextActive === initialActiveId
+            ? initialMessages
+            : prev.activeId === nextActive
+              ? prev.messages
+              : initialMessages,
+      };
+    });
   }, [initialConversations, initialMessages, initialActiveId]);
 
   // Si el chat abierto recibe algo nuevo en el poll, recarga el hilo.
@@ -265,6 +267,21 @@ export function InboxScreen({
   const conversations = bundle.conversations;
   const activeId = bundle.activeId;
   const messages = bundle.messages;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (filter === "all") url.searchParams.delete("f");
+    else url.searchParams.set("f", filter);
+    if (activeId) url.searchParams.set("c", activeId);
+    else url.searchParams.delete("c");
+    // phone/name solo sirven para deep-link de entrada.
+    url.searchParams.delete("phone");
+    url.searchParams.delete("name");
+    const next = `${url.pathname}${url.search}${url.hash}`;
+    const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (next !== current) window.history.replaceState(null, "", next);
+  }, [filter, activeId]);
 
   const assigneeName = useMemo(() => {
     const map = new Map(assignees.map((item) => [item.userId, item.name || item.email]));
