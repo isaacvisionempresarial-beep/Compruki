@@ -223,10 +223,16 @@ export async function ensureWhatsAppInbound(env: MetaWaEnv, callbackUrl: string)
     );
   }
 
-  await metaRequest(env, `${env.businessAccountId}/subscribed_apps`, "POST");
-
-  const notes = ["App suscrita a la cuenta de WhatsApp"];
+  const notes: string[] = [];
   let callbackReady = false;
+  try {
+    await metaRequest(env, `${env.businessAccountId}/subscribed_apps`, "POST");
+    notes.push("App suscrita a la cuenta de WhatsApp");
+  } catch (error) {
+    // Token sin manage en WABA: Meta UI «Suscribir webhooks» suele bastar.
+    const detail = error instanceof Error ? error.message : "sin permiso WABA";
+    notes.push(`Suscripción WABA por API no quedó (${detail.slice(0, 120)})`);
+  }
   const appId = await resolveMetaAppId(env);
   if (!appId) {
     notes.push("Sin META_WA_APP_ID no registro el callback de la app");
@@ -280,9 +286,8 @@ export async function ensureWhatsAppInbound(env: MetaWaEnv, callbackUrl: string)
   }
 
   if (!callbackReady) {
-    throw new MetaApiError(
-      422,
-      "La cuenta quedó suscrita, pero el callback no apunta a Compruki. Revisa META_WA_APP_ID y el verify token.",
+    notes.push(
+      "Callback no confirmado por API; deja «Suscribir webhooks» ON en Meta y prueba un mensaje entrante a este número",
     );
   }
   return `${notes.join(". ")}.`;
