@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import { startTransition, useActionState, useEffect, useMemo, useRef, useState } from "react";
 import {
   FOLLOWUP_OPEN_STAGES,
   followupStageLabel,
@@ -229,6 +229,31 @@ export function InboxScreen({
     }));
   }, [initialConversations, initialMessages, initialActiveId]);
 
+  // Si el chat abierto recibe algo nuevo en el poll, recarga el hilo.
+  const prevActiveForStampRef = useRef<string | null>(null);
+  useEffect(() => {
+    const currentId = bundle.activeId;
+    if (!currentId) return;
+    if (prevActiveForStampRef.current !== currentId) {
+      prevActiveForStampRef.current = currentId;
+      activeStampRef.current = "";
+    }
+    const row = initialConversations.find((item) => item.id === currentId);
+    if (!row) return;
+    const stamp = `${row.id}|${row.lastMessageAt}|${row.lastMessagePreview}|${row.unreadCount}`;
+    if (!activeStampRef.current) {
+      activeStampRef.current = stamp;
+      return;
+    }
+    if (stamp === activeStampRef.current) return;
+    activeStampRef.current = stamp;
+    const fd = new FormData();
+    fd.set("conversationId", currentId);
+    startTransition(() => {
+      selectAction(fd);
+    });
+  }, [initialConversations, bundle.activeId, selectAction]);
+
   const conversations = bundle.conversations;
   const activeId = bundle.activeId;
   const messages = bundle.messages;
@@ -242,6 +267,27 @@ export function InboxScreen({
     () => conversations.reduce((sum, item) => sum + (item.unreadCount > 0 ? item.unreadCount : 0), 0),
     [conversations],
   );
+
+  useEffect(() => {
+    const previous = prevUnreadRef.current;
+    prevUnreadRef.current = unreadTotal;
+    if (previous === null || unreadTotal <= previous) return;
+    const candidate = [...conversations]
+      .filter((item) => item.unreadCount > 0 && item.id !== activeId)
+      .sort((a, b) => (b.lastMessageAt || "").localeCompare(a.lastMessageAt || ""))[0];
+    if (!candidate) return;
+    setArrivalNotice({
+      id: candidate.id,
+      name: candidate.contactName || candidate.phone,
+      preview: candidate.lastMessagePreview || "Nuevo mensaje",
+    });
+  }, [unreadTotal, conversations, activeId]);
+
+  useEffect(() => {
+    if (!arrivalNotice) return;
+    const id = window.setTimeout(() => setArrivalNotice(null), 8_000);
+    return () => window.clearTimeout(id);
+  }, [arrivalNotice]);
 
   const filterCounts = useMemo(() => {
     let mine = 0;
@@ -310,6 +356,13 @@ export function InboxScreen({
   const [draft, setDraft] = useState("");
   const [showFailed, setShowFailed] = useState(false);
   const [phoneCopied, setPhoneCopied] = useState(false);
+  const [arrivalNotice, setArrivalNotice] = useState<{
+    id: string;
+    name: string;
+    preview: string;
+  } | null>(null);
+  const prevUnreadRef = useRef<number | null>(null);
+  const activeStampRef = useRef("");
 
   const failedCount = useMemo(
     () =>
@@ -432,6 +485,50 @@ export function InboxScreen({
         <p className="text-xs text-danger">{feedbackError}</p>
       ) : null}
       {feedbackOk && !sendState.ok ? <p className="text-xs text-success">{feedbackOk}</p> : null}
+
+      {arrivalNotice ? (
+        <div
+          role="status"
+          className="elevate-1 flex items-center gap-2 rounded-[10px] border border-line bg-card px-2.5 py-2"
+        >
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[12px] font-semibold text-ink">
+              Nuevo · {arrivalNotice.name}
+            </p>
+            <p className="truncate text-[11px] text-muted">{arrivalNotice.preview}</p>
+          </div>
+          <button
+            type="button"
+            className={btnDark}
+            onClick={() => {
+              const fd = new FormData();
+              fd.set("conversationId", arrivalNotice.id);
+              setBundle((prev) => ({
+                ...prev,
+                activeId: arrivalNotice.id,
+                messages: [],
+                conversations: prev.conversations.map((row) =>
+                  row.id === arrivalNotice.id ? { ...row, unreadCount: 0 } : row,
+                ),
+              }));
+              setArrivalNotice(null);
+              startTransition(() => {
+                selectAction(fd);
+              });
+            }}
+          >
+            Abrir
+          </button>
+          <button
+            type="button"
+            className={btn}
+            aria-label="Cerrar aviso"
+            onClick={() => setArrivalNotice(null)}
+          >
+            ×
+          </button>
+        </div>
+      ) : null}
 
       <div className="grid min-h-[min(78vh,42rem)] gap-2 lg:grid-cols-[220px_minmax(0,1fr)]">
         <aside className="elevate-1 flex min-h-0 flex-col overflow-hidden rounded-[12px] border border-line bg-card">
