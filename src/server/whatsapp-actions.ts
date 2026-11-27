@@ -89,29 +89,23 @@ export async function verifyWhatsAppConnectionAction(
       touchChecked: true,
     };
     let inboundNote = "";
+    let inboundWarn = "";
     try {
       inboundNote = await ensureWhatsAppInbound(env, siteUrl("/api/whatsapp/webhook"));
     } catch (error) {
-      const message =
+      // Número OK: no bloquear Verificar; Meta UI puede ya entregar webhooks.
+      inboundWarn =
         error instanceof MetaApiError
           ? error.message
           : error instanceof Error
             ? error.message
-            : "No se pudo suscribir el webhook.";
-      await upsertWhatsAppConnection(access.tenantId, {
-        ...phonePatch,
-        lastError: message,
-        detail: "Número verificado con Graph API. El webhook no quedó suscrito.",
-      });
-      const [connection, recent] = await Promise.all([
-        readWhatsAppConnection(access.tenantId),
-        listRecentWhatsAppMessages(access.tenantId, 25),
-      ]);
-      return { error: message, ok: null, connection, templates: [], recent };
+            : "Webhook no confirmado por API.";
+      inboundNote =
+        "Webhook no confirmado por API; deja «Suscribir webhooks» ON en Meta y prueba un mensaje entrante.";
     }
     await upsertWhatsAppConnection(access.tenantId, {
       ...phonePatch,
-      lastError: "",
+      lastError: inboundWarn,
       detail: `Número verificado con Graph API. ${inboundNote}`,
     });
 

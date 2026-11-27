@@ -22,6 +22,7 @@ export type MetaJson = {
   messages?: Array<{ id?: string }>;
   data?:
     | Array<{
+        id?: string;
         name?: string;
         language?: string;
         status?: string;
@@ -32,6 +33,7 @@ export type MetaJson = {
         is_valid?: boolean;
       }>
     | { app_id?: string; is_valid?: boolean };
+  whatsapp_business_account?: { id?: string; name?: string };
 };
 
 export class MetaApiError extends Error {
@@ -139,6 +141,31 @@ export async function verifyMetaPhone(env: MetaWaEnv) {
   };
 }
 
+/** Resuelve el WABA real del número (el Messaging Account ID de Meta UI a veces no sirve para subscribed_apps). */
+export async function resolveWhatsAppBusinessAccountId(env: MetaWaEnv): Promise<string | null> {
+  try {
+    const result = await metaRequest(
+      env,
+      `${env.phoneNumberId}?fields=whatsapp_business_account{id,name}`,
+      "GET",
+    );
+    if (result.whatsapp_business_account?.id) {
+      return String(result.whatsapp_business_account.id);
+    }
+  } catch {
+    /* token sin ese field */
+  }
+  try {
+    const listed = await metaRequest(env, "me/whatsapp_business_accounts?fields=id,name&limit=25", "GET");
+    const rows = Array.isArray(listed.data) ? listed.data : [];
+    const match = rows.find((row) => row.id);
+    if (match?.id) return String(match.id);
+  } catch {
+    /* sin acceso a /me/WABA */
+  }
+  return env.businessAccountId || null;
+}
+
 export async function sendWhatsAppText(env: MetaWaEnv, toPhoneDigits: string, body: string) {
   const sent = await metaRequest(env, `${env.phoneNumberId}/messages`, "POST", {
     messaging_product: "whatsapp",
@@ -216,22 +243,24 @@ async function resolveMetaAppId(env: MetaWaEnv): Promise<string | null> {
  * en ese caso solo registra el override de este phone number id.
  */
 export async function ensureWhatsAppInbound(env: MetaWaEnv, callbackUrl: string): Promise<string> {
-  if (!env.businessAccountId) {
-    throw new MetaApiError(
-      422,
-      "Falta META_WA_WABA_ID. Sin la cuenta de WhatsApp, Meta no entrega webhooks.",
-    );
-  }
-
   const notes: string[] = [];
   let callbackReady = false;
-  try {
-    await metaRequest(env, `${env.businessAccountId}/subscribed_apps`, "POST");
-    notes.push("App suscrita a la cuenta de WhatsApp");
-  } catch (error) {
-    // Token sin manage en WABA: Meta UI «Suscribir webhooks» suele bastar.
-    const detail = error instanceof Error ? error.message : "sin permiso WABA";
-    notes.push(`Suscripción WABA por API no quedó (${detail.slice(0, 120)})`);
+
+  const wabaId = (await resolveWhatsAppBusinessAccountId(env)) || env.businessAccountId;
+  if (!wabaId) {
+    notes.push("Sin WABA ID: deja «Suscribir webhooks» ON en Meta y prueba un mensaje entrante");
+  } else {
+    if (env.businessAccountId && wabaId !== env.businessAccountId) {
+      notes.push(`WABA resuelto desde el número: ${wabaId} (Railway tenía ${env.businessAccountId})`);
+    }
+    try {
+      await metaRequest(env, `${wabaId}/subscribed_apps`, "POST");
+      notes.push("App suscrita a la cuenta de WhatsApp");
+    } catch (error) {
+      // Token sin manage en WABA: Meta UI «Suscribir webhooks» suele bastar.
+      const detail = error instanceof Error ? error.message : "sin permiso WABA";
+      notes.push(`Suscripción WABA por API no quedó (${detail.slice(0, 120)})`);
+    }
   }
   const appId = await resolveMetaAppId(env);
   if (!appId) {
