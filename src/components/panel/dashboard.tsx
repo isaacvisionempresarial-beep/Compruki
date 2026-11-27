@@ -169,6 +169,12 @@ export function Dashboard({
           tone: ops.freeChats > 0 ? "warn" : "ok",
         },
         {
+          label: "Por responder",
+          value: ops.awaitingReply,
+          href: "/panel/inbox?f=awaiting",
+          tone: ops.awaitingReply > 0 ? "warn" : "ok",
+        },
+        {
           label: "CRM abiertos",
           value: ops.openFollowups,
           href: "/panel/clientes?f=all",

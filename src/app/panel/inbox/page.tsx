@@ -23,7 +23,12 @@ export default async function InboxPage({
   const params = await searchParams;
   const filterRaw = (params.f ?? "").trim().toLowerCase();
   const initialFilter =
-    filterRaw === "mine" || filterRaw === "unassigned" || filterRaw === "unread" ? filterRaw : "all";
+    filterRaw === "mine" ||
+    filterRaw === "unassigned" ||
+    filterRaw === "unread" ||
+    filterRaw === "awaiting"
+      ? filterRaw
+      : "all";
   const data = await loadInboxPanelData({
     activeId: params.c ?? null,
     phone: params.phone ?? null,

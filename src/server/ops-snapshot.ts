@@ -7,6 +7,7 @@ export type OpsSnapshot = {
   openChats: number;
   freeChats: number;
   myChats: number;
+  awaitingReply: number;
   openFollowups: number;
   overdueFollowups: number;
   highFollowups: number;
@@ -29,6 +30,9 @@ export async function getOpsSnapshot(tenantId: string, actorUserId: string): Pro
     openChats: conversations.filter((item) => item.status !== "closed").length,
     freeChats: conversations.filter((item) => !item.assignedTo && item.status !== "closed").length,
     myChats: conversations.filter((item) => item.assignedTo === actorUserId).length,
+    awaitingReply: conversations.filter(
+      (item) => item.lastDirection === "inbound" && item.status !== "closed",
+    ).length,
     openFollowups: followups.length,
     overdueFollowups: followups.filter((task) => task.dueAt && task.dueAt.slice(0, 10) < today).length,
     highFollowups: followups.filter((task) => task.priority === "high").length,

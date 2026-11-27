@@ -33,7 +33,7 @@ const empty: InboxActionState = {
   messages: [],
 };
 
-type FilterId = "all" | "mine" | "unassigned" | "unread";
+type FilterId = "all" | "mine" | "unassigned" | "unread" | "awaiting";
 type StageFilter = "all" | FollowupStageId;
 
 const ctrl =
@@ -238,6 +238,7 @@ export function InboxScreen({
       if (filter === "mine" && item.assignedTo !== actorUserId) return false;
       if (filter === "unassigned" && item.assignedTo) return false;
       if (filter === "unread" && item.unreadCount <= 0) return false;
+      if (filter === "awaiting" && item.lastDirection !== "inbound") return false;
       if (stageFilter !== "all" && item.pipelineStage !== stageFilter) return false;
       if (!q) return true;
       const hay = `${item.contactName} ${item.phone} ${item.lastMessagePreview}`.toLowerCase();
@@ -395,13 +396,14 @@ export function InboxScreen({
               aria-label="Buscar conversaciones"
               className={cx(ctrl, "w-full")}
             />
-            <div className="grid grid-cols-4 gap-0.5" role="tablist" aria-label="Filtro">
+            <div className="grid grid-cols-5 gap-0.5" role="tablist" aria-label="Filtro">
               {(
                 [
                   ["all", "Todos"],
                   ["mine", "Míos"],
                   ["unassigned", "Libres"],
                   ["unread", "Nuevos"],
+                  ["awaiting", "Responder"],
                 ] as const
               ).map(([id, label]) => (
                 <button
@@ -410,6 +412,7 @@ export function InboxScreen({
                   role="tab"
                   aria-selected={filter === id}
                   onClick={() => setFilter(id)}
+                  title={id === "awaiting" ? "Último mensaje entrante: te toca responder" : undefined}
                   className={cx(
                     "h-7 rounded-[6px] text-[10px] font-semibold",
                     filter === id ? "bg-ink text-canvas" : "bg-subtle text-muted hover:text-ink",
