@@ -20,7 +20,7 @@ import {
   type InboxMessage,
 } from "@/server/whatsapp-inbox";
 import { normalizeCrmPhone } from "@/lib/crm-contacts";
-import { createFollowup } from "@/server/followups";
+import { advancePipelineOnOperatorOutbound, createFollowup } from "@/server/followups";
 import { listTeamMembers } from "@/server/team";
 import { metaWaConfigured, requireMetaWaEnv } from "@/server/whatsapp/env";
 import { listWhatsAppTemplates } from "@/server/whatsapp/meta-client";
@@ -225,6 +225,12 @@ export async function sendInboxMessageAction(
     const conversation = await getInboxConversation(access.tenantId, conversationId);
     if (conversation && !conversation.assignedTo && access.user.id) {
       await assignConversation(access.tenantId, conversationId, access.user.id).catch(() => undefined);
+    }
+    if (conversation?.phone) {
+      await advancePipelineOnOperatorOutbound({
+        tenantId: access.tenantId,
+        phone: conversation.phone,
+      }).catch(() => undefined);
     }
     revalidatePath("/panel/inbox");
     revalidatePath("/panel/clientes");

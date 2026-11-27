@@ -223,6 +223,31 @@ export async function advancePipelineOnCustomerReply(input: {
     .in("stage", ["nuevo", "contactar", "espera"]);
 }
 
+/** Si escribimos primero, Lead/Contactar → En espera. */
+export async function advancePipelineOnOperatorOutbound(input: {
+  tenantId: string;
+  phone: string;
+}) {
+  const phones = phoneCandidates(input.phone);
+  if (phones.length === 0) return;
+  const supabase = createAdminSupabase();
+  const now = new Date().toISOString();
+  await supabase
+    .from("whatsapp_conversations")
+    .update({ pipeline_stage: "espera", updated_at: now })
+    .eq("tenant_id", input.tenantId)
+    .in("phone", phones)
+    .in("pipeline_stage", ["nuevo", "contactar"]);
+
+  await supabase
+    .from("followup_tasks")
+    .update({ stage: "espera", updated_at: now })
+    .eq("tenant_id", input.tenantId)
+    .eq("status", "open")
+    .in("phone", phones)
+    .in("stage", ["nuevo", "contactar"]);
+}
+
 /** Crea Lead solo si no hay seguimiento abierto para ese celular (webhook Inbox → CRM). */
 export async function ensureLeadFromInbound(input: {
   tenantId: string;

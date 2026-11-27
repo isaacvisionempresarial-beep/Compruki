@@ -695,7 +695,7 @@ export function InboxScreen({
                     301 123 4236.
                   </p>
                 ) : (
-                  <p className="mb-1.5 rounded-[8px] bg-accent-tint px-2 py-1.5 text-[11px] leading-4 text-accent-strong">
+                  <p className="mb-1.5 rounded-[8px] bg-success-tint px-2 py-1.5 text-[11px] leading-4 text-success">
                     Ventana 24 h abierta: puedes escribir texto libre o usar las respuestas rápidas.
                   </p>
                 )}

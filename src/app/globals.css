@@ -23,6 +23,8 @@
   --status-warning-tint: #fff6e8;
   --status-danger: #8e1d34;
   --status-danger-tint: #fdecef;
+  --status-success: #0f6b4c;
+  --status-success-tint: #eaf8f2;
 }
 
 @theme inline {
@@ -47,6 +49,8 @@
   --color-warning-tint: var(--status-warning-tint);
   --color-danger: var(--status-danger);
   --color-danger-tint: var(--status-danger-tint);
+  --color-success: var(--status-success);
+  --color-success-tint: var(--status-success-tint);
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-outfit), var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
 }
