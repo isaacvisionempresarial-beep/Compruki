@@ -198,6 +198,31 @@ export async function countOpenFollowupsByPhone(): Promise<Record<string, number
   return counts;
 }
 
+/** Si el contacto responde, avanza Lead/Contactar/En espera → Negociación. */
+export async function advancePipelineOnCustomerReply(input: {
+  tenantId: string;
+  phone: string;
+}) {
+  const phones = phoneCandidates(input.phone);
+  if (phones.length === 0) return;
+  const supabase = createAdminSupabase();
+  const now = new Date().toISOString();
+  await supabase
+    .from("whatsapp_conversations")
+    .update({ pipeline_stage: "negociacion", updated_at: now })
+    .eq("tenant_id", input.tenantId)
+    .in("phone", phones)
+    .in("pipeline_stage", ["nuevo", "contactar", "espera"]);
+
+  await supabase
+    .from("followup_tasks")
+    .update({ stage: "negociacion", updated_at: now })
+    .eq("tenant_id", input.tenantId)
+    .eq("status", "open")
+    .in("phone", phones)
+    .in("stage", ["nuevo", "contactar", "espera"]);
+}
+
 /** Crea Lead solo si no hay seguimiento abierto para ese celular (webhook Inbox → CRM). */
 export async function ensureLeadFromInbound(input: {
   tenantId: string;
@@ -226,6 +251,12 @@ export async function ensureLeadFromInbound(input: {
       .eq("status", "open")
       .in("phone", [...candidates])
       .limit(1);
+
+    await advancePipelineOnCustomerReply({
+      tenantId: input.tenantId,
+      phone: phone.length >= 7 ? phone : waPhone!,
+    }).catch(() => undefined);
+
     if (existing && existing.length > 0) return { created: false };
 
     const note = (input.preview?.trim() || "Mensaje entrante por WhatsApp").slice(0, 400);

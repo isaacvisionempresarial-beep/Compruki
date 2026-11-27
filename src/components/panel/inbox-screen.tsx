@@ -224,6 +224,14 @@ export function InboxScreen({
     [conversations],
   );
 
+  useEffect(() => {
+    const base = "Inbox WhatsApp";
+    document.title = unreadTotal > 0 ? `(${unreadTotal}) ${base}` : base;
+    return () => {
+      document.title = base;
+    };
+  }, [unreadTotal]);
+
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase().replace(/\s+/g, "");
     return conversations.filter((item) => {
@@ -686,7 +694,11 @@ export function InboxScreen({
                     <span className="font-semibold">Plantilla Meta</span> abajo o pídele un hola al
                     301 123 4236.
                   </p>
-                ) : null}
+                ) : (
+                  <p className="mb-1.5 rounded-[8px] bg-success-tint px-2 py-1.5 text-[11px] leading-4 text-success">
+                    Ventana 24 h abierta: puedes escribir texto libre o usar las respuestas rápidas.
+                  </p>
+                )}
                 <form action={sendAction} className="flex flex-col gap-1.5">
                   <input type="hidden" name="conversationId" value={active.id} />
                   {withinCustomerWindow ? (
