@@ -203,6 +203,24 @@ export async function updateConversationPipeline(
   }
 }
 
+export async function updateConversationContactName(
+  tenantId: string,
+  conversationId: string,
+  contactName: string,
+) {
+  const supabase = createAdminSupabase();
+  const name = contactName.trim().slice(0, 80);
+  const { error } = await supabase
+    .from("whatsapp_conversations")
+    .update({
+      contact_name: name,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("tenant_id", tenantId)
+    .eq("id", conversationId);
+  if (error) throw new Error(error.message);
+}
+
 export async function assignConversation(
   tenantId: string,
   conversationId: string,

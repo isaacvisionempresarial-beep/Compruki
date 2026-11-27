@@ -15,6 +15,7 @@ import {
   createFollowupFromInboxAction,
   markAllInboxReadAction,
   openInboxByPhoneAction,
+  renameInboxContactAction,
   selectInboxConversationAction,
   sendInboxMessageAction,
   updateInboxStageAction,
@@ -72,6 +73,7 @@ export function InboxScreen({
   const [followState, followAction, following] = useActionState(createFollowupFromInboxAction, empty);
   const [openState, openAction, opening] = useActionState(openInboxByPhoneAction, empty);
   const [readState, readAction, markingRead] = useActionState(markAllInboxReadAction, empty);
+  const [renameState, renameAction, renaming] = useActionState(renameInboxContactAction, empty);
   const [filter, setFilter] = useState<FilterId>(initialFilter);
   const [stageFilter, setStageFilter] = useState<StageFilter>("all");
   const [query, setQuery] = useState("");
@@ -99,6 +101,7 @@ export function InboxScreen({
     stageState.conversations.length ||
     assignState.conversations.length ||
     followState.conversations.length ||
+    renameState.conversations.length ||
     readState.conversations.length ||
     selectState.conversations.length
       ? openState.conversations.length
@@ -111,9 +114,11 @@ export function InboxScreen({
               ? assignState.conversations
               : followState.conversations.length
                 ? followState.conversations
-                : readState.conversations.length
-                  ? readState.conversations
-                  : selectState.conversations
+                : renameState.conversations.length
+                  ? renameState.conversations
+                  : readState.conversations.length
+                    ? readState.conversations
+                    : selectState.conversations
       : initialConversations;
 
   const activeId =
@@ -122,6 +127,7 @@ export function InboxScreen({
     stageState.activeId ||
     assignState.activeId ||
     followState.activeId ||
+    renameState.activeId ||
     readState.activeId ||
     selectState.activeId ||
     initialActiveId;
@@ -132,6 +138,7 @@ export function InboxScreen({
     (stageState.activeId && stageState.messages) ||
     (assignState.activeId && assignState.messages) ||
     (followState.activeId && followState.messages) ||
+    (renameState.activeId && renameState.messages) ||
     (readState.activeId && readState.messages) ||
     (selectState.activeId && selectState.messages) ||
     initialMessages;
@@ -188,11 +195,18 @@ export function InboxScreen({
     openState.error ||
     stageState.error ||
     assignState.error ||
+    renameState.error ||
     followState.error ||
     readState.error ||
     selectState.error;
   const feedbackOk =
-    sendState.ok || openState.ok || stageState.ok || assignState.ok || followState.ok || readState.ok;
+    sendState.ok ||
+    openState.ok ||
+    stageState.ok ||
+    assignState.ok ||
+    renameState.ok ||
+    followState.ok ||
+    readState.ok;
 
   function deliveryMark(status: string, outbound: boolean) {
     if (!outbound) return null;
@@ -349,12 +363,22 @@ export function InboxScreen({
             <>
               <header className="shrink-0 border-b border-line px-2.5 py-2">
                 <div className="flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-ink">
-                      {active.contactName || active.phone}
-                      <span className="ml-2 font-normal text-muted tabular-nums">{active.phone}</span>
-                    </p>
-                  </div>
+                  <form action={renameAction} className="flex min-w-0 flex-1 items-center gap-1">
+                    <input type="hidden" name="conversationId" value={active.id} />
+                    <input
+                      name="contactName"
+                      defaultValue={active.contactName}
+                      key={`${active.id}-name-${active.contactName}`}
+                      placeholder="Nombre"
+                      aria-label="Nombre del contacto"
+                      maxLength={80}
+                      className={cx(ctrl, "min-w-0 flex-1 max-w-[12rem] font-semibold")}
+                    />
+                    <span className="truncate text-xs text-muted tabular-nums">{active.phone}</span>
+                    <button type="submit" disabled={renaming} className={btn} title="Guardar nombre">
+                      {renaming ? "…" : "OK"}
+                    </button>
+                  </form>
                   <Link
                     href="/panel/clientes"
                     className="shrink-0 text-xs font-semibold text-accent-strong hover:underline"

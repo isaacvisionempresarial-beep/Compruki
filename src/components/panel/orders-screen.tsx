@@ -907,6 +907,16 @@ export function OrderEditor({
           {order.address}
           {order.reference ? ` · ${order.reference}` : ""}
         </p>
+        {order.phone ? (
+          <p className="mt-2">
+            <Link
+              href={`/panel/inbox?phone=${encodeURIComponent(order.phone)}&name=${encodeURIComponent(order.customerName || "")}`}
+              className="inline-flex h-8 items-center rounded-[8px] border border-line bg-canvas px-2.5 text-xs font-semibold text-ink hover:bg-subtle"
+            >
+              Abrir en Inbox
+            </Link>
+          </p>
+        ) : null}
         {phoneMatches.length > 0 ? (
           <div className="mt-3">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">También</p>
@@ -1190,6 +1200,14 @@ function DispatchSheet({ orders, moved }: { orders: StoreOrder[]; moved: boolean
                       >
                         Abrir
                       </Link>
+                      {order.phone ? (
+                        <Link
+                          href={`/panel/inbox?phone=${encodeURIComponent(order.phone)}&name=${encodeURIComponent(order.customerName || "")}`}
+                          className="inline-flex h-9 items-center rounded-[10px] border border-line bg-canvas px-3 text-sm font-semibold hover:bg-subtle"
+                        >
+                          Inbox
+                        </Link>
+                      ) : null}
                       <button
                         type="button"
                         title="Copia datos de este pedido para Dropi. No crea el pedido."

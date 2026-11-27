@@ -248,6 +248,14 @@ export function CustomersScreen({
                       <button type="submit" disabled={!tableReady} className={btn}>
                         Guardar en Lead
                       </button>
+                      {item.phone ? (
+                        <Link
+                          href={`/panel/inbox?phone=${encodeURIComponent(item.phone)}&name=${encodeURIComponent(item.customerName)}`}
+                          className={btn}
+                        >
+                          Inbox
+                        </Link>
+                      ) : null}
                       <Link href={orderFocusHref(item.orderNumber)} className={btn}>
                         Pedido
                       </Link>

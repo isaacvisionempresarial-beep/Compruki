@@ -14,6 +14,7 @@ import {
   probeInboxTables,
   sendInboxTemplate,
   sendInboxText,
+  updateConversationContactName,
   updateConversationPipeline,
   type InboxConversation,
   type InboxMessage,
@@ -238,6 +239,32 @@ export async function assignInboxConversationAction(
     const data = await pack(access.tenantId, conversationId || null);
     return {
       error: error instanceof Error ? error.message : "No se pudo asignar.",
+      ok: null,
+      ...data,
+    };
+  }
+}
+
+export async function renameInboxContactAction(
+  _state: InboxActionState,
+  formData: FormData,
+): Promise<InboxActionState> {
+  const access = await requireWhatsAppAccess();
+  if (!access) return { error: "Sin permiso WhatsApp.", ok: null, conversations: [], activeId: null, messages: [] };
+  const conversationId = String(formData.get("conversationId") || "");
+  try {
+    await updateConversationContactName(
+      access.tenantId,
+      conversationId,
+      String(formData.get("contactName") || ""),
+    );
+    revalidatePath("/panel/inbox");
+    const data = await pack(access.tenantId, conversationId);
+    return { error: null, ok: "Nombre del contacto guardado.", ...data };
+  } catch (error) {
+    const data = await pack(access.tenantId, conversationId || null);
+    return {
+      error: error instanceof Error ? error.message : "No se pudo guardar el nombre.",
       ok: null,
       ...data,
     };
