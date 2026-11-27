@@ -79,7 +79,13 @@ export function InboxScreen({
   const [query, setQuery] = useState("");
   const defaultTemplateKey = templates[0] ? `${templates[0].name}::${templates[0].language}` : "";
   const [templateKey, setTemplateKey] = useState(defaultTemplateKey);
+  const [templateVarValues, setTemplateVarValues] = useState<Record<string, string>>({});
   const router = useRouter();
+
+  useEffect(() => {
+    if (!defaultTemplateKey) return;
+    setTemplateKey((current) => current || defaultTemplateKey);
+  }, [defaultTemplateKey]);
 
   useEffect(() => {
     const tick = () => {
@@ -103,6 +109,18 @@ export function InboxScreen({
     const [name, language] = templateKey.split("::");
     return templates.find((item) => item.name === name && item.language === language) ?? null;
   }, [templateKey, templates]);
+
+  const templatePositions = useMemo(() => {
+    const body = selectedTemplate?.body || "";
+    return [
+      ...new Set([...body.matchAll(/{{(\d+)}}/g)].map((match) => Number(match[1]))),
+    ].sort((a, b) => a - b);
+  }, [selectedTemplate]);
+
+  const templateValuesJoined = useMemo(() => {
+    if (!templatePositions.length) return "";
+    return templatePositions.map((position) => templateVarValues[String(position)]?.trim() || "").join("|");
+  }, [templatePositions, templateVarValues]);
 
   // Última acción gana: antes sendState “pegaba” el hilo y no dejaba cambiar de chat.
   const [bundle, setBundle] = useState({
@@ -223,6 +241,21 @@ export function InboxScreen({
     () => conversations.find((item) => item.id === activeId) ?? null,
     [conversations, activeId],
   );
+
+  useEffect(() => {
+    const firstName =
+      (active?.contactName || "").trim().split(/\s+/).filter(Boolean)[0] || "";
+    setTemplateVarValues((prev) => {
+      const next: Record<string, string> = {};
+      for (const position of templatePositions) {
+        const key = String(position);
+        if (prev[key]?.trim()) next[key] = prev[key];
+        else if (position === 1 && firstName && !/^\d+$/.test(firstName)) next[key] = firstName;
+        else next[key] = "";
+      }
+      return next;
+    });
+  }, [templateKey, selectedTemplate?.body, active?.contactName, templatePositions]);
 
   const threadRef = useRef<HTMLDivElement>(null);
   const [composerKey, setComposerKey] = useState(0);
@@ -715,44 +748,75 @@ export function InboxScreen({
                       Plantilla Meta{templates.length ? ` (${templates.length})` : ""}
                       {!withinCustomerWindow ? " · requerida" : ""}
                     </summary>
-                    <div className="mt-1.5 flex flex-wrap gap-1">
-                      {templates.length > 0 ? (
-                        <>
-                          <select
-                            aria-label="Plantilla aprobada"
-                            value={templateKey}
-                            onChange={(event) => setTemplateKey(event.target.value)}
-                            className={cx(ctrl, "min-w-[12rem] flex-1")}
-                          >
-                            {templates.map((item) => (
-                              <option key={`${item.name}-${item.language}`} value={`${item.name}::${item.language}`}>
-                                {item.name} · {item.language}
-                                {item.category ? ` · ${item.category}` : ""}
-                              </option>
-                            ))}
-                          </select>
-                          <input type="hidden" name="templateName" value={selectedTemplate?.name || ""} />
-                          <input type="hidden" name="language" value={selectedTemplate?.language || "en_US"} />
-                        </>
-                      ) : (
-                        <>
-                          <input name="templateName" placeholder="Nombre" className={cx(ctrl, "w-[8rem]")} />
-                          <input name="language" defaultValue="en_US" className={cx(ctrl, "w-[4.5rem]")} />
-                        </>
-                      )}
-                      <input
-                        name="templateValues"
-                        placeholder="Vars |"
-                        className={cx(ctrl, "min-w-[6rem] flex-1")}
-                      />
-                      <button type="submit" name="mode" value="template" disabled={sending} className={btn}>
-                        Enviar plantilla
-                      </button>
+                    <div className="mt-1.5 flex flex-col gap-1.5">
+                      <div className="flex flex-wrap gap-1">
+                        {templates.length > 0 ? (
+                          <>
+                            <select
+                              aria-label="Plantilla aprobada"
+                              value={templateKey}
+                              onChange={(event) => setTemplateKey(event.target.value)}
+                              className={cx(ctrl, "min-w-[12rem] flex-1")}
+                            >
+                              {templates.map((item) => (
+                                <option
+                                  key={`${item.name}-${item.language}`}
+                                  value={`${item.name}::${item.language}`}
+                                >
+                                  {item.name} · {item.language}
+                                  {item.category ? ` · ${item.category}` : ""}
+                                </option>
+                              ))}
+                            </select>
+                            <input type="hidden" name="templateName" value={selectedTemplate?.name || ""} />
+                            <input
+                              type="hidden"
+                              name="language"
+                              value={selectedTemplate?.language || "es"}
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <input name="templateName" placeholder="Nombre" className={cx(ctrl, "w-[8rem]")} />
+                            <input name="language" defaultValue="es" className={cx(ctrl, "w-[4.5rem]")} />
+                          </>
+                        )}
+                        <input type="hidden" name="templateValues" value={templateValuesJoined} />
+                        <button type="submit" name="mode" value="template" disabled={sending} className={btn}>
+                          Enviar plantilla
+                        </button>
+                      </div>
+                      {selectedTemplate?.body ? (
+                        <p className="text-[11px] leading-4 text-muted">{selectedTemplate.body}</p>
+                      ) : null}
+                      {templatePositions.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {templatePositions.map((position) => (
+                            <label key={position} className="grid gap-0.5">
+                              <span className="text-[10px] font-bold tracking-wide text-muted uppercase">
+                                {`{{${position}}}`}
+                              </span>
+                              <input
+                                value={templateVarValues[String(position)] || ""}
+                                onChange={(event) =>
+                                  setTemplateVarValues((prev) => ({
+                                    ...prev,
+                                    [String(position)]: event.target.value,
+                                  }))
+                                }
+                                placeholder={position === 1 ? "Nombre" : `Valor ${position}`}
+                                className={cx(ctrl, "w-[8.5rem]")}
+                                required
+                              />
+                            </label>
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
                     <p className="mt-1 text-[11px] text-muted">
                       {templates.length === 0
-                        ? "Sin plantillas listadas aún. Escribe el nombre aprobado en Meta (ej. hello_world)."
-                        : "Para saludar en español: Meta → WhatsApp → Plantillas de mensajes → crea una UTILITY en es y espera aprobación."}
+                        ? "Sin plantillas aprobadas. Créalas en Conexión → Plantillas."
+                        : "Las plantillas en español aparecen primero. Si Meta aún revisa saludo_compruki, usa hello_world."}
                     </p>
                   </details>
                 </form>

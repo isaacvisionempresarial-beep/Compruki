@@ -36,6 +36,7 @@ export type InboxTemplateOption = {
   language: string;
   status: string;
   category: string;
+  body: string;
 };
 
 export type InboxActionState = {
@@ -138,6 +139,13 @@ export async function loadInboxPanelData(opts?: {
   };
 }
 
+function templateLanguageRank(language: string) {
+  const lang = language.toLowerCase();
+  if (lang === "es" || lang === "es_co") return 0;
+  if (lang.startsWith("es")) return 1;
+  return 2;
+}
+
 async function loadApprovedTemplates(): Promise<InboxTemplateOption[]> {
   if (!metaWaConfigured()) return [];
   try {
@@ -155,7 +163,15 @@ async function loadApprovedTemplates(): Promise<InboxTemplateOption[]> {
         language: String(row.language),
         status: String(row.status || "APPROVED"),
         category: String(row.category || ""),
+        body: String(row.body || ""),
       }))
+      .sort((a, b) => {
+        const lang = templateLanguageRank(a.language) - templateLanguageRank(b.language);
+        if (lang !== 0) return lang;
+        if (a.name === "hello_world" && b.name !== "hello_world") return 1;
+        if (b.name === "hello_world" && a.name !== "hello_world") return -1;
+        return a.name.localeCompare(b.name);
+      })
       .slice(0, 40);
   } catch {
     return [];
