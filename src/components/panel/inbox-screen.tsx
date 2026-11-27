@@ -9,6 +9,7 @@ import {
   type FollowupStageId,
 } from "@/lib/crm-pipeline";
 import { cx } from "@/lib/cx";
+import { fillInboxQuickReply, INBOX_QUICK_REPLIES } from "@/lib/inbox-quick-replies";
 import {
   assignInboxConversationAction,
   createFollowupFromInboxAction,
@@ -165,6 +166,7 @@ export function InboxScreen({
 
   const threadRef = useRef<HTMLDivElement>(null);
   const [composerKey, setComposerKey] = useState(0);
+  const [draft, setDraft] = useState("");
 
   useEffect(() => {
     const el = threadRef.current;
@@ -175,6 +177,10 @@ export function InboxScreen({
   useEffect(() => {
     if (sendState.ok) setComposerKey((n) => n + 1);
   }, [sendState.ok, sendState.messages.length]);
+
+  useEffect(() => {
+    setDraft("");
+  }, [activeId, composerKey]);
 
   const feedbackError =
     sendState.error ||
@@ -503,11 +509,28 @@ export function InboxScreen({
                 <form action={sendAction} className="flex flex-col gap-1.5">
                   <input type="hidden" name="conversationId" value={active.id} />
                   <input type="hidden" name="mode" value="text" />
+                  <div className="flex gap-1 overflow-x-auto pb-0.5">
+                    {INBOX_QUICK_REPLIES.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        className="shrink-0 rounded-[6px] border border-line bg-canvas px-2 py-1 text-[11px] font-semibold text-ink hover:bg-subtle"
+                        title={fillInboxQuickReply(item.text, active.contactName || "")}
+                        onClick={() =>
+                          setDraft(fillInboxQuickReply(item.text, active.contactName || ""))
+                        }
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
                   <div className="flex gap-1.5">
                     <textarea
                       key={`body-${active.id}-${composerKey}`}
                       name="body"
                       rows={1}
+                      value={draft}
+                      onChange={(event) => setDraft(event.target.value)}
                       placeholder="Mensaje… (Enter envía, Shift+Enter salto)"
                       onKeyDown={(event) => {
                         if (event.key !== "Enter" || event.shiftKey) return;
@@ -516,7 +539,7 @@ export function InboxScreen({
                       }}
                       className="min-h-8 max-h-24 flex-1 resize-y rounded-[8px] border border-line bg-canvas px-2.5 py-1.5 text-sm outline-none focus:border-ink"
                     />
-                    <button type="submit" disabled={sending} className={btnDark}>
+                    <button type="submit" disabled={sending || !draft.trim()} className={btnDark}>
                       {sending ? "…" : "Enviar"}
                     </button>
                   </div>
