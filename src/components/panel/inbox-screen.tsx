@@ -309,6 +309,7 @@ export function InboxScreen({
   const [composerKey, setComposerKey] = useState(0);
   const [draft, setDraft] = useState("");
   const [showFailed, setShowFailed] = useState(false);
+  const [phoneCopied, setPhoneCopied] = useState(false);
 
   const failedCount = useMemo(
     () =>
@@ -326,6 +327,7 @@ export function InboxScreen({
 
   useEffect(() => {
     setShowFailed(false);
+    setPhoneCopied(false);
   }, [activeId]);
 
   useEffect(() => {
@@ -377,12 +379,31 @@ export function InboxScreen({
     return status ? { text: status, title: status, className: "text-on-dark/55" } : null;
   }
 
-  const withinCustomerWindow = useMemo(() => {
+  const customerWindow = useMemo(() => {
     const lastInbound = [...messages].reverse().find((msg) => msg.direction === "inbound");
-    if (!lastInbound) return false;
-    const age = Date.now() - new Date(lastInbound.createdAt).getTime();
-    return Number.isFinite(age) && age <= 24 * 60 * 60 * 1000;
-  }, [messages]);
+    if (!lastInbound) return { open: false, leftLabel: "", urgent: false };
+    const endsAt = new Date(lastInbound.createdAt).getTime() + 24 * 60 * 60 * 1000;
+    const leftMs = endsAt - nowTick;
+    if (!Number.isFinite(leftMs) || leftMs <= 0) {
+      return { open: false, leftLabel: "", urgent: false };
+    }
+    const hours = Math.floor(leftMs / 3_600_000);
+    const mins = Math.floor((leftMs % 3_600_000) / 60_000);
+    const leftLabel = hours > 0 ? `${hours}h ${mins}m` : `${Math.max(1, mins)}m`;
+    return { open: true, leftLabel, urgent: leftMs < 2 * 3_600_000 };
+  }, [messages, nowTick]);
+  const withinCustomerWindow = customerWindow.open;
+
+  async function copyActivePhone() {
+    if (!active?.phone) return;
+    try {
+      await navigator.clipboard.writeText(active.phone);
+      setPhoneCopied(true);
+      window.setTimeout(() => setPhoneCopied(false), 1600);
+    } catch {
+      setPhoneCopied(false);
+    }
+  }
 
   if (!tableReady) {
     return (
@@ -604,7 +625,17 @@ export function InboxScreen({
                       className={cx(ctrl, "w-[9.5rem] font-semibold sm:w-[12rem]")}
                     />
                   </form>
-                  <span className="truncate text-[11px] text-muted tabular-nums">{active.phone}</span>
+                  <button
+                    type="button"
+                    onClick={() => void copyActivePhone()}
+                    title="Copiar celular"
+                    className="truncate text-[11px] text-muted tabular-nums hover:text-ink hover:underline"
+                  >
+                    {active.phone}
+                  </button>
+                  {phoneCopied ? (
+                    <span className="text-[10px] font-semibold text-success">Copiado</span>
+                  ) : null}
                   {(assigning || staging || renaming) && (
                     <span className="text-[10px] text-muted">Guardando…</span>
                   )}
@@ -786,8 +817,19 @@ export function InboxScreen({
                     301 123 4236.
                   </p>
                 ) : (
-                  <p className="mb-1.5 rounded-[8px] bg-success-tint px-2 py-1.5 text-[11px] leading-4 text-success">
-                    Ventana 24 h abierta: puedes escribir texto libre o usar las respuestas rápidas.
+                  <p
+                    className={cx(
+                      "mb-1.5 rounded-[8px] px-2 py-1.5 text-[11px] leading-4",
+                      customerWindow.urgent
+                        ? "bg-warning-tint text-warning"
+                        : "bg-success-tint text-success",
+                    )}
+                  >
+                    Ventana abierta · quedan{" "}
+                    <span className="font-semibold tabular-nums">{customerWindow.leftLabel}</span>
+                    {customerWindow.urgent
+                      ? " — responde pronto o usa plantilla."
+                      : ": texto libre o respuestas rápidas."}
                   </p>
                 )}
                 <form action={sendAction} className="flex flex-col gap-1.5">
