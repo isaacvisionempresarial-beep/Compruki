@@ -95,53 +95,97 @@ export function InboxScreen({
     return templates.find((item) => item.name === name && item.language === language) ?? null;
   }, [templateKey, templates]);
 
-  const conversations =
-    openState.conversations.length ||
-    sendState.conversations.length ||
-    stageState.conversations.length ||
-    assignState.conversations.length ||
-    followState.conversations.length ||
-    renameState.conversations.length ||
-    readState.conversations.length ||
-    selectState.conversations.length
-      ? openState.conversations.length
-        ? openState.conversations
-        : sendState.conversations.length
-          ? sendState.conversations
-          : stageState.conversations.length
-            ? stageState.conversations
-            : assignState.conversations.length
-              ? assignState.conversations
-              : followState.conversations.length
-                ? followState.conversations
-                : renameState.conversations.length
-                  ? renameState.conversations
-                  : readState.conversations.length
-                    ? readState.conversations
-                    : selectState.conversations
-      : initialConversations;
+  // Última acción gana: antes sendState “pegaba” el hilo y no dejaba cambiar de chat.
+  const [bundle, setBundle] = useState({
+    conversations: initialConversations,
+    activeId: initialActiveId,
+    messages: initialMessages,
+  });
 
-  const activeId =
-    openState.activeId ||
-    sendState.activeId ||
-    stageState.activeId ||
-    assignState.activeId ||
-    followState.activeId ||
-    renameState.activeId ||
-    readState.activeId ||
-    selectState.activeId ||
-    initialActiveId;
+  useEffect(() => {
+    if (!selectState.activeId && !selectState.conversations.length) return;
+    setBundle((prev) => ({
+      conversations: selectState.conversations.length ? selectState.conversations : prev.conversations,
+      activeId: selectState.activeId,
+      messages: selectState.messages,
+    }));
+  }, [selectState]);
 
-  const messages =
-    (openState.activeId && openState.messages) ||
-    (sendState.activeId && sendState.messages) ||
-    (stageState.activeId && stageState.messages) ||
-    (assignState.activeId && assignState.messages) ||
-    (followState.activeId && followState.messages) ||
-    (renameState.activeId && renameState.messages) ||
-    (readState.activeId && readState.messages) ||
-    (selectState.activeId && selectState.messages) ||
-    initialMessages;
+  useEffect(() => {
+    if (!sendState.activeId && !sendState.ok && !sendState.error) return;
+    setBundle((prev) => ({
+      conversations: sendState.conversations.length ? sendState.conversations : prev.conversations,
+      activeId: sendState.activeId || prev.activeId,
+      messages: sendState.activeId ? sendState.messages : prev.messages,
+    }));
+  }, [sendState]);
+
+  useEffect(() => {
+    if (!stageState.activeId && !stageState.ok && !stageState.error) return;
+    setBundle((prev) => ({
+      conversations: stageState.conversations.length ? stageState.conversations : prev.conversations,
+      activeId: stageState.activeId || prev.activeId,
+      messages: stageState.activeId ? stageState.messages : prev.messages,
+    }));
+  }, [stageState]);
+
+  useEffect(() => {
+    if (!assignState.activeId && !assignState.ok && !assignState.error) return;
+    setBundle((prev) => ({
+      conversations: assignState.conversations.length ? assignState.conversations : prev.conversations,
+      activeId: assignState.activeId || prev.activeId,
+      messages: assignState.activeId ? assignState.messages : prev.messages,
+    }));
+  }, [assignState]);
+
+  useEffect(() => {
+    if (!followState.activeId && !followState.ok && !followState.error) return;
+    setBundle((prev) => ({
+      conversations: followState.conversations.length ? followState.conversations : prev.conversations,
+      activeId: followState.activeId || prev.activeId,
+      messages: followState.activeId ? followState.messages : prev.messages,
+    }));
+  }, [followState]);
+
+  useEffect(() => {
+    if (!renameState.activeId && !renameState.ok && !renameState.error) return;
+    setBundle((prev) => ({
+      conversations: renameState.conversations.length ? renameState.conversations : prev.conversations,
+      activeId: renameState.activeId || prev.activeId,
+      messages: renameState.activeId ? renameState.messages : prev.messages,
+    }));
+  }, [renameState]);
+
+  useEffect(() => {
+    if (!openState.activeId && !openState.ok && !openState.error) return;
+    setBundle((prev) => ({
+      conversations: openState.conversations.length ? openState.conversations : prev.conversations,
+      activeId: openState.activeId,
+      messages: openState.messages,
+    }));
+  }, [openState]);
+
+  useEffect(() => {
+    if (!readState.ok && !readState.error && !readState.conversations.length) return;
+    setBundle((prev) => ({
+      conversations: readState.conversations.length ? readState.conversations : prev.conversations,
+      activeId: readState.activeId || prev.activeId,
+      messages: readState.activeId ? readState.messages : prev.messages,
+    }));
+  }, [readState]);
+
+  useEffect(() => {
+    setBundle((prev) => ({
+      conversations: initialConversations,
+      activeId: prev.activeId || initialActiveId,
+      messages:
+        prev.activeId && prev.activeId === initialActiveId ? initialMessages : prev.messages,
+    }));
+  }, [initialConversations, initialMessages, initialActiveId]);
+
+  const conversations = bundle.conversations;
+  const activeId = bundle.activeId;
+  const messages = bundle.messages;
 
   const assigneeName = useMemo(() => {
     const map = new Map(assignees.map((item) => [item.userId, item.name || item.email]));
@@ -340,6 +384,13 @@ export function InboxScreen({
                     <input type="hidden" name="conversationId" value={item.id} />
                     <button
                       type="submit"
+                      onClick={() =>
+                        setBundle((prev) =>
+                          prev.activeId === item.id
+                            ? prev
+                            : { ...prev, activeId: item.id, messages: [] },
+                        )
+                      }
                       className={cx(
                         "w-full px-2.5 py-1.5 text-left hover:bg-subtle",
                         item.id === activeId ? "bg-accent-tint/45" : "",
