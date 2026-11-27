@@ -124,18 +124,20 @@ export async function processWhatsAppWebhook(payload: WebhookPayload): Promise<{
         if (error?.code === 131042) {
           detail = "Configura país, moneda y método de pago en Meta Business.";
         }
-        // Si el envío fue desde Meta (no desde el panel), igual dejamos rastro en Actividad.
-        await insertWhatsAppMessage(tenantId, {
-          waMessageId: status.id,
-          direction: "outbound",
-          phone: status.recipient_id || "",
-          body: `Estado Meta: ${status.status}${detail ? ` · ${detail}` : ""}`,
-          messageType: "status",
-          deliveryStatus: status.status,
-          deliveryDetail: detail,
-          createdBy: "meta-webhook",
-        });
-        await updateWhatsAppDelivery(tenantId, status.id, status.status, detail);
+        const updated = await updateWhatsAppDelivery(tenantId, status.id, status.status, detail);
+        if (!updated) {
+          // Envío fuera del panel (p. ej. Meta): rastro en Actividad, no ensucia el Inbox.
+          await insertWhatsAppMessage(tenantId, {
+            waMessageId: status.id,
+            direction: "outbound",
+            phone: status.recipient_id || "",
+            body: `Estado Meta: ${status.status}${detail ? ` · ${detail}` : ""}`,
+            messageType: "status",
+            deliveryStatus: status.status,
+            deliveryDetail: detail,
+            createdBy: "meta-webhook",
+          });
+        }
         statuses += 1;
       }
 

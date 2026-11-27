@@ -188,13 +188,14 @@ export function InboxScreen({
   const feedbackOk =
     sendState.ok || openState.ok || stageState.ok || assignState.ok || followState.ok || readState.ok;
 
-  function deliveryLabel(status: string) {
+  function deliveryMark(status: string, outbound: boolean) {
+    if (!outbound) return null;
     const s = status.toLowerCase();
-    if (s === "sent") return "enviado";
-    if (s === "delivered") return "entregado";
-    if (s === "read") return "leído";
-    if (s === "failed") return "falló";
-    return status;
+    if (s === "failed") return { text: "!", title: "Falló el envío", className: "text-danger" };
+    if (s === "read") return { text: "✓✓", title: "Leído", className: "text-[#7dd3fc]" };
+    if (s === "delivered") return { text: "✓✓", title: "Entregado", className: "text-on-dark/70" };
+    if (s === "sent") return { text: "✓", title: "Enviado", className: "text-on-dark/55" };
+    return status ? { text: status, title: status, className: "text-on-dark/55" } : null;
   }
 
   if (!tableReady) {
@@ -454,33 +455,47 @@ export function InboxScreen({
                 {messages.length === 0 ? (
                   <p className="text-xs text-muted">Sin mensajes. Escribe abajo o manda una plantilla.</p>
                 ) : (
-                  messages.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={cx(
-                        "max-w-[min(88%,26rem)] rounded-[10px] px-2.5 py-1.5 text-[13px] leading-snug",
-                        msg.direction === "outbound"
-                          ? "ml-auto bg-primary text-on-dark"
-                          : "mr-auto bg-card text-ink shadow-[0_0_0_1px_var(--color-line)]",
-                      )}
-                    >
-                      <p className="whitespace-pre-wrap">{msg.body}</p>
-                      <p
+                  messages.map((msg) => {
+                    const mark = deliveryMark(msg.deliveryStatus, msg.direction === "outbound");
+                    return (
+                      <div
+                        key={msg.id}
                         className={cx(
-                          "mt-0.5 text-[9px]",
-                          msg.direction === "outbound" ? "text-on-dark/65" : "text-muted",
+                          "max-w-[min(88%,26rem)] rounded-[10px] px-2.5 py-1.5 text-[13px] leading-snug",
+                          msg.direction === "outbound"
+                            ? "ml-auto bg-primary text-on-dark"
+                            : "mr-auto bg-card text-ink shadow-[0_0_0_1px_var(--color-line)]",
                         )}
                       >
-                        {new Date(msg.createdAt).toLocaleString("es-CO", {
-                          day: "2-digit",
-                          month: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                        {msg.deliveryStatus ? ` · ${deliveryLabel(msg.deliveryStatus)}` : ""}
-                      </p>
-                    </div>
-                  ))
+                        <p className="whitespace-pre-wrap">{msg.body}</p>
+                        <p
+                          className={cx(
+                            "mt-0.5 flex items-center gap-1 text-[9px]",
+                            msg.direction === "outbound"
+                              ? "justify-end text-on-dark/65"
+                              : "text-muted",
+                          )}
+                        >
+                          <span>
+                            {new Date(msg.createdAt).toLocaleString("es-CO", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                          {mark ? (
+                            <span
+                              className={cx("font-semibold tracking-tight", mark.className)}
+                              title={mark.title}
+                            >
+                              {mark.text}
+                            </span>
+                          ) : null}
+                        </p>
+                      </div>
+                    );
+                  })
                 )}
               </div>
 

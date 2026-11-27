@@ -303,21 +303,45 @@ export async function insertWhatsAppMessage(
   }
 }
 
+const DELIVERY_RANK: Record<string, number> = {
+  sent: 1,
+  delivered: 2,
+  read: 3,
+  failed: 4,
+};
+
 export async function updateWhatsAppDelivery(
   tenantId: string,
   waMessageId: string,
   status: string,
   detail = "",
-) {
+): Promise<boolean> {
   const supabase = createAdminSupabase();
-  await supabase
+  const { data: existing } = await supabase
+    .from("whatsapp_messages")
+    .select("id, delivery_status")
+    .eq("tenant_id", tenantId)
+    .eq("wa_message_id", waMessageId)
+    .maybeSingle();
+  if (!existing?.id) return false;
+
+  const current = String(existing.delivery_status || "");
+  const nextRank = DELIVERY_RANK[status] ?? 0;
+  const currentRank = DELIVERY_RANK[current] ?? 0;
+  // No degradar (ej. read → delivered). failed siempre gana.
+  if (status !== "failed" && nextRank > 0 && currentRank > nextRank) {
+    return true;
+  }
+
+  const { error } = await supabase
     .from("whatsapp_messages")
     .update({
       delivery_status: status,
       delivery_detail: detail.slice(0, 400),
     })
-    .eq("tenant_id", tenantId)
-    .eq("wa_message_id", waMessageId);
+    .eq("id", existing.id);
+  if (error) throw new Error(error.message);
+  return true;
 }
 
 /** Solo dígitos; Colombia 10 dígitos → 57… */
