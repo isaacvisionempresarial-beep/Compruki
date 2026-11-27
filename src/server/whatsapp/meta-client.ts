@@ -65,6 +65,18 @@ function formatMetaReject(error: MetaJson["error"] | undefined): string {
     );
   }
 
+  if (
+    code === 10 ||
+    /paid message account|cannot access the provided/i.test(lower)
+  ) {
+    return (
+      "El token no tiene acceso a la cuenta de mensajería de este número (error 10). " +
+      "En Meta Business → Usuarios del sistema → Conextalaatomyads → Asignar activos, " +
+      "agrega la cuenta de WhatsApp/mensajería del 301 1234236 con Control total, " +
+      "genera un token nuevo y actualízalo en Railway."
+    );
+  }
+
   const detail = raw.slice(0, 240);
   return detail
     ? `Meta rechazó la solicitud: ${detail}${code ? ` (${code})` : ""}`
