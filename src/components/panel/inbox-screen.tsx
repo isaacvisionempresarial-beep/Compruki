@@ -491,44 +491,62 @@ export function InboxScreen({
                 {conversations.length === 0 ? "Sin chats." : "Nada con esa búsqueda/filtro."}
               </li>
             ) : (
-              visible.map((item) => (
-                <li key={item.id} className="border-b border-line/80 last:border-0">
-                  <form action={selectAction}>
-                    <input type="hidden" name="conversationId" value={item.id} />
-                    <button
-                      type="submit"
-                      onClick={() =>
-                        setBundle((prev) =>
-                          prev.activeId === item.id
-                            ? prev
-                            : { ...prev, activeId: item.id, messages: [] },
-                        )
-                      }
-                      className={cx(
-                        "w-full px-2.5 py-1.5 text-left hover:bg-subtle",
-                        item.id === activeId ? "bg-accent-tint/45" : "",
-                      )}
-                    >
-                      <div className="flex items-center justify-between gap-1">
-                        <span className="truncate text-[13px] font-semibold text-ink">
-                          {item.contactName || item.phone}
-                        </span>
-                        {item.unreadCount > 0 ? (
-                          <span className="rounded-full bg-accent px-1 text-[10px] font-bold text-primary-dark">
-                            {item.unreadCount}
+              visible.map((item) => {
+                const awaiting =
+                  item.lastDirection === "inbound" && item.status !== "closed";
+                return (
+                  <li key={item.id} className="border-b border-line/80 last:border-0">
+                    <form action={selectAction}>
+                      <input type="hidden" name="conversationId" value={item.id} />
+                      <button
+                        type="submit"
+                        onClick={() =>
+                          setBundle((prev) => ({
+                            ...prev,
+                            activeId: item.id,
+                            messages: prev.activeId === item.id ? prev.messages : [],
+                            conversations: prev.conversations.map((row) =>
+                              row.id === item.id ? { ...row, unreadCount: 0 } : row,
+                            ),
+                          }))
+                        }
+                        className={cx(
+                          "w-full border-l-2 px-2.5 py-1.5 text-left hover:bg-subtle",
+                          item.id === activeId
+                            ? "border-l-accent bg-accent-tint/45"
+                            : awaiting
+                              ? "border-l-warning bg-warning-tint/40"
+                              : "border-l-transparent",
+                        )}
+                      >
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="truncate text-[13px] font-semibold text-ink">
+                            {item.contactName || item.phone}
                           </span>
-                        ) : null}
-                      </div>
-                      <p className="truncate text-[11px] leading-4 text-muted">
-                        {item.lastMessagePreview || "—"}
-                      </p>
-                      <p className="truncate text-[9px] font-semibold tracking-wide text-muted uppercase">
-                        {followupStageLabel(item.pipelineStage)} · {assigneeName(item.assignedTo)}
-                      </p>
-                    </button>
-                  </form>
-                </li>
-              ))
+                          <span className="flex shrink-0 items-center gap-1">
+                            {awaiting && item.id !== activeId ? (
+                              <span className="rounded-[4px] bg-warning-tint px-1 text-[9px] font-bold text-warning">
+                                Resp.
+                              </span>
+                            ) : null}
+                            {item.unreadCount > 0 ? (
+                              <span className="rounded-full bg-accent px-1 text-[10px] font-bold text-primary-dark">
+                                {item.unreadCount}
+                              </span>
+                            ) : null}
+                          </span>
+                        </div>
+                        <p className="truncate text-[11px] leading-4 text-muted">
+                          {item.lastMessagePreview || "—"}
+                        </p>
+                        <p className="truncate text-[9px] font-semibold tracking-wide text-muted uppercase">
+                          {followupStageLabel(item.pipelineStage)} · {assigneeName(item.assignedTo)}
+                        </p>
+                      </button>
+                    </form>
+                  </li>
+                );
+              })
             )}
           </ul>
         </aside>

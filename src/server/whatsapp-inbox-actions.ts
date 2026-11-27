@@ -62,7 +62,16 @@ async function pack(tenantId: string, activeId: string | null): Promise<Omit<Inb
     null;
   const messages = selected ? await listInboxMessages(tenantId, selected) : [];
   if (selected) await markConversationRead(tenantId, selected).catch(() => undefined);
-  return { conversations, activeId: selected, messages };
+  return {
+    // Refleja el leído al instante (mark ocurre después del list).
+    conversations: selected
+      ? conversations.map((item) =>
+          item.id === selected ? { ...item, unreadCount: 0 } : item,
+        )
+      : conversations,
+    activeId: selected,
+    messages,
+  };
 }
 
 export async function loadInboxPanelData(opts?: {
