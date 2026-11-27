@@ -89,6 +89,15 @@ export function InboxScreen({
     return () => window.clearInterval(id);
   }, [router]);
 
+  // Tras enviar, refresca seguido para ver ✓✓ entregado/leído.
+  useEffect(() => {
+    if (!sendState.ok) return;
+    const timers = [2_000, 5_000, 10_000, 18_000].map((ms) =>
+      window.setTimeout(() => router.refresh(), ms),
+    );
+    return () => timers.forEach((id) => window.clearTimeout(id));
+  }, [sendState.ok, sendState.messages.length, router]);
+
   const selectedTemplate = useMemo(() => {
     if (!templateKey) return null;
     const [name, language] = templateKey.split("::");
@@ -218,12 +227,31 @@ export function InboxScreen({
   const threadRef = useRef<HTMLDivElement>(null);
   const [composerKey, setComposerKey] = useState(0);
   const [draft, setDraft] = useState("");
+  const [showFailed, setShowFailed] = useState(false);
+
+  const failedCount = useMemo(
+    () =>
+      messages.filter((msg) => msg.direction === "outbound" && msg.deliveryStatus === "failed")
+        .length,
+    [messages],
+  );
+
+  const threadMessages = useMemo(() => {
+    if (showFailed || failedCount === 0) return messages;
+    return messages.filter(
+      (msg) => !(msg.direction === "outbound" && msg.deliveryStatus === "failed"),
+    );
+  }, [messages, showFailed, failedCount]);
+
+  useEffect(() => {
+    setShowFailed(false);
+  }, [activeId]);
 
   useEffect(() => {
     const el = threadRef.current;
     if (!el) return;
     el.scrollTop = el.scrollHeight;
-  }, [activeId, messages]);
+  }, [activeId, threadMessages]);
 
   useEffect(() => {
     if (sendState.ok) setComposerKey((n) => n + 1);
@@ -546,10 +574,25 @@ export function InboxScreen({
                 ref={threadRef}
                 className="min-h-0 flex-1 space-y-1.5 overflow-y-auto bg-canvas/40 px-2.5 py-2.5"
               >
-                {messages.length === 0 ? (
-                  <p className="text-xs text-muted">Sin mensajes. Escribe abajo o manda una plantilla.</p>
+                {failedCount > 0 ? (
+                  <button
+                    type="button"
+                    className="text-[11px] font-semibold text-muted hover:text-ink"
+                    onClick={() => setShowFailed((value) => !value)}
+                  >
+                    {showFailed
+                      ? "Ocultar mensajes fallidos"
+                      : `Mostrar ${failedCount} fallido(s)`}
+                  </button>
+                ) : null}
+                {threadMessages.length === 0 ? (
+                  <p className="text-xs text-muted">
+                    {messages.length > 0
+                      ? "Solo hay fallidos ocultos. Muestra fallidos o envía una plantilla."
+                      : "Sin mensajes. Escribe abajo o manda una plantilla."}
+                  </p>
                 ) : (
-                  messages.map((msg) => {
+                  threadMessages.map((msg) => {
                     const failed = msg.direction === "outbound" && msg.deliveryStatus === "failed";
                     const mark = deliveryMark(
                       msg.deliveryStatus,
@@ -706,11 +749,11 @@ export function InboxScreen({
                         Enviar plantilla
                       </button>
                     </div>
-                    {templates.length === 0 ? (
-                      <p className="mt-1 text-[11px] text-muted">
-                        Sin plantillas listadas aún. Escribe el nombre aprobado en Meta (ej. hello_world).
-                      </p>
-                    ) : null}
+                    <p className="mt-1 text-[11px] text-muted">
+                      {templates.length === 0
+                        ? "Sin plantillas listadas aún. Escribe el nombre aprobado en Meta (ej. hello_world)."
+                        : "Para saludar en español: Meta → WhatsApp → Plantillas de mensajes → crea una UTILITY en es y espera aprobación."}
+                    </p>
                   </details>
                 </form>
               </footer>
