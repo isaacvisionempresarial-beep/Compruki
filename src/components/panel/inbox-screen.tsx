@@ -105,14 +105,6 @@ export function InboxScreen({
     return () => window.clearInterval(id);
   }, []);
 
-  useEffect(() => {
-    const tick = () => {
-      if (document.visibilityState === "visible") router.refresh();
-    };
-    const id = window.setInterval(tick, 25_000);
-    return () => window.clearInterval(id);
-  }, [router]);
-
   // Tras enviar, refresca seguido para ver ✓✓ entregado/leído.
   useEffect(() => {
     if (!sendState.ok) return;
@@ -333,6 +325,26 @@ export function InboxScreen({
       awaiting,
     } satisfies Record<FilterId, number>;
   }, [conversations, actorUserId]);
+
+  const busyQueue = filterCounts.awaiting > 0 || unreadTotal > 0;
+
+  useEffect(() => {
+    const refreshIfVisible = () => {
+      if (document.visibilityState === "visible") router.refresh();
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") router.refresh();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("focus", refreshIfVisible);
+    const intervalMs = busyQueue ? 10_000 : 25_000;
+    const id = window.setInterval(refreshIfVisible, intervalMs);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("focus", refreshIfVisible);
+      window.clearInterval(id);
+    };
+  }, [router, busyQueue]);
 
   useEffect(() => {
     const base = "Inbox WhatsApp";
