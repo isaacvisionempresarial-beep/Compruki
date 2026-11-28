@@ -8,7 +8,11 @@ import {
   followupStageLabel,
   type FollowupStageId,
 } from "@/lib/crm-pipeline";
-import { normalizeCrmPhone, type PhoneOrderChip } from "@/lib/crm-contacts";
+import {
+  normalizeCrmPhone,
+  type PhoneFollowupChip,
+  type PhoneOrderChip,
+} from "@/lib/crm-contacts";
 import { cx } from "@/lib/cx";
 import { formatRelativeShort, formatWindowLeft } from "@/lib/format";
 import { orderFocusHref } from "@/lib/store-order";
@@ -36,6 +40,7 @@ const empty: InboxActionState = {
   messages: [],
   activeOrders: [],
   activeOrderExtra: 0,
+  activeFollowup: null,
 };
 
 type InboxBundle = {
@@ -44,6 +49,7 @@ type InboxBundle = {
   messages: InboxMessage[];
   activeOrders: PhoneOrderChip[];
   activeOrderExtra: number;
+  activeFollowup: PhoneFollowupChip | null;
   ordersForId: string | null;
 };
 
@@ -55,19 +61,26 @@ function bundleFromAction(prev: InboxBundle, state: InboxActionState, mode: "alw
     messages: useThread ? state.messages : prev.messages,
     activeOrders: useThread ? state.activeOrders : prev.activeOrders,
     activeOrderExtra: useThread ? state.activeOrderExtra : prev.activeOrderExtra,
+    activeFollowup: useThread ? state.activeFollowup : prev.activeFollowup,
     ordersForId: useThread ? state.activeId : prev.ordersForId,
   };
 }
 
-function ordersAfterSwitch(prev: InboxBundle, conversationId: string) {
+function contextAfterSwitch(prev: InboxBundle, conversationId: string) {
   if (prev.activeId === conversationId) {
     return {
       activeOrders: prev.activeOrders,
       activeOrderExtra: prev.activeOrderExtra,
+      activeFollowup: prev.activeFollowup,
       ordersForId: prev.ordersForId,
     };
   }
-  return { activeOrders: [] as PhoneOrderChip[], activeOrderExtra: 0, ordersForId: null as string | null };
+  return {
+    activeOrders: [] as PhoneOrderChip[],
+    activeOrderExtra: 0,
+    activeFollowup: null as PhoneFollowupChip | null,
+    ordersForId: null as string | null,
+  };
 }
 
 type FilterId = "all" | "mine" | "unassigned" | "unread" | "awaiting" | "urgent" | "template";
@@ -89,6 +102,7 @@ export function InboxScreen({
   initialMessages,
   initialActiveOrders = [],
   initialActiveOrderExtra = 0,
+  initialActiveFollowup = null,
   assignees,
   templates = [],
   actorUserId,
@@ -102,6 +116,7 @@ export function InboxScreen({
   initialMessages: InboxMessage[];
   initialActiveOrders?: PhoneOrderChip[];
   initialActiveOrderExtra?: number;
+  initialActiveFollowup?: PhoneFollowupChip | null;
   assignees: InboxAssignee[];
   templates?: InboxTemplateOption[];
   actorUserId: string;
@@ -185,6 +200,7 @@ export function InboxScreen({
     messages: initialMessages,
     activeOrders: initialActiveOrders,
     activeOrderExtra: initialActiveOrderExtra,
+    activeFollowup: initialActiveFollowup,
     ordersForId: initialActiveId,
   });
 
@@ -248,10 +264,22 @@ export function InboxScreen({
           : keepLocal
             ? prev.activeOrderExtra
             : initialActiveOrderExtra,
+        activeFollowup: useServerThread
+          ? initialActiveFollowup
+          : keepLocal
+            ? prev.activeFollowup
+            : initialActiveFollowup,
         ordersForId: useServerThread ? initialActiveId : keepLocal ? prev.ordersForId : initialActiveId,
       };
     });
-  }, [initialConversations, initialMessages, initialActiveId, initialActiveOrders, initialActiveOrderExtra]);
+  }, [
+    initialConversations,
+    initialMessages,
+    initialActiveId,
+    initialActiveOrders,
+    initialActiveOrderExtra,
+    initialActiveFollowup,
+  ]);
 
   // Si el chat abierto recibe algo nuevo en el poll, recarga el hilo.
   useEffect(() => {
@@ -431,7 +459,7 @@ export function InboxScreen({
       !conversations.find((row) => row.id === conversationId)?.assignedTo;
     setBundle((prev) => ({
       ...prev,
-      ...ordersAfterSwitch(prev, conversationId),
+      ...contextAfterSwitch(prev, conversationId),
       activeId: conversationId,
       messages: prev.activeId === conversationId ? prev.messages : [],
       conversations: prev.conversations.map((row) =>
@@ -530,9 +558,10 @@ export function InboxScreen({
     [conversations, activeId],
   );
   const phoneKey = active ? normalizeCrmPhone(active.phone) || active.phone : "";
-  const ordersReady = Boolean(active && bundle.ordersForId === active.id);
-  const shownOrders = ordersReady ? bundle.activeOrders : [];
-  const extraOrders = ordersReady ? bundle.activeOrderExtra : 0;
+  const contextReady = Boolean(active && bundle.ordersForId === active.id);
+  const shownOrders = contextReady ? bundle.activeOrders : [];
+  const extraOrders = contextReady ? bundle.activeOrderExtra : 0;
+  const activeFollowup = contextReady ? bundle.activeFollowup : null;
 
   useEffect(() => {
     const firstName =
@@ -771,7 +800,7 @@ export function InboxScreen({
               fd.set("conversationId", arrivalNotice.id);
               setBundle((prev) => ({
                 ...prev,
-                ...ordersAfterSwitch(prev, arrivalNotice.id),
+                ...contextAfterSwitch(prev, arrivalNotice.id),
                 activeId: arrivalNotice.id,
                 messages: [],
                 conversations: prev.conversations.map((row) =>
@@ -921,7 +950,7 @@ export function InboxScreen({
                         onClick={() =>
                           setBundle((prev) => ({
                             ...prev,
-                            ...ordersAfterSwitch(prev, item.id),
+                            ...contextAfterSwitch(prev, item.id),
                             activeId: item.id,
                             messages: prev.activeId === item.id ? prev.messages : [],
                             conversations: prev.conversations.map((row) =>
@@ -1138,36 +1167,81 @@ export function InboxScreen({
                 </div>
               </header>
 
-              <div className="flex min-w-0 shrink-0 flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-line px-2 py-1 text-[11px] leading-4">
-                {!ordersReady ? (
-                  <span className="text-muted">…</span>
-                ) : shownOrders.length === 0 ? (
-                  <span className="text-muted">Sin pedidos con este celular</span>
-                ) : (
-                  <>
-                    {shownOrders.map((order) => (
-                      <Link
-                        key={order.number}
-                        href={orderFocusHref(order.number)}
-                        className="inline-flex min-w-0 items-baseline gap-1 truncate text-ink hover:underline"
-                        title={`${order.number} · ${order.statusLabel} · ${order.totalLabel}`}
-                      >
-                        <span className="font-semibold">{order.number}</span>
-                        <span className="truncate text-muted">{order.statusLabel}</span>
-                        <span className="shrink-0 tabular-nums text-muted">{order.totalLabel}</span>
-                      </Link>
-                    ))}
-                    {extraOrders > 0 ? (
-                      <Link
-                        href={`/panel/pedidos?q=${encodeURIComponent(phoneKey)}`}
-                        className="shrink-0 font-semibold text-muted hover:text-ink hover:underline"
-                        title="Ver el resto de pedidos de este celular"
-                      >
-                        +{extraOrders}
-                      </Link>
-                    ) : null}
-                  </>
-                )}
+              <div className="flex min-w-0 shrink-0 flex-col gap-0.5 border-b border-line px-2 py-1 text-[11px] leading-4">
+                <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5">
+                  {!contextReady ? (
+                    <span className="text-muted">…</span>
+                  ) : shownOrders.length === 0 ? (
+                    <span className="text-muted">Sin pedidos con este celular</span>
+                  ) : (
+                    <>
+                      {shownOrders.map((order) => (
+                        <Link
+                          key={order.number}
+                          href={orderFocusHref(order.number)}
+                          className="inline-flex min-w-0 items-baseline gap-1 truncate text-ink hover:underline"
+                          title={`${order.number} · ${order.statusLabel} · ${order.totalLabel}`}
+                        >
+                          <span className="font-semibold">{order.number}</span>
+                          <span className="truncate text-muted">{order.statusLabel}</span>
+                          <span className="shrink-0 tabular-nums text-muted">{order.totalLabel}</span>
+                        </Link>
+                      ))}
+                      {extraOrders > 0 ? (
+                        <Link
+                          href={`/panel/pedidos?q=${encodeURIComponent(phoneKey)}`}
+                          className="shrink-0 font-semibold text-muted hover:text-ink hover:underline"
+                          title="Ver el resto de pedidos de este celular"
+                        >
+                          +{extraOrders}
+                        </Link>
+                      ) : null}
+                    </>
+                  )}
+                </div>
+                {contextReady ? (
+                  activeFollowup ? (
+                    <Link
+                      href={`/panel/clientes?q=${encodeURIComponent(phoneKey)}`}
+                      className={cx(
+                        "inline-flex min-w-0 items-baseline gap-1 truncate hover:underline",
+                        activeFollowup.overdue ? "text-danger" : "text-ink",
+                      )}
+                      title={[
+                        activeFollowup.stageLabel,
+                        activeFollowup.dueLabel,
+                        activeFollowup.high ? "alta" : "",
+                        activeFollowup.note,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    >
+                      <span className="font-semibold">CRM</span>
+                      <span className="truncate text-muted">{activeFollowup.stageLabel}</span>
+                      {activeFollowup.dueLabel ? (
+                        <span
+                          className={cx(
+                            "shrink-0 font-semibold",
+                            activeFollowup.overdue ? "text-danger" : "text-muted",
+                          )}
+                        >
+                          {activeFollowup.dueLabel}
+                        </span>
+                      ) : null}
+                      {activeFollowup.high ? (
+                        <span className="shrink-0 font-semibold text-warning">alta</span>
+                      ) : null}
+                      {activeFollowup.note ? (
+                        <span className="truncate text-muted">{activeFollowup.note}</span>
+                      ) : null}
+                      {activeFollowup.openCount > 1 ? (
+                        <span className="shrink-0 text-muted">+{activeFollowup.openCount - 1}</span>
+                      ) : null}
+                    </Link>
+                  ) : (
+                    <span className="text-muted">Sin seguimiento CRM abierto</span>
+                  )
+                ) : null}
               </div>
 
               <div

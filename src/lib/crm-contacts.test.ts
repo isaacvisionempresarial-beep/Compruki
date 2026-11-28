@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { buildCrmContacts, normalizeCrmPhone, phonesMatchLast10, recentOrdersForPhone } from "@/lib/crm-contacts";
+import {
+  buildCrmContacts,
+  normalizeCrmPhone,
+  openFollowupChipForPhone,
+  phonesMatchLast10,
+  recentOrdersForPhone,
+} from "@/lib/crm-contacts";
 import type { StoreOrder } from "@/lib/store-order";
 
 function order(partial: Partial<StoreOrder> & Pick<StoreOrder, "number" | "phone" | "createdAt">): StoreOrder {
@@ -69,6 +75,52 @@ describe("recentOrdersForPhone", () => {
     expect(result.extra).toBe(1);
     expect(recentOrdersForPhone(rows, "3010000000").shown).toHaveLength(1);
     expect(recentOrdersForPhone(rows, "3010000000").extra).toBe(0);
+  });
+});
+
+describe("openFollowupChipForPhone", () => {
+  it("prioriza vencido y alta, y cuenta abiertos del celular", () => {
+    const chip = openFollowupChipForPhone(
+      [
+        {
+          phone: "3001234567",
+          note: "Llamar mañana",
+          stage: "espera",
+          dueAt: "2026-12-01",
+          priority: "normal",
+          status: "open",
+          createdAt: "2026-11-01T10:00:00.000Z",
+        },
+        {
+          phone: "573001234567",
+          note: "Cliente molesto por demora del envío a Medellín y pide novedad urgente del pedido",
+          stage: "postventa",
+          dueAt: "2026-11-01",
+          priority: "high",
+          status: "open",
+          createdAt: "2026-11-20T10:00:00.000Z",
+        },
+        {
+          phone: "3019998877",
+          note: "Otro",
+          stage: "nuevo",
+          dueAt: "2026-10-01",
+          priority: "high",
+          status: "open",
+          createdAt: "2026-11-21T10:00:00.000Z",
+        },
+      ],
+      "573001234567",
+      "2026-11-28",
+    );
+    expect(chip).toMatchObject({
+      stageLabel: "Postventa",
+      dueLabel: "vencido",
+      overdue: true,
+      high: true,
+      openCount: 2,
+    });
+    expect(chip?.note.endsWith("…")).toBe(true);
   });
 });
 

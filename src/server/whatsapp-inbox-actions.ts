@@ -19,9 +19,19 @@ import {
   type InboxConversation,
   type InboxMessage,
 } from "@/server/whatsapp-inbox";
-import { normalizeCrmPhone, recentOrdersForPhone, type PhoneOrderChip } from "@/lib/crm-contacts";
+import {
+  normalizeCrmPhone,
+  openFollowupChipForPhone,
+  recentOrdersForPhone,
+  type PhoneFollowupChip,
+  type PhoneOrderChip,
+} from "@/lib/crm-contacts";
 import { listOrders } from "@/server/order-store";
-import { advancePipelineOnOperatorOutbound, createFollowup } from "@/server/followups";
+import {
+  advancePipelineOnOperatorOutbound,
+  createFollowup,
+  listOpenFollowups,
+} from "@/server/followups";
 import { listTeamMembers } from "@/server/team";
 import { metaWaConfigured, requireMetaWaEnv } from "@/server/whatsapp/env";
 import { listWhatsAppTemplates } from "@/server/whatsapp/meta-client";
@@ -48,6 +58,7 @@ export type InboxActionState = {
   messages: InboxMessage[];
   activeOrders: PhoneOrderChip[];
   activeOrderExtra: number;
+  activeFollowup: PhoneFollowupChip | null;
 };
 
 function emptyInboxAction(error: string): InboxActionState {
@@ -59,12 +70,24 @@ function emptyInboxAction(error: string): InboxActionState {
     messages: [],
     activeOrders: [],
     activeOrderExtra: 0,
+    activeFollowup: null,
   };
 }
 
-async function ordersForActivePhone(phone: string) {
-  if (normalizeCrmPhone(phone).length !== 10) return { shown: [] as PhoneOrderChip[], extra: 0 };
-  return recentOrdersForPhone(await listOrders(), phone);
+async function contextForActivePhone(phone: string) {
+  if (normalizeCrmPhone(phone).length !== 10) {
+    return { shown: [] as PhoneOrderChip[], extra: 0, followup: null as PhoneFollowupChip | null };
+  }
+  const [orders, followups] = await Promise.all([
+    listOrders(),
+    listOpenFollowups(120).catch(() => []),
+  ]);
+  const phoneOrders = recentOrdersForPhone(orders, phone);
+  return {
+    shown: phoneOrders.shown,
+    extra: phoneOrders.extra,
+    followup: openFollowupChipForPhone(followups, phone),
+  };
 }
 
 async function requireWhatsAppAccess() {
@@ -81,9 +104,15 @@ async function pack(tenantId: string, activeId: string | null): Promise<Omit<Inb
     conversations[0]?.id ||
     null;
   const activePhone = selected ? conversations.find((item) => item.id === selected)?.phone ?? "" : "";
-  const [messages, phoneOrders] = await Promise.all([
+  const [messages, phoneContext] = await Promise.all([
     selected ? listInboxMessages(tenantId, selected) : Promise.resolve([] as InboxMessage[]),
-    activePhone ? ordersForActivePhone(activePhone) : Promise.resolve({ shown: [] as PhoneOrderChip[], extra: 0 }),
+    activePhone
+      ? contextForActivePhone(activePhone)
+      : Promise.resolve({
+          shown: [] as PhoneOrderChip[],
+          extra: 0,
+          followup: null as PhoneFollowupChip | null,
+        }),
   ]);
   if (selected) await markConversationRead(tenantId, selected).catch(() => undefined);
   return {
@@ -95,8 +124,9 @@ async function pack(tenantId: string, activeId: string | null): Promise<Omit<Inb
       : conversations,
     activeId: selected,
     messages,
-    activeOrders: phoneOrders.shown,
-    activeOrderExtra: phoneOrders.extra,
+    activeOrders: phoneContext.shown,
+    activeOrderExtra: phoneContext.extra,
+    activeFollowup: phoneContext.followup,
   };
 }
 
@@ -120,6 +150,7 @@ export async function loadInboxPanelData(opts?: {
       bootError: null as string | null,
       activeOrders: [] as PhoneOrderChip[],
       activeOrderExtra: 0,
+      activeFollowup: null as PhoneFollowupChip | null,
     };
   }
   const tableReady = await probeInboxTables();
@@ -137,6 +168,7 @@ export async function loadInboxPanelData(opts?: {
       bootError: null,
       activeOrders: [],
       activeOrderExtra: 0,
+      activeFollowup: null,
     };
   }
 

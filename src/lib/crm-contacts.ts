@@ -1,4 +1,9 @@
 import { STATUS_LABEL, type OrderStatus } from "@/lib/demo-data";
+import {
+  followupStageLabel,
+  normalizeFollowupStage,
+  type FollowupStageId,
+} from "@/lib/crm-pipeline";
 import { formatCop } from "@/lib/format";
 import type { StoreOrder } from "@/lib/store-order";
 
@@ -51,6 +56,72 @@ export function recentOrdersForPhone(
     totalLabel: formatCop(order.total),
   }));
   return { shown, extra: Math.max(0, matched.length - shown.length) };
+}
+
+export type PhoneFollowupChip = {
+  note: string;
+  stageLabel: string;
+  dueLabel: string;
+  overdue: boolean;
+  high: boolean;
+  openCount: number;
+};
+
+type FollowupChipSource = {
+  phone: string;
+  note: string;
+  stage: string;
+  dueAt: string | null;
+  priority: string;
+  status: string;
+  createdAt: string;
+};
+
+function followupDueLabel(dueAt: string | null, today: string, overdue: boolean) {
+  if (!dueAt) return "";
+  const day = dueAt.slice(0, 10);
+  if (overdue) return "vencido";
+  if (day === today) return "hoy";
+  return day.slice(5).replace("-", "/");
+}
+
+/** Seguimiento abierto más urgente del celular (vencido → alta → fecha). */
+export function openFollowupChipForPhone(
+  tasks: FollowupChipSource[],
+  phone: string,
+  today = new Date().toISOString().slice(0, 10),
+): PhoneFollowupChip | null {
+  if (normalizeCrmPhone(phone).length !== 10) return null;
+  const open = tasks.filter(
+    (task) => task.status === "open" && phonesMatchLast10(task.phone, phone),
+  );
+  if (!open.length) return null;
+  const ranked = [...open].sort((a, b) => {
+    const aDue = a.dueAt?.slice(0, 10) || "";
+    const bDue = b.dueAt?.slice(0, 10) || "";
+    const aOver = Boolean(aDue && aDue < today);
+    const bOver = Boolean(bDue && bDue < today);
+    if (aOver !== bOver) return aOver ? -1 : 1;
+    const aHigh = a.priority === "high";
+    const bHigh = b.priority === "high";
+    if (aHigh !== bHigh) return aHigh ? -1 : 1;
+    if (aDue && bDue && aDue !== bDue) return aDue.localeCompare(bDue);
+    if (aDue !== bDue) return aDue ? -1 : 1;
+    return b.createdAt.localeCompare(a.createdAt);
+  });
+  const top = ranked[0]!;
+  const dueDay = top.dueAt?.slice(0, 10) || "";
+  const overdue = Boolean(dueDay && dueDay < today);
+  const stage = normalizeFollowupStage(top.stage) as FollowupStageId;
+  const note = top.note.trim().replace(/\s+/g, " ");
+  return {
+    note: note.length > 72 ? `${note.slice(0, 71)}…` : note,
+    stageLabel: followupStageLabel(stage),
+    dueLabel: followupDueLabel(top.dueAt, today, overdue),
+    overdue,
+    high: top.priority === "high",
+    openCount: open.length,
+  };
 }
 
 /**
