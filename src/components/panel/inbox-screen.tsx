@@ -16,7 +16,12 @@ import {
 import { cx } from "@/lib/cx";
 import { formatRelativeShort, formatWindowLeft } from "@/lib/format";
 import { orderFocusHref } from "@/lib/store-order";
-import { fillInboxQuickReply, INBOX_QUICK_REPLIES } from "@/lib/inbox-quick-replies";
+import {
+  fillInboxQuickReply,
+  inboxMediaLabel,
+  INBOX_QUICK_REPLIES,
+  orderStatusQuickReply,
+} from "@/lib/inbox-quick-replies";
 import {
   assignInboxConversationAction,
   createFollowupFromInboxAction,
@@ -1273,6 +1278,7 @@ export function InboxScreen({
                       msg.direction === "outbound",
                       msg.deliveryDetail,
                     );
+                    const mediaLabel = inboxMediaLabel(msg.messageType);
                     return (
                       <div
                         key={msg.id}
@@ -1285,6 +1291,16 @@ export function InboxScreen({
                             : "mr-auto bg-card text-ink shadow-[0_0_0_1px_var(--color-line)]",
                         )}
                       >
+                        {mediaLabel ? (
+                          <p
+                            className={cx(
+                              "mb-0.5 text-[10px] font-bold tracking-wide uppercase",
+                              msg.direction === "outbound" ? "text-on-dark/70" : "text-muted",
+                            )}
+                          >
+                            {mediaLabel}
+                          </p>
+                        ) : null}
                         <p className="whitespace-pre-wrap">{msg.body}</p>
                         {failed && msg.deliveryDetail ? (
                           <p className="mt-1 text-[11px] leading-4 text-[#fecaca]">{msg.deliveryDetail}</p>
@@ -1347,6 +1363,18 @@ export function InboxScreen({
                   <input type="hidden" name="conversationId" value={active.id} />
                   {withinCustomerWindow ? (
                     <div className="flex gap-1 overflow-x-auto pb-0.5">
+                      {shownOrders[0] ? (
+                        <button
+                          type="button"
+                          className="shrink-0 rounded-[6px] border border-line bg-canvas px-2 py-1 text-[11px] font-semibold text-ink hover:bg-subtle"
+                          title={orderStatusQuickReply(shownOrders[0], active.contactName || "")}
+                          onClick={() =>
+                            setDraft(orderStatusQuickReply(shownOrders[0]!, active.contactName || ""))
+                          }
+                        >
+                          Estado
+                        </button>
+                      ) : null}
                       {INBOX_QUICK_REPLIES.map((item) => (
                         <button
                           key={item.id}

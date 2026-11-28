@@ -45,3 +45,29 @@ export function fillInboxQuickReply(template: string, contactName: string) {
   const nombre = skip ? "" : ` ${first}`;
   return template.replaceAll("{nombre}", nombre);
 }
+
+const MEDIA_LABEL: Record<string, string> = {
+  image: "Imagen",
+  audio: "Audio",
+  voice: "Audio",
+  document: "Documento",
+  video: "Video",
+  sticker: "Sticker",
+  reaction: "Reacción",
+};
+
+/** Etiqueta corta para tipos no texto en el hilo del Inbox. */
+export function inboxMediaLabel(messageType: string) {
+  return MEDIA_LABEL[messageType.trim().toLowerCase()] || null;
+}
+
+/** Borrador de estado con el pedido más reciente del chat. */
+export function orderStatusQuickReply(
+  order: { number: string; statusLabel: string },
+  contactName: string,
+) {
+  return fillInboxQuickReply(
+    `Hola{nombre}, tu pedido ${order.number} está en: ${order.statusLabel}. ¿Te ayudo con algo más?`,
+    contactName,
+  );
+}
