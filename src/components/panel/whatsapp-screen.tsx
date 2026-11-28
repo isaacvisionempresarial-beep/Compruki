@@ -95,6 +95,17 @@ export function WhatsAppScreen({
   const [draftBody, setDraftBody] = useState(
     "Hola {{1}}, te escribimos desde Compruki. ¿En qué te ayudamos?",
   );
+  const [webhookCopied, setWebhookCopied] = useState(false);
+
+  async function copyWebhookUrl() {
+    try {
+      await navigator.clipboard.writeText(webhookUrl);
+      setWebhookCopied(true);
+      window.setTimeout(() => setWebhookCopied(false), 1600);
+    } catch {
+      setWebhookCopied(false);
+    }
+  }
 
   const connection =
     tplState.connection ??
@@ -475,6 +486,9 @@ export function WhatsAppScreen({
               <code className="text-ink">messages</code>
             </p>
           </div>
+          <button type="button" className={btn} onClick={() => void copyWebhookUrl()}>
+            {webhookCopied ? "Copiado" : "Copiar URL"}
+          </button>
         </div>
         <p className="mt-1.5 break-all rounded-[6px] border border-line bg-canvas px-2 py-1.5 text-[11px] font-semibold tabular-nums">
           {webhookUrl}
@@ -566,10 +580,17 @@ export function WhatsAppScreen({
       </section>
 
       <section className={card} aria-labelledby="wa-recientes">
-        <p className={labelCap}>Actividad</p>
-        <h2 id="wa-recientes" className="mt-0.5 text-sm font-semibold">
-          Últimos mensajes
-        </h2>
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <p className={labelCap}>Actividad</p>
+            <h2 id="wa-recientes" className="mt-0.5 text-sm font-semibold">
+              Últimos mensajes
+            </h2>
+          </div>
+          <Link href="/panel/inbox" className={btn}>
+            Inbox
+          </Link>
+        </div>
         {recent.length === 0 ? (
           <p className="mt-1 text-[11px] text-muted">Aún no hay mensajes.</p>
         ) : (
@@ -577,13 +598,23 @@ export function WhatsAppScreen({
             {recent.map((msg) => (
               <li key={msg.id} className="rounded-[6px] border border-line px-2 py-1.5 text-[11px]">
                 <div className="flex flex-wrap items-baseline justify-between gap-1">
-                  <p className="font-semibold">
+                  <p className="min-w-0 font-semibold">
                     {msg.direction === "inbound" ? "↓" : "↑"} {msg.phone}
                     {msg.contactName ? ` · ${msg.contactName}` : ""}
                   </p>
-                  <p className="text-[10px] text-muted tabular-nums">
-                    {new Date(msg.createdAt).toLocaleString("es-CO")}
-                  </p>
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <p className="text-[10px] text-muted tabular-nums">
+                      {new Date(msg.createdAt).toLocaleString("es-CO")}
+                    </p>
+                    {msg.phone ? (
+                      <Link
+                        href={`/panel/inbox?phone=${encodeURIComponent(msg.phone)}&name=${encodeURIComponent(msg.contactName || "")}`}
+                        className="text-[10px] font-semibold text-accent-strong hover:underline"
+                      >
+                        Abrir
+                      </Link>
+                    ) : null}
+                  </div>
                 </div>
                 <p className="mt-0.5 truncate text-muted" title={msg.body}>
                   {msg.body}
