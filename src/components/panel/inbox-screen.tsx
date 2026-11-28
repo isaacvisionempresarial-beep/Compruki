@@ -9,7 +9,7 @@ import {
   type FollowupStageId,
 } from "@/lib/crm-pipeline";
 import { cx } from "@/lib/cx";
-import { formatRelativeShort } from "@/lib/format";
+import { formatRelativeShort, formatWindowLeft } from "@/lib/format";
 import { fillInboxQuickReply, INBOX_QUICK_REPLIES } from "@/lib/inbox-quick-replies";
 import {
   assignInboxConversationAction,
@@ -358,7 +358,8 @@ export function InboxScreen({
     () =>
       [...conversations]
         .filter((item) => item.lastDirection === "inbound" && item.status !== "closed")
-        .sort((a, b) => (b.lastMessageAt || "").localeCompare(a.lastMessageAt || "")),
+        // Más urgente primero (menos tiempo de ventana).
+        .sort((a, b) => (a.lastMessageAt || "").localeCompare(b.lastMessageAt || "")),
     [conversations],
   );
 
@@ -435,7 +436,7 @@ export function InboxScreen({
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase().replace(/\s+/g, "");
-    return conversations.filter((item) => {
+    const list = conversations.filter((item) => {
       if (filter === "mine" && item.assignedTo !== actorUserId) return false;
       if (filter === "unassigned" && item.assignedTo) return false;
       if (filter === "unread" && item.unreadCount <= 0) return false;
@@ -445,6 +446,9 @@ export function InboxScreen({
       const hay = `${item.contactName} ${item.phone} ${item.lastMessagePreview}`.toLowerCase();
       return hay.includes(q) || item.phone.replace(/\D/g, "").includes(q.replace(/\D/g, ""));
     });
+    if (filter !== "awaiting") return list;
+    // Más urgente primero: menos tiempo de ventana 24 h.
+    return [...list].sort((a, b) => (a.lastMessageAt || "").localeCompare(b.lastMessageAt || ""));
   }, [conversations, filter, stageFilter, actorUserId, query]);
 
   const active = useMemo(
@@ -798,6 +802,10 @@ export function InboxScreen({
               visible.map((item) => {
                 const awaiting =
                   item.lastDirection === "inbound" && item.status !== "closed";
+                const windowLeft =
+                  awaiting && item.lastMessageAt
+                    ? formatWindowLeft(item.lastMessageAt, nowTick)
+                    : null;
                 return (
                   <li key={item.id} className="border-b border-line/80 last:border-0">
                     <form action={selectAction}>
@@ -819,7 +827,9 @@ export function InboxScreen({
                           item.id === activeId
                             ? "border-l-accent bg-accent-tint/45"
                             : awaiting
-                              ? "border-l-warning bg-warning-tint/40"
+                              ? windowLeft?.urgent
+                                ? "border-l-danger bg-danger-tint/30"
+                                : "border-l-warning bg-warning-tint/40"
                               : "border-l-transparent",
                         )}
                       >
@@ -829,8 +839,20 @@ export function InboxScreen({
                           </span>
                           <span className="flex shrink-0 items-center gap-1">
                             {awaiting && item.id !== activeId ? (
-                              <span className="rounded-[4px] bg-warning-tint px-1 text-[9px] font-bold text-warning">
-                                Resp.
+                              <span
+                                className={cx(
+                                  "rounded-[4px] px-1 text-[9px] font-bold",
+                                  windowLeft?.urgent
+                                    ? "bg-danger-tint text-danger"
+                                    : "bg-warning-tint text-warning",
+                                )}
+                                title={
+                                  windowLeft
+                                    ? `Ventana 24 h: ${windowLeft.label}`
+                                    : "Por responder"
+                                }
+                              >
+                                {windowLeft ? windowLeft.label : "Resp."}
                               </span>
                             ) : null}
                             {item.unreadCount > 0 ? (

@@ -27,3 +27,18 @@ export function formatRelativeShort(iso: string, now = Date.now()) {
   const day = new Date(at);
   return `${day.getDate()} ${MONTHS[day.getMonth()]}`;
 }
+
+const CUSTOMER_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+/** Tiempo restante de ventana Meta 24 h desde el último entrante. */
+export function formatWindowLeft(lastInboundAt: string, now = Date.now()) {
+  if (!lastInboundAt) return null;
+  const at = new Date(lastInboundAt).getTime();
+  if (!Number.isFinite(at)) return null;
+  const leftMs = at + CUSTOMER_WINDOW_MS - now;
+  if (leftMs <= 0) return { label: "cerrada", urgent: true, leftMs: 0 };
+  const hours = Math.floor(leftMs / 3_600_000);
+  const mins = Math.floor((leftMs % 3_600_000) / 60_000);
+  const label = hours > 0 ? `${hours}h ${mins}m` : `${Math.max(1, mins)}m`;
+  return { label, urgent: leftMs < 2 * 3_600_000, leftMs };
+}
