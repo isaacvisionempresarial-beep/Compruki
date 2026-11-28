@@ -177,7 +177,7 @@ export function Dashboard({
         {
           label: "Ventana <2h",
           value: ops.urgentWindow,
-          href: "/panel/inbox?f=awaiting",
+          href: "/panel/inbox?f=urgent",
           tone: ops.urgentWindow > 0 ? "danger" : "ok",
         },
         {

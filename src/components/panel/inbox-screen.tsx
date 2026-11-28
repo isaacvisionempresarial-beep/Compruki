@@ -34,7 +34,7 @@ const empty: InboxActionState = {
   messages: [],
 };
 
-type FilterId = "all" | "mine" | "unassigned" | "unread" | "awaiting";
+type FilterId = "all" | "mine" | "unassigned" | "unread" | "awaiting" | "urgent";
 type StageFilter = "all" | FollowupStageId;
 
 const ctrl =
@@ -337,11 +337,17 @@ export function InboxScreen({
     let unassigned = 0;
     let unread = 0;
     let awaiting = 0;
+    let urgent = 0;
+    const now = Date.now();
     for (const item of conversations) {
       if (item.assignedTo === actorUserId) mine += 1;
       if (!item.assignedTo && item.status !== "closed") unassigned += 1;
       if (item.unreadCount > 0) unread += 1;
-      if (item.lastDirection === "inbound" && item.status !== "closed") awaiting += 1;
+      if (item.lastDirection === "inbound" && item.status !== "closed") {
+        awaiting += 1;
+        const left = item.lastMessageAt ? formatWindowLeft(item.lastMessageAt, now) : null;
+        if (left?.urgent && left.leftMs > 0) urgent += 1;
+      }
     }
     return {
       all: conversations.length,
@@ -349,6 +355,7 @@ export function InboxScreen({
       unassigned,
       unread,
       awaiting,
+      urgent,
     } satisfies Record<FilterId, number>;
   }, [conversations, actorUserId]);
 
@@ -436,20 +443,26 @@ export function InboxScreen({
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase().replace(/\s+/g, "");
+    const now = nowTick;
     const list = conversations.filter((item) => {
       if (filter === "mine" && item.assignedTo !== actorUserId) return false;
       if (filter === "unassigned" && item.assignedTo) return false;
       if (filter === "unread" && item.unreadCount <= 0) return false;
       if (filter === "awaiting" && item.lastDirection !== "inbound") return false;
+      if (filter === "urgent") {
+        if (item.lastDirection !== "inbound" || item.status === "closed") return false;
+        const left = item.lastMessageAt ? formatWindowLeft(item.lastMessageAt, now) : null;
+        if (!left?.urgent || left.leftMs <= 0) return false;
+      }
       if (stageFilter !== "all" && item.pipelineStage !== stageFilter) return false;
       if (!q) return true;
       const hay = `${item.contactName} ${item.phone} ${item.lastMessagePreview}`.toLowerCase();
       return hay.includes(q) || item.phone.replace(/\D/g, "").includes(q.replace(/\D/g, ""));
     });
-    if (filter !== "awaiting") return list;
+    if (filter !== "awaiting" && filter !== "urgent") return list;
     // Más urgente primero: menos tiempo de ventana 24 h.
     return [...list].sort((a, b) => (a.lastMessageAt || "").localeCompare(b.lastMessageAt || ""));
-  }, [conversations, filter, stageFilter, actorUserId, query]);
+  }, [conversations, filter, stageFilter, actorUserId, query, nowTick]);
 
   const active = useMemo(
     () => conversations.find((item) => item.id === activeId) ?? null,
@@ -732,7 +745,7 @@ export function InboxScreen({
               aria-label="Buscar conversaciones"
               className={cx(ctrl, "w-full")}
             />
-            <div className="grid grid-cols-5 gap-0.5" role="tablist" aria-label="Filtro">
+            <div className="flex flex-wrap gap-0.5" role="tablist" aria-label="Filtro">
               {(
                 [
                   ["all", "Todos", "Todos"],
@@ -740,6 +753,7 @@ export function InboxScreen({
                   ["unassigned", "Libres", "Sin asignar"],
                   ["unread", "Nuevos", "No leídos"],
                   ["awaiting", "Resp.", "Por responder"],
+                  ["urgent", "<2h", "Ventana por cerrar (<2 h)"],
                 ] as const
               ).map(([id, label, title]) => {
                 const count = filterCounts[id];
@@ -752,8 +766,14 @@ export function InboxScreen({
                     onClick={() => setFilter(id)}
                     title={count > 0 ? `${title} (${count})` : title}
                     className={cx(
-                      "flex h-6 flex-col items-center justify-center rounded-[5px] leading-none",
-                      filter === id ? "bg-ink text-canvas" : "bg-subtle text-muted hover:text-ink",
+                      "flex h-6 min-w-[2.4rem] flex-1 flex-col items-center justify-center rounded-[5px] px-1 leading-none",
+                      filter === id
+                        ? id === "urgent"
+                          ? "bg-danger text-canvas"
+                          : "bg-ink text-canvas"
+                        : id === "urgent" && count > 0
+                          ? "bg-danger-tint text-danger"
+                          : "bg-subtle text-muted hover:text-ink",
                     )}
                   >
                     <span className="text-[9px] font-semibold">{label}</span>
@@ -761,7 +781,7 @@ export function InboxScreen({
                       <span
                         className={cx(
                           "text-[8px] font-bold tabular-nums",
-                          filter === id ? "text-canvas/80" : "text-muted",
+                          filter === id ? "text-canvas/80" : "opacity-80",
                         )}
                       >
                         {count}
