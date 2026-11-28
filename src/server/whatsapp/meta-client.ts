@@ -16,6 +16,8 @@ export type MetaJson = {
   };
   success?: boolean;
   id?: string;
+  url?: string;
+  mime_type?: string;
   display_phone_number?: string;
   verified_name?: string;
   quality_rating?: string;
@@ -437,4 +439,35 @@ export async function createWhatsAppTemplate(
     components: [bodyComponent],
   });
   return { id: result.id ? String(result.id) : null, name, status: "PENDING" };
+}
+
+/** Baja un archivo de Meta por media_id (URL temporal ~5 min). */
+export async function downloadWhatsAppMedia(env: MetaWaEnv, mediaId: string) {
+  const id = mediaId.trim();
+  if (!id) throw new MetaApiError(422, "Falta el media_id de Meta.");
+  const path = `${id}?phone_number_id=${encodeURIComponent(env.phoneNumberId)}`;
+  const meta = await metaRequest(env, path, "GET");
+  const url = typeof meta.url === "string" ? meta.url : "";
+  const mimeType =
+    typeof meta.mime_type === "string" && meta.mime_type
+      ? meta.mime_type
+      : "application/octet-stream";
+  if (!url) throw new MetaApiError(502, "Meta no devolvió URL de media.");
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      headers: { Authorization: `Bearer ${env.accessToken}` },
+      signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
+    });
+  } catch {
+    throw new MetaApiError(502, "No fue posible descargar el archivo de Meta.");
+  }
+  if (!response.ok) {
+    throw new MetaApiError(502, "Meta rechazó la descarga del archivo.");
+  }
+  return {
+    bytes: await response.arrayBuffer(),
+    mimeType: response.headers.get("content-type") || mimeType,
+  };
 }

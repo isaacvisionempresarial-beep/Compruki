@@ -3,6 +3,7 @@ import {
   type FollowupStageId,
 } from "@/lib/crm-pipeline";
 import { createAdminSupabase } from "@/lib/supabase/admin";
+import { mediaIdFromDetail } from "@/lib/whatsapp-media";
 import { syncOpenFollowupsFromConversation } from "@/server/followups";
 import {
   insertWhatsAppMessage,
@@ -11,6 +12,8 @@ import {
 } from "@/server/whatsapp/connection";
 import { requireMetaWaEnv, metaWaConfigured } from "@/server/whatsapp/env";
 import { sendWhatsAppTemplate, sendWhatsAppText, MetaApiError } from "@/server/whatsapp/meta-client";
+
+export { mediaIdFromDetail } from "@/lib/whatsapp-media";
 
 export type InboxConversation = {
   id: string;
@@ -33,6 +36,7 @@ export type InboxMessage = {
   messageType: string;
   deliveryStatus: string;
   deliveryDetail: string;
+  mediaId: string;
   createdBy: string;
   createdAt: string;
 };
@@ -40,6 +44,7 @@ export type InboxMessage = {
 const CUSTOMER_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 function mapInboxMessage(row: Record<string, unknown>): InboxMessage {
+  const deliveryDetail = String(row.delivery_detail ?? "");
   return {
     id: String(row.id),
     waMessageId: String(row.wa_message_id),
@@ -47,7 +52,8 @@ function mapInboxMessage(row: Record<string, unknown>): InboxMessage {
     body: String(row.body ?? ""),
     messageType: String(row.message_type ?? "text"),
     deliveryStatus: String(row.delivery_status ?? ""),
-    deliveryDetail: String(row.delivery_detail ?? ""),
+    deliveryDetail,
+    mediaId: mediaIdFromDetail(deliveryDetail),
     createdBy: String(row.created_by ?? ""),
     createdAt: String(row.created_at),
   };
@@ -193,6 +199,23 @@ export async function listInboxMessages(tenantId: string, conversationId: string
     return byPhone.data.map((row) => mapInboxMessage(row as Record<string, unknown>));
   }
   return (data ?? []).map((row) => mapInboxMessage(row as Record<string, unknown>));
+}
+
+export async function getInboxMessageById(
+  tenantId: string,
+  messageId: string,
+): Promise<InboxMessage | null> {
+  const supabase = createAdminSupabase();
+  const { data, error } = await supabase
+    .from("whatsapp_messages")
+    .select(
+      "id, wa_message_id, direction, body, message_type, delivery_status, delivery_detail, created_by, created_at",
+    )
+    .eq("tenant_id", tenantId)
+    .eq("id", messageId)
+    .maybeSingle();
+  if (error || !data) return null;
+  return mapInboxMessage(data as Record<string, unknown>);
 }
 
 export async function markConversationRead(tenantId: string, conversationId: string) {

@@ -1369,6 +1369,54 @@ export function InboxScreen({
                             {mediaLabel}
                           </p>
                         ) : null}
+                        {msg.mediaId &&
+                        (msg.messageType === "image" || msg.messageType === "sticker") ? (
+                          // Proxy autenticado a Meta; next/image no aplica aquí.
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={`/panel/inbox/media/${msg.id}`}
+                            alt={msg.body || mediaLabel || "Media"}
+                            className="mb-1 max-h-56 w-full rounded-[8px] object-contain bg-black/10"
+                            loading="lazy"
+                            onClick={(event) => event.stopPropagation()}
+                          />
+                        ) : null}
+                        {msg.mediaId && msg.messageType === "audio" ? (
+                          <audio
+                            controls
+                            preload="none"
+                            className="mb-1 w-full"
+                            src={`/panel/inbox/media/${msg.id}`}
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            Audio
+                          </audio>
+                        ) : null}
+                        {msg.mediaId && msg.messageType === "video" ? (
+                          <video
+                            controls
+                            preload="none"
+                            className="mb-1 max-h-56 w-full rounded-[8px] bg-black/10"
+                            src={`/panel/inbox/media/${msg.id}`}
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            Video
+                          </video>
+                        ) : null}
+                        {msg.mediaId && msg.messageType === "document" ? (
+                          <a
+                            href={`/panel/inbox/media/${msg.id}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={cx(
+                              "mb-1 inline-flex text-[11px] font-semibold underline",
+                              msg.direction === "outbound" ? "text-on-dark/90" : "text-accent-strong",
+                            )}
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            Abrir archivo
+                          </a>
+                        ) : null}
                         <p className="whitespace-pre-wrap">{msg.body}</p>
                         {failed && msg.deliveryDetail ? (
                           <p className="mt-1 text-[11px] leading-4 text-[#fecaca]">{msg.deliveryDetail}</p>

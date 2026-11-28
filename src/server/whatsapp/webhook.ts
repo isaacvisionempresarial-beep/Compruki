@@ -16,12 +16,12 @@ type InboundMessage = {
     button_reply?: { title?: string };
     list_reply?: { title?: string };
   };
-  image?: { caption?: string };
-  document?: { caption?: string; filename?: string };
-  video?: { caption?: string };
-  audio?: unknown;
-  voice?: unknown;
-  sticker?: unknown;
+  image?: { id?: string; caption?: string };
+  document?: { id?: string; caption?: string; filename?: string };
+  video?: { id?: string; caption?: string };
+  audio?: { id?: string };
+  voice?: { id?: string };
+  sticker?: { id?: string };
   reaction?: { emoji?: string };
 };
 
@@ -54,27 +54,30 @@ type WebhookPayload = {
   }>;
 };
 
-function extractInboundBody(message: InboundMessage): { body: string; messageType: string } | null {
+function extractInboundBody(
+  message: InboundMessage,
+): { body: string; messageType: string; mediaId: string } | null {
   if (message.type === "text" && message.text?.body?.trim()) {
-    return { body: message.text.body.trim(), messageType: "text" };
+    return { body: message.text.body.trim(), messageType: "text", mediaId: "" };
   }
   if (message.type === "button" && message.button?.text?.trim()) {
-    return { body: message.button.text.trim(), messageType: "button" };
+    return { body: message.button.text.trim(), messageType: "button", mediaId: "" };
   }
   const choice =
     message.interactive?.button_reply?.title || message.interactive?.list_reply?.title;
   if (message.type === "interactive" && choice?.trim()) {
-    return { body: choice.trim(), messageType: "interactive" };
+    return { body: choice.trim(), messageType: "interactive", mediaId: "" };
   }
   if (message.type === "reaction") {
     const emoji = message.reaction?.emoji?.trim() || "👍";
-    return { body: `Reacción: ${emoji}`, messageType: "reaction" };
+    return { body: `Reacción: ${emoji}`, messageType: "reaction", mediaId: "" };
   }
   if (message.type === "image") {
     const caption = message.image?.caption?.trim();
     return {
       body: caption ? `Imagen · ${caption}` : "Imagen",
       messageType: "image",
+      mediaId: message.image?.id?.trim() || "",
     };
   }
   if (message.type === "document") {
@@ -83,6 +86,7 @@ function extractInboundBody(message: InboundMessage): { body: string; messageTyp
     return {
       body: caption || filename || "Documento",
       messageType: "document",
+      mediaId: message.document?.id?.trim() || "",
     };
   }
   if (message.type === "video") {
@@ -90,13 +94,22 @@ function extractInboundBody(message: InboundMessage): { body: string; messageTyp
     return {
       body: caption ? `Video · ${caption}` : "Video",
       messageType: "video",
+      mediaId: message.video?.id?.trim() || "",
     };
   }
   if (message.type === "audio" || message.type === "voice") {
-    return { body: "Nota de voz", messageType: "audio" };
+    return {
+      body: "Nota de voz",
+      messageType: "audio",
+      mediaId: message.audio?.id?.trim() || message.voice?.id?.trim() || "",
+    };
   }
   if (message.type === "sticker") {
-    return { body: "Sticker", messageType: "sticker" };
+    return {
+      body: "Sticker",
+      messageType: "sticker",
+      mediaId: message.sticker?.id?.trim() || "",
+    };
   }
   return null;
 }
@@ -181,6 +194,8 @@ export async function processWhatsAppWebhook(payload: WebhookPayload): Promise<{
           body: extracted.body,
           messageType: extracted.messageType,
           deliveryStatus: "received",
+          // Sin migración: el media_id de Meta vive en delivery_detail.
+          deliveryDetail: extracted.mediaId ? `media:${extracted.mediaId}` : "",
         });
         await ensureLeadFromInbound({
           tenantId,
