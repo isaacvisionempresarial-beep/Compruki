@@ -117,13 +117,55 @@ export function WhatsAppScreen({
     let approved = 0;
     let pending = 0;
     let rejected = 0;
+    let approvedEs = 0;
     for (const item of templates) {
       const status = item.status.toUpperCase();
-      if (status === "APPROVED") approved += 1;
-      else if (status === "PENDING" || status === "IN_APPEAL") pending += 1;
+      if (status === "APPROVED") {
+        approved += 1;
+        if (/^es(_|$)/i.test(item.language || "")) approvedEs += 1;
+      } else if (status === "PENDING" || status === "IN_APPEAL") pending += 1;
       else if (status === "REJECTED" || status === "DISABLED") rejected += 1;
     }
-    return { approved, pending, rejected, total: templates.length };
+    return { approved, approvedEs, pending, rejected, total: templates.length };
+  }, [templates]);
+
+  const saludoTemplate = useMemo(() => {
+    const matches = templates.filter((item) => /^saludo/i.test(item.name));
+    if (!matches.length) return null;
+    const rank = (item: (typeof matches)[number]) => {
+      const status = item.status.toUpperCase();
+      const lang = (item.language || "").toLowerCase();
+      const statusScore =
+        status === "APPROVED" ? 0 : status === "PENDING" || status === "IN_APPEAL" ? 1 : 2;
+      const langScore = lang === "es" || lang.startsWith("es_") ? 0 : lang.startsWith("en") ? 2 : 1;
+      return statusScore * 10 + langScore;
+    };
+    return [...matches].sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name))[0];
+  }, [templates]);
+
+  const sortedTemplates = useMemo(() => {
+    const langScore = (language: string) => {
+      const lang = (language || "").toLowerCase();
+      if (lang === "es" || lang.startsWith("es_")) return 0;
+      if (lang.startsWith("en")) return 2;
+      return 1;
+    };
+    const statusScore = (status: string) => {
+      const value = status.toUpperCase();
+      if (value === "APPROVED") return 0;
+      if (value === "PENDING" || value === "IN_APPEAL") return 1;
+      return 2;
+    };
+    return [...templates].sort((a, b) => {
+      const aSaludo = /^saludo/i.test(a.name) ? 0 : 1;
+      const bSaludo = /^saludo/i.test(b.name) ? 0 : 1;
+      if (aSaludo !== bSaludo) return aSaludo - bSaludo;
+      const byLang = langScore(a.language) - langScore(b.language);
+      if (byLang) return byLang;
+      const byStatus = statusScore(a.status) - statusScore(b.status);
+      if (byStatus) return byStatus;
+      return a.name.localeCompare(b.name) || a.language.localeCompare(b.language);
+    });
   }, [templates]);
 
   return (
@@ -244,6 +286,9 @@ export function WhatsAppScreen({
             {templateStats.total > 0 ? (
               <p className="mt-1 text-[11px] font-semibold text-muted">
                 {templateStats.approved} aprobada(s)
+                {templateStats.approvedEs
+                  ? ` · ${templateStats.approvedEs} ES`
+                  : " · sin ES aprobada"}
                 {templateStats.pending ? ` · ${templateStats.pending} pendiente(s)` : ""}
                 {templateStats.rejected ? ` · ${templateStats.rejected} rechazada(s)` : ""}
               </p>
@@ -255,6 +300,38 @@ export function WhatsAppScreen({
             </button>
           </form>
         </div>
+
+        {saludoTemplate ? (
+          <p
+            className={cx(
+              "mt-3 rounded-[10px] px-3 py-2 text-[12px] leading-5",
+              saludoTemplate.status.toUpperCase() === "APPROVED"
+                ? "bg-success-tint text-success"
+                : saludoTemplate.status.toUpperCase() === "REJECTED" ||
+                    saludoTemplate.status.toUpperCase() === "DISABLED"
+                  ? "bg-danger-tint text-danger"
+                  : "bg-warning-tint text-warning",
+            )}
+          >
+            Saludo · <span className="font-semibold">{saludoTemplate.name}</span> (
+            {saludoTemplate.language}) ·{" "}
+            <span className="font-semibold uppercase">{saludoTemplate.status}</span>
+            {saludoTemplate.status.toUpperCase() === "APPROVED"
+              ? " — ya puedes usarla en el Inbox fuera de ventana 24 h."
+              : saludoTemplate.status.toUpperCase() === "PENDING" ||
+                  saludoTemplate.status.toUpperCase() === "IN_APPEAL"
+                ? " — Meta aún la revisa. Actualiza la lista en un rato."
+                : saludoTemplate.rejectedReason
+                  ? ` — ${saludoTemplate.rejectedReason}`
+                  : " — revisa el motivo o envía otra en ES."}
+          </p>
+        ) : (
+          <p className="mt-3 rounded-[10px] bg-warning-tint px-3 py-2 text-[12px] leading-5 text-warning">
+            Aún no hay un <span className="font-semibold">saludo_*</span> en esta WABA. Envía{" "}
+            <span className="font-semibold">saludo_compruki</span> en ES abajo (útil fuera de ventana
+            24 h).
+          </p>
+        )}
 
         <form action={tplAction} className="mt-3 grid gap-2">
           <div className="grid gap-2 sm:grid-cols-3">
@@ -328,12 +405,14 @@ export function WhatsAppScreen({
           {listState.ok ? <p className="text-sm text-success">{listState.ok}</p> : null}
         </form>
 
-        {templates.length === 0 ? (
+        {sortedTemplates.length === 0 ? (
           <p className="mt-3 text-sm text-muted">Aún no hay plantillas en esta cuenta (o falta WABA ID).</p>
         ) : (
           <ul className="mt-3 space-y-1.5">
-            {templates.map((item) => {
+            {sortedTemplates.map((item) => {
               const status = item.status.toUpperCase();
+              const isEs = /^es(_|$)/i.test(item.language || "");
+              const isSaludo = /^saludo/i.test(item.name);
               const statusClassName =
                 status === "APPROVED"
                   ? "text-success"
@@ -343,10 +422,20 @@ export function WhatsAppScreen({
               return (
               <li
                 key={`${item.name}-${item.language}-${item.status}`}
-                className="rounded-[10px] border border-line px-3 py-2 text-sm"
+                className={cx(
+                  "rounded-[10px] border px-3 py-2 text-sm",
+                  isSaludo || (isEs && status === "APPROVED")
+                    ? "border-accent/40 bg-accent-tint/20"
+                    : "border-line",
+                )}
               >
                 <p className="font-semibold">
                   {item.name} · {item.language}
+                  {isEs ? (
+                    <span className="ml-1 rounded-[4px] bg-subtle px-1 text-[9px] font-bold text-muted">
+                      ES
+                    </span>
+                  ) : null}
                   <span
                     className={cx(
                       "ml-2 text-[11px] font-bold tracking-wide uppercase",
