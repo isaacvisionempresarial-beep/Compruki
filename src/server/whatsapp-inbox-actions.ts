@@ -54,6 +54,7 @@ export type InboxTemplateOption = {
 export type InboxActionState = {
   error: string | null;
   ok: string | null;
+  draft: string | null;
   conversations: InboxConversation[];
   activeId: string | null;
   messages: InboxMessage[];
@@ -66,6 +67,7 @@ function emptyInboxAction(error: string): InboxActionState {
   return {
     error,
     ok: null,
+    draft: null,
     conversations: [],
     activeId: null,
     messages: [],
@@ -128,6 +130,7 @@ async function pack(tenantId: string, activeId: string | null): Promise<Omit<Inb
     activeOrders: phoneContext.shown,
     activeOrderExtra: phoneContext.extra,
     activeFollowup: phoneContext.followup,
+    draft: null,
   };
 }
 
@@ -274,6 +277,7 @@ export async function signalInboxTypingAction(
   return {
     error: null,
     ok: null,
+    draft: null,
     conversations: [],
     activeId: null,
     messages: [],
@@ -281,6 +285,45 @@ export async function signalInboxTypingAction(
     activeOrderExtra: 0,
     activeFollowup: null,
   };
+}
+
+export async function draftInboxReplyAction(
+  _state: InboxActionState,
+  formData: FormData,
+): Promise<InboxActionState> {
+  const access = await requireWhatsAppAccess();
+  if (!access) return emptyInboxAction("Sin permiso WhatsApp.");
+  const conversationId = String(formData.get("conversationId") || "");
+  if (!conversationId) return emptyInboxAction("Falta la conversación.");
+  try {
+    const conversation = await getInboxConversation(access.tenantId, conversationId);
+    if (!conversation) return emptyInboxAction("Conversación no encontrada.");
+    const [messages, phoneOrders] = await Promise.all([
+      listInboxMessages(access.tenantId, conversationId, 40),
+      contextForActivePhone(conversation.phone),
+    ]);
+    const { generateInboxReplyDraft } = await import("@/server/agent-inbox-draft");
+    const draft = await generateInboxReplyDraft({
+      contactName: conversation.contactName,
+      messages,
+      orders: phoneOrders.shown,
+    });
+    const data = await pack(access.tenantId, conversationId);
+    return {
+      ...data,
+      error: null,
+      ok: draft.via === "openai" ? "Borrador IA listo (revisa antes de enviar)." : "Borrador listo (revisa antes de enviar).",
+      draft: draft.text,
+    };
+  } catch (error) {
+    const data = await pack(access.tenantId, conversationId || null);
+    return {
+      ...data,
+      error: error instanceof Error ? error.message : "No se pudo armar el borrador.",
+      ok: null,
+      draft: null,
+    };
+  }
 }
 
 export async function sendInboxMessageAction(

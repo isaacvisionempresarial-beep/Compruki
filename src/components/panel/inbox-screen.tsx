@@ -30,6 +30,7 @@ import {
 import {
   assignInboxConversationAction,
   createFollowupFromInboxAction,
+  draftInboxReplyAction,
   markAllInboxReadAction,
   openInboxByPhoneAction,
   renameInboxContactAction,
@@ -46,6 +47,7 @@ import type { InboxConversation, InboxMessage } from "@/server/whatsapp-inbox";
 const empty: InboxActionState = {
   error: null,
   ok: null,
+  draft: null,
   conversations: [],
   activeId: null,
   messages: [],
@@ -144,6 +146,7 @@ export function InboxScreen({
   const [readState, readAction, markingRead] = useActionState(markAllInboxReadAction, empty);
   const [renameState, renameAction, renaming] = useActionState(renameInboxContactAction, empty);
   const [, typingAction] = useActionState(signalInboxTypingAction, empty);
+  const [draftState, draftAction, drafting] = useActionState(draftInboxReplyAction, empty);
   const [filter, setFilter] = useState<FilterId>(initialFilter);
   const [stageFilter, setStageFilter] = useState<StageFilter>("all");
   const [query, setQuery] = useState("");
@@ -645,11 +648,21 @@ export function InboxScreen({
   }, [sendState.ok, sendState.messages.length]);
 
   useEffect(() => {
+    const text = draftState.draft?.trim();
+    if (!text) return;
+    setDraft(text);
+    window.requestAnimationFrame(() => {
+      composerRef.current?.focus({ preventScroll: true });
+    });
+  }, [draftState.draft, draftState.ok]);
+
+  useEffect(() => {
     setDraft("");
   }, [activeId, composerKey]);
 
   const feedbackError =
     sendState.error ||
+    draftState.error ||
     bootError ||
     openState.error ||
     stageState.error ||
@@ -660,6 +673,7 @@ export function InboxScreen({
     selectState.error;
   const feedbackOk =
     sendState.ok ||
+    draftState.ok ||
     openState.ok ||
     stageState.ok ||
     assignState.ok ||
@@ -1550,6 +1564,21 @@ export function InboxScreen({
                   <input type="hidden" name="conversationId" value={active.id} />
                   {withinCustomerWindow ? (
                     <div className="flex gap-1 overflow-x-auto pb-0.5">
+                      <button
+                        type="button"
+                        disabled={drafting}
+                        className="shrink-0 rounded-[6px] border border-line bg-canvas px-2 py-1 text-[11px] font-semibold text-ink hover:bg-subtle disabled:opacity-50"
+                        title="Arma un borrador (IA si hay clave; si no, plantilla). No envía solo."
+                        onClick={() => {
+                          const fd = new FormData();
+                          fd.set("conversationId", active.id);
+                          startTransition(() => {
+                            draftAction(fd);
+                          });
+                        }}
+                      >
+                        {drafting ? "…" : "Borrador"}
+                      </button>
                       {shownOrders[0] ? (
                         <button
                           type="button"
