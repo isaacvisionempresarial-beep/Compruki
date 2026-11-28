@@ -703,6 +703,11 @@ export function InboxScreen({
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.key === "Escape" && arrivalNotice) {
+        event.preventDefault();
+        setArrivalNotice(null);
+        return;
+      }
       const goNext = event.key === "]" || event.code === "BracketRight";
       const goPrev = event.key === "[" || event.code === "BracketLeft";
       if (!goNext && !goPrev) return;
@@ -720,7 +725,16 @@ export function InboxScreen({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [nextReply, prevReply, replyFilter, conversations, actorUserId, selectAction, assignAction]);
+  }, [
+    arrivalNotice,
+    nextReply,
+    prevReply,
+    replyFilter,
+    conversations,
+    actorUserId,
+    selectAction,
+    assignAction,
+  ]);
 
   if (!tableReady) {
     return (
@@ -841,7 +855,8 @@ export function InboxScreen({
           <button
             type="button"
             className={btn}
-            aria-label="Cerrar aviso"
+            aria-label="Cerrar aviso (Esc)"
+            title="Cerrar (Esc)"
             onClick={() => setArrivalNotice(null)}
           >
             ×
@@ -1449,7 +1464,19 @@ export function InboxScreen({
                     <p className="text-[11px] leading-4 text-danger">{sendState.error}</p>
                   ) : null}
                   {sendState.ok ? (
-                    <p className="text-[11px] leading-4 text-success">{sendState.ok}</p>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <p className="text-[11px] leading-4 text-success">{sendState.ok}</p>
+                      {nextReply && nextReply.id !== activeId ? (
+                        <button
+                          type="button"
+                          className={btnDark}
+                          title="Abrir el siguiente de la cola (tecla ])"
+                          onClick={openNextReply}
+                        >
+                          Sig. en cola
+                        </button>
+                      ) : null}
+                    </div>
                   ) : null}
                   <details className="text-xs text-muted" open={!withinCustomerWindow}>
                     <summary className="cursor-pointer font-semibold hover:text-ink">
