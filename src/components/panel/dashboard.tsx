@@ -175,6 +175,12 @@ export function Dashboard({
           tone: ops.awaitingReply > 0 ? "warn" : "ok",
         },
         {
+          label: "Ventana <2h",
+          value: ops.urgentWindow,
+          href: "/panel/inbox?f=awaiting",
+          tone: ops.urgentWindow > 0 ? "danger" : "ok",
+        },
+        {
           label: "CRM abiertos",
           value: ops.openFollowups,
           href: "/panel/clientes?f=all",
