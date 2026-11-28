@@ -27,7 +27,8 @@ export default async function InboxPage({
     filterRaw === "unassigned" ||
     filterRaw === "unread" ||
     filterRaw === "awaiting" ||
-    filterRaw === "urgent"
+    filterRaw === "urgent" ||
+    filterRaw === "template"
       ? filterRaw
       : "all";
   const data = await loadInboxPanelData({

@@ -9,6 +9,7 @@ export type OpsSnapshot = {
   myChats: number;
   awaitingReply: number;
   urgentWindow: number;
+  needsTemplate: number;
   openFollowups: number;
   overdueFollowups: number;
   highFollowups: number;
@@ -46,6 +47,12 @@ export async function getOpsSnapshot(tenantId: string, actorUserId: string): Pro
       if (!Number.isFinite(at)) return false;
       const left = at + WINDOW_MS - now;
       return left > 0 && left < URGENT_LEFT_MS;
+    }).length,
+    needsTemplate: awaiting.filter((item) => {
+      if (!item.lastMessageAt) return false;
+      const at = new Date(item.lastMessageAt).getTime();
+      if (!Number.isFinite(at)) return false;
+      return at + WINDOW_MS - now <= 0;
     }).length,
     openFollowups: followups.length,
     overdueFollowups: followups.filter((task) => task.dueAt && task.dueAt.slice(0, 10) < today).length,

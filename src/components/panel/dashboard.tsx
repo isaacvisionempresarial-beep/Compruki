@@ -181,6 +181,12 @@ export function Dashboard({
           tone: ops.urgentWindow > 0 ? "danger" : "ok",
         },
         {
+          label: "Necesita plantilla",
+          value: ops.needsTemplate,
+          href: "/panel/inbox?f=template",
+          tone: ops.needsTemplate > 0 ? "warn" : "ok",
+        },
+        {
           label: "CRM abiertos",
           value: ops.openFollowups,
           href: "/panel/clientes?f=all",

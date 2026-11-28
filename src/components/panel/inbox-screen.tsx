@@ -34,7 +34,7 @@ const empty: InboxActionState = {
   messages: [],
 };
 
-type FilterId = "all" | "mine" | "unassigned" | "unread" | "awaiting" | "urgent";
+type FilterId = "all" | "mine" | "unassigned" | "unread" | "awaiting" | "urgent" | "template";
 type StageFilter = "all" | FollowupStageId;
 
 const ctrl =
@@ -338,6 +338,7 @@ export function InboxScreen({
     let unread = 0;
     let awaiting = 0;
     let urgent = 0;
+    let template = 0;
     const now = Date.now();
     for (const item of conversations) {
       if (item.assignedTo === actorUserId) mine += 1;
@@ -346,7 +347,8 @@ export function InboxScreen({
       if (item.lastDirection === "inbound" && item.status !== "closed") {
         awaiting += 1;
         const left = item.lastMessageAt ? formatWindowLeft(item.lastMessageAt, now) : null;
-        if (left?.urgent && left.leftMs > 0) urgent += 1;
+        if (left && left.leftMs <= 0) template += 1;
+        else if (left?.urgent && left.leftMs > 0) urgent += 1;
       }
     }
     return {
@@ -356,6 +358,7 @@ export function InboxScreen({
       unread,
       awaiting,
       urgent,
+      template,
     } satisfies Record<FilterId, number>;
   }, [conversations, actorUserId]);
 
@@ -379,8 +382,19 @@ export function InboxScreen({
     [awaitingQueue, nowTick],
   );
 
-  const replyQueue = filter === "urgent" ? urgentQueue : awaitingQueue;
-  const replyFilter: FilterId = filter === "urgent" ? "urgent" : "awaiting";
+  const templateQueue = useMemo(
+    () =>
+      awaitingQueue.filter((item) => {
+        const left = item.lastMessageAt ? formatWindowLeft(item.lastMessageAt, nowTick) : null;
+        return Boolean(left && left.leftMs <= 0);
+      }),
+    [awaitingQueue, nowTick],
+  );
+
+  const replyQueue =
+    filter === "urgent" ? urgentQueue : filter === "template" ? templateQueue : awaitingQueue;
+  const replyFilter: FilterId =
+    filter === "urgent" ? "urgent" : filter === "template" ? "template" : "awaiting";
 
   const nextReply = useMemo(() => {
     if (!replyQueue.length) return null;
@@ -466,12 +480,17 @@ export function InboxScreen({
         const left = item.lastMessageAt ? formatWindowLeft(item.lastMessageAt, now) : null;
         if (!left?.urgent || left.leftMs <= 0) return false;
       }
+      if (filter === "template") {
+        if (item.lastDirection !== "inbound" || item.status === "closed") return false;
+        const left = item.lastMessageAt ? formatWindowLeft(item.lastMessageAt, now) : null;
+        if (!left || left.leftMs > 0) return false;
+      }
       if (stageFilter !== "all" && item.pipelineStage !== stageFilter) return false;
       if (!q) return true;
       const hay = `${item.contactName} ${item.phone} ${item.lastMessagePreview}`.toLowerCase();
       return hay.includes(q) || item.phone.replace(/\D/g, "").includes(q.replace(/\D/g, ""));
     });
-    if (filter !== "awaiting" && filter !== "urgent") return list;
+    if (filter !== "awaiting" && filter !== "urgent" && filter !== "template") return list;
     // Más urgente primero: menos tiempo de ventana 24 h.
     return [...list].sort((a, b) => (a.lastMessageAt || "").localeCompare(b.lastMessageAt || ""));
   }, [conversations, filter, stageFilter, actorUserId, query, nowTick]);
@@ -645,7 +664,9 @@ export function InboxScreen({
                 title={
                   replyFilter === "urgent"
                     ? "Anterior ventana <2 h (tecla [)"
-                    : "Anterior por responder (tecla [)"
+                    : replyFilter === "template"
+                      ? "Anterior que necesita plantilla (tecla [)"
+                      : "Anterior por responder (tecla [)"
                 }
                 disabled={!prevReply || replyQueue.length < 2}
                 onClick={openPrevReply}
@@ -658,11 +679,17 @@ export function InboxScreen({
                 title={
                   replyFilter === "urgent"
                     ? "Siguiente ventana <2 h (tecla ])"
-                    : "Siguiente por responder (tecla ])"
+                    : replyFilter === "template"
+                      ? "Siguiente que necesita plantilla (tecla ])"
+                      : "Siguiente por responder (tecla ])"
                 }
                 onClick={openNextReply}
               >
-                {replyFilter === "urgent" ? "Sig. <2h" : "Sig. Resp."}
+                {replyFilter === "urgent"
+                  ? "Sig. <2h"
+                  : replyFilter === "template"
+                    ? "Sig. Plant."
+                    : "Sig. Resp."}
                 {replyQueue.length > 1 ? ` (${replyQueue.length})` : ""}
               </button>
             </div>
@@ -774,6 +801,7 @@ export function InboxScreen({
                   ["unread", "Nuevos", "No leídos"],
                   ["awaiting", "Resp.", "Por responder"],
                   ["urgent", "<2h", "Ventana por cerrar (<2 h)"],
+                  ["template", "Plant.", "Ventana cerrada — solo plantilla Meta"],
                 ] as const
               ).map(([id, label, title]) => {
                 const count = filterCounts[id];
@@ -790,10 +818,14 @@ export function InboxScreen({
                       filter === id
                         ? id === "urgent"
                           ? "bg-danger text-canvas"
-                          : "bg-ink text-canvas"
+                          : id === "template"
+                            ? "bg-warning text-canvas"
+                            : "bg-ink text-canvas"
                         : id === "urgent" && count > 0
                           ? "bg-danger-tint text-danger"
-                          : "bg-subtle text-muted hover:text-ink",
+                          : id === "template" && count > 0
+                            ? "bg-warning-tint text-warning"
+                            : "bg-subtle text-muted hover:text-ink",
                     )}
                   >
                     <span className="text-[9px] font-semibold">{label}</span>
