@@ -90,6 +90,7 @@ export function InboxScreen({
     name: string;
     preview: string;
   } | null>(null);
+  const [notifyOffer, setNotifyOffer] = useState(false);
   const prevUnreadRef = useRef<number | null>(null);
   const activeStampRef = useRef("");
   const prevActiveForStampRef = useRef<string | null>(null);
@@ -99,6 +100,11 @@ export function InboxScreen({
     if (!defaultTemplateKey) return;
     setTemplateKey((current) => current || defaultTemplateKey);
   }, [defaultTemplateKey]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !("Notification" in window)) return;
+    setNotifyOffer(Notification.permission === "default");
+  }, []);
 
   useEffect(() => {
     const id = window.setInterval(() => setNowTick(Date.now()), 60_000);
@@ -293,11 +299,31 @@ export function InboxScreen({
       .filter((item) => item.unreadCount > 0 && item.id !== activeId)
       .sort((a, b) => (b.lastMessageAt || "").localeCompare(a.lastMessageAt || ""))[0];
     if (!candidate) return;
-    setArrivalNotice({
+    const notice = {
       id: candidate.id,
       name: candidate.contactName || candidate.phone,
       preview: candidate.lastMessagePreview || "Nuevo mensaje",
-    });
+    };
+    setArrivalNotice(notice);
+    if (
+      typeof window !== "undefined" &&
+      "Notification" in window &&
+      Notification.permission === "granted" &&
+      document.visibilityState !== "visible"
+    ) {
+      try {
+        const desktop = new Notification(`Compruki · ${notice.name}`, {
+          body: notice.preview.slice(0, 120),
+          tag: `inbox-${notice.id}`,
+        });
+        desktop.onclick = () => {
+          window.focus();
+          desktop.close();
+        };
+      } catch {
+        // Algunos navegadores bloquean Notification sin gesto previo.
+      }
+    }
   }, [unreadTotal, conversations, activeId]);
 
   useEffect(() => {
@@ -505,9 +531,25 @@ export function InboxScreen({
           <h1 className="text-xl leading-6 font-extrabold tracking-tight">Inbox WhatsApp</h1>
           <p className="text-xs text-muted">Meta · CRM · {roleLabel}</p>
         </div>
-        <Link href="/panel/whatsapp" className={btn}>
-          Conexión
-        </Link>
+        <div className="flex items-center gap-1.5">
+          {notifyOffer ? (
+            <button
+              type="button"
+              className={btn}
+              title="Avisos del sistema cuando llegue un mensaje y esta pestaña esté oculta"
+              onClick={() => {
+                void Notification.requestPermission().then((result) => {
+                  setNotifyOffer(result === "default");
+                });
+              }}
+            >
+              Activar avisos
+            </button>
+          ) : null}
+          <Link href="/panel/whatsapp" className={btn}>
+            Conexión
+          </Link>
+        </div>
       </div>
 
       {feedbackError && !sendState.error ? (
