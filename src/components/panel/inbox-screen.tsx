@@ -370,19 +370,31 @@ export function InboxScreen({
     [conversations],
   );
 
-  const nextAwaiting = useMemo(() => {
-    if (!awaitingQueue.length) return null;
-    const currentIndex = awaitingQueue.findIndex((item) => item.id === activeId);
-    if (currentIndex < 0) return awaitingQueue[0];
-    return awaitingQueue[(currentIndex + 1) % awaitingQueue.length] ?? null;
-  }, [awaitingQueue, activeId]);
+  const urgentQueue = useMemo(
+    () =>
+      awaitingQueue.filter((item) => {
+        const left = item.lastMessageAt ? formatWindowLeft(item.lastMessageAt, nowTick) : null;
+        return Boolean(left?.urgent && left.leftMs > 0);
+      }),
+    [awaitingQueue, nowTick],
+  );
 
-  const prevAwaiting = useMemo(() => {
-    if (!awaitingQueue.length) return null;
-    const currentIndex = awaitingQueue.findIndex((item) => item.id === activeId);
-    if (currentIndex < 0) return awaitingQueue[awaitingQueue.length - 1] ?? null;
-    return awaitingQueue[(currentIndex - 1 + awaitingQueue.length) % awaitingQueue.length] ?? null;
-  }, [awaitingQueue, activeId]);
+  const replyQueue = filter === "urgent" ? urgentQueue : awaitingQueue;
+  const replyFilter: FilterId = filter === "urgent" ? "urgent" : "awaiting";
+
+  const nextReply = useMemo(() => {
+    if (!replyQueue.length) return null;
+    const currentIndex = replyQueue.findIndex((item) => item.id === activeId);
+    if (currentIndex < 0) return replyQueue[0];
+    return replyQueue[(currentIndex + 1) % replyQueue.length] ?? null;
+  }, [replyQueue, activeId]);
+
+  const prevReply = useMemo(() => {
+    if (!replyQueue.length) return null;
+    const currentIndex = replyQueue.findIndex((item) => item.id === activeId);
+    if (currentIndex < 0) return replyQueue[replyQueue.length - 1] ?? null;
+    return replyQueue[(currentIndex - 1 + replyQueue.length) % replyQueue.length] ?? null;
+  }, [replyQueue, activeId]);
 
   function openConversation(conversationId: string) {
     const fd = new FormData();
@@ -400,19 +412,19 @@ export function InboxScreen({
     });
   }
 
-  function openAwaiting(conversationId: string) {
-    setFilter("awaiting");
+  function openReply(conversationId: string) {
+    setFilter(replyFilter);
     openConversation(conversationId);
   }
 
-  function openNextAwaiting() {
-    if (!nextAwaiting) return;
-    openAwaiting(nextAwaiting.id);
+  function openNextReply() {
+    if (!nextReply) return;
+    openReply(nextReply.id);
   }
 
-  function openPrevAwaiting() {
-    if (!prevAwaiting) return;
-    openAwaiting(prevAwaiting.id);
+  function openPrevReply() {
+    if (!prevReply) return;
+    openReply(prevReply.id);
   }
 
   useEffect(() => {
@@ -596,15 +608,15 @@ export function InboxScreen({
           return;
         }
       }
-      const targetChat = goNext ? nextAwaiting : prevAwaiting;
+      const targetChat = goNext ? nextReply : prevReply;
       if (!targetChat) return;
       event.preventDefault();
-      setFilter("awaiting");
+      setFilter(replyFilter);
       openConversation(targetChat.id);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [nextAwaiting, prevAwaiting, selectAction]);
+  }, [nextReply, prevReply, replyFilter, selectAction]);
 
   if (!tableReady) {
     return (
@@ -625,25 +637,33 @@ export function InboxScreen({
           <p className="text-xs text-muted">Meta · CRM · {roleLabel}</p>
         </div>
         <div className="flex items-center gap-1.5">
-          {awaitingQueue.length > 0 ? (
+          {replyQueue.length > 0 ? (
             <div className="flex items-center gap-1">
               <button
                 type="button"
                 className={btn}
-                title="Anterior por responder (tecla [)"
-                disabled={!prevAwaiting || awaitingQueue.length < 2}
-                onClick={openPrevAwaiting}
+                title={
+                  replyFilter === "urgent"
+                    ? "Anterior ventana <2 h (tecla [)"
+                    : "Anterior por responder (tecla [)"
+                }
+                disabled={!prevReply || replyQueue.length < 2}
+                onClick={openPrevReply}
               >
                 Ant.
               </button>
               <button
                 type="button"
                 className={btnDark}
-                title="Siguiente por responder (tecla ])"
-                onClick={openNextAwaiting}
+                title={
+                  replyFilter === "urgent"
+                    ? "Siguiente ventana <2 h (tecla ])"
+                    : "Siguiente por responder (tecla ])"
+                }
+                onClick={openNextReply}
               >
-                Sig. Resp.
-                {filterCounts.awaiting > 1 ? ` (${filterCounts.awaiting})` : ""}
+                {replyFilter === "urgent" ? "Sig. <2h" : "Sig. Resp."}
+                {replyQueue.length > 1 ? ` (${replyQueue.length})` : ""}
               </button>
             </div>
           ) : null}
