@@ -587,6 +587,7 @@ export function InboxScreen({
   }, [templateKey, selectedTemplate?.body, active?.contactName, templatePositions]);
 
   const threadRef = useRef<HTMLDivElement>(null);
+  const composerRef = useRef<HTMLTextAreaElement>(null);
   const [composerKey, setComposerKey] = useState(0);
   const [draft, setDraft] = useState("");
   const [showFailed, setShowFailed] = useState(false);
@@ -674,6 +675,13 @@ export function InboxScreen({
     return { open: true, leftLabel, urgent: leftMs < 2 * 3_600_000 };
   }, [messages, nowTick]);
   const withinCustomerWindow = customerWindow.open;
+
+  useEffect(() => {
+    if (!withinCustomerWindow) return;
+    const el = composerRef.current;
+    if (!el || el.disabled) return;
+    el.focus({ preventScroll: true });
+  }, [activeId, composerKey, withinCustomerWindow]);
 
   async function copyActivePhone() {
     if (!active?.phone) return;
@@ -832,22 +840,12 @@ export function InboxScreen({
           <button
             type="button"
             className={btnDark}
+            title="Abrir y asignarme si está libre"
             onClick={() => {
-              const fd = new FormData();
-              fd.set("conversationId", arrivalNotice.id);
-              setBundle((prev) => ({
-                ...prev,
-                ...contextAfterSwitch(prev, arrivalNotice.id),
-                activeId: arrivalNotice.id,
-                messages: [],
-                conversations: prev.conversations.map((row) =>
-                  row.id === arrivalNotice.id ? { ...row, unreadCount: 0 } : row,
-                ),
-              }));
+              const id = arrivalNotice.id;
               setArrivalNotice(null);
-              startTransition(() => {
-                selectAction(fd);
-              });
+              setFilter("awaiting");
+              openConversation(id, { claimIfFree: true });
             }}
           >
             Abrir
@@ -1432,6 +1430,7 @@ export function InboxScreen({
                   <div className="flex gap-1.5">
                     <textarea
                       key={`body-${active.id}-${composerKey}`}
+                      ref={composerRef}
                       name="body"
                       rows={1}
                       value={draft}
