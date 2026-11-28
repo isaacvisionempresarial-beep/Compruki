@@ -410,25 +410,39 @@ export function InboxScreen({
     return replyQueue[(currentIndex - 1 + replyQueue.length) % replyQueue.length] ?? null;
   }, [replyQueue, activeId]);
 
-  function openConversation(conversationId: string) {
-    const fd = new FormData();
-    fd.set("conversationId", conversationId);
+  function openConversation(conversationId: string, opts?: { claimIfFree?: boolean }) {
+    const claim =
+      Boolean(opts?.claimIfFree) &&
+      !conversations.find((row) => row.id === conversationId)?.assignedTo;
     setBundle((prev) => ({
       ...prev,
       activeId: conversationId,
       messages: prev.activeId === conversationId ? prev.messages : [],
       conversations: prev.conversations.map((row) =>
-        row.id === conversationId ? { ...row, unreadCount: 0 } : row,
+        row.id === conversationId
+          ? {
+              ...row,
+              unreadCount: 0,
+              ...(claim ? { assignedTo: actorUserId } : {}),
+            }
+          : row,
       ),
     }));
     startTransition(() => {
-      selectAction(fd);
+      const selectFd = new FormData();
+      selectFd.set("conversationId", conversationId);
+      selectAction(selectFd);
+      if (!claim) return;
+      const assignFd = new FormData();
+      assignFd.set("conversationId", conversationId);
+      assignFd.set("assignedTo", actorUserId);
+      assignAction(assignFd);
     });
   }
 
   function openReply(conversationId: string) {
     setFilter(replyFilter);
-    openConversation(conversationId);
+    openConversation(conversationId, { claimIfFree: true });
   }
 
   function openNextReply() {
@@ -627,15 +641,14 @@ export function InboxScreen({
           return;
         }
       }
-      const targetChat = goNext ? nextReply : prevReply;
-      if (!targetChat) return;
+      if (!(goNext ? nextReply : prevReply)) return;
       event.preventDefault();
-      setFilter(replyFilter);
-      openConversation(targetChat.id);
+      if (goNext) openNextReply();
+      else openPrevReply();
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [nextReply, prevReply, replyFilter, selectAction]);
+  }, [nextReply, prevReply, replyFilter, conversations, actorUserId, selectAction, assignAction]);
 
   if (!tableReady) {
     return (
@@ -663,10 +676,10 @@ export function InboxScreen({
                 className={btn}
                 title={
                   replyFilter === "urgent"
-                    ? "Anterior ventana <2 h (tecla [)"
+                    ? "Anterior ventana <2 h (tecla [); te asigna si está libre"
                     : replyFilter === "template"
-                      ? "Anterior que necesita plantilla (tecla [)"
-                      : "Anterior por responder (tecla [)"
+                      ? "Anterior que necesita plantilla (tecla [); te asigna si está libre"
+                      : "Anterior por responder (tecla [); te asigna si está libre"
                 }
                 disabled={!prevReply || replyQueue.length < 2}
                 onClick={openPrevReply}
@@ -678,10 +691,10 @@ export function InboxScreen({
                 className={btnDark}
                 title={
                   replyFilter === "urgent"
-                    ? "Siguiente ventana <2 h (tecla ])"
+                    ? "Siguiente ventana <2 h (tecla ]); te asigna si está libre"
                     : replyFilter === "template"
-                      ? "Siguiente que necesita plantilla (tecla ])"
-                      : "Siguiente por responder (tecla ])"
+                      ? "Siguiente que necesita plantilla (tecla ]); te asigna si está libre"
+                      : "Siguiente por responder (tecla ]); te asigna si está libre"
                 }
                 onClick={openNextReply}
               >
