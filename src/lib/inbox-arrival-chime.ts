@@ -1,6 +1,27 @@
+const STORAGE_KEY = "compruki.inbox.chimeMuted";
+
+export function isInboxArrivalChimeMuted() {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function setInboxArrivalChimeMuted(muted: boolean) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(STORAGE_KEY, muted ? "1" : "0");
+  } catch {
+    // private mode / bloqueo de storage
+  }
+}
+
 /** Pitido suave al llegar un mensaje (sin archivo de audio). */
 export function playInboxArrivalChime() {
   if (typeof window === "undefined") return;
+  if (isInboxArrivalChimeMuted()) return;
   const AudioCtx =
     window.AudioContext ||
     (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;

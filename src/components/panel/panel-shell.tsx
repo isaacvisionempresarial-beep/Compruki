@@ -98,7 +98,7 @@ function buildNavGroups(canManageUsers: boolean, inboxUnread: number) {
           id: "inbox",
           label: "Inbox",
           icon: "chat",
-          href: "/panel/inbox",
+          href: inboxUnread > 0 ? "/panel/inbox?f=awaiting" : "/panel/inbox",
           badge: inboxUnread > 0 ? inboxUnread : undefined,
         },
         { id: "whatsapp", label: "WhatsApp", icon: "link", href: "/panel/whatsapp" },

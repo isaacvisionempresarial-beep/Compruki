@@ -16,7 +16,11 @@ import {
 import { cx } from "@/lib/cx";
 import { formatRelativeShort, formatWindowLeft } from "@/lib/format";
 import { orderFocusHref } from "@/lib/store-order";
-import { playInboxArrivalChime } from "@/lib/inbox-arrival-chime";
+import {
+  isInboxArrivalChimeMuted,
+  playInboxArrivalChime,
+  setInboxArrivalChimeMuted,
+} from "@/lib/inbox-arrival-chime";
 import {
   fillInboxQuickReply,
   inboxMediaLabel,
@@ -153,6 +157,7 @@ export function InboxScreen({
     preview: string;
   } | null>(null);
   const [notifyOffer, setNotifyOffer] = useState(false);
+  const [chimeMuted, setChimeMuted] = useState(false);
   const prevUnreadRef = useRef<number | null>(null);
   const activeStampRef = useRef("");
   const prevActiveForStampRef = useRef<string | null>(null);
@@ -166,6 +171,10 @@ export function InboxScreen({
   useEffect(() => {
     if (typeof window === "undefined" || !("Notification" in window)) return;
     setNotifyOffer(Notification.permission === "default");
+  }, []);
+
+  useEffect(() => {
+    setChimeMuted(isInboxArrivalChimeMuted());
   }, []);
 
   useEffect(() => {
@@ -801,6 +810,23 @@ export function InboxScreen({
               </button>
             </div>
           ) : null}
+          <button
+            type="button"
+            className={btn}
+            title={
+              chimeMuted
+                ? "Activar pitido al llegar un mensaje"
+                : "Silenciar pitido al llegar un mensaje"
+            }
+            aria-pressed={chimeMuted}
+            onClick={() => {
+              const next = !chimeMuted;
+              setChimeMuted(next);
+              setInboxArrivalChimeMuted(next);
+            }}
+          >
+            {chimeMuted ? "Sonido off" : "Sonido"}
+          </button>
           {notifyOffer ? (
             <button
               type="button"
