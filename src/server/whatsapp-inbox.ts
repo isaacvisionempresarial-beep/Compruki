@@ -231,15 +231,24 @@ export async function markConversationRead(tenantId: string, conversationId: str
     .eq("tenant_id", tenantId)
     .eq("id", conversationId);
 
+  await signalWhatsAppReadReceipt(tenantId, conversationId, { typing: false });
+}
+
+/** Leído (+ opcional «escribiendo…») hacia Meta con el último wamid entrante. */
+export async function signalWhatsAppReadReceipt(
+  tenantId: string,
+  conversationId: string,
+  opts?: { typing?: boolean },
+) {
   if (!metaWaConfigured()) return;
   try {
     const messages = await listInboxMessages(tenantId, conversationId, 40);
     const lastInbound = [...messages].reverse().find((msg) => msg.direction === "inbound");
     const waId = lastInbound?.waMessageId?.trim() || "";
     if (!waId || waId.startsWith("local:") || !waId.startsWith("wamid")) return;
-    await markWhatsAppInboundRead(requireMetaWaEnv(), waId);
+    await markWhatsAppInboundRead(requireMetaWaEnv(), waId, { typing: Boolean(opts?.typing) });
   } catch {
-    // El leído local ya quedó; Meta puede fallar sin bloquear el Inbox.
+    // No bloquea el Inbox si Meta falla.
   }
 }
 

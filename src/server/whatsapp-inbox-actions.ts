@@ -14,6 +14,7 @@ import {
   probeInboxTables,
   sendInboxTemplate,
   sendInboxText,
+  signalWhatsAppReadReceipt,
   updateConversationContactName,
   updateConversationPipeline,
   type InboxConversation,
@@ -258,6 +259,28 @@ export async function selectInboxConversationAction(
   const activeId = String(formData.get("conversationId") || "") || null;
   const data = await pack(access.tenantId, activeId);
   return { error: null, ok: null, ...data };
+}
+
+/** «Escribiendo…» en el celular del cliente (throttled desde el composer). */
+export async function signalInboxTypingAction(
+  _state: InboxActionState,
+  formData: FormData,
+): Promise<InboxActionState> {
+  const access = await requireWhatsAppAccess();
+  if (!access) return emptyInboxAction("Sin permiso WhatsApp.");
+  const conversationId = String(formData.get("conversationId") || "");
+  if (!conversationId) return emptyInboxAction("Falta la conversación.");
+  await signalWhatsAppReadReceipt(access.tenantId, conversationId, { typing: true });
+  return {
+    error: null,
+    ok: null,
+    conversations: [],
+    activeId: null,
+    messages: [],
+    activeOrders: [],
+    activeOrderExtra: 0,
+    activeFollowup: null,
+  };
 }
 
 export async function sendInboxMessageAction(

@@ -35,6 +35,7 @@ import {
   renameInboxContactAction,
   selectInboxConversationAction,
   sendInboxMessageAction,
+  signalInboxTypingAction,
   updateInboxStageAction,
   type InboxActionState,
   type InboxAssignee,
@@ -142,6 +143,7 @@ export function InboxScreen({
   const [openState, openAction, opening] = useActionState(openInboxByPhoneAction, empty);
   const [readState, readAction, markingRead] = useActionState(markAllInboxReadAction, empty);
   const [renameState, renameAction, renaming] = useActionState(renameInboxContactAction, empty);
+  const [, typingAction] = useActionState(signalInboxTypingAction, empty);
   const [filter, setFilter] = useState<FilterId>(initialFilter);
   const [stageFilter, setStageFilter] = useState<StageFilter>("all");
   const [query, setQuery] = useState("");
@@ -163,6 +165,7 @@ export function InboxScreen({
   const activeStampRef = useRef("");
   const prevActiveForStampRef = useRef<string | null>(null);
   const openFromNoticeRef = useRef<(conversationId: string) => void>(() => undefined);
+  const typingSentAtRef = useRef<{ id: string; at: number } | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -701,6 +704,19 @@ export function InboxScreen({
     if (!el || el.disabled) return;
     el.focus({ preventScroll: true });
   }, [activeId, composerKey, withinCustomerWindow]);
+
+  function maybeSignalTyping() {
+    if (!activeId || !withinCustomerWindow) return;
+    const now = Date.now();
+    const prev = typingSentAtRef.current;
+    if (prev?.id === activeId && now - prev.at < 20_000) return;
+    typingSentAtRef.current = { id: activeId, at: now };
+    const fd = new FormData();
+    fd.set("conversationId", activeId);
+    startTransition(() => {
+      typingAction(fd);
+    });
+  }
 
   async function copyActivePhone() {
     if (!active?.phone) return;
@@ -1568,7 +1584,11 @@ export function InboxScreen({
                       name="body"
                       rows={1}
                       value={draft}
-                      onChange={(event) => setDraft(event.target.value)}
+                      onChange={(event) => {
+                        setDraft(event.target.value);
+                        maybeSignalTyping();
+                      }}
+                      onFocus={() => maybeSignalTyping()}
                       placeholder={
                         withinCustomerWindow
                           ? "Mensaje… (Enter envía, Shift+Enter salto)"

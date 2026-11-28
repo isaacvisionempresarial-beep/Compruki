@@ -192,14 +192,19 @@ export async function resolveWhatsAppBusinessAccountId(env: MetaWaEnv): Promise<
   return env.businessAccountId || null;
 }
 
-/** Doble check azul en el teléfono del cliente (wamid entrante). */
-export async function markWhatsAppInboundRead(env: MetaWaEnv, waMessageId: string) {
+/** Doble check azul; con `typing` también muestra «escribiendo…» (~25 s). */
+export async function markWhatsAppInboundRead(
+  env: MetaWaEnv,
+  waMessageId: string,
+  opts?: { typing?: boolean },
+) {
   const messageId = waMessageId.trim();
   if (!messageId) throw new MetaApiError(422, "Falta el message_id entrante.");
   await metaRequest(env, `${env.phoneNumberId}/messages`, "POST", {
     messaging_product: "whatsapp",
     status: "read",
     message_id: messageId,
+    ...(opts?.typing ? { typing_indicator: { type: "text" } } : {}),
   });
 }
 
