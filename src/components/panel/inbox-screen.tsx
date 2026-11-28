@@ -8,8 +8,10 @@ import {
   followupStageLabel,
   type FollowupStageId,
 } from "@/lib/crm-pipeline";
+import { normalizeCrmPhone, type PhoneOrderChip } from "@/lib/crm-contacts";
 import { cx } from "@/lib/cx";
 import { formatRelativeShort, formatWindowLeft } from "@/lib/format";
+import { orderFocusHref } from "@/lib/store-order";
 import { fillInboxQuickReply, INBOX_QUICK_REPLIES } from "@/lib/inbox-quick-replies";
 import {
   assignInboxConversationAction,
@@ -32,7 +34,41 @@ const empty: InboxActionState = {
   conversations: [],
   activeId: null,
   messages: [],
+  activeOrders: [],
+  activeOrderExtra: 0,
 };
+
+type InboxBundle = {
+  conversations: InboxConversation[];
+  activeId: string | null;
+  messages: InboxMessage[];
+  activeOrders: PhoneOrderChip[];
+  activeOrderExtra: number;
+  ordersForId: string | null;
+};
+
+function bundleFromAction(prev: InboxBundle, state: InboxActionState, mode: "always" | "keep"): InboxBundle {
+  const useThread = mode === "always" || Boolean(state.activeId);
+  return {
+    conversations: state.conversations.length ? state.conversations : prev.conversations,
+    activeId: mode === "always" ? state.activeId : state.activeId || prev.activeId,
+    messages: useThread ? state.messages : prev.messages,
+    activeOrders: useThread ? state.activeOrders : prev.activeOrders,
+    activeOrderExtra: useThread ? state.activeOrderExtra : prev.activeOrderExtra,
+    ordersForId: useThread ? state.activeId : prev.ordersForId,
+  };
+}
+
+function ordersAfterSwitch(prev: InboxBundle, conversationId: string) {
+  if (prev.activeId === conversationId) {
+    return {
+      activeOrders: prev.activeOrders,
+      activeOrderExtra: prev.activeOrderExtra,
+      ordersForId: prev.ordersForId,
+    };
+  }
+  return { activeOrders: [] as PhoneOrderChip[], activeOrderExtra: 0, ordersForId: null as string | null };
+}
 
 type FilterId = "all" | "mine" | "unassigned" | "unread" | "awaiting" | "urgent" | "template";
 type StageFilter = "all" | FollowupStageId;
@@ -51,6 +87,8 @@ export function InboxScreen({
   initialConversations,
   initialActiveId,
   initialMessages,
+  initialActiveOrders = [],
+  initialActiveOrderExtra = 0,
   assignees,
   templates = [],
   actorUserId,
@@ -62,6 +100,8 @@ export function InboxScreen({
   initialConversations: InboxConversation[];
   initialActiveId: string | null;
   initialMessages: InboxMessage[];
+  initialActiveOrders?: PhoneOrderChip[];
+  initialActiveOrderExtra?: number;
   assignees: InboxAssignee[];
   templates?: InboxTemplateOption[];
   actorUserId: string;
@@ -139,82 +179,53 @@ export function InboxScreen({
   }, [templatePositions, templateVarValues]);
 
   // Última acción gana: antes sendState “pegaba” el hilo y no dejaba cambiar de chat.
-  const [bundle, setBundle] = useState({
+  const [bundle, setBundle] = useState<InboxBundle>({
     conversations: initialConversations,
     activeId: initialActiveId,
     messages: initialMessages,
+    activeOrders: initialActiveOrders,
+    activeOrderExtra: initialActiveOrderExtra,
+    ordersForId: initialActiveId,
   });
 
   useEffect(() => {
     if (!selectState.activeId && !selectState.conversations.length) return;
-    setBundle((prev) => ({
-      conversations: selectState.conversations.length ? selectState.conversations : prev.conversations,
-      activeId: selectState.activeId,
-      messages: selectState.messages,
-    }));
+    setBundle((prev) => bundleFromAction(prev, selectState, "always"));
   }, [selectState]);
 
   useEffect(() => {
     if (!sendState.activeId && !sendState.ok && !sendState.error) return;
-    setBundle((prev) => ({
-      conversations: sendState.conversations.length ? sendState.conversations : prev.conversations,
-      activeId: sendState.activeId || prev.activeId,
-      messages: sendState.activeId ? sendState.messages : prev.messages,
-    }));
+    setBundle((prev) => bundleFromAction(prev, sendState, "keep"));
   }, [sendState]);
 
   useEffect(() => {
     if (!stageState.activeId && !stageState.ok && !stageState.error) return;
-    setBundle((prev) => ({
-      conversations: stageState.conversations.length ? stageState.conversations : prev.conversations,
-      activeId: stageState.activeId || prev.activeId,
-      messages: stageState.activeId ? stageState.messages : prev.messages,
-    }));
+    setBundle((prev) => bundleFromAction(prev, stageState, "keep"));
   }, [stageState]);
 
   useEffect(() => {
     if (!assignState.activeId && !assignState.ok && !assignState.error) return;
-    setBundle((prev) => ({
-      conversations: assignState.conversations.length ? assignState.conversations : prev.conversations,
-      activeId: assignState.activeId || prev.activeId,
-      messages: assignState.activeId ? assignState.messages : prev.messages,
-    }));
+    setBundle((prev) => bundleFromAction(prev, assignState, "keep"));
   }, [assignState]);
 
   useEffect(() => {
     if (!followState.activeId && !followState.ok && !followState.error) return;
-    setBundle((prev) => ({
-      conversations: followState.conversations.length ? followState.conversations : prev.conversations,
-      activeId: followState.activeId || prev.activeId,
-      messages: followState.activeId ? followState.messages : prev.messages,
-    }));
+    setBundle((prev) => bundleFromAction(prev, followState, "keep"));
   }, [followState]);
 
   useEffect(() => {
     if (!renameState.activeId && !renameState.ok && !renameState.error) return;
-    setBundle((prev) => ({
-      conversations: renameState.conversations.length ? renameState.conversations : prev.conversations,
-      activeId: renameState.activeId || prev.activeId,
-      messages: renameState.activeId ? renameState.messages : prev.messages,
-    }));
+    setBundle((prev) => bundleFromAction(prev, renameState, "keep"));
   }, [renameState]);
 
   useEffect(() => {
     if (!openState.activeId && !openState.ok && !openState.error) return;
-    setBundle((prev) => ({
-      conversations: openState.conversations.length ? openState.conversations : prev.conversations,
-      activeId: openState.activeId,
-      messages: openState.messages,
-    }));
+    setBundle((prev) => bundleFromAction(prev, openState, "always"));
   }, [openState]);
 
   useEffect(() => {
     if (!readState.ok && !readState.error && !readState.conversations.length) return;
-    setBundle((prev) => ({
-      conversations: readState.conversations.length ? readState.conversations : prev.conversations,
-      activeId: readState.activeId || prev.activeId,
-      messages: readState.activeId ? readState.messages : prev.messages,
-    }));
+    setBundle((prev) => bundleFromAction(prev, readState, "keep"));
   }, [readState]);
 
   useEffect(() => {
@@ -224,19 +235,23 @@ export function InboxScreen({
         Boolean(nextActive) &&
         (nextActive === initialActiveId ||
           initialConversations.some((item) => item.id === nextActive));
+      const useServerThread = Boolean(serverHasActive && nextActive === initialActiveId);
+      const keepLocal = !useServerThread && prev.activeId === nextActive;
       return {
         conversations: initialConversations,
         activeId: nextActive,
         // Con ?c= en URL, el refresh trae mensajes del hilo abierto.
-        messages:
-          serverHasActive && nextActive === initialActiveId
-            ? initialMessages
-            : prev.activeId === nextActive
-              ? prev.messages
-              : initialMessages,
+        messages: useServerThread ? initialMessages : keepLocal ? prev.messages : initialMessages,
+        activeOrders: useServerThread ? initialActiveOrders : keepLocal ? prev.activeOrders : initialActiveOrders,
+        activeOrderExtra: useServerThread
+          ? initialActiveOrderExtra
+          : keepLocal
+            ? prev.activeOrderExtra
+            : initialActiveOrderExtra,
+        ordersForId: useServerThread ? initialActiveId : keepLocal ? prev.ordersForId : initialActiveId,
       };
     });
-  }, [initialConversations, initialMessages, initialActiveId]);
+  }, [initialConversations, initialMessages, initialActiveId, initialActiveOrders, initialActiveOrderExtra]);
 
   // Si el chat abierto recibe algo nuevo en el poll, recarga el hilo.
   useEffect(() => {
@@ -416,6 +431,7 @@ export function InboxScreen({
       !conversations.find((row) => row.id === conversationId)?.assignedTo;
     setBundle((prev) => ({
       ...prev,
+      ...ordersAfterSwitch(prev, conversationId),
       activeId: conversationId,
       messages: prev.activeId === conversationId ? prev.messages : [],
       conversations: prev.conversations.map((row) =>
@@ -513,6 +529,10 @@ export function InboxScreen({
     () => conversations.find((item) => item.id === activeId) ?? null,
     [conversations, activeId],
   );
+  const phoneKey = active ? normalizeCrmPhone(active.phone) || active.phone : "";
+  const ordersReady = Boolean(active && bundle.ordersForId === active.id);
+  const shownOrders = ordersReady ? bundle.activeOrders : [];
+  const extraOrders = ordersReady ? bundle.activeOrderExtra : 0;
 
   useEffect(() => {
     const firstName =
@@ -751,6 +771,7 @@ export function InboxScreen({
               fd.set("conversationId", arrivalNotice.id);
               setBundle((prev) => ({
                 ...prev,
+                ...ordersAfterSwitch(prev, arrivalNotice.id),
                 activeId: arrivalNotice.id,
                 messages: [],
                 conversations: prev.conversations.map((row) =>
@@ -900,6 +921,7 @@ export function InboxScreen({
                         onClick={() =>
                           setBundle((prev) => ({
                             ...prev,
+                            ...ordersAfterSwitch(prev, item.id),
                             activeId: item.id,
                             messages: prev.activeId === item.id ? prev.messages : [],
                             conversations: prev.conversations.map((row) =>
@@ -1014,7 +1036,7 @@ export function InboxScreen({
                   )}
                   <div className="ml-auto flex shrink-0 items-center gap-2">
                     <Link
-                      href={`/panel/pedidos?q=${encodeURIComponent(active.phone)}`}
+                      href={`/panel/pedidos?q=${encodeURIComponent(phoneKey)}`}
                       className="text-[11px] font-semibold text-accent-strong hover:underline"
                       title="Ver pedidos de este celular"
                     >
@@ -1115,6 +1137,38 @@ export function InboxScreen({
                   </form>
                 </div>
               </header>
+
+              <div className="flex min-w-0 shrink-0 flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-line px-2 py-1 text-[11px] leading-4">
+                {!ordersReady ? (
+                  <span className="text-muted">…</span>
+                ) : shownOrders.length === 0 ? (
+                  <span className="text-muted">Sin pedidos con este celular</span>
+                ) : (
+                  <>
+                    {shownOrders.map((order) => (
+                      <Link
+                        key={order.number}
+                        href={orderFocusHref(order.number)}
+                        className="inline-flex min-w-0 items-baseline gap-1 truncate text-ink hover:underline"
+                        title={`${order.number} · ${order.statusLabel} · ${order.totalLabel}`}
+                      >
+                        <span className="font-semibold">{order.number}</span>
+                        <span className="truncate text-muted">{order.statusLabel}</span>
+                        <span className="shrink-0 tabular-nums text-muted">{order.totalLabel}</span>
+                      </Link>
+                    ))}
+                    {extraOrders > 0 ? (
+                      <Link
+                        href={`/panel/pedidos?q=${encodeURIComponent(phoneKey)}`}
+                        className="shrink-0 font-semibold text-muted hover:text-ink hover:underline"
+                        title="Ver el resto de pedidos de este celular"
+                      >
+                        +{extraOrders}
+                      </Link>
+                    ) : null}
+                  </>
+                )}
+              </div>
 
               <div
                 ref={threadRef}

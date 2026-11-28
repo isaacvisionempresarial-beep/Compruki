@@ -18,6 +18,7 @@ import type { OrderReading } from "@/server/agent-order-reading";
 import type { SupportResolutionDraft } from "@/server/agent-support-draft";
 import { parsePesos, sizeChoiceLabel, variantFits } from "@/lib/catalog";
 import { citiesForDepartment, listColombiaDepartments } from "@/lib/colombia-places";
+import { phonesMatchLast10 } from "@/lib/crm-contacts";
 import { blockedDropiAnswer } from "@/lib/dropi-provider";
 import { cx } from "@/lib/cx";
 import { STATUS_LABEL, STATUS_SEQUENCE, type OrderStatus } from "@/lib/demo-data";
@@ -1123,6 +1124,7 @@ function StatusFilter({
 
 function matchesOrder(order: StoreOrder, query: string, guides: SizeGuide[], priceGuides: PriceGuide[] = [], costGuides: CostGuide[] = []) {
   if (!query) return true;
+  if (phonesMatchLast10(order.phone, query)) return true;
   return [orderPriceStayNote(order, priceGuides), costDriftNote(costDrift(order, costGuides)), orderCostCopyNote(order, costGuides), priceDrift(order, priceGuides).length > 0 || costDrift(order, costGuides).length > 0 ? accountHoldNote(order.status) : "", order.number, order.customerName, order.city, order.department ?? "", order.phone, order.document ?? "", order.address, order.reference, order.providerRef ?? "", order.internalNote ?? "", order.customerReason ?? "", order.buyerNote ?? "", order.customerNotifiedAt ? "avisé" : "", order.buyerNoteSeenAt ? "leí aviso" : "", order.campaignEntry ? "campaña" : "", awaitsDropiNumber(order) || needsClosedDropiNumber(order) || needsIncidenceDropiNumber(order) ? "dropi" : "", needsDepartment(order) || needsClosedDepartment(order) ? "departamento" : "", missingSizeNote(order, guides), catalogCostQueueNote(order), collectedWithoutCost(order) ? "utilidad" : "", needsBuyerNoteReview(order) ? "aviso comprador cliente" : "", needsCustomerNotice(order) ? "avisar aviso" : "", needsIncidenceReason(order) ? "motivo incidencia" : "", needsReturnReason(order) ? "motivo devolución" : "", needsReturnFreight(order) ? "flete devolución" : "", readyToConfirm(order, guides) ? "confirmar" : "", readyToPrepare(order) ? "preparación preparar" : "", readyToDispatch(order) ? "despacho preparación" : "", ...order.lines.flatMap((line) => [line.title, line.sku, line.variant ?? ""])].some(
     (value) => value.toLocaleLowerCase("es").includes(query),
   );

@@ -19,7 +19,8 @@ import {
   type InboxConversation,
   type InboxMessage,
 } from "@/server/whatsapp-inbox";
-import { normalizeCrmPhone } from "@/lib/crm-contacts";
+import { normalizeCrmPhone, recentOrdersForPhone, type PhoneOrderChip } from "@/lib/crm-contacts";
+import { listOrders } from "@/server/order-store";
 import { advancePipelineOnOperatorOutbound, createFollowup } from "@/server/followups";
 import { listTeamMembers } from "@/server/team";
 import { metaWaConfigured, requireMetaWaEnv } from "@/server/whatsapp/env";
@@ -45,7 +46,26 @@ export type InboxActionState = {
   conversations: InboxConversation[];
   activeId: string | null;
   messages: InboxMessage[];
+  activeOrders: PhoneOrderChip[];
+  activeOrderExtra: number;
 };
+
+function emptyInboxAction(error: string): InboxActionState {
+  return {
+    error,
+    ok: null,
+    conversations: [],
+    activeId: null,
+    messages: [],
+    activeOrders: [],
+    activeOrderExtra: 0,
+  };
+}
+
+async function ordersForActivePhone(phone: string) {
+  if (normalizeCrmPhone(phone).length !== 10) return { shown: [] as PhoneOrderChip[], extra: 0 };
+  return recentOrdersForPhone(await listOrders(), phone);
+}
 
 async function requireWhatsAppAccess() {
   const access = await assertPanelAccess();
@@ -60,7 +80,11 @@ async function pack(tenantId: string, activeId: string | null): Promise<Omit<Inb
     (activeId && conversations.find((item) => item.id === activeId)?.id) ||
     conversations[0]?.id ||
     null;
-  const messages = selected ? await listInboxMessages(tenantId, selected) : [];
+  const activePhone = selected ? conversations.find((item) => item.id === selected)?.phone ?? "" : "";
+  const [messages, phoneOrders] = await Promise.all([
+    selected ? listInboxMessages(tenantId, selected) : Promise.resolve([] as InboxMessage[]),
+    activePhone ? ordersForActivePhone(activePhone) : Promise.resolve({ shown: [] as PhoneOrderChip[], extra: 0 }),
+  ]);
   if (selected) await markConversationRead(tenantId, selected).catch(() => undefined);
   return {
     // Refleja el leído al instante (mark ocurre después del list).
@@ -71,6 +95,8 @@ async function pack(tenantId: string, activeId: string | null): Promise<Omit<Inb
       : conversations,
     activeId: selected,
     messages,
+    activeOrders: phoneOrders.shown,
+    activeOrderExtra: phoneOrders.extra,
   };
 }
 
@@ -92,6 +118,8 @@ export async function loadInboxPanelData(opts?: {
       actorUserId: "",
       roleLabel: "",
       bootError: null as string | null,
+      activeOrders: [] as PhoneOrderChip[],
+      activeOrderExtra: 0,
     };
   }
   const tableReady = await probeInboxTables();
@@ -107,6 +135,8 @@ export async function loadInboxPanelData(opts?: {
       actorUserId: access.user.id,
       roleLabel: access.roleLabel,
       bootError: null,
+      activeOrders: [],
+      activeOrderExtra: 0,
     };
   }
 
@@ -192,7 +222,7 @@ export async function selectInboxConversationAction(
   formData: FormData,
 ): Promise<InboxActionState> {
   const access = await requireWhatsAppAccess();
-  if (!access) return { error: "Sin permiso WhatsApp.", ok: null, conversations: [], activeId: null, messages: [] };
+  if (!access) return emptyInboxAction("Sin permiso WhatsApp.");
   const activeId = String(formData.get("conversationId") || "") || null;
   const data = await pack(access.tenantId, activeId);
   return { error: null, ok: null, ...data };
@@ -203,7 +233,7 @@ export async function sendInboxMessageAction(
   formData: FormData,
 ): Promise<InboxActionState> {
   const access = await requireWhatsAppAccess();
-  if (!access) return { error: "Sin permiso WhatsApp.", ok: null, conversations: [], activeId: null, messages: [] };
+  if (!access) return emptyInboxAction("Sin permiso WhatsApp.");
 
   const conversationId = String(formData.get("conversationId") || "");
   // Si hay hidden + botón submit, get() puede devolver el primero; preferimos el último.
@@ -260,7 +290,7 @@ export async function assignInboxConversationAction(
   formData: FormData,
 ): Promise<InboxActionState> {
   const access = await requireWhatsAppAccess();
-  if (!access) return { error: "Sin permiso WhatsApp.", ok: null, conversations: [], activeId: null, messages: [] };
+  if (!access) return emptyInboxAction("Sin permiso WhatsApp.");
   const conversationId = String(formData.get("conversationId") || "");
   try {
     await assignConversation(access.tenantId, conversationId, String(formData.get("assignedTo") || ""));
@@ -283,7 +313,7 @@ export async function renameInboxContactAction(
   formData: FormData,
 ): Promise<InboxActionState> {
   const access = await requireWhatsAppAccess();
-  if (!access) return { error: "Sin permiso WhatsApp.", ok: null, conversations: [], activeId: null, messages: [] };
+  if (!access) return emptyInboxAction("Sin permiso WhatsApp.");
   const conversationId = String(formData.get("conversationId") || "");
   try {
     await updateConversationContactName(
@@ -309,7 +339,7 @@ export async function markAllInboxReadAction(
   _formData: FormData,
 ): Promise<InboxActionState> {
   const access = await requireWhatsAppAccess();
-  if (!access) return { error: "Sin permiso WhatsApp.", ok: null, conversations: [], activeId: null, messages: [] };
+  if (!access) return emptyInboxAction("Sin permiso WhatsApp.");
   try {
     const cleared = await markAllInboxRead(access.tenantId);
     revalidatePath("/panel/inbox");
@@ -335,7 +365,7 @@ export async function updateInboxStageAction(
   formData: FormData,
 ): Promise<InboxActionState> {
   const access = await requireWhatsAppAccess();
-  if (!access) return { error: "Sin permiso WhatsApp.", ok: null, conversations: [], activeId: null, messages: [] };
+  if (!access) return emptyInboxAction("Sin permiso WhatsApp.");
   const conversationId = String(formData.get("conversationId") || "");
   const stage = String(formData.get("stage") || "");
   const statusRaw = String(formData.get("status") || "");
@@ -369,7 +399,7 @@ export async function createFollowupFromInboxAction(
   formData: FormData,
 ): Promise<InboxActionState> {
   const access = await requireWhatsAppAccess();
-  if (!access) return { error: "Sin permiso WhatsApp.", ok: null, conversations: [], activeId: null, messages: [] };
+  if (!access) return emptyInboxAction("Sin permiso WhatsApp.");
   const conversationId = String(formData.get("conversationId") || "");
   const conversation = await getInboxConversation(access.tenantId, conversationId);
   if (!conversation) {
@@ -399,7 +429,7 @@ export async function openInboxByPhoneAction(
   formData: FormData,
 ): Promise<InboxActionState> {
   const access = await requireWhatsAppAccess();
-  if (!access) return { error: "Sin permiso WhatsApp.", ok: null, conversations: [], activeId: null, messages: [] };
+  if (!access) return emptyInboxAction("Sin permiso WhatsApp.");
   try {
     const conversation = await openConversationByPhone(
       access.tenantId,

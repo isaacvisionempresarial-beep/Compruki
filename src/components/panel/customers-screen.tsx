@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import type { CrmContact } from "@/lib/crm-contacts";
+import { phonesMatchLast10, type CrmContact } from "@/lib/crm-contacts";
 import { FOLLOWUP_OPEN_STAGES, groupFollowupsByStage } from "@/lib/crm-pipeline";
 import { cx } from "@/lib/cx";
 import { formatDay } from "@/lib/format";
@@ -81,6 +81,7 @@ export function CustomersScreen({
     if (!panelQuery) return true;
     const hay = `${name} ${phone}`.toLocaleLowerCase("es");
     if (hay.includes(panelQuery)) return true;
+    if (phonesMatchLast10(phone, panelQuery)) return true;
     if (panelDigits && phone.replace(/\D/g, "").includes(panelDigits)) return true;
     return false;
   };

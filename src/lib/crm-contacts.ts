@@ -1,4 +1,5 @@
 import { STATUS_LABEL, type OrderStatus } from "@/lib/demo-data";
+import { formatCop } from "@/lib/format";
 import type { StoreOrder } from "@/lib/store-order";
 
 export type CrmContact = {
@@ -16,6 +17,40 @@ export type CrmContact = {
 /** Normaliza teléfono para agrupar contactos de pedidos. */
 export function normalizeCrmPhone(phone: string) {
   return phone.replace(/\D/g, "").slice(-10);
+}
+
+/**
+ * Meta guarda el wa_id con 57 y los pedidos suelen ir en 10 dígitos.
+ * Coincide solo cuando ambos quedan en los mismos 10.
+ */
+export function phonesMatchLast10(left: string, right: string) {
+  const a = normalizeCrmPhone(left);
+  const b = normalizeCrmPhone(right);
+  return a.length === 10 && a === b;
+}
+
+export type PhoneOrderChip = {
+  number: string;
+  statusLabel: string;
+  totalLabel: string;
+};
+
+/** Pedidos recientes del mismo celular (últimos 10 dígitos), del más nuevo al más viejo. */
+export function recentOrdersForPhone(
+  orders: Array<Pick<StoreOrder, "number" | "phone" | "status" | "total" | "createdAt">>,
+  phone: string,
+  limit = 3,
+): { shown: PhoneOrderChip[]; extra: number } {
+  if (normalizeCrmPhone(phone).length !== 10) return { shown: [], extra: 0 };
+  const matched = orders
+    .filter((order) => phonesMatchLast10(order.phone, phone))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const shown = matched.slice(0, Math.max(0, limit)).map((order) => ({
+    number: order.number,
+    statusLabel: STATUS_LABEL[order.status] ?? order.status,
+    totalLabel: formatCop(order.total),
+  }));
+  return { shown, extra: Math.max(0, matched.length - shown.length) };
 }
 
 /**

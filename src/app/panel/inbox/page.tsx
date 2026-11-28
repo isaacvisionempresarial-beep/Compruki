@@ -42,6 +42,8 @@ export default async function InboxPage({
       initialConversations={data.conversations}
       initialActiveId={data.activeId}
       initialMessages={data.messages}
+      initialActiveOrders={data.activeOrders}
+      initialActiveOrderExtra={data.activeOrderExtra}
       assignees={data.assignees}
       templates={data.templates}
       actorUserId={data.actorUserId}
