@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { PanelShell } from "@/components/panel/panel-shell";
 import { hasPermission, requirePanelAccess } from "@/server/panel-auth";
-import { countInboxUnread } from "@/server/whatsapp-inbox";
+import { countInboxNavAttention } from "@/server/whatsapp-inbox";
 
 const panelDescription =
   "Panel de COMPRUKÍ. Catálogo, pedidos, sincronización y margen.";
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 export default async function PanelLayout({ children }: { children: ReactNode }) {
   const access = await requirePanelAccess();
   const inboxUnread = hasPermission(access, "whatsapp_manage")
-    ? await countInboxUnread(access.tenantId).catch(() => 0)
+    ? await countInboxNavAttention(access.tenantId).catch(() => 0)
     : 0;
   return (
     <PanelShell

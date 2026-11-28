@@ -111,6 +111,29 @@ export async function countInboxUnread(tenantId: string): Promise<number> {
   }
 }
 
+/** Badge del menú: lo mayor entre no leídos y chats por responder. */
+export async function countInboxNavAttention(tenantId: string): Promise<number> {
+  try {
+    const supabase = createAdminSupabase();
+    const { data, error } = await supabase
+      .from("whatsapp_conversations")
+      .select("unread_count, last_direction, status")
+      .eq("tenant_id", tenantId)
+      .order("last_message_at", { ascending: false })
+      .limit(80);
+    if (error || !data) return 0;
+    let unread = 0;
+    let awaiting = 0;
+    for (const row of data) {
+      unread += Number(row.unread_count || 0);
+      if (row.last_direction === "inbound" && row.status !== "closed") awaiting += 1;
+    }
+    return Math.max(unread, awaiting);
+  } catch {
+    return 0;
+  }
+}
+
 export async function listInboxConversations(tenantId: string, limit = 80): Promise<InboxConversation[]> {
   const supabase = createAdminSupabase();
   const { data, error } = await supabase

@@ -1311,17 +1311,16 @@ export function InboxScreen({
                     );
                     const mediaLabel = inboxMediaLabel(msg.messageType);
                     const copied = copiedMsgId === msg.id;
-                    return (
+                    const bubble = (
                       <button
                         type="button"
-                        key={msg.id}
                         className={cx(
-                          "block max-w-[min(88%,26rem)] rounded-[10px] px-2.5 py-1.5 text-left text-[13px] leading-snug",
+                          "block w-full max-w-[min(88%,26rem)] rounded-[10px] px-2.5 py-1.5 text-left text-[13px] leading-snug",
                           msg.direction === "outbound"
                             ? failed
-                              ? "ml-auto bg-[#7f1d1d] text-on-dark"
-                              : "ml-auto bg-primary text-on-dark"
-                            : "mr-auto bg-card text-ink shadow-[0_0_0_1px_var(--color-line)]",
+                              ? "bg-[#7f1d1d] text-on-dark"
+                              : "bg-primary text-on-dark"
+                            : "bg-card text-ink shadow-[0_0_0_1px_var(--color-line)]",
                         )}
                         title={copied ? "Copiado" : "Clic para copiar"}
                         onClick={() => void copyMessageBody(msg.id, msg.body)}
@@ -1368,6 +1367,43 @@ export function InboxScreen({
                           ) : null}
                         </p>
                       </button>
+                    );
+                    if (!failed) {
+                      return (
+                        <div
+                          key={msg.id}
+                          className={cx(
+                            "max-w-[min(88%,26rem)]",
+                            msg.direction === "outbound" ? "ml-auto" : "mr-auto",
+                          )}
+                        >
+                          {bubble}
+                        </div>
+                      );
+                    }
+                    return (
+                      <div key={msg.id} className="ml-auto flex max-w-[min(88%,26rem)] flex-col items-end gap-1">
+                        {bubble}
+                        {withinCustomerWindow && msg.body.trim() ? (
+                          <button
+                            type="button"
+                            className={btn}
+                            title="Poner el texto fallido en el composer para reenviar"
+                            onClick={() => {
+                              setDraft(msg.body);
+                              window.requestAnimationFrame(() => {
+                                composerRef.current?.focus({ preventScroll: true });
+                              });
+                            }}
+                          >
+                            Reenviar
+                          </button>
+                        ) : (
+                          <p className="text-[10px] text-muted">
+                            Ventana cerrada: usa plantilla Meta para reintentar.
+                          </p>
+                        )}
+                      </div>
                     );
                   })
                 )}
