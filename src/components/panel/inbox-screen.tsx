@@ -158,6 +158,7 @@ export function InboxScreen({
   } | null>(null);
   const [notifyOffer, setNotifyOffer] = useState(false);
   const [chimeMuted, setChimeMuted] = useState(false);
+  const [brokenMediaIds, setBrokenMediaIds] = useState<Record<string, true>>({});
   const prevUnreadRef = useRef<number | null>(null);
   const activeStampRef = useRef("");
   const prevActiveForStampRef = useRef<string | null>(null);
@@ -627,6 +628,7 @@ export function InboxScreen({
     setShowFailed(false);
     setPhoneCopied(false);
     setCopiedMsgId(null);
+    setBrokenMediaIds({});
   }, [activeId]);
 
   useEffect(() => {
@@ -1371,15 +1373,29 @@ export function InboxScreen({
                         ) : null}
                         {msg.mediaId &&
                         (msg.messageType === "image" || msg.messageType === "sticker") ? (
-                          // Proxy autenticado a Meta; next/image no aplica aquí.
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={`/panel/inbox/media/${msg.id}`}
-                            alt={msg.body || mediaLabel || "Media"}
-                            className="mb-1 max-h-56 w-full rounded-[8px] object-contain bg-black/10"
-                            loading="lazy"
-                            onClick={(event) => event.stopPropagation()}
-                          />
+                          brokenMediaIds[msg.id] ? (
+                            <p
+                              className={cx(
+                                "mb-1 text-[11px]",
+                                msg.direction === "outbound" ? "text-on-dark/70" : "text-muted",
+                              )}
+                            >
+                              Media no disponible (Meta lo borra ~7 días si no se abrió antes).
+                            </p>
+                          ) : (
+                            // Proxy autenticado (cache local + Meta); next/image no aplica aquí.
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={`/panel/inbox/media/${msg.id}`}
+                              alt={msg.body || mediaLabel || "Media"}
+                              className="mb-1 max-h-56 w-full rounded-[8px] object-contain bg-black/10"
+                              loading="lazy"
+                              onClick={(event) => event.stopPropagation()}
+                              onError={() =>
+                                setBrokenMediaIds((prev) => ({ ...prev, [msg.id]: true }))
+                              }
+                            />
+                          )
                         ) : null}
                         {msg.mediaId && msg.messageType === "audio" ? (
                           <audio
