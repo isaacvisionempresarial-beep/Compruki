@@ -58,6 +58,17 @@ function statusClass(status: WhatsAppConnectionState["status"]) {
   }
 }
 
+const card = "elevate-1 mt-2 rounded-[12px] border border-line bg-card px-2.5 py-2";
+const ctrl =
+  "h-7 w-full rounded-[6px] border border-line bg-canvas px-2 text-[11px] text-ink outline-none focus:border-ink";
+const area =
+  "w-full rounded-[6px] border border-line bg-canvas px-2 py-1.5 text-[11px] text-ink outline-none focus:border-ink";
+const btn =
+  "inline-flex h-7 shrink-0 items-center justify-center rounded-[6px] border border-line bg-card px-2 text-[11px] font-semibold text-ink hover:bg-subtle disabled:opacity-50";
+const btnDark =
+  "inline-flex h-7 shrink-0 items-center justify-center rounded-[6px] bg-ink px-2.5 text-[11px] font-semibold text-canvas disabled:opacity-50";
+const labelCap = "text-[10px] font-bold tracking-[0.08em] text-muted uppercase";
+
 export function WhatsAppScreen({
   connection: initialConnection,
   recent: initialRecent,
@@ -275,34 +286,27 @@ export function WhatsAppScreen({
         </div>
       </section>
 
-      <section
-        className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3"
-        aria-labelledby="wa-plantillas"
-      >
+      <section className={card} aria-labelledby="wa-plantillas">
         <div className="flex flex-wrap items-start justify-between gap-2">
-          <div>
-            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Plantillas</p>
+          <div className="min-w-0">
+            <p className={labelCap}>Plantillas</p>
             <h2 id="wa-plantillas" className="mt-0.5 text-sm font-semibold">
-              Enviar a aprobación de Meta
+              Enviar a aprobación
             </h2>
-            <p className="mt-1 text-xs leading-5 text-muted">
-              Misma lógica que ConextaIA: se crea en la WABA y Meta la revisa. Cuando esté APPROVED,
-              úsala en el Inbox.
+            <p className="mt-0.5 text-[11px] leading-4 text-muted">
+              Meta revisa y, si queda APPROVED, se usa en el Inbox.
+              {templateStats.total > 0
+                ? ` · ${templateStats.approved} OK${
+                    templateStats.approvedEs ? ` (${templateStats.approvedEs} ES)` : " · sin ES"
+                  }${templateStats.pending ? ` · ${templateStats.pending} pend.` : ""}${
+                    templateStats.rejected ? ` · ${templateStats.rejected} rech.` : ""
+                  }`
+                : ""}
             </p>
-            {templateStats.total > 0 ? (
-              <p className="mt-1 text-[11px] font-semibold text-muted">
-                {templateStats.approved} aprobada(s)
-                {templateStats.approvedEs
-                  ? ` · ${templateStats.approvedEs} ES`
-                  : " · sin ES aprobada"}
-                {templateStats.pending ? ` · ${templateStats.pending} pendiente(s)` : ""}
-                {templateStats.rejected ? ` · ${templateStats.rejected} rechazada(s)` : ""}
-              </p>
-            ) : null}
           </div>
           <form action={listAction}>
-            <button type="submit" disabled={listing || !connection.env.ready} className="rounded-[10px] border border-line bg-canvas px-3 py-2 text-xs font-semibold disabled:opacity-50">
-              {listing ? "…" : "Actualizar lista"}
+            <button type="submit" disabled={listing || !connection.env.ready} className={btn}>
+              {listing ? "…" : "Actualizar"}
             </button>
           </form>
         </div>
@@ -310,7 +314,7 @@ export function WhatsAppScreen({
         {saludoTemplate ? (
           <p
             className={cx(
-              "mt-3 rounded-[10px] px-3 py-2 text-[12px] leading-5",
+              "mt-2 rounded-[8px] px-2 py-1.5 text-[11px] leading-4",
               saludoTemplate.status.toUpperCase() === "APPROVED"
                 ? "bg-success-tint text-success"
                 : saludoTemplate.status.toUpperCase() === "REJECTED" ||
@@ -323,77 +327,74 @@ export function WhatsAppScreen({
             {saludoTemplate.language}) ·{" "}
             <span className="font-semibold uppercase">{saludoTemplate.status}</span>
             {saludoTemplate.status.toUpperCase() === "APPROVED"
-              ? " — ya puedes usarla en el Inbox fuera de ventana 24 h."
+              ? " — lista para Inbox fuera de 24 h."
               : saludoTemplate.status.toUpperCase() === "PENDING" ||
                   saludoTemplate.status.toUpperCase() === "IN_APPEAL"
-                ? " — Meta aún la revisa. Actualiza la lista en un rato."
+                ? " — Meta la revisa."
                 : saludoTemplate.rejectedReason
                   ? ` — ${saludoTemplate.rejectedReason}`
-                  : " — revisa el motivo o envía otra en ES."}
+                  : " — envía otra en ES."}
           </p>
         ) : (
-          <p className="mt-3 rounded-[10px] bg-warning-tint px-3 py-2 text-[12px] leading-5 text-warning">
-            Aún no hay un <span className="font-semibold">saludo_*</span> en esta WABA. Envía{" "}
-            <span className="font-semibold">saludo_compruki</span> en ES abajo (útil fuera de ventana
-            24 h).
+          <p className="mt-2 rounded-[8px] bg-warning-tint px-2 py-1.5 text-[11px] leading-4 text-warning">
+            Falta <span className="font-semibold">saludo_*</span>. Envía{" "}
+            <span className="font-semibold">saludo_compruki</span> en ES abajo.
           </p>
         )}
 
-        <form action={tplAction} className="mt-3 grid gap-2">
-          <div className="grid gap-2 sm:grid-cols-3">
-            <label className="grid gap-1 text-sm sm:col-span-1">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Nombre</span>
+        <form action={tplAction} className="mt-2 grid gap-1.5">
+          <div className="grid gap-1.5 sm:grid-cols-3">
+            <label className="grid gap-0.5">
+              <span className={labelCap}>Nombre</span>
               <input
                 name="name"
                 required
                 pattern="[a-z0-9_]{2,64}"
                 defaultValue="saludo_compruki"
                 placeholder="saludo_compruki"
-                className="rounded-[10px] border border-line bg-canvas px-3 py-2"
+                className={ctrl}
               />
             </label>
-            <label className="grid gap-1 text-sm">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Categoría</span>
-              <select name="category" defaultValue="UTILITY" className="rounded-[10px] border border-line bg-canvas px-3 py-2">
+            <label className="grid gap-0.5">
+              <span className={labelCap}>Categoría</span>
+              <select name="category" defaultValue="UTILITY" className={ctrl}>
                 <option value="UTILITY">UTILITY</option>
                 <option value="MARKETING">MARKETING</option>
               </select>
             </label>
-            <label className="grid gap-1 text-sm">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Idioma</span>
-              <select name="language" defaultValue="es" className="rounded-[10px] border border-line bg-canvas px-3 py-2">
+            <label className="grid gap-0.5">
+              <span className={labelCap}>Idioma</span>
+              <select name="language" defaultValue="es" className={ctrl}>
                 <option value="es">es</option>
                 <option value="es_CO">es_CO</option>
                 <option value="en_US">en_US</option>
               </select>
             </label>
           </div>
-          <label className="grid gap-1 text-sm">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Texto</span>
+          <label className="grid gap-0.5">
+            <span className={labelCap}>Texto</span>
             <textarea
               name="body"
               required
-              rows={3}
+              rows={2}
               value={draftBody}
               onChange={(event) => setDraftBody(event.target.value)}
-              className="rounded-[10px] border border-line bg-canvas px-3 py-2"
+              className={area}
             />
-            <span className="text-[11px] text-muted">
-              Variables {"{{1}}"}, {"{{2}}"}… no al inicio ni al final del texto.
+            <span className="text-[10px] text-muted">
+              Variables {"{{1}}"}… no al inicio ni al final.
             </span>
           </label>
           {draftPositions.length > 0 ? (
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-1.5 sm:grid-cols-2">
               {draftPositions.map((position) => (
-                <label key={position} className="grid gap-1 text-sm">
-                  <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
-                    Ejemplo {`{{${position}}}`}
-                  </span>
+                <label key={position} className="grid gap-0.5">
+                  <span className={labelCap}>Ejemplo {`{{${position}}}`}</span>
                   <input
                     name={`example_${position}`}
                     required
                     defaultValue={position === 1 ? "Leidy" : `Ejemplo ${position}`}
-                    className="rounded-[10px] border border-line bg-canvas px-3 py-2"
+                    className={ctrl}
                   />
                 </label>
               ))}
@@ -402,19 +403,19 @@ export function WhatsAppScreen({
           <button
             type="submit"
             disabled={tplBusy || !connection.env.ready || !connection.env.businessAccountId}
-            className="w-fit rounded-[10px] bg-ink px-3 py-2 text-sm font-semibold text-canvas disabled:opacity-50"
+            className={btnDark}
           >
-            {tplBusy ? "Enviando a Meta…" : "Enviar a aprobación"}
+            {tplBusy ? "Enviando…" : "Enviar a aprobación"}
           </button>
-          {tplState.error ? <p className="text-sm text-danger">{tplState.error}</p> : null}
-          {tplState.ok ? <p className="text-sm text-success">{tplState.ok}</p> : null}
-          {listState.ok ? <p className="text-sm text-success">{listState.ok}</p> : null}
+          {tplState.error ? <p className="text-[11px] text-danger">{tplState.error}</p> : null}
+          {tplState.ok ? <p className="text-[11px] text-success">{tplState.ok}</p> : null}
+          {listState.ok ? <p className="text-[11px] text-success">{listState.ok}</p> : null}
         </form>
 
         {sortedTemplates.length === 0 ? (
-          <p className="mt-3 text-sm text-muted">Aún no hay plantillas en esta cuenta (o falta WABA ID).</p>
+          <p className="mt-2 text-[11px] text-muted">Sin plantillas (o falta WABA ID).</p>
         ) : (
-          <ul className="mt-3 space-y-1.5">
+          <ul className="mt-2 max-h-48 space-y-1 overflow-y-auto">
             {sortedTemplates.map((item) => {
               const status = item.status.toUpperCase();
               const isEs = /^es(_|$)/i.test(item.language || "");
@@ -426,117 +427,111 @@ export function WhatsAppScreen({
                     ? "text-danger"
                     : "text-warning";
               return (
-              <li
-                key={`${item.name}-${item.language}-${item.status}`}
-                className={cx(
-                  "rounded-[10px] border px-3 py-2 text-sm",
-                  isSaludo || (isEs && status === "APPROVED")
-                    ? "border-accent/40 bg-accent-tint/20"
-                    : "border-line",
-                )}
-              >
-                <p className="font-semibold">
-                  {item.name} · {item.language}
-                  {isEs ? (
-                    <span className="ml-1 rounded-[4px] bg-subtle px-1 text-[9px] font-bold text-muted">
-                      ES
+                <li
+                  key={`${item.name}-${item.language}-${item.status}`}
+                  className={cx(
+                    "rounded-[6px] border px-2 py-1.5 text-[11px]",
+                    isSaludo || (isEs && status === "APPROVED")
+                      ? "border-accent/40 bg-accent-tint/20"
+                      : "border-line",
+                  )}
+                >
+                  <p className="font-semibold">
+                    {item.name} · {item.language}
+                    {isEs ? (
+                      <span className="ml-1 rounded-[4px] bg-subtle px-1 text-[9px] font-bold text-muted">
+                        ES
+                      </span>
+                    ) : null}
+                    <span className={cx("ml-1.5 text-[10px] font-bold uppercase", statusClassName)}>
+                      {item.status || "—"}
+                      {item.category ? ` · ${item.category}` : ""}
                     </span>
+                  </p>
+                  {item.body ? (
+                    <p className="mt-0.5 truncate text-[10px] text-muted" title={item.body}>
+                      {item.body}
+                    </p>
                   ) : null}
-                  <span
-                    className={cx(
-                      "ml-2 text-[11px] font-bold tracking-wide uppercase",
-                      statusClassName,
-                    )}
-                  >
-                    {item.status || "—"}
-                    {item.category ? ` · ${item.category}` : ""}
-                  </span>
-                </p>
-                {item.body ? <p className="mt-0.5 text-xs text-muted">{item.body}</p> : null}
-                {item.rejectedReason ? (
-                  <p className="mt-0.5 text-xs text-danger">{item.rejectedReason}</p>
-                ) : null}
-              </li>
+                  {item.rejectedReason ? (
+                    <p className="mt-0.5 text-[10px] text-danger">{item.rejectedReason}</p>
+                  ) : null}
+                </li>
               );
             })}
           </ul>
         )}
       </section>
 
-      <section
-        className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3"
-        aria-labelledby="wa-webhook"
-      >
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Webhook</p>
-        <h2 id="wa-webhook" className="mt-0.5 text-sm font-semibold">
-          URL para Meta Developer
-        </h2>
-        <p className="mt-1 text-xs leading-5 text-muted">
-          Meta entrega los mensajes a esta URL. Verify token ={" "}
-          <code className="text-ink">META_WA_VERIFY_TOKEN</code>. Campo:{" "}
-          <code className="text-ink">messages</code>.
-        </p>
-        <p className="mt-2 break-all rounded-[10px] border border-line bg-canvas px-3 py-2 text-sm font-semibold tabular-nums">
+      <section className={card} aria-labelledby="wa-webhook">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className={labelCap}>Webhook</p>
+            <h2 id="wa-webhook" className="mt-0.5 text-sm font-semibold">
+              URL Meta Developer
+            </h2>
+            <p className="mt-0.5 text-[11px] leading-4 text-muted">
+              Verify = <code className="text-ink">META_WA_VERIFY_TOKEN</code> · fields{" "}
+              <code className="text-ink">messages</code>
+            </p>
+          </div>
+        </div>
+        <p className="mt-1.5 break-all rounded-[6px] border border-line bg-canvas px-2 py-1.5 text-[11px] font-semibold tabular-nums">
           {webhookUrl}
         </p>
       </section>
 
-      <section
-        className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3"
-        aria-labelledby="wa-envio"
-      >
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Prueba</p>
+      <section className={card} aria-labelledby="wa-envio">
+        <p className={labelCap}>Prueba</p>
         <h2 id="wa-envio" className="mt-0.5 text-sm font-semibold">
           Enviar mensaje
         </h2>
-        <p className="mt-1 text-xs leading-5 text-muted">
-          Texto libre solo dentro de la ventana de 24 h (después de que el contacto te escriba).
-          Fuera de esa ventana usa una plantilla aprobada.
+        <p className="mt-0.5 text-[11px] leading-4 text-muted">
+          Texto solo en ventana 24 h; fuera de ella usa plantilla aprobada.
         </p>
 
-        <form action={sendAction} className="mt-3 grid gap-3">
-          <label className="grid gap-1 text-sm">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Celular</span>
-            <input
-              name="phone"
-              required
-              inputMode="tel"
-              placeholder="573001112233"
-              className="rounded-[10px] border border-line bg-canvas px-3 py-2"
-            />
-          </label>
-
-          <fieldset className="grid gap-2">
-            <legend className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Tipo</legend>
-            <label className="flex items-center gap-2 text-sm">
-              <input type="radio" name="mode" value="text" defaultChecked />
-              Texto (ventana 24 h)
+        <form action={sendAction} className="mt-2 grid gap-1.5">
+          <div className="grid gap-1.5 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <label className="grid gap-0.5">
+              <span className={labelCap}>Celular</span>
+              <input
+                name="phone"
+                required
+                inputMode="tel"
+                placeholder="573001112233"
+                className={ctrl}
+              />
             </label>
-            <label className="flex items-center gap-2 text-sm">
-              <input type="radio" name="mode" value="template" />
-              Plantilla aprobada
-            </label>
-          </fieldset>
+            <fieldset className="flex items-end gap-3 pb-0.5">
+              <legend className="sr-only">Tipo</legend>
+              <label className="flex items-center gap-1 text-[11px] font-semibold">
+                <input type="radio" name="mode" value="text" defaultChecked />
+                Texto
+              </label>
+              <label className="flex items-center gap-1 text-[11px] font-semibold">
+                <input type="radio" name="mode" value="template" />
+                Plantilla
+              </label>
+            </fieldset>
+          </div>
 
-          <label className="grid gap-1 text-sm">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Texto</span>
+          <label className="grid gap-0.5">
+            <span className={labelCap}>Texto</span>
             <textarea
               name="body"
-              rows={3}
+              rows={2}
               placeholder="Hola, te escribimos desde Compruki…"
-              className="rounded-[10px] border border-line bg-canvas px-3 py-2"
+              className={area}
             />
           </label>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <label className="grid gap-1 text-sm">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
-                Plantilla (nombre)
-              </span>
+          <div className="grid gap-1.5 sm:grid-cols-3">
+            <label className="grid gap-0.5 sm:col-span-1">
+              <span className={labelCap}>Plantilla</span>
               <input
                 name="templateName"
                 placeholder="hello_world"
-                className="rounded-[10px] border border-line bg-canvas px-3 py-2"
+                className={ctrl}
                 list="wa-templates"
               />
               <datalist id="wa-templates">
@@ -547,68 +542,53 @@ export function WhatsAppScreen({
                 ))}
               </datalist>
             </label>
-            <label className="grid gap-1 text-sm">
-              <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Idioma</span>
+            <label className="grid gap-0.5">
+              <span className={labelCap}>Idioma</span>
+              <input name="language" defaultValue="es" placeholder="es" className={ctrl} />
+            </label>
+            <label className="grid gap-0.5">
+              <span className={labelCap}>Vars |</span>
               <input
-                name="language"
-                defaultValue="es"
-                placeholder="es o en_US"
-                className="rounded-[10px] border border-line bg-canvas px-3 py-2"
+                name="templateValues"
+                placeholder="Juan|Pedido 1234"
+                className={ctrl}
               />
             </label>
           </div>
 
-          <label className="grid gap-1 text-sm">
-            <span className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
-              Variables plantilla (separadas por |)
-            </span>
-            <input
-              name="templateValues"
-              placeholder="Juan|Pedido 1234"
-              className="rounded-[10px] border border-line bg-canvas px-3 py-2"
-            />
-          </label>
-
-          <button
-            type="submit"
-            disabled={sending || !connection.env.ready}
-            className="w-fit rounded-[10px] bg-ink px-3 py-2 text-sm font-semibold text-canvas disabled:opacity-50"
-          >
+          <button type="submit" disabled={sending || !connection.env.ready} className={btnDark}>
             {sending ? "Enviando…" : "Enviar prueba"}
           </button>
         </form>
 
-        {feedbackError ? <p className="mt-3 text-sm text-danger">{feedbackError}</p> : null}
-        {feedbackOk ? <p className="mt-3 text-sm text-success">{feedbackOk}</p> : null}
+        {feedbackError ? <p className="mt-1.5 text-[11px] text-danger">{feedbackError}</p> : null}
+        {feedbackOk ? <p className="mt-1.5 text-[11px] text-success">{feedbackOk}</p> : null}
       </section>
 
-      <section
-        className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3"
-        aria-labelledby="wa-recientes"
-      >
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Actividad</p>
+      <section className={card} aria-labelledby="wa-recientes">
+        <p className={labelCap}>Actividad</p>
         <h2 id="wa-recientes" className="mt-0.5 text-sm font-semibold">
           Últimos mensajes
         </h2>
         {recent.length === 0 ? (
-          <p className="mt-2 text-sm text-muted">
-            Aún no hay mensajes. Cuando Meta entregue el webhook o envíes una prueba, aparecen aquí.
-          </p>
+          <p className="mt-1 text-[11px] text-muted">Aún no hay mensajes.</p>
         ) : (
-          <ul className="mt-3 space-y-2">
+          <ul className="mt-1.5 max-h-52 space-y-1 overflow-y-auto">
             {recent.map((msg) => (
-              <li key={msg.id} className="rounded-[10px] border border-line px-3 py-2 text-sm">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <li key={msg.id} className="rounded-[6px] border border-line px-2 py-1.5 text-[11px]">
+                <div className="flex flex-wrap items-baseline justify-between gap-1">
                   <p className="font-semibold">
-                    {msg.direction === "inbound" ? "Entrante" : "Saliente"} · {msg.phone}
+                    {msg.direction === "inbound" ? "↓" : "↑"} {msg.phone}
                     {msg.contactName ? ` · ${msg.contactName}` : ""}
                   </p>
-                  <p className="text-[11px] text-muted tabular-nums">
+                  <p className="text-[10px] text-muted tabular-nums">
                     {new Date(msg.createdAt).toLocaleString("es-CO")}
                   </p>
                 </div>
-                <p className="mt-1 text-muted">{msg.body}</p>
-                <p className="mt-1 text-[11px] text-muted">
+                <p className="mt-0.5 truncate text-muted" title={msg.body}>
+                  {msg.body}
+                </p>
+                <p className="mt-0.5 text-[10px] text-muted">
                   {msg.messageType} · {msg.deliveryStatus}
                   {msg.createdBy ? ` · ${msg.createdBy}` : ""}
                 </p>
@@ -618,30 +598,20 @@ export function WhatsAppScreen({
         )}
       </section>
 
-      <section
-        className="elevate-1 mt-3 rounded-[14px] border border-line bg-card px-3 py-3"
-        aria-labelledby="wa-alta"
-      >
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Alta Meta</p>
+      <section className={card} aria-labelledby="wa-alta">
+        <p className={labelCap}>Alta Meta</p>
         <h2 id="wa-alta" className="mt-0.5 text-sm font-semibold">
-          Número nuevo desde cero
+          Número nuevo
         </h2>
-        <ol className="mt-2 list-decimal space-y-2 pl-4 text-sm leading-5 text-muted">
-          <li>App Compruki en Meta Developers + producto WhatsApp con el número Business.</li>
+        <ol className="mt-1.5 list-decimal space-y-1 pl-4 text-[11px] leading-4 text-muted">
+          <li>App Compruki + WhatsApp Business con el número.</li>
+          <li>System user con Control total en WABA y cuenta de mensajería.</li>
           <li>
-            Usuario del sistema con acceso a la app, la cuenta de WhatsApp y la cuenta de
-            mensajería (Control total en ambas).
-          </li>
-          <li>
-            Token permanente con <code className="text-ink">whatsapp_business_messaging</code> y{" "}
+            Token con <code className="text-ink">whatsapp_business_messaging</code> y{" "}
             <code className="text-ink">whatsapp_business_management</code>.
           </li>
-          <li>
-            Railway: ACCESS_TOKEN, PHONE_NUMBER_ID, WABA_ID, VERIFY_TOKEN, APP_SECRET (y APP_ID).
-          </li>
-          <li>
-            Webhook = URL de arriba + el mismo verify token. «Verificar con Meta» y prueba en Inbox.
-          </li>
+          <li>Railway: TOKEN, PHONE_ID, WABA, VERIFY, APP_SECRET (+ APP_ID).</li>
+          <li>Webhook = URL de arriba · Verificar · prueba en Inbox.</li>
         </ol>
       </section>
     </div>
