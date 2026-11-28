@@ -146,6 +146,7 @@ export function InboxScreen({
   const [templateVarValues, setTemplateVarValues] = useState<Record<string, string>>({});
   const [nowTick, setNowTick] = useState(() => Date.now());
   const [phoneCopied, setPhoneCopied] = useState(false);
+  const [copiedMsgId, setCopiedMsgId] = useState<string | null>(null);
   const [arrivalNotice, setArrivalNotice] = useState<{
     id: string;
     name: string;
@@ -607,6 +608,7 @@ export function InboxScreen({
   useEffect(() => {
     setShowFailed(false);
     setPhoneCopied(false);
+    setCopiedMsgId(null);
   }, [activeId]);
 
   useEffect(() => {
@@ -681,6 +683,20 @@ export function InboxScreen({
       window.setTimeout(() => setPhoneCopied(false), 1600);
     } catch {
       setPhoneCopied(false);
+    }
+  }
+
+  async function copyMessageBody(messageId: string, body: string) {
+    const text = body.trim();
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedMsgId(messageId);
+      window.setTimeout(() => {
+        setCopiedMsgId((current) => (current === messageId ? null : current));
+      }, 1400);
+    } catch {
+      setCopiedMsgId(null);
     }
   }
 
@@ -1281,17 +1297,21 @@ export function InboxScreen({
                       msg.deliveryDetail,
                     );
                     const mediaLabel = inboxMediaLabel(msg.messageType);
+                    const copied = copiedMsgId === msg.id;
                     return (
-                      <div
+                      <button
+                        type="button"
                         key={msg.id}
                         className={cx(
-                          "max-w-[min(88%,26rem)] rounded-[10px] px-2.5 py-1.5 text-[13px] leading-snug",
+                          "block max-w-[min(88%,26rem)] rounded-[10px] px-2.5 py-1.5 text-left text-[13px] leading-snug",
                           msg.direction === "outbound"
                             ? failed
                               ? "ml-auto bg-[#7f1d1d] text-on-dark"
                               : "ml-auto bg-primary text-on-dark"
                             : "mr-auto bg-card text-ink shadow-[0_0_0_1px_var(--color-line)]",
                         )}
+                        title={copied ? "Copiado" : "Clic para copiar"}
+                        onClick={() => void copyMessageBody(msg.id, msg.body)}
                       >
                         {mediaLabel ? (
                           <p
@@ -1316,14 +1336,16 @@ export function InboxScreen({
                           )}
                         >
                           <span>
-                            {new Date(msg.createdAt).toLocaleString("es-CO", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                            {copied
+                              ? "Copiado"
+                              : new Date(msg.createdAt).toLocaleString("es-CO", {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
                           </span>
-                          {mark ? (
+                          {!copied && mark ? (
                             <span
                               className={cx("font-semibold tracking-tight", mark.className)}
                               title={mark.title}
@@ -1332,7 +1354,7 @@ export function InboxScreen({
                             </span>
                           ) : null}
                         </p>
-                      </div>
+                      </button>
                     );
                   })
                 )}
