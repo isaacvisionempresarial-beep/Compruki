@@ -161,6 +161,7 @@ export function InboxScreen({
   const prevUnreadRef = useRef<number | null>(null);
   const activeStampRef = useRef("");
   const prevActiveForStampRef = useRef<string | null>(null);
+  const openFromNoticeRef = useRef<(conversationId: string) => void>(() => undefined);
   const router = useRouter();
 
   useEffect(() => {
@@ -379,6 +380,7 @@ export function InboxScreen({
         desktop.onclick = () => {
           window.focus();
           desktop.close();
+          openFromNoticeRef.current(notice.id);
         };
       } catch {
         // Algunos navegadores bloquean Notification sin gesto previo.
@@ -505,6 +507,12 @@ export function InboxScreen({
     setFilter(replyFilter);
     openConversation(conversationId, { claimIfFree: true });
   }
+
+  openFromNoticeRef.current = (conversationId: string) => {
+    setArrivalNotice(null);
+    setFilter("awaiting");
+    openConversation(conversationId, { claimIfFree: true });
+  };
 
   function openNextReply() {
     if (!nextReply) return;
