@@ -369,6 +369,13 @@ export function InboxScreen({
     return awaitingQueue[(currentIndex + 1) % awaitingQueue.length] ?? null;
   }, [awaitingQueue, activeId]);
 
+  const prevAwaiting = useMemo(() => {
+    if (!awaitingQueue.length) return null;
+    const currentIndex = awaitingQueue.findIndex((item) => item.id === activeId);
+    if (currentIndex < 0) return awaitingQueue[awaitingQueue.length - 1] ?? null;
+    return awaitingQueue[(currentIndex - 1 + awaitingQueue.length) % awaitingQueue.length] ?? null;
+  }, [awaitingQueue, activeId]);
+
   function openConversation(conversationId: string) {
     const fd = new FormData();
     fd.set("conversationId", conversationId);
@@ -385,10 +392,19 @@ export function InboxScreen({
     });
   }
 
+  function openAwaiting(conversationId: string) {
+    setFilter("awaiting");
+    openConversation(conversationId);
+  }
+
   function openNextAwaiting() {
     if (!nextAwaiting) return;
-    setFilter("awaiting");
-    openConversation(nextAwaiting.id);
+    openAwaiting(nextAwaiting.id);
+  }
+
+  function openPrevAwaiting() {
+    if (!prevAwaiting) return;
+    openAwaiting(prevAwaiting.id);
   }
 
   useEffect(() => {
@@ -553,7 +569,9 @@ export function InboxScreen({
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
-      if (event.key !== "]" && event.code !== "BracketRight") return;
+      const goNext = event.key === "]" || event.code === "BracketRight";
+      const goPrev = event.key === "[" || event.code === "BracketLeft";
+      if (!goNext && !goPrev) return;
       const target = event.target as HTMLElement | null;
       if (target) {
         const tag = target.tagName;
@@ -561,14 +579,15 @@ export function InboxScreen({
           return;
         }
       }
-      if (!nextAwaiting) return;
+      const targetChat = goNext ? nextAwaiting : prevAwaiting;
+      if (!targetChat) return;
       event.preventDefault();
       setFilter("awaiting");
-      openConversation(nextAwaiting.id);
+      openConversation(targetChat.id);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [nextAwaiting, selectAction]);
+  }, [nextAwaiting, prevAwaiting, selectAction]);
 
   if (!tableReady) {
     return (
@@ -589,16 +608,27 @@ export function InboxScreen({
           <p className="text-xs text-muted">Meta · CRM · {roleLabel}</p>
         </div>
         <div className="flex items-center gap-1.5">
-          {nextAwaiting ? (
-            <button
-              type="button"
-              className={btnDark}
-              title="Siguiente chat por responder (tecla ])"
-              onClick={openNextAwaiting}
-            >
-              Sig. Resp.
-              {filterCounts.awaiting > 1 ? ` (${filterCounts.awaiting})` : ""}
-            </button>
+          {awaitingQueue.length > 0 ? (
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                className={btn}
+                title="Anterior por responder (tecla [)"
+                disabled={!prevAwaiting || awaitingQueue.length < 2}
+                onClick={openPrevAwaiting}
+              >
+                Ant.
+              </button>
+              <button
+                type="button"
+                className={btnDark}
+                title="Siguiente por responder (tecla ])"
+                onClick={openNextAwaiting}
+              >
+                Sig. Resp.
+                {filterCounts.awaiting > 1 ? ` (${filterCounts.awaiting})` : ""}
+              </button>
+            </div>
           ) : null}
           {notifyOffer ? (
             <button
