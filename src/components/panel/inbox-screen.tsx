@@ -354,6 +354,43 @@ export function InboxScreen({
 
   const busyQueue = filterCounts.awaiting > 0 || unreadTotal > 0;
 
+  const awaitingQueue = useMemo(
+    () =>
+      [...conversations]
+        .filter((item) => item.lastDirection === "inbound" && item.status !== "closed")
+        .sort((a, b) => (b.lastMessageAt || "").localeCompare(a.lastMessageAt || "")),
+    [conversations],
+  );
+
+  const nextAwaiting = useMemo(() => {
+    if (!awaitingQueue.length) return null;
+    const currentIndex = awaitingQueue.findIndex((item) => item.id === activeId);
+    if (currentIndex < 0) return awaitingQueue[0];
+    return awaitingQueue[(currentIndex + 1) % awaitingQueue.length] ?? null;
+  }, [awaitingQueue, activeId]);
+
+  function openConversation(conversationId: string) {
+    const fd = new FormData();
+    fd.set("conversationId", conversationId);
+    setBundle((prev) => ({
+      ...prev,
+      activeId: conversationId,
+      messages: prev.activeId === conversationId ? prev.messages : [],
+      conversations: prev.conversations.map((row) =>
+        row.id === conversationId ? { ...row, unreadCount: 0 } : row,
+      ),
+    }));
+    startTransition(() => {
+      selectAction(fd);
+    });
+  }
+
+  function openNextAwaiting() {
+    if (!nextAwaiting) return;
+    setFilter("awaiting");
+    openConversation(nextAwaiting.id);
+  }
+
   useEffect(() => {
     const refreshIfVisible = () => {
       if (document.visibilityState === "visible") router.refresh();
@@ -513,6 +550,26 @@ export function InboxScreen({
     }
   }
 
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.key !== "]" && event.code !== "BracketRight") return;
+      const target = event.target as HTMLElement | null;
+      if (target) {
+        const tag = target.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable) {
+          return;
+        }
+      }
+      if (!nextAwaiting) return;
+      event.preventDefault();
+      setFilter("awaiting");
+      openConversation(nextAwaiting.id);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [nextAwaiting, selectAction]);
+
   if (!tableReady) {
     return (
       <div className="mx-auto max-w-[900px] pb-6">
@@ -532,6 +589,17 @@ export function InboxScreen({
           <p className="text-xs text-muted">Meta · CRM · {roleLabel}</p>
         </div>
         <div className="flex items-center gap-1.5">
+          {nextAwaiting ? (
+            <button
+              type="button"
+              className={btnDark}
+              title="Siguiente chat por responder (tecla ])"
+              onClick={openNextAwaiting}
+            >
+              Sig. Resp.
+              {filterCounts.awaiting > 1 ? ` (${filterCounts.awaiting})` : ""}
+            </button>
+          ) : null}
           {notifyOffer ? (
             <button
               type="button"
