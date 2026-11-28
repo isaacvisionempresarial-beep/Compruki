@@ -16,6 +16,7 @@ import {
 import { cx } from "@/lib/cx";
 import { formatRelativeShort, formatWindowLeft } from "@/lib/format";
 import { orderFocusHref } from "@/lib/store-order";
+import { playInboxArrivalChime } from "@/lib/inbox-arrival-chime";
 import {
   fillInboxQuickReply,
   inboxMediaLabel,
@@ -353,6 +354,7 @@ export function InboxScreen({
       preview: candidate.lastMessagePreview || "Nuevo mensaje",
     };
     setArrivalNotice(notice);
+    playInboxArrivalChime();
     if (
       typeof window !== "undefined" &&
       "Notification" in window &&

@@ -71,31 +71,32 @@ function extractInboundBody(message: InboundMessage): { body: string; messageTyp
     return { body: `Reacción: ${emoji}`, messageType: "reaction" };
   }
   if (message.type === "image") {
+    const caption = message.image?.caption?.trim();
     return {
-      body: message.image?.caption?.trim() || "[Imagen recibida]",
+      body: caption ? `Imagen · ${caption}` : "Imagen",
       messageType: "image",
     };
   }
   if (message.type === "document") {
+    const caption = message.document?.caption?.trim();
+    const filename = message.document?.filename?.trim();
     return {
-      body:
-        message.document?.caption?.trim() ||
-        message.document?.filename?.trim() ||
-        "[Documento recibido]",
+      body: caption || filename || "Documento",
       messageType: "document",
     };
   }
   if (message.type === "video") {
+    const caption = message.video?.caption?.trim();
     return {
-      body: message.video?.caption?.trim() || "[Video recibido]",
+      body: caption ? `Video · ${caption}` : "Video",
       messageType: "video",
     };
   }
   if (message.type === "audio" || message.type === "voice") {
-    return { body: "[Nota de voz recibida]", messageType: "audio" };
+    return { body: "Nota de voz", messageType: "audio" };
   }
   if (message.type === "sticker") {
-    return { body: "[Sticker recibido]", messageType: "sticker" };
+    return { body: "Sticker", messageType: "sticker" };
   }
   return null;
 }
