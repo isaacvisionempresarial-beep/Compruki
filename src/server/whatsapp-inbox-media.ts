@@ -1,4 +1,6 @@
 import { createAdminSupabase } from "@/lib/supabase/admin";
+import { metaWaConfigured, requireMetaWaEnv } from "@/server/whatsapp/env";
+import { downloadWhatsAppMedia } from "@/server/whatsapp/meta-client";
 
 export const WHATSAPP_INBOX_MEDIA_BUCKET = "whatsapp-inbox-media";
 
@@ -44,5 +46,23 @@ export async function saveCachedInboxMedia(
     return true;
   } catch {
     return false;
+  }
+}
+
+/** Baja de Meta y guarda en cache (webhook / primer acceso). No lanza. */
+export async function prefetchInboxMediaFromMeta(
+  tenantId: string,
+  messageId: string,
+  mediaId: string,
+) {
+  if (!tenantId || !messageId || !mediaId.trim()) return;
+  if (!metaWaConfigured()) return;
+  const hit = await loadCachedInboxMedia(tenantId, messageId);
+  if (hit) return;
+  try {
+    const file = await downloadWhatsAppMedia(requireMetaWaEnv(), mediaId);
+    await saveCachedInboxMedia(tenantId, messageId, file.bytes, file.mimeType);
+  } catch {
+    // El proxy reintentará al abrir; no bloquea el webhook.
   }
 }

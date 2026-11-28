@@ -3,6 +3,7 @@ import {
   updateWhatsAppDelivery,
   upsertWhatsAppConnection,
 } from "@/server/whatsapp/connection";
+import { prefetchInboxMediaFromMeta } from "@/server/whatsapp-inbox-media";
 import { ensureLeadFromInbound } from "@/server/followups";
 import { getPilotTenantId } from "@/server/tenant";
 
@@ -186,7 +187,7 @@ export async function processWhatsAppWebhook(payload: WebhookPayload): Promise<{
         if (!extracted) continue;
         const contactName =
           value.contacts?.find((c) => c.wa_id === message.from)?.profile?.name?.trim() || "";
-        await insertWhatsAppMessage(tenantId, {
+        const rowId = await insertWhatsAppMessage(tenantId, {
           waMessageId: message.id,
           direction: "inbound",
           phone: message.from,
@@ -197,6 +198,10 @@ export async function processWhatsAppWebhook(payload: WebhookPayload): Promise<{
           // Sin migración: el media_id de Meta vive en delivery_detail.
           deliveryDetail: extracted.mediaId ? `media:${extracted.mediaId}` : "",
         });
+        if (rowId && extracted.mediaId) {
+          // No await: el webhook responde rápido; el cache corre en paralelo.
+          void prefetchInboxMediaFromMeta(tenantId, rowId, extracted.mediaId);
+        }
         await ensureLeadFromInbound({
           tenantId,
           phone: message.from,

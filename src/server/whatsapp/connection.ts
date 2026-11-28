@@ -269,7 +269,7 @@ export async function insertWhatsAppMessage(
     deliveryDetail?: string;
     createdBy?: string;
   },
-) {
+): Promise<string | null> {
   const supabase = createAdminSupabase();
   const isStatus = (input.messageType ?? "text") === "status";
   const conversationId = isStatus
@@ -301,6 +301,13 @@ export async function insertWhatsAppMessage(
   if (error && !/duplicate|unique/i.test(error.message)) {
     throw new Error(error.message);
   }
+  const { data } = await supabase
+    .from("whatsapp_messages")
+    .select("id")
+    .eq("tenant_id", tenantId)
+    .eq("wa_message_id", input.waMessageId)
+    .maybeSingle();
+  return data?.id ? String(data.id) : null;
 }
 
 const DELIVERY_RANK: Record<string, number> = {
