@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CrmContact } from "@/lib/crm-contacts";
 import { FOLLOWUP_OPEN_STAGES, groupFollowupsByStage } from "@/lib/crm-pipeline";
 import { cx } from "@/lib/cx";
@@ -25,11 +25,11 @@ export type CrmAssignee = { userId: string; name: string };
 type BoardFilter = "all" | "mine" | "overdue" | "high";
 
 const ctrl =
-  "h-8 w-full rounded-[8px] border border-line bg-canvas px-2 text-xs text-ink outline-none focus:border-ink";
+  "h-7 w-full rounded-[6px] border border-line bg-canvas px-1.5 text-[11px] text-ink outline-none focus:border-ink";
 const btn =
-  "inline-flex h-8 shrink-0 items-center justify-center rounded-[8px] border border-line bg-card px-2 text-xs font-semibold text-ink hover:bg-subtle disabled:opacity-50";
+  "inline-flex h-7 shrink-0 items-center justify-center rounded-[6px] border border-line bg-card px-2 text-[11px] font-semibold text-ink hover:bg-subtle disabled:opacity-50";
 const btnPrimary =
-  "inline-flex h-8 shrink-0 items-center justify-center rounded-[8px] bg-primary px-2.5 text-xs font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-50";
+  "inline-flex h-7 shrink-0 items-center justify-center rounded-[6px] bg-primary px-2 text-[11px] font-semibold text-on-dark hover:bg-primary-soft disabled:opacity-50";
 
 export function CustomersScreen({
   accounts = [],
@@ -66,6 +66,16 @@ export function CustomersScreen({
   const today = new Date().toISOString().slice(0, 10);
   const panelQuery = usePanelQuery().trim().toLocaleLowerCase("es");
   const panelDigits = panelQuery.replace(/\D/g, "");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (boardFilter === "all") url.searchParams.delete("f");
+    else url.searchParams.set("f", boardFilter);
+    const next = `${url.pathname}${url.search}${url.hash}`;
+    const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (next !== current) window.history.replaceState(null, "", next);
+  }, [boardFilter]);
 
   const matchesPanelQuery = (phone: string, name: string) => {
     if (!panelQuery) return true;
@@ -109,104 +119,92 @@ export function CustomersScreen({
     userId ? assignees.find((item) => item.userId === userId)?.name || "Asignado" : "Libre";
 
   return (
-    <div className="mx-auto max-w-[1600px] pb-8">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div>
+    <div className="mx-auto max-w-[1600px] pb-6">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="min-w-0">
           <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Operación</p>
-          <h1 className="mt-0.5 text-[22px] leading-7 font-extrabold tracking-tight">CRM · Pipeline</h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted">
-            Lead → Postventa · {openTasks.length} abiertos ·{" "}
+          <h1 className="mt-0.5 text-xl leading-6 font-extrabold tracking-tight">CRM · Pipeline</h1>
+          <p className="mt-0.5 text-[11px] text-muted">
+            {openTasks.length} abiertos · Lead → Postventa ·{" "}
             <Link href="/panel/inbox" className="font-semibold text-accent-strong hover:underline">
               Inbox
             </Link>
           </p>
         </div>
+        <div className="flex flex-wrap gap-1" role="tablist" aria-label="Filtro del tablero">
+          {(
+            [
+              ["all", "Todos", filterCounts.all],
+              ["mine", "Míos", filterCounts.mine],
+              ["overdue", "Venc.", filterCounts.overdue],
+              ["high", "Alta", filterCounts.high],
+            ] as const
+          ).map(([id, label, count]) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={boardFilter === id}
+              onClick={() => setBoardFilter(id)}
+              className={cx(
+                "inline-flex h-7 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold",
+                boardFilter === id ? "bg-ink text-canvas" : "bg-subtle text-muted hover:text-ink",
+              )}
+            >
+              {label}
+              <span className="tabular-nums opacity-80">{count}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {!tableReady ? (
-        <p role="status" className="mt-3 rounded-[10px] bg-warning-tint px-3 py-2 text-sm text-warning">
+        <p role="status" className="mt-2 rounded-[8px] bg-warning-tint px-2 py-1.5 text-[11px] text-warning">
           Falta followup_tasks (013).
         </p>
       ) : null}
       {tableReady && !pipelineReady ? (
-        <p role="status" className="mt-3 rounded-[10px] bg-warning-tint px-3 py-2 text-sm text-warning">
+        <p role="status" className="mt-2 rounded-[8px] bg-warning-tint px-2 py-1.5 text-[11px] text-warning">
           Falta stage (014 / 021).
         </p>
       ) : null}
       {tableReady && pipelineReady && !crmProReady ? (
-        <p role="status" className="mt-3 rounded-[10px] bg-warning-tint px-3 py-2 text-sm text-warning">
-          Para responsable y vencimiento corre <code className="text-ink">022_crm_pipeline_pro.sql</code>.
+        <p role="status" className="mt-2 rounded-[8px] bg-warning-tint px-2 py-1.5 text-[11px] text-warning">
+          Para responsable/vencimiento: <code className="text-ink">022_crm_pipeline_pro.sql</code>.
         </p>
       ) : null}
-      {flash ? <p className="mt-3 text-sm font-medium text-accent-strong">{flash}</p> : null}
-      {error ? <p className="mt-3 text-sm font-medium text-danger">{error}</p> : null}
-      {policyError ? <p className="mt-3 text-sm font-medium text-danger">{policyError}</p> : null}
+      {flash ? <p className="mt-2 text-[11px] font-medium text-accent-strong">{flash}</p> : null}
+      {error ? <p className="mt-2 text-[11px] font-medium text-danger">{error}</p> : null}
+      {policyError ? <p className="mt-2 text-[11px] font-medium text-danger">{policyError}</p> : null}
 
-      {/* Pipeline primero */}
-      <section className="mt-4" aria-labelledby="pipeline">
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <div>
-            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Pipeline</p>
-            <h2 id="pipeline" className="mt-0.5 text-base font-bold">
-              Tablero de seguimientos
-            </h2>
-            <p className="mt-0.5 text-xs text-muted">
-              Un mensaje nuevo en WhatsApp crea Lead si no había seguimiento. Mover etapa sincroniza Inbox.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-1" role="tablist" aria-label="Filtro del tablero">
-            {(
-              [
-                ["all", "Todos", filterCounts.all],
-                ["mine", "Míos", filterCounts.mine],
-                ["overdue", "Vencidos", filterCounts.overdue],
-                ["high", "Alta", filterCounts.high],
-              ] as const
-            ).map(([id, label, count]) => (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-selected={boardFilter === id}
-                onClick={() => setBoardFilter(id)}
-                className={cx(
-                  "inline-flex h-8 items-center gap-1 rounded-[8px] border px-2.5 text-xs font-semibold",
-                  boardFilter === id
-                    ? "border-ink bg-ink text-canvas"
-                    : "border-line bg-card text-ink hover:bg-subtle",
-                )}
-              >
-                {label}
-                <span className="tabular-nums opacity-80">{count}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+      <section className="mt-3" aria-labelledby="pipeline">
+        <h2 id="pipeline" className="sr-only">
+          Tablero de seguimientos
+        </h2>
 
         {openTasks.length === 0 ? (
-          <div className="elevate-1 mt-3 rounded-[12px] border border-line bg-card px-4 py-3">
-            <p className="text-sm text-muted">Sin abiertos. Escribe por WhatsApp o crea uno desde un contacto.</p>
+          <div className="elevate-1 rounded-[10px] border border-line bg-card px-3 py-2">
+            <p className="text-[11px] text-muted">Sin abiertos. Escribe por WhatsApp o crea uno abajo.</p>
           </div>
         ) : filteredTasks.length === 0 ? (
-          <div className="elevate-1 mt-3 rounded-[12px] border border-line bg-card px-4 py-3">
-            <p className="text-sm text-muted">Nada en este filtro.</p>
+          <div className="elevate-1 rounded-[10px] border border-line bg-card px-3 py-2">
+            <p className="text-[11px] text-muted">Nada en este filtro.</p>
           </div>
         ) : (
-          <div className="mt-3 -mx-1 overflow-x-auto pb-2">
-            <div className="flex min-w-max gap-2 px-1">
+          <div className="-mx-1 overflow-x-auto pb-1">
+            <div className="flex min-w-max gap-1.5 px-1">
               {FOLLOWUP_OPEN_STAGES.map((stage) => (
                 <div
                   key={stage.id}
-                  className="elevate-1 flex w-[220px] shrink-0 flex-col rounded-[12px] border border-line bg-card"
+                  className="elevate-1 flex w-[200px] shrink-0 flex-col rounded-[10px] border border-line bg-card"
                 >
-                  <div className="border-b border-line px-2.5 py-2">
+                  <div className="border-b border-line px-2 py-1.5">
                     <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
                       {stage.label}
                       <span className="ml-1 tabular-nums text-ink">{byStage[stage.id].length}</span>
                     </p>
-                    <p className="mt-0.5 truncate text-[10px] text-muted">{stage.hint}</p>
                   </div>
-                  <ul className="max-h-[min(62vh,34rem)] space-y-1.5 overflow-y-auto p-2">
+                  <ul className="max-h-[min(64vh,36rem)] space-y-1 overflow-y-auto p-1.5">
                     {byStage[stage.id].length === 0 ? (
                       <li className="px-1 py-2 text-[11px] text-muted">Vacío</li>
                     ) : (
@@ -229,16 +227,20 @@ export function CustomersScreen({
         )}
       </section>
 
-      <section className="mt-6" aria-labelledby="prioridad">
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">AG-07</p>
-        <h2 id="prioridad" className="mt-0.5 text-base font-bold">
-          Priorizar
-        </h2>
-        <form action={prioritizeFollowupsAction} className="mt-2">
-          <button type="submit" disabled={!ag07Enabled} className={btnPrimary}>
-            Priorizar contactos
-          </button>
-        </form>
+      <section className="mt-4" aria-labelledby="prioridad">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">AG-07</p>
+            <h2 id="prioridad" className="mt-0.5 text-sm font-bold">
+              Priorizar
+            </h2>
+          </div>
+          <form action={prioritizeFollowupsAction}>
+            <button type="submit" disabled={!ag07Enabled} className={btnPrimary}>
+              Priorizar
+            </button>
+          </form>
+        </div>
         {priority ? (
           <div className="elevate-1 mt-3 rounded-[12px] border border-line bg-card px-3 py-3">
             <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">
@@ -286,27 +288,27 @@ export function CustomersScreen({
         ) : null}
       </section>
 
-      <section className="mt-6" aria-labelledby="contactos">
+      <section className="mt-4" aria-labelledby="contactos">
         <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Agenda</p>
-        <h2 id="contactos" className="mt-0.5 text-base font-bold">
+        <h2 id="contactos" className="mt-0.5 text-sm font-bold">
           Contactos de pedidos
         </h2>
         {contacts.length === 0 ? (
-          <p className="mt-2 text-sm text-muted">Aún no hay pedidos con teléfono.</p>
+          <p className="mt-1.5 text-[11px] text-muted">Aún no hay pedidos con teléfono.</p>
         ) : visibleContacts.length === 0 ? (
-          <p className="mt-2 text-sm text-muted">Ningún contacto coincide con la búsqueda.</p>
+          <p className="mt-1.5 text-[11px] text-muted">Ningún contacto coincide con la búsqueda.</p>
         ) : (
-          <ul className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+          <ul className="mt-2 grid gap-1.5 md:grid-cols-2 xl:grid-cols-3">
             {visibleContacts.map((contact) => (
-              <li key={contact.phone} className="elevate-1 rounded-[12px] border border-line bg-card px-3 py-2.5">
-                <p className="text-sm font-semibold">{contact.customerName}</p>
-                <p className="mt-0.5 text-[11px] text-muted">
+              <li key={contact.phone} className="elevate-1 rounded-[10px] border border-line bg-card px-2.5 py-2">
+                <p className="text-[13px] font-semibold">{contact.customerName}</p>
+                <p className="mt-0.5 text-[10px] text-muted">
                   {contact.phone}
-                  {contact.openFollowups > 0 ? ` · ${contact.openFollowups} abierto(s)` : ""}
+                  {contact.openFollowups > 0 ? ` · ${contact.openFollowups} ab.` : ""}
                   {" · "}
                   {contact.latestOrderNumber}
                 </p>
-                <form action={createFollowupAction} className="mt-2 space-y-1.5">
+                <form action={createFollowupAction} className="mt-1.5 space-y-1">
                   <input type="hidden" name="phone" value={contact.phone} />
                   <input type="hidden" name="customerName" value={contact.customerName} />
                   <input type="hidden" name="orderNumber" value={contact.latestOrderNumber} />
@@ -431,18 +433,18 @@ function PipelineCard({
 }) {
   const due = dueLabel(task.dueAt);
   return (
-    <li className="rounded-[10px] border border-line bg-canvas px-2 py-1.5">
-      <div className="flex items-start gap-1.5">
-        <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${priorityDot(task.priority)}`} />
+    <li className="rounded-[8px] border border-line bg-canvas px-1.5 py-1.5">
+      <div className="flex items-start gap-1">
+        <span className={`mt-1 h-1.5 w-1.5 shrink-0 rounded-full ${priorityDot(task.priority)}`} />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[13px] font-semibold text-ink">
+          <p className="truncate text-[12px] font-semibold text-ink">
             {task.customerName || "Sin nombre"}
             {task.orderNumber ? (
               <span className="font-normal text-muted"> · {task.orderNumber}</span>
             ) : null}
           </p>
-          <p className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-muted">{task.note || "—"}</p>
-          <p className="mt-0.5 text-[10px] text-muted">
+          <p className="mt-0.5 line-clamp-2 text-[10px] leading-tight text-muted">{task.note || "—"}</p>
+          <p className="mt-0.5 text-[9px] text-muted">
             {assigneeLabel}
             {due ? (
               <span className={due.overdue ? " text-danger font-semibold" : ""}>
@@ -455,54 +457,65 @@ function PipelineCard({
       </div>
 
       {pipelineReady ? (
-        <form action={moveFollowupStageAction} className="mt-1.5 flex gap-1">
+        <form action={moveFollowupStageAction} className="mt-1">
           <input type="hidden" name="id" value={task.id} />
-          <select name="stage" defaultValue={task.stage} className={ctrl} aria-label="Etapa">
+          <select
+            name="stage"
+            defaultValue={task.stage}
+            className={ctrl}
+            aria-label="Etapa"
+            title="Cambia etapa (sincroniza Inbox)"
+            onChange={(event) => event.currentTarget.form?.requestSubmit()}
+          >
             {FOLLOWUP_OPEN_STAGES.map((stage) => (
               <option key={stage.id} value={stage.id}>
                 {stage.label}
               </option>
             ))}
           </select>
-          <button type="submit" className={btn} title="Mueve etapa y sincroniza Inbox">
-            →
-          </button>
         </form>
       ) : null}
 
       {crmProReady ? (
         <form action={updateFollowupMetaAction} className="mt-1 space-y-1">
           <input type="hidden" name="id" value={task.id} />
-          <div className="grid grid-cols-[1fr_auto] gap-1">
-            <select name="assignedTo" defaultValue={task.assignedTo} className={ctrl}>
-              <option value="">Sin asignar</option>
-              {assignees.map((person) => (
-                <option key={person.userId} value={person.userId}>
-                  {person.name}
-                </option>
-              ))}
-            </select>
-            <select name="priority" defaultValue={task.priority} className={ctrl} title="Prioridad">
+          <select
+            name="assignedTo"
+            defaultValue={task.assignedTo}
+            className={ctrl}
+            onChange={(event) => event.currentTarget.form?.requestSubmit()}
+          >
+            <option value="">Sin asignar</option>
+            {assignees.map((person) => (
+              <option key={person.userId} value={person.userId}>
+                {person.name}
+              </option>
+            ))}
+          </select>
+          <div className="grid grid-cols-2 gap-1">
+            <select
+              name="priority"
+              defaultValue={task.priority}
+              className={ctrl}
+              title="Prioridad"
+              onChange={(event) => event.currentTarget.form?.requestSubmit()}
+            >
               <option value="low">Baja</option>
               <option value="normal">Normal</option>
               <option value="high">Alta</option>
             </select>
-          </div>
-          <div className="flex gap-1">
             <input
               type="date"
               name="dueAt"
               defaultValue={task.dueAt ? task.dueAt.slice(0, 10) : ""}
               className={ctrl}
+              onChange={(event) => event.currentTarget.form?.requestSubmit()}
             />
-            <button type="submit" className={btn}>
-              OK
-            </button>
           </div>
         </form>
       ) : null}
 
-      <div className="mt-1.5 flex flex-wrap gap-1">
+      <div className="mt-1 flex flex-wrap gap-1">
         <form action={resolveFollowupAction}>
           <input type="hidden" name="id" value={task.id} />
           <input type="hidden" name="status" value="done" />
@@ -513,7 +526,7 @@ function PipelineCard({
         <form action={resolveFollowupAction}>
           <input type="hidden" name="id" value={task.id} />
           <input type="hidden" name="status" value="dismissed" />
-          <button type="submit" className={btn}>
+          <button type="submit" className={btn} aria-label="Descartar">
             ×
           </button>
         </form>
