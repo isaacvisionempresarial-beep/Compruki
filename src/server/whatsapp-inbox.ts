@@ -11,7 +11,12 @@ import {
   upsertWhatsAppConversation,
 } from "@/server/whatsapp/connection";
 import { requireMetaWaEnv, metaWaConfigured } from "@/server/whatsapp/env";
-import { sendWhatsAppTemplate, sendWhatsAppText, MetaApiError } from "@/server/whatsapp/meta-client";
+import {
+  markWhatsAppInboundRead,
+  sendWhatsAppTemplate,
+  sendWhatsAppText,
+  MetaApiError,
+} from "@/server/whatsapp/meta-client";
 
 export { mediaIdFromDetail } from "@/lib/whatsapp-media";
 
@@ -225,6 +230,17 @@ export async function markConversationRead(tenantId: string, conversationId: str
     .update({ unread_count: 0, updated_at: new Date().toISOString() })
     .eq("tenant_id", tenantId)
     .eq("id", conversationId);
+
+  if (!metaWaConfigured()) return;
+  try {
+    const messages = await listInboxMessages(tenantId, conversationId, 40);
+    const lastInbound = [...messages].reverse().find((msg) => msg.direction === "inbound");
+    const waId = lastInbound?.waMessageId?.trim() || "";
+    if (!waId || waId.startsWith("local:") || !waId.startsWith("wamid")) return;
+    await markWhatsAppInboundRead(requireMetaWaEnv(), waId);
+  } catch {
+    // El leído local ya quedó; Meta puede fallar sin bloquear el Inbox.
+  }
 }
 
 export async function markAllInboxRead(tenantId: string): Promise<number> {
