@@ -181,92 +181,98 @@ export function WhatsAppScreen({
       </p>
 
       <section
-        className="elevate-1 mt-5 rounded-[14px] border border-line bg-card px-3 py-3"
+        className="elevate-1 mt-4 rounded-[12px] border border-line bg-card px-2.5 py-2"
         aria-labelledby="wa-estado"
       >
-        <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
-        <h2 id="wa-estado" className={cx("mt-0.5 text-sm font-semibold", statusClass(connection.status))}>
-          {statusLabel(connection.status)}
-        </h2>
-        <p className="mt-1 text-xs leading-5 text-muted">{connection.detail || "—"}</p>
-        {connection.lastError && !isSoftWaWarning(connection.lastError) ? (
-          <p className="mt-1 text-xs leading-5 text-danger">{connection.lastError}</p>
-        ) : null}
-        {connection.status === "verificada" && connection.lastInboundAt ? (
-          <p className="mt-1 text-xs leading-5 text-success">
-            Entrantes y salientes listos. Usa el Inbox para atender chats.
-          </p>
-        ) : null}
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Estado</p>
+            <h2
+              id="wa-estado"
+              className={cx("mt-0.5 text-sm font-semibold", statusClass(connection.status))}
+            >
+              {statusLabel(connection.status)}
+              {connection.status === "verificada" && connection.lastInboundAt ? (
+                <span className="ml-1.5 text-[11px] font-semibold text-success">
+                  · listo para Inbox
+                </span>
+              ) : null}
+            </h2>
+            <p className="mt-0.5 truncate text-[11px] leading-4 text-muted">
+              {connection.detail || "—"}
+            </p>
+            {connection.lastError && !isSoftWaWarning(connection.lastError) ? (
+              <p className="mt-0.5 text-[11px] leading-4 text-danger">{connection.lastError}</p>
+            ) : null}
+          </div>
+          <form action={verifyAction}>
+            <button
+              type="submit"
+              disabled={verifying || !connection.env.ready}
+              className="inline-flex h-7 items-center rounded-[6px] bg-ink px-2.5 text-[11px] font-semibold text-canvas disabled:opacity-50"
+            >
+              {verifying ? "Verificando…" : "Verificar"}
+            </button>
+          </form>
+        </div>
 
-        <dl className="mt-3 grid gap-2 sm:grid-cols-2 text-sm">
-          <div className="rounded-[10px] border border-line px-3 py-2">
-            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Número</dt>
-            <dd className="mt-0.5 font-semibold tabular-nums">
-              {connection.displayPhoneNumber || "Pendiente de verificación"}
-            </dd>
-          </div>
-          <div className="rounded-[10px] border border-line px-3 py-2">
-            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Nombre verificado</dt>
-            <dd className="mt-0.5 font-semibold">{connection.verifiedName || "—"}</dd>
-          </div>
-          <div className="rounded-[10px] border border-line px-3 py-2">
-            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Último webhook / check</dt>
-            <dd className="mt-0.5 font-semibold tabular-nums">
-              {connection.lastCheckedAt
-                ? new Date(connection.lastCheckedAt).toLocaleString("es-CO")
-                : "Aún no llega ningún POST de Meta"}
-            </dd>
-          </div>
-          <div className="rounded-[10px] border border-line px-3 py-2">
-            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Último entrante</dt>
-            <dd className="mt-0.5 font-semibold tabular-nums">
-              {connection.lastInboundAt
-                ? new Date(connection.lastInboundAt).toLocaleString("es-CO")
-                : "Ninguno (escribe un hola al número de Compruki)"}
-            </dd>
-          </div>
-          <div className="rounded-[10px] border border-line px-3 py-2">
-            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Phone Number ID</dt>
-            <dd className="mt-0.5 font-semibold break-all tabular-nums">
-              {connection.phoneNumberId || "—"}
-            </dd>
-          </div>
-          <div className="rounded-[10px] border border-line px-3 py-2">
-            <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">Calidad</dt>
-            <dd className="mt-0.5 font-semibold">{connection.qualityRating || "—"}</dd>
-          </div>
-        </dl>
-
-        <dl className="mt-3 grid gap-2 sm:grid-cols-3 text-xs">
+        <dl className="mt-2 grid gap-x-4 gap-y-1 sm:grid-cols-2">
           {(
             [
-              ["Token", connection.env.accessToken],
-              ["Phone Number ID", connection.env.phoneNumberId],
-              ["Verify token", connection.env.verifyToken],
-              ["App secret", connection.env.appSecret],
-              ["WABA ID", connection.env.businessAccountId],
-              ["App ID", connection.env.appId],
-              ["Graph", true],
+              ["Número", connection.displayPhoneNumber || "Pendiente de verificación"],
+              ["Nombre", connection.verifiedName || "—"],
+              [
+                "Webhook",
+                connection.lastCheckedAt
+                  ? new Date(connection.lastCheckedAt).toLocaleString("es-CO")
+                  : "Sin POST aún",
+              ],
+              [
+                "Entrante",
+                connection.lastInboundAt
+                  ? new Date(connection.lastInboundAt).toLocaleString("es-CO")
+                  : "Ninguno",
+              ],
+              ["Phone ID", connection.phoneNumberId || "—"],
+              ["Calidad", connection.qualityRating || "—"],
             ] as const
-          ).map(([label, ok]) => (
-            <div key={label} className="rounded-[10px] border border-line px-3 py-2">
-              <dt className="text-[10px] font-bold tracking-[0.08em] text-muted uppercase">{label}</dt>
-              <dd className={cx("mt-0.5 font-semibold", label === "Graph" ? "text-ink" : ok ? "text-success" : "text-danger")}>
-                {label === "Graph" ? connection.env.graphVersion : ok ? "OK" : "Falta"}
+          ).map(([label, value]) => (
+            <div key={label} className="flex min-w-0 items-baseline gap-1.5 text-[11px]">
+              <dt className="shrink-0 font-semibold text-muted">{label}</dt>
+              <dd className="min-w-0 truncate font-semibold text-ink tabular-nums" title={value}>
+                {value}
               </dd>
             </div>
           ))}
         </dl>
 
-        <form action={verifyAction} className="mt-3">
-          <button
-            type="submit"
-            disabled={verifying || !connection.env.ready}
-            className="rounded-[10px] bg-ink px-3 py-2 text-sm font-semibold text-canvas disabled:opacity-50"
-          >
-            {verifying ? "Verificando…" : "Verificar con Meta"}
-          </button>
-        </form>
+        <div className="mt-2 flex flex-wrap gap-1" aria-label="Variables de entorno">
+          {(
+            [
+              ["Token", connection.env.accessToken],
+              ["Phone ID", connection.env.phoneNumberId],
+              ["Verify", connection.env.verifyToken],
+              ["Secret", connection.env.appSecret],
+              ["WABA", connection.env.businessAccountId],
+              ["App", connection.env.appId],
+            ] as const
+          ).map(([label, ok]) => (
+            <span
+              key={label}
+              className={cx(
+                "inline-flex h-6 items-center rounded-[5px] border px-1.5 text-[10px] font-semibold",
+                ok
+                  ? "border-success/30 bg-success-tint text-success"
+                  : "border-danger/30 bg-danger-tint text-danger",
+              )}
+            >
+              {label} {ok ? "OK" : "Falta"}
+            </span>
+          ))}
+          <span className="inline-flex h-6 items-center rounded-[5px] border border-line bg-subtle px-1.5 text-[10px] font-semibold text-ink">
+            Graph {connection.env.graphVersion}
+          </span>
+        </div>
       </section>
 
       <section
